@@ -3,15 +3,7 @@
  * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
  */
 
-export const Colors = {
-  text: "#fff",
-  background: "#fff",
-  tint: "#0a7ea4",
-  icon: "#687076",
-  tabIconDefault: "#687076",
-  tabIconSelected: "#0a7ea4",
-  menuInactiveColor: "#9DB2CE",
-  white: "#fff",
-  backgroundGradientColor: ["#521CB152", "#521CB100"],
-  secondaryBackground: "rgba(21, 9, 34, 1)",
+export const Images = {
+  logo: require("@/assets/images/3d-logo.png"),
+  backgroundImage: require("@/assets/images/background.png"),
 };
