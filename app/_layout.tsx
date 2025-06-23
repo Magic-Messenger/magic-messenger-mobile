@@ -1,9 +1,10 @@
 import { useFonts } from "expo-font";
+import { Image } from "expo-image";
 import { StatusBar } from "expo-status-bar";
 import { ImageBackground, StyleSheet } from "react-native";
 import "react-native-reanimated";
 
-import { Images } from "@/constants";
+import { Colors, Images } from "@/constants";
 import { LinearGradient } from "expo-linear-gradient";
 import { Stack } from "expo-router";
 
@@ -28,7 +29,16 @@ export default function RootLayout() {
       />
       <Stack
         screenOptions={{
+          headerTransparent: true,
+          headerTintColor: Colors.white,
           contentStyle: { backgroundColor: "transparent" },
+          headerTitle: () => (
+            <Image
+              source={Images.logo}
+              contentFit="contain"
+              style={styles.headerImage}
+            />
+          ),
         }}
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -52,5 +62,9 @@ const styles = StyleSheet.create({
     right: 0,
     opacity: 0.1,
     height: "60%",
+  },
+  headerImage: {
+    width: 105,
+    height: 30,
   },
 });
