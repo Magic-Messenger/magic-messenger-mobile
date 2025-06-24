@@ -1,11 +1,10 @@
 import { useFonts } from "expo-font";
 import { Image } from "expo-image";
 import { StatusBar } from "expo-status-bar";
-import { ImageBackground, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import "react-native-reanimated";
 
 import { Colors, Images } from "@/constants";
-import { LinearGradient } from "expo-linear-gradient";
 import { Stack } from "expo-router";
 
 export default function RootLayout() {
@@ -18,20 +17,14 @@ export default function RootLayout() {
   }
 
   return (
-    <LinearGradient
-      colors={["rgba(23, 7, 50, 1)", "rgba(1, 1, 3, 1)"]}
-      style={styles.container}
-    >
-      <ImageBackground
-        source={Images.backgroundImage}
-        style={styles.imageBackground}
-        resizeMode="cover"
-      />
+    <>
       <Stack
         screenOptions={{
           headerTransparent: true,
           headerTintColor: Colors.white,
-          contentStyle: { backgroundColor: "transparent" },
+          contentStyle: {
+            backgroundColor: "transparent",
+          },
           headerTitle: () => (
             <Image
               source={Images.logo}
@@ -45,24 +38,11 @@ export default function RootLayout() {
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="light" />
-    </LinearGradient>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    position: "relative",
-  },
-  imageBackground: {
-    position: "absolute",
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    opacity: 0.1,
-    height: "60%",
-  },
   headerImage: {
     width: 105,
     height: 30,

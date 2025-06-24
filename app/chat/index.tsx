@@ -1,10 +1,9 @@
-import { ThemedText } from "@/components/ThemedText";
+import { AppLayout, ThemedText } from "@/components";
 import { View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ChatScreen() {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <AppLayout>
       <View
         style={{
           flex: 1,
@@ -14,6 +13,6 @@ export default function ChatScreen() {
       >
         <ThemedText type="title">Chat Page !</ThemedText>
       </View>
-    </SafeAreaView>
+    </AppLayout>
   );
 }

@@ -1,11 +1,10 @@
-import { ThemedText } from "@/components/ThemedText";
+import { AppLayout, ThemedText } from "@/components";
 import { router } from "expo-router";
 import { Button, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <AppLayout>
       <View
         style={{
           flex: 1,
@@ -13,12 +12,9 @@ export default function HomeScreen() {
           justifyContent: "center",
         }}
       >
-        <Button
-          title="Chat Screen"
-          onPress={() => router.push("/screens/chat")}
-        />
+        <Button title="Chat Screen" onPress={() => router.push("/chat")} />
         <ThemedText type="title">Home Page !</ThemedText>
       </View>
-    </SafeAreaView>
+    </AppLayout>
   );
 }
