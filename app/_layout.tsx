@@ -5,6 +5,7 @@ import { StyleSheet } from "react-native";
 import "react-native-reanimated";
 
 import { Colors, Images } from "@/constants";
+import "@/i18n";
 import { Stack } from "expo-router";
 
 export default function RootLayout() {
