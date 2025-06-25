@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import { Button, View } from "react-native";
 
 export default function HomeScreen() {
+  console.log("env file: ", process.env);
   return (
     <AppLayout>
       <View

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "magic-mobil-expo",
+    "name": "Magic",
     "slug": "magic-mobil-expo",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -33,10 +33,18 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "ios": {
+            "enableFullScreenImage_legacy": true,
+            "image": "./assets/images/splash.png",
+            "resizeMode": "cover",
+            "backgroundColor": "#ffffff"
+          },
+          "android": {
+            "image": "./assets/images/splash.png",
+            "resizeMode": "cover",
+            "backgroundColor": "#ffffff",
+            "imageWidth": 180
+          }
         }
       ]
     ],
@@ -49,6 +57,6 @@
         "projectId": "69b8d425-13b6-41fd-9bb5-5c8dae0fc021"
       }
     },
-    "owner": "kadirbarcin"
+    "owner": "tulparyazilim"
   }
 }
