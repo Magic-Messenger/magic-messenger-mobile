@@ -1,14 +1,15 @@
+import { useAppStore } from "@/store";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import en from "./locales/en.json";
 import tr from "./locales/tr.json";
 
 const initI18n = async () => {
-  //TODO: Zustand structer
+  const currentLanguage = useAppStore.getState()?.settings?.language;
 
   i18n.use(initReactI18next).init({
-    lng: "tr",
-    fallbackLng: "en",
+    lng: currentLanguage,
+    fallbackLng: process?.env?.EXPO_PUBLIC_DEFAULT_LANGUAGE,
     resources: {
       tr: {
         translation: tr,
