@@ -30,8 +30,16 @@ export default function HomeScreen() {
         <ThemedText type="title">{t("welcome")}</ThemedText>
 
         <View style={{ flexDirection: "row" }}>
-          <Button title="Türkçe" onPress={() => changeLanguage("tr")} />
-          <Button title="English" onPress={() => changeLanguage("en")} />
+          <Button
+            title="Türkçe"
+            disabled={currentLanguage === "tr"}
+            onPress={() => changeLanguage("tr")}
+          />
+          <Button
+            title="English"
+            disabled={currentLanguage === "en"}
+            onPress={() => changeLanguage("en")}
+          />
         </View>
 
         <ThemedText type="title">Home Page !</ThemedText>
