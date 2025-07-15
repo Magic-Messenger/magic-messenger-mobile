@@ -16,6 +16,6 @@ export default function IndexPage() {
   if (isLogin) {
     return <Redirect href="/(tabs)/home" />;
   } else {
-    return <Redirect href="/(auth)/login" />;
+    return <Redirect href="/(auth)/preLogin" />;
   }
 }

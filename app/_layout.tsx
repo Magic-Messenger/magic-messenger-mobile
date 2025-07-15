@@ -18,6 +18,12 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    SFPro: require("../assets/fonts/SF-Pro.ttf"),
+    SFProBold: require("../assets/fonts/SF-Pro-Text-Bold.ttf"),
+    SFProLight: require("../assets/fonts/SF-Pro-Text-Light.ttf"),
+    SFProMedium: require("../assets/fonts/SF-Pro-Text-Medium.ttf"),
+    SFProRegular: require("../assets/fonts/SF-Pro-Text-Regular.ttf"),
+    SFProSemiBold: require("../assets/fonts/SF-Pro-Text-Semibold.ttf"),
   });
 
   const { isLogin, rehydrated } = useUserStore();

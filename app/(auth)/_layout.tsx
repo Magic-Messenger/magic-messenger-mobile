@@ -6,8 +6,15 @@ export default function AuthScreen() {
       screenOptions={{
         headerShown: false,
       }}
-      initialRouteName="login/index"
+      initialRouteName="preLogin/index"
     >
+      <Stack.Screen
+        name="preLogin/index"
+        options={{
+          headerShown: false,
+        }}
+      />
+
       <Stack.Screen
         name="login/index"
         options={{
