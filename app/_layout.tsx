@@ -30,6 +30,7 @@ export default function RootLayout() {
             contentStyle: {
               backgroundColor: "transparent",
             },
+            headerTitleAlign: "center",
             headerTitle: () => (
               <Image
                 source={Images.logo}

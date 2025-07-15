@@ -15,6 +15,7 @@ export default function TabLayout() {
         headerTintColor: Colors.white,
         tabBarActiveTintColor: Colors.white,
         tabBarInactiveTintColor: Colors.menuInactiveColor,
+        headerTitleAlign: "center",
         headerTitle: () => (
           <Image
             source={Images.logo}
