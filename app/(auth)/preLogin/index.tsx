@@ -1,13 +1,19 @@
 import Logo from "@/assets/images/3d-logo.png";
-import { AppImage, AppLayout, ThemedText } from "@/components";
-import { commonStyle, flexBox } from "@/constants";
+import { AppImage, AppLayout, Button, ThemedText } from "@/components";
+import { commonStyle, spacing } from "@/constants";
+import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
 
 export default function PreLoginScreen() {
   const { t } = useTranslation();
+
+  const redirectLoginPage = () => {
+    router.push("/(auth)/licenseNumber");
+  };
+
   return (
-    <AppLayout>
+    <AppLayout container scrollable>
       <View
         style={[
           commonStyle.flex,
@@ -15,9 +21,27 @@ export default function PreLoginScreen() {
           commonStyle.justifyContentCenter,
         ]}
       >
-        <View style={styles.mainContainer}>
-          <AppImage source={Logo} style={styles.logoImage} />
-          <ThemedText weight="semiBold">{t("welcome")}</ThemedText>
+        <AppImage source={Logo} style={styles.logoImage} />
+        <ThemedText weight="semiBold" style={commonStyle.pt2}>
+          {t("welcome")}
+        </ThemedText>
+
+        <View
+          style={[
+            styles.mainContainer,
+            commonStyle.fullWidth,
+            commonStyle.gap5,
+          ]}
+        >
+          <Button
+            type="primary"
+            label={t("login")}
+            onPress={redirectLoginPage}
+          />
+          <ThemedText center type="default" weight="semiBold">
+            or
+          </ThemedText>
+          <Button type="primary" label={t("register")} onPress={() => {}} />
         </View>
       </View>
     </AppLayout>
@@ -26,7 +50,9 @@ export default function PreLoginScreen() {
 
 const styles = StyleSheet.create({
   mainContainer: {
-    ...flexBox(1, "column", "center", "center"),
+    ...spacing({
+      mt: 60,
+    }),
   },
   logoImage: {
     width: 240,

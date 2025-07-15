@@ -1,4 +1,4 @@
-import { Colors, Images } from "@/constants";
+import { Colors, Images, spacing } from "@/constants";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { ImageBackground, ScrollView, StyleSheet, View } from "react-native";
@@ -7,15 +7,20 @@ import { SafeAreaView } from "react-native-safe-area-context";
 interface AppLayoutProps {
   children: React.ReactNode;
   scrollable?: boolean;
+  container?: boolean;
 }
 
-export function AppLayout({ children, scrollable = false }: AppLayoutProps) {
+export function AppLayout({
+  children,
+  container = false,
+  scrollable = false,
+}: AppLayoutProps) {
   const Container = scrollable ? ScrollView : View;
 
   return (
     <LinearGradient
       colors={Colors.backgroundColor as never}
-      style={styles.gradient}
+      style={[styles.gradient, container ? styles.container : undefined]}
     >
       <ImageBackground
         source={Images.backgroundImage}
@@ -53,5 +58,11 @@ const styles = StyleSheet.create({
   },
   content: {
     flexGrow: 1,
+  },
+  container: {
+    ...spacing({
+      pl: 20,
+      pr: 20,
+    }),
   },
 });

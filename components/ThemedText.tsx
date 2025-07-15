@@ -4,12 +4,14 @@ import { StyleSheet, Text, type TextProps } from "react-native";
 export type ThemedTextProps = TextProps & {
   type?: "default" | "title" | "defaultSemiBold" | "subtitle" | "link";
   weight?: "bold" | "semiBold" | "light" | "medium" | "regular";
+  center?: boolean;
 };
 
 export function ThemedText({
   style,
   type = "default",
   weight,
+  center,
   ...rest
 }: ThemedTextProps) {
   return (
@@ -23,6 +25,7 @@ export function ThemedText({
         type === "subtitle" ? styles.subtitle : undefined,
         type === "link" ? styles.link : undefined,
         weight ? styles?.[weight] : undefined,
+        center ? styles.center : undefined,
         style,
       ]}
       {...rest}
@@ -32,8 +35,9 @@ export function ThemedText({
 
 const styles = StyleSheet.create({
   default: {
-    fontSize: 16,
+    fontSize: 15,
     lineHeight: 24,
+    fontFamily: Fonts.SFProRegular,
   },
   defaultSemiBold: {
     fontSize: 16,
@@ -41,9 +45,10 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   title: {
-    fontSize: 32,
+    fontSize: 22,
     fontWeight: "bold",
     lineHeight: 32,
+    fontFamily: Fonts.SFProBold,
   },
   subtitle: {
     fontSize: 20,
@@ -68,5 +73,8 @@ const styles = StyleSheet.create({
   },
   regular: {
     fontFamily: Fonts.SFProRegular,
+  },
+  center: {
+    textAlign: "center",
   },
 });

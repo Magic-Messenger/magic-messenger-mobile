@@ -15,4 +15,7 @@ export const Colors = {
   backgroundColor: ["rgba(23, 7, 50, 1)", "rgba(1, 1, 3, 1)"],
   backgroundGradientColor: ["#521CB152", "#521CB100"],
   secondaryBackground: "rgba(21, 9, 34, 1)",
+  buttonPrimary: ["#783ABF", "#39149E"],
+  buttonSecondary: ["#2A1243", "#2A1243"],
+  buttonTransparent: ["transparent", "transparent"],
 };

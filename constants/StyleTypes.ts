@@ -61,7 +61,16 @@ export interface TextStyleOptions {
 }
 
 /* Spacing */
-export type SpacingKey = "mt" | "mb" | "ml" | "mr" | "pt" | "pb" | "pl" | "pr";
+export type SpacingKey =
+  | "mt"
+  | "mb"
+  | "ml"
+  | "mr"
+  | "pt"
+  | "pb"
+  | "pl"
+  | "pr"
+  | "gap";
 export type SpacingOptions = Partial<Record<SpacingKey, number>>;
 
 /* position */

@@ -1,3 +1,4 @@
+import { Colors } from "@/constants";
 import { Stack } from "expo-router";
 
 export default function AuthScreen() {
@@ -5,21 +6,21 @@ export default function AuthScreen() {
     <Stack
       screenOptions={{
         headerShown: false,
+        headerTransparent: true,
+        headerTintColor: Colors.white,
+        contentStyle: {
+          backgroundColor: "transparent",
+        },
+        headerTitleAlign: "center",
       }}
       initialRouteName="preLogin/index"
     >
-      <Stack.Screen
-        name="preLogin/index"
-        options={{
-          headerShown: false,
-        }}
-      />
+      <Stack.Screen name="preLogin/index" />
 
       <Stack.Screen
         name="login/index"
         options={{
           title: "Giriş Yap",
-          headerShown: false,
         }}
       />
 
@@ -27,7 +28,14 @@ export default function AuthScreen() {
         name="register/index"
         options={{
           title: "Kayıt Ol",
-          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="licenseNumber/index"
+        options={{
+          headerShown: true,
+          title: "Enter License",
         }}
       />
     </Stack>
