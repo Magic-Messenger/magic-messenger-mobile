@@ -1,20 +1,21 @@
 import { AppLayout, ThemedText } from "@/components";
-import { Colors, commonStyle, spacing, textStyle } from "@/constants";
+import { commonStyle } from "@/constants";
 import { useAppStore } from "@/store";
 import { changeLanguage } from "@/utils";
 import { router } from "expo-router";
-import { useEffect } from "react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Button, StyleSheet, Text, View } from "react-native";
+import { Button, StyleSheet, View } from "react-native";
 
 export default function HomeScreen() {
   const { t } = useTranslation();
   const currentLanguage = useAppStore.getState()?.settings?.language;
 
-  useEffect(() => {
+  useMemo(() => {
     if (__DEV__) {
       console.log("process.env:", JSON.stringify(process.env, null, 2));
     }
+    return null;
   }, []);
 
   return (
@@ -26,10 +27,6 @@ export default function HomeScreen() {
           commonStyle.justifyContentCenter,
         ]}
       >
-        <View>
-          <Text style={style.textStyle}>adsfadsfasfas</Text>
-        </View>
-
         <Button title="Chat Screen" onPress={() => router.push("/chat")} />
         <ThemedText type="title">{currentLanguage}</ThemedText>
         <ThemedText type="title">{t("welcome")}</ThemedText>
@@ -53,11 +50,4 @@ export default function HomeScreen() {
   );
 }
 
-const style = StyleSheet.create({
-  textStyle: {
-    ...textStyle(15, Colors.white),
-    ...spacing({
-      mb: 20,
-    }),
-  },
-});
+const style = StyleSheet.create({});

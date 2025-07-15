@@ -6,7 +6,10 @@ import "react-native-reanimated";
 
 import { Colors, Images } from "@/constants";
 import "@/i18n";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
+
+const queryClient = new QueryClient();
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -19,26 +22,28 @@ export default function RootLayout() {
 
   return (
     <>
-      <Stack
-        screenOptions={{
-          headerTransparent: true,
-          headerTintColor: Colors.white,
-          contentStyle: {
-            backgroundColor: "transparent",
-          },
-          headerTitle: () => (
-            <Image
-              source={Images.logo}
-              contentFit="contain"
-              style={styles.headerImage}
-            />
-          ),
-        }}
-      >
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="light" />
+      <QueryClientProvider client={queryClient}>
+        <Stack
+          screenOptions={{
+            headerTransparent: true,
+            headerTintColor: Colors.white,
+            contentStyle: {
+              backgroundColor: "transparent",
+            },
+            headerTitle: () => (
+              <Image
+                source={Images.logo}
+                contentFit="contain"
+                style={styles.headerImage}
+              />
+            ),
+          }}
+        >
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+        <StatusBar style="light" />
+      </QueryClientProvider>
     </>
   );
 }
