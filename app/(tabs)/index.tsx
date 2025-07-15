@@ -1,10 +1,11 @@
 import { AppLayout, ThemedText } from "@/components";
+import { Colors, commonStyle, spacing, textStyle } from "@/constants";
 import { useAppStore } from "@/store";
 import { changeLanguage } from "@/utils";
 import { router } from "expo-router";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Button, View } from "react-native";
+import { Button, StyleSheet, Text, View } from "react-native";
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -19,17 +20,21 @@ export default function HomeScreen() {
   return (
     <AppLayout>
       <View
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
+        style={[
+          commonStyle.flex,
+          commonStyle.alignItemsCenter,
+          commonStyle.justifyContentCenter,
+        ]}
       >
+        <View>
+          <Text style={style.textStyle}>adsfadsfasfas</Text>
+        </View>
+
         <Button title="Chat Screen" onPress={() => router.push("/chat")} />
         <ThemedText type="title">{currentLanguage}</ThemedText>
         <ThemedText type="title">{t("welcome")}</ThemedText>
 
-        <View style={{ flexDirection: "row" }}>
+        <View style={commonStyle.flexRow}>
           <Button
             title="Türkçe"
             disabled={currentLanguage === "tr"}
@@ -47,3 +52,12 @@ export default function HomeScreen() {
     </AppLayout>
   );
 }
+
+const style = StyleSheet.create({
+  textStyle: {
+    ...textStyle(15, Colors.white),
+    ...spacing({
+      mb: 20,
+    }),
+  },
+});
