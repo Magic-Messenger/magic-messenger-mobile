@@ -1,15 +1,22 @@
 import { AppLayout, ThemedText } from "@/components";
 import { commonStyle } from "@/constants";
-import { useAppStore } from "@/store";
+import { useAppStore, useUserStore } from "@/store";
 import { changeLanguage } from "@/utils";
 import { router } from "expo-router";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Button, StyleSheet, View } from "react-native";
+import { Button, StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function HomeScreen() {
   const { t } = useTranslation();
+  const { logout, isLogin } = useUserStore();
   const currentLanguage = useAppStore.getState()?.settings?.language;
+
+  useEffect(() => {
+    if (!isLogin) {
+      router.replace("/(auth)/login");
+    }
+  }, [isLogin]);
 
   useMemo(() => {
     if (__DEV__) {
@@ -17,6 +24,10 @@ export default function HomeScreen() {
     }
     return null;
   }, []);
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <AppLayout>
@@ -27,7 +38,7 @@ export default function HomeScreen() {
           commonStyle.justifyContentCenter,
         ]}
       >
-        <Button title="Chat Screen" onPress={() => router.push("/chat")} />
+        {/* <Button title="Chat Screen" onPress={() => router.push("/chat")} /> */}
         <ThemedText type="title">{currentLanguage}</ThemedText>
         <ThemedText type="title">{t("welcome")}</ThemedText>
 
@@ -45,6 +56,20 @@ export default function HomeScreen() {
         </View>
 
         <ThemedText type="title">Home Page !</ThemedText>
+
+        <TouchableOpacity
+          onPress={handleLogout}
+          style={{
+            backgroundColor: "#FF3B30",
+            padding: 15,
+            borderRadius: 8,
+            marginTop: 20,
+          }}
+        >
+          <ThemedText type="default" style={{ color: "white" }}>
+            Çıkış Yap
+          </ThemedText>
+        </TouchableOpacity>
       </View>
     </AppLayout>
   );

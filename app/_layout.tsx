@@ -6,17 +6,29 @@ import "react-native-reanimated";
 
 import { Colors, Images } from "@/constants";
 import "@/i18n";
+import { useUserStore } from "@/store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
 
 const queryClient = new QueryClient();
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
-  if (!loaded) {
+  const { isLogin, rehydrated } = useUserStore();
+
+  useEffect(() => {
+    if (loaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded]);
+
+  if (!loaded || !rehydrated) {
     return null;
   }
 
@@ -40,6 +52,8 @@ export default function RootLayout() {
             ),
           }}
         >
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
         </Stack>
