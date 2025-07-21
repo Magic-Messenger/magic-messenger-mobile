@@ -1,6 +1,6 @@
 import { AppLayout, Button, SectionHeader, ThemedText } from "@/components";
 import { Colors, commonStyle, spacing } from "@/constants";
-import { copyToClipboard, shotToast } from "@/utils";
+import { copyToClipboard, shotToast, spacingPixel } from "@/utils";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 8,
     backgroundColor: Colors.secondary,
-    padding: 20,
+    padding: spacingPixel(20),
     justifyContent: "center",
     borderRadius: 10,
   },
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     width: "30%",
   },
   phrasesInfoContainer: {
-    padding: 20,
+    padding: spacingPixel(20),
     borderRadius: 10,
     borderWidth: 1,
     borderColor: Colors.white,

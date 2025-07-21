@@ -1,5 +1,6 @@
 import { ThemedText } from "@/components";
 import { Colors, Fonts } from "@/constants";
+import { fontPixel, heightPixel, spacingPixel } from "@/utils";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { forwardRef, useState } from "react";
 import { Control, Controller, FieldPath, FieldValues } from "react-hook-form";
@@ -209,28 +210,28 @@ const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
+    marginBottom: spacingPixel(16),
   },
   label: {
-    fontSize: 14,
+    fontSize: fontPixel(13),
     fontFamily: Fonts.SFProSemiBold,
     color: Colors.white,
-    marginBottom: 8,
+    marginBottom: spacingPixel(8),
   },
   required: {
     color: Colors.white,
-    fontSize: 14,
+    fontSize: fontPixel(13),
     fontFamily: Fonts.SFProMedium,
   },
   dropdown: {
     backgroundColor: Colors.secondary,
     borderRadius: 9,
-    paddingHorizontal: 16,
+    paddingHorizontal: spacingPixel(16),
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     borderWidth: 0,
-    height: 50,
+    height: heightPixel(45),
   },
   disabledDropdown: {
     backgroundColor: Colors.secondary,
@@ -240,7 +241,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   dropdownText: {
-    fontSize: 14,
+    fontSize: fontPixel(13),
     color: Colors.white,
     flex: 1,
   },
@@ -248,15 +249,15 @@ const styles = StyleSheet.create({
     color: Colors.textDisabled,
   },
   arrow: {
-    fontSize: 12,
+    fontSize: fontPixel(12),
     color: Colors.white,
-    marginLeft: 8,
+    marginLeft: spacingPixel(8),
   },
   errorText: {
     color: Colors.danger,
-    fontSize: 13,
-    fontFamily: Fonts.SFProSemiBold,
-    marginTop: 4,
+    fontSize: fontPixel(13),
+    fontFamily: Fonts.SFProMedium,
+    marginTop: spacingPixel(4),
   },
   modalOverlay: {
     flex: 1,
@@ -268,32 +269,32 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.secondary,
     borderRadius: 16,
     width: width * 0.85,
-    maxHeight: 400,
+    maxHeight: heightPixel(400),
     overflow: "hidden",
   },
   modalHeader: {
-    paddingVertical: 16,
-    paddingHorizontal: 20,
+    paddingVertical: spacingPixel(16),
+    paddingHorizontal: spacingPixel(20),
     alignItems: "center",
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: fontPixel(17),
     fontFamily: Fonts.SFProBold,
     color: Colors.white,
   },
   optionsList: {
-    maxHeight: 300,
+    maxHeight: heightPixel(300),
   },
   optionItem: {
-    paddingVertical: 16,
-    paddingHorizontal: 20,
+    paddingVertical: spacingPixel(16),
+    paddingHorizontal: spacingPixel(20),
     borderBottomWidth: 0.5,
   },
   selectedOption: {
     backgroundColor: Colors.secondarySelected,
   },
   optionText: {
-    fontSize: 16,
+    fontSize: fontPixel(15),
     color: Colors.white,
   },
   selectedOptionText: {

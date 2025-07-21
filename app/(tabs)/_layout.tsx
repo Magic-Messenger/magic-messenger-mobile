@@ -4,6 +4,7 @@ import React from "react";
 
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Colors, Images } from "@/constants";
+import { widthPixel } from "@/utils";
 import { StyleSheet } from "react-native";
 
 export default function TabLayout() {
@@ -40,7 +41,7 @@ export default function TabLayout() {
           title: "Home",
           tabBarIcon: ({ focused }) => (
             <IconSymbol
-              size={28}
+              size={widthPixel(28)}
               name="house.fill"
               color={focused ? Colors.white : Colors.menuInactiveColor}
             />
@@ -53,7 +54,7 @@ export default function TabLayout() {
           title: "Explore",
           tabBarIcon: ({ focused }) => (
             <IconSymbol
-              size={28}
+              size={widthPixel(28)}
               name="paperplane.fill"
               color={focused ? Colors.white : Colors.menuInactiveColor}
             />

@@ -1,6 +1,7 @@
 import Logo from "@/assets/images/3d-logo.png";
 import { AppImage, AppLayout, Button, ThemedText } from "@/components";
 import { commonStyle, spacing } from "@/constants";
+import { heightPixel, widthPixel } from "@/utils";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
@@ -63,7 +64,7 @@ const styles = StyleSheet.create({
     }),
   },
   logoImage: {
-    width: 240,
-    height: 60,
+    width: widthPixel(220),
+    height: heightPixel(50),
   },
 });

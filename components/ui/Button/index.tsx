@@ -1,5 +1,6 @@
 import { ThemedText, ThemedTextProps } from "@/components";
 import { Colors, commonStyle, spacing } from "@/constants";
+import { heightPixel } from "@/utils";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   ActivityIndicator,
@@ -86,7 +87,7 @@ export function Button({
 const styles = StyleSheet.create({
   button: {
     width: "100%",
-    height: 54,
+    height: heightPixel(45),
     borderRadius: 9,
     overflow: "hidden",
   },

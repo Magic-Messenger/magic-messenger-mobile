@@ -15,7 +15,6 @@ export const changeLanguage = (language: string) => {
 };
 
 export const copyToClipboard = async (copyData: string) => {
-  console.log("copyData: ", copyData);
   await Clipboard.setStringAsync(copyData);
 };
 

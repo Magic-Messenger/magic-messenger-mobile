@@ -1,5 +1,6 @@
 import { ThemedText } from "@/components";
 import { Colors, Fonts } from "@/constants";
+import { fontPixel, heightPixel, spacingPixel } from "@/utils";
 import React, { forwardRef } from "react";
 import { Control, Controller, FieldPath, FieldValues } from "react-hook-form";
 import {
@@ -161,28 +162,28 @@ export const Input = <
 
 const styles = StyleSheet.create({
   label: {
-    fontSize: 14,
+    fontSize: fontPixel(13),
     fontFamily: Fonts.SFProSemiBold,
     color: Colors.white,
-    marginBottom: 8,
+    marginBottom: spacingPixel(7),
   },
   required: {
     color: Colors.white,
-    fontSize: 14,
+    fontSize: fontPixel(13),
     fontFamily: Fonts.SFProMedium,
   },
   input: {
     borderWidth: 0,
     borderRadius: 9,
-    paddingHorizontal: 12,
-    fontSize: 14,
+    paddingHorizontal: spacingPixel(12),
+    fontSize: fontPixel(13),
     backgroundColor: Colors.secondary,
     color: Colors.white,
     fontFamily: Fonts.SFProMedium,
-    height: 50,
+    height: heightPixel(45),
   },
   multilineInput: {
-    height: 100,
+    height: heightPixel(100),
     textAlignVertical: "top",
   },
   disabledInput: {
@@ -194,8 +195,8 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: Colors.danger,
-    fontSize: 13,
-    fontFamily: Fonts.SFProSemiBold,
-    marginTop: 4,
+    fontSize: fontPixel(13),
+    fontFamily: Fonts.SFProMedium,
+    marginTop: spacingPixel(4),
   },
 });

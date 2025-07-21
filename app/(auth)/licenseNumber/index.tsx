@@ -1,4 +1,4 @@
-import { AppLayout, Button, LicenseInput, ThemedText } from "@/components";
+import { AppLayout, Button, LicenseInput, SectionHeader } from "@/components";
 import { commonStyle, spacing } from "@/constants";
 import { router } from "expo-router";
 import { StyleSheet, View } from "react-native";
@@ -7,11 +7,11 @@ export default function LicenseNumberScreen() {
   return (
     <AppLayout container scrollable>
       <View style={styles.mainContainer}>
-        <ThemedText type="title">Fill in License Code</ThemedText>
-        <ThemedText type="default">
-          You’re license will be activated on this device. It’s not possible to
-          activate the license on multiple devices.
-        </ThemedText>
+        <SectionHeader
+          title="Fill in License Code"
+          description="You’re license will be activated on this device. It’s not possible to
+          activate the license on multiple devices."
+        />
 
         <LicenseInput
           groupCount={4}
@@ -34,11 +34,6 @@ const styles = StyleSheet.create({
   mainContainer: {
     ...spacing({
       mt: 80,
-    }),
-  },
-  licenseInput: {
-    ...spacing({
-      mt: 60,
     }),
   },
 });

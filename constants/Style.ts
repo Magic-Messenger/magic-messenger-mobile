@@ -1,3 +1,4 @@
+import { fontPixel, spacingPixel } from "@/utils/PixelHelper";
 import { StyleSheet } from "react-native";
 import {
   AlignContent,
@@ -40,7 +41,7 @@ export function textStyle(
   italic: boolean = false
 ) {
   const style: any = {
-    fontSize: size,
+    fontSize: fontPixel(size),
     color,
     fontWeight: weight,
     textAlign: align,
@@ -52,15 +53,15 @@ export function textStyle(
 
 export function spacing(options: SpacingOptions) {
   const style: any = {};
-  if (options.mt !== undefined) style.marginTop = options.mt;
-  if (options.mb !== undefined) style.marginBottom = options.mb;
-  if (options.ml !== undefined) style.marginLeft = options.ml;
-  if (options.mr !== undefined) style.marginRight = options.mr;
-  if (options.pt !== undefined) style.paddingTop = options.pt;
-  if (options.pb !== undefined) style.paddingBottom = options.pb;
-  if (options.pl !== undefined) style.paddingLeft = options.pl;
-  if (options.pr !== undefined) style.paddingRight = options.pr;
-  if (options.gap !== undefined) style.gap = options.gap;
+  if (options.mt !== undefined) style.marginTop = spacingPixel(options.mt);
+  if (options.mb !== undefined) style.marginBottom = spacingPixel(options.mb);
+  if (options.ml !== undefined) style.marginLeft = spacingPixel(options.ml);
+  if (options.mr !== undefined) style.marginRight = spacingPixel(options.mr);
+  if (options.pt !== undefined) style.paddingTop = spacingPixel(options.pt);
+  if (options.pb !== undefined) style.paddingBottom = spacingPixel(options.pb);
+  if (options.pl !== undefined) style.paddingLeft = spacingPixel(options.pl);
+  if (options.pr !== undefined) style.paddingRight = spacingPixel(options.pr);
+  if (options.gap !== undefined) style.gap = spacingPixel(options.gap);
   return style;
 }
 
@@ -198,3 +199,5 @@ export const commonStyle = StyleSheet.create({
   gap9: { ...spacing({ gap: 36 }) },
   gap10: { ...spacing({ gap: 40 }) },
 });
+
+console.log("dsaf", spacingPixel(12));

@@ -1,3 +1,4 @@
+import { fontPixel, heightPixel, spacingPixel } from "@/utils";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -109,14 +110,14 @@ interface Styles {
 const styles = StyleSheet.create<Styles>({
   image: {
     width: "100%",
-    height: 200,
+    height: heightPixel(200),
   },
   placeholder: {
     backgroundColor: "#f0f0f0",
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
-    height: 200,
+    height: heightPixel(200),
   },
   errorText: {
     color: "#666",
@@ -135,7 +136,7 @@ const styles = StyleSheet.create<Styles>({
   },
   loadingText: {
     color: "#666",
-    fontSize: 14,
-    marginTop: 8,
+    fontSize: fontPixel(14),
+    marginTop: spacingPixel(8),
   },
 });
