@@ -1,13 +1,16 @@
 import { Colors } from "@/constants";
 import { Stack } from "expo-router";
+import { useTranslation } from "react-i18next";
 
 export default function AuthScreen() {
+  const { t } = useTranslation();
   return (
     <Stack
       screenOptions={{
         headerShown: false,
         headerTransparent: true,
         headerTintColor: Colors.white,
+        headerBackTitle: t("back"),
         contentStyle: {
           backgroundColor: "transparent",
         },
@@ -27,6 +30,7 @@ export default function AuthScreen() {
       <Stack.Screen
         name="register/index"
         options={{
+          headerShown: true,
           title: "Kayıt Ol",
         }}
       />

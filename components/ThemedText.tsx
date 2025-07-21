@@ -36,7 +36,6 @@ export function ThemedText({
 const styles = StyleSheet.create({
   default: {
     fontSize: 15,
-    lineHeight: 24,
     fontFamily: Fonts.SFProRegular,
   },
   defaultSemiBold: {

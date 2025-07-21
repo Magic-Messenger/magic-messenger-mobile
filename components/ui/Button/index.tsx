@@ -69,10 +69,15 @@ export function Button({
           commonStyle.alignItemsCenter,
         ]}
       >
-        {loading && <ActivityIndicator />}
-        {leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}
-        <ThemedText {...textProps}>{label}</ThemedText>
-        {rightIcon && <View style={styles.rightIcon}>{rightIcon}</View>}
+        {loading ? (
+          <ActivityIndicator />
+        ) : (
+          <>
+            {leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}
+            <ThemedText {...textProps}>{label}</ThemedText>
+            {rightIcon && <View style={styles.rightIcon}>{rightIcon}</View>}
+          </>
+        )}
       </LinearGradient>
     </TouchableOpacity>
   );

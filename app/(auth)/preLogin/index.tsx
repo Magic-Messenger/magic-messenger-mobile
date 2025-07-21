@@ -12,6 +12,10 @@ export default function PreLoginScreen() {
     router.push("/(auth)/licenseNumber");
   };
 
+  const redirectRegisterPage = () => {
+    router.push("/(auth)/register");
+  };
+
   return (
     <AppLayout container scrollable>
       <View
@@ -41,7 +45,11 @@ export default function PreLoginScreen() {
           <ThemedText center type="default" weight="semiBold">
             or
           </ThemedText>
-          <Button type="primary" label={t("register")} onPress={() => {}} />
+          <Button
+            type="primary"
+            label={t("register.title")}
+            onPress={redirectRegisterPage}
+          />
         </View>
       </View>
     </AppLayout>

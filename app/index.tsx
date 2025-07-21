@@ -1,3 +1,4 @@
+import "@/i18n";
 import { useUserStore } from "@/store";
 import { Redirect } from "expo-router";
 import { useEffect } from "react";

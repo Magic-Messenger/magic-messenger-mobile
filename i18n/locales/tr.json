@@ -1,6 +1,20 @@
 {
   "welcome": "Merhaba",
   "login": "Giriş Yap",
-  "register": "Kayıt Ol",
-  "or": "veya"
+  "or": "veya",
+  "register": {
+    "title": "Kayıt Ol",
+    "button": "Next",
+    "selectLanguage": "Dil Seçiniz",
+    "passwordValidate": ""
+  },
+  "userName": "Kullanıcı Adı",
+  "password": "Şifre",
+  "confirmPassword": "Şifre Tekrar",
+  "inputError": {
+    "minLength": "{{field}} en az {{count}} karekter olmalıdır",
+    "required": "{{field}} zorunlu"
+  },
+
+  "back": "Geri"
 }

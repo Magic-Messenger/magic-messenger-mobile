@@ -4,14 +4,25 @@
  */
 
 export const Colors = {
-  text: "#fff",
+  primary: "",
+  secondary: "#2A1243",
+  secondarySelected: "#3b1a5d",
+  danger: "#FF2D2D",
+
   background: "#fff",
   tint: "#0a7ea4",
   icon: "#687076",
+
   tabIconDefault: "#687076",
   tabIconSelected: "#0a7ea4",
   menuInactiveColor: "#9DB2CE",
   white: "#fff",
+
+  /* text */
+  text: "#fff",
+  textDisabled: "#555",
+
+  /* gradient */
   backgroundColor: ["rgba(23, 7, 50, 1)", "rgba(1, 1, 3, 1)"],
   backgroundGradientColor: ["#521CB152", "#521CB100"],
   secondaryBackground: "rgba(21, 9, 34, 1)",

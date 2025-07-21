@@ -5,7 +5,6 @@ import { StyleSheet } from "react-native";
 import "react-native-reanimated";
 
 import { Colors, Images } from "@/constants";
-import "@/i18n";
 import { useUserStore } from "@/store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
@@ -26,7 +25,7 @@ export default function RootLayout() {
     SFProSemiBold: require("../assets/fonts/SF-Pro-Text-Semibold.ttf"),
   });
 
-  const { isLogin, rehydrated } = useUserStore();
+  const { rehydrated } = useUserStore();
 
   useEffect(() => {
     if (loaded) {
