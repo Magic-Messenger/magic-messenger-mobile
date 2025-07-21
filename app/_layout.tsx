@@ -6,10 +6,12 @@ import "react-native-reanimated";
 
 import { Colors, Images } from "@/constants";
 import { useUserStore } from "@/store";
+import { toastConfig } from "@/utils";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+import Toast from "react-native-toast-message";
 
 const queryClient = new QueryClient();
 SplashScreen.preventAutoHideAsync();
@@ -62,6 +64,8 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
         </Stack>
+
+        <Toast config={toastConfig as never} />
         <StatusBar style="light" />
       </QueryClientProvider>
     </>

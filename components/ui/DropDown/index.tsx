@@ -1,4 +1,4 @@
-import { ThemedText } from "@/components/ThemedText";
+import { ThemedText } from "@/components";
 import { Colors, Fonts } from "@/constants";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { forwardRef, useState } from "react";

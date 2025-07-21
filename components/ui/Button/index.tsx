@@ -1,4 +1,4 @@
-import { ThemedText, ThemedTextProps } from "@/components/ThemedText";
+import { ThemedText, ThemedTextProps } from "@/components";
 import { Colors, commonStyle, spacing } from "@/constants";
 import { LinearGradient } from "expo-linear-gradient";
 import {

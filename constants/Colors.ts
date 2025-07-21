@@ -4,7 +4,7 @@
  */
 
 export const Colors = {
-  primary: "",
+  primary: "#39149E",
   secondary: "#2A1243",
   secondarySelected: "#3b1a5d",
   danger: "#FF2D2D",
@@ -29,4 +29,8 @@ export const Colors = {
   buttonPrimary: ["#783ABF", "#39149E"],
   buttonSecondary: ["#2A1243", "#2A1243"],
   buttonTransparent: ["transparent", "transparent"],
+
+  /* toast */
+  toatBackground: "#2DC62A",
+  toatBackgroundDanger: "#CB4848",
 };

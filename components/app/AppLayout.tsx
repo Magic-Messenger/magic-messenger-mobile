@@ -8,12 +8,14 @@ interface AppLayoutProps {
   children: React.ReactNode;
   scrollable?: boolean;
   container?: boolean;
+  footer?: React.ReactNode;
 }
 
 export function AppLayout({
   children,
   container = false,
   scrollable = false,
+  footer,
 }: AppLayoutProps) {
   const Container = scrollable ? ScrollView : View;
 
@@ -34,6 +36,7 @@ export function AppLayout({
         >
           {children}
         </Container>
+        {footer && <>{footer}</>}
       </SafeAreaView>
     </LinearGradient>
   );

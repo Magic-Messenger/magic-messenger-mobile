@@ -1,5 +1,12 @@
-import { AppLayout, Button, Dropdown, Input, ThemedText } from "@/components";
-import { commonStyle, spacing } from "@/constants";
+import {
+  AppLayout,
+  Button,
+  Dropdown,
+  Input,
+  SectionHeader,
+} from "@/components";
+import { spacing } from "@/constants";
+import { router } from "expo-router";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
@@ -39,22 +46,31 @@ export default function RegisterScreen() {
         console.error("Şifreler eşleşmiyor");
         return;
       }
+      router.push("/(auth)/securityPhrases");
     } catch (error) {
       console.error("Kayıt sırasında hata:", error);
     }
   };
 
   return (
-    <AppLayout container scrollable>
+    <AppLayout
+      container
+      scrollable
+      footer={
+        <Button
+          type="primary"
+          label={t("register.button")}
+          onPress={handleSubmit(onSubmit)}
+          loading={isSubmitting}
+          disabled={isSubmitting}
+        />
+      }
+    >
       <View style={styles.mainContainer}>
-        <View style={styles.headerContainer}>
-          <ThemedText type="title" style={styles.title}>
-            {t("register.title")}
-          </ThemedText>
-          <ThemedText type="default" style={styles.subtitle}>
-            {t("register.subtitle")}
-          </ThemedText>
-        </View>
+        <SectionHeader
+          title={t("register.title")}
+          description={t("register.subtitle")}
+        />
 
         <View style={styles.formContainer}>
           <Input
@@ -129,16 +145,6 @@ export default function RegisterScreen() {
             error={errors.language?.message}
           />
         </View>
-
-        <View style={styles.buttonContainer}>
-          <Button
-            type="primary"
-            label={t("register.button", "Register")}
-            onPress={handleSubmit(onSubmit)}
-            loading={isSubmitting}
-            disabled={isSubmitting}
-          />
-        </View>
       </View>
     </AppLayout>
   );
@@ -150,26 +156,9 @@ const styles = StyleSheet.create({
       mt: 60,
     }),
   },
-  headerContainer: {
-    ...spacing({}),
-  },
-  title: {
-    ...spacing({
-      mb: 8,
-    }),
-  },
-  subtitle: {
-    ...commonStyle.mb7,
-    opacity: 0.8,
-  },
   formContainer: {
     ...spacing({
       gap: 16,
-    }),
-  },
-  buttonContainer: {
-    ...spacing({
-      mt: 32,
     }),
   },
 });

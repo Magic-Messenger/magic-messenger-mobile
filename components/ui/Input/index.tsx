@@ -1,4 +1,4 @@
-import { ThemedText } from "@/components/ThemedText";
+import { ThemedText } from "@/components";
 import { Colors, Fonts } from "@/constants";
 import React, { forwardRef } from "react";
 import { Control, Controller, FieldPath, FieldValues } from "react-hook-form";

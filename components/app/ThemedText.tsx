@@ -50,8 +50,8 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.SFProBold,
   },
   subtitle: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: Fonts.SFProSemiBold,
+    opacity: 0.8,
   },
   link: {
     lineHeight: 30,

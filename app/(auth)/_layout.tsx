@@ -23,7 +23,7 @@ export default function AuthScreen() {
       <Stack.Screen
         name="login/index"
         options={{
-          title: "Giriş Yap",
+          title: t("login"),
         }}
       />
 
@@ -31,7 +31,7 @@ export default function AuthScreen() {
         name="register/index"
         options={{
           headerShown: true,
-          title: "Kayıt Ol",
+          title: t("register.title"),
         }}
       />
 
@@ -40,6 +40,14 @@ export default function AuthScreen() {
         options={{
           headerShown: true,
           title: "Enter License",
+        }}
+      />
+
+      <Stack.Screen
+        name="securityPhrases/index"
+        options={{
+          headerShown: true,
+          title: t("securityPhrases.title"),
         }}
       />
     </Stack>

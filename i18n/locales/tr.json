@@ -2,19 +2,35 @@
   "welcome": "Merhaba",
   "login": "Giriş Yap",
   "or": "veya",
+  "back": "Geri",
+
+  "common": {},
+
   "register": {
     "title": "Kayıt Ol",
     "button": "Next",
     "selectLanguage": "Dil Seçiniz",
-    "passwordValidate": ""
+    "subtitle": "If you lose access to your chat space you need this 15 words in the sequence words. To restore you need the license key, your digit access and this 15 words in the sequence order."
   },
+
   "userName": "Kullanıcı Adı",
   "password": "Şifre",
   "confirmPassword": "Şifre Tekrar",
+
   "inputError": {
     "minLength": "{{field}} en az {{count}} karekter olmalıdır",
     "required": "{{field}} zorunlu"
   },
 
-  "back": "Geri"
+  "securityPhrases": {
+    "title": "Güvenlik Ekranı",
+    "sectionTitle": "Write 15 words keyphrase",
+    "subtitle": "If you lose access to your chat space you need this 15 words in the sequence words. To restore you need the license key, your digit access and this 15 words in the sequence order.",
+    "phrases": {
+      "title": "Güvenlik Anaharı",
+      "message": "Lüffen bu güvenlik anahtarını saklayınız",
+      "copy": "Kopyalamak için tıklayınız",
+      "successCopyClipboard": "Başarıyla Kopyalandı"
+    }
+  }
 }
