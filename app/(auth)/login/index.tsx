@@ -1,52 +1,135 @@
-import { AppLayout, ThemedText } from "@/components";
-import { commonStyle } from "@/constants";
+import { usePostApiAccountLogin } from "@/api/endpoints/magicMessenger";
+import { AppLayout, Button, Input, SectionHeader } from "@/components";
+import { spacing } from "@/constants";
 import { useUserStore } from "@/store";
 import { router } from "expo-router";
-import { useEffect } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { StyleSheet, View } from "react-native";
+
+interface RegisterFormData {
+  username: string;
+  password: string;
+  confirmPassword: string;
+  language: number;
+}
+
+const LANGUAGE_OPTIONS = [
+  { label: "Türkçe", value: 1 },
+  { label: "English", value: 2 },
+] as const;
 
 export default function LoginScreen() {
-  const { login, isLogin } = useUserStore();
+  const { t } = useTranslation();
+  const { login } = useUserStore();
+  const { mutateAsync: loginApi } = usePostApiAccountLogin();
 
-  useEffect(() => {
-    if (isLogin) {
-      router.replace("/(tabs)/home");
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterFormData>({
+    defaultValues: {
+      username: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (formValues: RegisterFormData) => {
+    try {
+      console.log("Form değerleri: ", formValues);
+
+      const loginResponse = await loginApi({
+        data: {
+          username: formValues?.username,
+          password: formValues?.password,
+        },
+      });
+
+      if (loginResponse.success && loginResponse?.data?.accessToken) {
+        console.log(loginResponse);
+        await login(loginResponse.data?.accessToken as string);
+        router.push("/(tabs)/home");
+      }
+    } catch (error) {
+      console.error("Kayıt sırasında hata:", error);
     }
-  }, [isLogin]);
-
-  const handleLogin = () => {
-    login();
   };
 
   return (
-    <AppLayout>
-      <View
-        style={[
-          commonStyle.flex,
-          commonStyle.alignItemsCenter,
-          commonStyle.justifyContentCenter,
-        ]}
-      >
-        <ThemedText type="title">Login Page !</ThemedText>
+    <AppLayout
+      container
+      scrollable
+      footer={
+        <Button
+          type="primary"
+          label={t("register.button")}
+          onPress={handleSubmit(onSubmit)}
+          loading={isSubmitting}
+          disabled={isSubmitting}
+        />
+      }
+    >
+      <View style={styles.mainContainer}>
+        <SectionHeader
+          title={t("register.title")}
+          description={t("register.subtitle")}
+        />
 
-        <TouchableOpacity
-          onPress={handleLogin}
-          style={{
-            backgroundColor: "#007AFF",
-            padding: 15,
-            borderRadius: 8,
-            marginVertical: 10,
-          }}
-        >
-          <ThemedText type="default" style={{ color: "white" }}>
-            Giriş Yap
-          </ThemedText>
-        </TouchableOpacity>
+        <View style={styles.formContainer}>
+          <Input
+            control={control}
+            name="username"
+            label={t("userName")}
+            rules={{
+              required: t("inputError.required", {
+                field: t("userName"),
+              }),
+              minLength: {
+                value: 3,
+                message: t("inputError.minLength", {
+                  field: t("userName"),
+                  count: 3,
+                }),
+              },
+            }}
+            error={errors.username?.message}
+          />
 
-        <TouchableOpacity onPress={() => router.push("/register")}>
-          <ThemedText type="default">Kayıt Ol Sayfasına Git</ThemedText>
-        </TouchableOpacity>
+          <Input
+            control={control}
+            name="password"
+            label={t("password")}
+            secureTextEntry
+            rules={{
+              required: t("inputError.required", {
+                field: t("password"),
+              }),
+              minLength: {
+                value: 8,
+                message: t("inputError.minLength", {
+                  field: t("password"),
+                  count: 8,
+                }),
+              },
+            }}
+            error={errors.password?.message}
+          />
+        </View>
       </View>
     </AppLayout>
   );
 }
+
+const styles = StyleSheet.create({
+  mainContainer: {
+    ...spacing({
+      mt: 60,
+    }),
+  },
+  formContainer: {
+    ...spacing({
+      gap: 16,
+    }),
+  },
+});

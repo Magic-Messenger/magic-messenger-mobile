@@ -3,5 +3,10 @@
     "source.fixAll": "explicit",
     "source.organizeImports": "explicit",
     "source.sortMembers": "explicit"
-  }
+  },
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "google-services.json": "google-services*, GoogleService*",
+    "package.json": ".rc,.ruby-version,Jenkinsfile,fingerprint.,.fingerprintignore,.easignore,.config.json,metro.config.js,.editorconfig,eslint.config.,lint-staged.config., firebase, .deepsource*, .gitignore, .eslint*, commitlint*, biome.json,app.config.,app.json, eas.json, package-lock.json, babel,, .prettier*, prettier*, tsconfig*, jsconfig*, vite*, pnpm-lock*, bun.lockb, nest*, .lintstagedrc*, .nycrc*, .release-it*, .commitlintrc*, orval.config.ts, eslint.config.js, README.md"
+  },
 }

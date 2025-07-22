@@ -1,3 +1,4 @@
+import { usePostApiAccountLogin } from "@/api/endpoints/magicMessenger";
 import {
   AppLayout,
   Button,
@@ -25,6 +26,7 @@ const LANGUAGE_OPTIONS = [
 
 export default function RegisterScreen() {
   const { t } = useTranslation();
+  const { mutateAsync: loginApi } = usePostApiAccountLogin();
 
   const {
     control,
@@ -46,6 +48,18 @@ export default function RegisterScreen() {
         console.error("Şifreler eşleşmiyor");
         return;
       }
+
+      const loginResponse = await loginApi({
+        data: {
+          username: formValues?.username,
+          password: formValues?.password,
+        },
+      });
+
+      if (loginResponse.success) {
+        console.log(loginResponse);
+      }
+
       router.push("/(auth)/securityPhrases");
     } catch (error) {
       console.error("Kayıt sırasında hata:", error);

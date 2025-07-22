@@ -10,7 +10,7 @@ export default function PreLoginScreen() {
   const { t } = useTranslation();
 
   const redirectLoginPage = () => {
-    router.push("/(auth)/licenseNumber");
+    router.push("/(auth)/login");
   };
 
   const redirectRegisterPage = () => {

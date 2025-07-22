@@ -199,5 +199,3 @@ export const commonStyle = StyleSheet.create({
   gap9: { ...spacing({ gap: 36 }) },
   gap10: { ...spacing({ gap: 40 }) },
 });
-
-console.log("dsaf", spacingPixel(12));

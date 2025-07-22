@@ -5,7 +5,9 @@ import { createJSONStorage, persist } from "zustand/middleware";
 interface UserStore {
   rehydrated: boolean;
   isLogin: boolean;
-  login: () => void;
+  accessToken: string | null;
+  refreshToken: string | null;
+  login: (refreshToken: string | null) => void;
   logout: () => void;
 }
 
@@ -14,8 +16,10 @@ export const useUserStore = create<UserStore>()(
     (set) => ({
       rehydrated: false,
       isLogin: false,
-      login: () => {
-        set({ isLogin: true });
+      accessToken: null,
+      refreshToken: null,
+      login: (accessToken) => {
+        set({ isLogin: true, accessToken });
       },
       logout: () => {
         set({ isLogin: false });
