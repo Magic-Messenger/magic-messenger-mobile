@@ -1,25 +1,24 @@
 import { AppLayout, Button, SectionHeader, ThemedText } from "@/components";
 import { Colors, commonStyle, spacing } from "@/constants";
+import { useUserStore } from "@/store";
 import { copyToClipboard, shotToast, spacingPixel } from "@/utils";
+import { router, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
+type RouteParams = {
+  accessToken: string;
+  securityPhrases: string;
+  userName: string;
+};
+
 const SecurityPhrasesScreen = () => {
   const { t } = useTranslation();
+  const { login } = useUserStore();
 
-  /* TEMP */
-  const securityPhrases = [
-    "3232",
-    "212E",
-    "23F4",
-    "GE23",
-    "3232",
-    "212E",
-    "23F4",
-    "GE23",
-    "3232",
-  ];
-  /* TEMP */
+  const params = useLocalSearchParams<RouteParams>();
+
+  const securityPhrases = params?.securityPhrases?.split(",");
 
   const copyPhrases = () => {
     if (securityPhrases) {
@@ -38,11 +37,24 @@ const SecurityPhrasesScreen = () => {
     }
   };
 
+  const handleNext = async () => {
+    if (securityPhrases && params?.accessToken && params?.userName) {
+      await login(params?.accessToken as string, params?.userName as string);
+      router.push("/(tabs)/home");
+    }
+  };
+
   return (
     <AppLayout
       container
       scrollable
-      footer={<Button type="primary" label={t("register.button")} />}
+      footer={
+        <Button
+          type="primary"
+          label={t("register.button")}
+          onPress={handleNext}
+        />
+      }
     >
       <View style={styles.mainContainer}>
         <SectionHeader
@@ -52,7 +64,7 @@ const SecurityPhrasesScreen = () => {
 
         <View style={styles.phrasesContainer}>
           {securityPhrases?.map((item, index) => (
-            <View key={index} style={styles.phrasesItem}>
+            <View style={styles.phrasesItem} key={`index_${index}`}>
               <ThemedText>{item}</ThemedText>
             </View>
           ))}

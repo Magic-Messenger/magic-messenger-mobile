@@ -31,8 +31,8 @@ export default function LoginScreen() {
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>({
     defaultValues: {
-      username: "",
-      password: "",
+      username: "kadirbarcin",
+      password: "Kadir123*+",
     },
   });
 

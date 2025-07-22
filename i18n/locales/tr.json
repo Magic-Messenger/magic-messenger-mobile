@@ -14,7 +14,8 @@
     "title": "Kayıt Ol",
     "button": "Next",
     "selectLanguage": "Dil Seçiniz",
-    "subtitle": "If you lose access to your chat space you need this 15 words in the sequence words. To restore you need the license key, your digit access and this 15 words in the sequence order."
+    "subtitle": "If you lose access to your chat space you need this 15 words in the sequence words. To restore you need the license key, your digit access and this 15 words in the sequence order.",
+    "passwordNotMatch": "Şifreler eşleşmiyor"
   },
 
   "userName": "Kullanıcı Adı",

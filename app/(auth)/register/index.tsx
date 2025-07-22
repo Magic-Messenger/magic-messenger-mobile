@@ -1,4 +1,4 @@
-import { usePostApiAccountLogin } from "@/api/endpoints/magicMessenger";
+import { usePostApiAccountRegister } from "@/api/endpoints/magicMessenger";
 import {
   AppLayout,
   Button,
@@ -7,6 +7,7 @@ import {
   SectionHeader,
 } from "@/components";
 import { spacing } from "@/constants";
+import { getInstallationId, shotToast } from "@/utils";
 import { router } from "expo-router";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -26,7 +27,7 @@ const LANGUAGE_OPTIONS = [
 
 export default function RegisterScreen() {
   const { t } = useTranslation();
-  const { mutateAsync: loginApi } = usePostApiAccountLogin();
+  const { mutateAsync: registerApi } = usePostApiAccountRegister();
 
   const {
     control,
@@ -34,33 +35,43 @@ export default function RegisterScreen() {
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>({
     defaultValues: {
-      username: "",
-      password: "",
-      confirmPassword: "",
+      username: `test-${Math.random()}`,
+      password: "Kadir123*+",
+      confirmPassword: "Kadir123*+",
+      language: 2,
     },
   });
 
   const onSubmit = async (formValues: RegisterFormData) => {
     try {
-      console.log("Form değerleri: ", formValues);
-
       if (formValues.password !== formValues.confirmPassword) {
-        console.error("Şifreler eşleşmiyor");
+        shotToast({
+          type: "error",
+          text1: t("register.passwordNotMatch"),
+        });
         return;
       }
 
-      const loginResponse = await loginApi({
+      const { success, data } = await registerApi({
         data: {
           username: formValues?.username,
           password: formValues?.password,
+          confirmPassword: formValues?.confirmPassword,
+          deviceId: await getInstallationId(),
         },
       });
+      console.log("loginResponse: ", data);
 
-      if (loginResponse.success) {
-        console.log(loginResponse);
+      if (success) {
+        router.push({
+          pathname: "/(auth)/securityPhrases",
+          params: {
+            accessToken: data?.accessToken?.token,
+            securityPhrases: data?.securityPhrases,
+            userName: data?.account?.username,
+          },
+        });
       }
-
-      router.push("/(auth)/securityPhrases");
     } catch (error) {
       console.error("Kayıt sırasında hata:", error);
     }
@@ -116,10 +127,10 @@ export default function RegisterScreen() {
                 field: t("password"),
               }),
               minLength: {
-                value: 6,
+                value: 8,
                 message: t("inputError.minLength", {
                   field: t("password"),
-                  count: 6,
+                  count: 8,
                 }),
               },
             }}
@@ -136,10 +147,10 @@ export default function RegisterScreen() {
                 field: t("password"),
               }),
               minLength: {
-                value: 6,
+                value: 8,
                 message: t("inputError.minLength", {
                   field: t("password"),
-                  count: 6,
+                  count: 8,
                 }),
               },
             }}

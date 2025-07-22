@@ -1,6 +1,8 @@
 import { useAppStore } from "@/store";
+import * as Application from "expo-application";
 import * as Clipboard from "expo-clipboard";
 import { changeLanguage as i18nChangeLanguage } from "i18next";
+import { Platform } from "react-native";
 import Toast, { ToastShowParams } from "react-native-toast-message";
 
 export const changeLanguage = (language: string) => {
@@ -24,4 +26,12 @@ export const shotToast = (toastConfig: ToastShowParams) => {
   Toast.show({
     ...toastConfig,
   });
+};
+
+export const getInstallationId = async () => {
+  if (Platform.OS === "ios") {
+    return await Application.getIosIdForVendorAsync();
+  } else if (Platform.OS === "android") {
+    return await Application.getAndroidId();
+  }
 };
