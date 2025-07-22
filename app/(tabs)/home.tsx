@@ -14,7 +14,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     if (!isLogin) {
-      router.replace("/(auth)/login");
+      router.replace("/(auth)/preLogin");
     }
   }, [isLogin]);
 

@@ -1,10 +1,14 @@
 {
   "welcome": "Merhaba",
-  "login": "Giriş Yap",
   "or": "veya",
   "back": "Geri",
 
   "common": {},
+
+  "login": {
+    "title": "Giriş Yap",
+    "userName": "Merhaba {{userName}},"
+  },
 
   "register": {
     "title": "Kayıt Ol",

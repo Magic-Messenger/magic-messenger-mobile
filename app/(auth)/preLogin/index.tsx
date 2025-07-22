@@ -40,7 +40,7 @@ export default function PreLoginScreen() {
         >
           <Button
             type="primary"
-            label={t("login")}
+            label={t("login.title")}
             onPress={redirectLoginPage}
           />
           <ThemedText center type="default" weight="semiBold">
