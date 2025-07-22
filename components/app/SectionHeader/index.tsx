@@ -1,4 +1,3 @@
-import { ThemedText } from "@/components";
 import { flexBox, spacing } from "@/constants";
 import {
   StyleProp,
@@ -7,6 +6,7 @@ import {
   View,
   ViewStyle,
 } from "react-native";
+import { ThemedText } from "../ThemedText";
 
 interface Props {
   title: string;

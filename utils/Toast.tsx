@@ -1,11 +1,10 @@
-import { ThemedText } from "@/components";
 import { Colors, Fonts } from "@/constants";
-import { View } from "react-native";
+import { Text, View } from "react-native";
 import { BaseToast, ErrorToast } from "react-native-toast-message";
 import { heightPixel, spacingPixel } from "./PixelHelper";
 
 export const toastConfig = {
-  success: (props) => (
+  success: (props: any) => (
     <BaseToast
       {...props}
       style={{
@@ -21,7 +20,7 @@ export const toastConfig = {
       }}
     />
   ),
-  error: (props) => (
+  error: (props: any) => (
     <ErrorToast
       {...props}
       style={{
@@ -37,7 +36,7 @@ export const toastConfig = {
       }}
     />
   ),
-  tomatoToast: ({ text1, props }) => (
+  tomatoToast: ({ text1, props }: { text1: string; props: any }) => (
     <View
       style={{
         height: heightPixel(60),
@@ -45,8 +44,8 @@ export const toastConfig = {
         backgroundColor: "tomato",
       }}
     >
-      <ThemedText>{text1}</ThemedText>
-      <ThemedText>{props.uuid}</ThemedText>
+      <Text style={{ color: "white" }}>{text1}</Text>
+      <Text style={{ color: "white" }}>{props.uuid}</Text>
     </View>
   ),
 };

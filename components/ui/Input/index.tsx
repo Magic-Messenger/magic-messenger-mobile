@@ -1,4 +1,3 @@
-import { ThemedText } from "@/components";
 import { Colors, Fonts } from "@/constants";
 import { fontPixel, heightPixel, spacingPixel } from "@/utils";
 import React, { forwardRef } from "react";
@@ -13,6 +12,7 @@ import {
   View,
   ViewStyle,
 } from "react-native";
+import { ThemedText } from "../../app/ThemedText";
 
 interface BaseInputProps extends Omit<TextInputProps, "style"> {
   label?: string;
@@ -33,7 +33,7 @@ interface BaseInputProps extends Omit<TextInputProps, "style"> {
 // React Hook Form ile kullanım için props
 interface ControlledInputProps<
   TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > extends BaseInputProps {
   control: Control<TFieldValues>;
   name: TName;
@@ -52,7 +52,7 @@ interface UncontrolledInputProps extends BaseInputProps {
 
 type CustomInputProps<
   TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = ControlledInputProps<TFieldValues, TName> | UncontrolledInputProps;
 
 // Input bileşenini forwardRef ile sarmalayalım
@@ -124,7 +124,7 @@ InputComponent.displayName = "InputComponent";
 // Ana Input component
 export const Input = <
   TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
   control,
   name,

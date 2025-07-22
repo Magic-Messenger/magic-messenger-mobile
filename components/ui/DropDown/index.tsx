@@ -1,4 +1,3 @@
-import { ThemedText } from "@/components";
 import { Colors, Fonts } from "@/constants";
 import { fontPixel, heightPixel, spacingPixel } from "@/utils";
 import { LinearGradient } from "expo-linear-gradient";
@@ -13,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { ThemedText } from "../../app/ThemedText";
 
 export interface DropdownOption {
   label: string;
@@ -40,7 +40,7 @@ interface StandaloneDropdownProps extends BaseDropdownProps {
 
 interface ControlledDropdownProps<
   TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > extends BaseDropdownProps {
   control: Control<TFieldValues>;
   name: TName;
@@ -51,7 +51,7 @@ interface ControlledDropdownProps<
 
 type ModernDropdownProps<
   TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = StandaloneDropdownProps | ControlledDropdownProps<TFieldValues, TName>;
 
 const DropdownComponent = forwardRef<
@@ -174,7 +174,7 @@ DropdownComponent.displayName = "DropdownComponent";
 
 export const Dropdown = <
   TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >(
   props: ModernDropdownProps<TFieldValues, TName>
 ) => {

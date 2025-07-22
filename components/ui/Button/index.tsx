@@ -1,4 +1,3 @@
-import { ThemedText, ThemedTextProps } from "@/components";
 import { Colors, commonStyle, spacing } from "@/constants";
 import { heightPixel } from "@/utils";
 import { LinearGradient } from "expo-linear-gradient";
@@ -10,6 +9,7 @@ import {
   View,
   ViewStyle,
 } from "react-native";
+import { ThemedText, ThemedTextProps } from "../../app/ThemedText";
 
 interface Props {
   type?: "default" | "primary" | "secondary";
