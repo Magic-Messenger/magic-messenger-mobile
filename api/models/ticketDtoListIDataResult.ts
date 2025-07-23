@@ -9,7 +9,7 @@ import type { TicketDto } from "./ticketDto";
 export interface TicketDtoListIDataResult {
   readonly success?: boolean;
   /** @nullable */
-  readonly message?: string | null;
+  messages?: string[] | null;
   /** @nullable */
   readonly data?: readonly TicketDto[] | null;
 }

@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 50,
     borderRadius: 8,
-    backgroundColor: Colors.secondaryBackground,
+    backgroundColor: Colors.secondary,
     color: Colors.white,
     fontFamily: Fonts.SFProMedium,
   },

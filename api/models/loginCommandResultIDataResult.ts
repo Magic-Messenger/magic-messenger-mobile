@@ -9,7 +9,7 @@ import type { LoginCommandResultIDataResultData } from "./loginCommandResultIDat
 export interface LoginCommandResultIDataResult {
   readonly success?: boolean;
   /** @nullable */
-  readonly message?: string | null;
+  messages?: string[] | null;
   /** @nullable */
   readonly data?: LoginCommandResultIDataResultData;
 }

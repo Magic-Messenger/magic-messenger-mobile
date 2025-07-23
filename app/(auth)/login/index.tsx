@@ -7,13 +7,13 @@ import {
   SectionHeader,
   ThemedText,
 } from "@/components";
-import { commonStyle, Images, spacing } from "@/constants";
+import { commonStyle, flexBox, Images, spacing } from "@/constants";
 import { useUserStore } from "@/store";
-import { heightPixel, widthPixel } from "@/utils";
+import { fontPixel, heightPixel, widthPixel } from "@/utils";
 import { router } from "expo-router";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 interface RegisterFormData {
   username: string;
@@ -136,6 +136,16 @@ export default function LoginScreen() {
             }}
             error={errors.password?.message}
           />
+
+          <View style={styles.forgotAccountContainer}>
+            <TouchableOpacity
+              onPress={() => router.push("/(auth)/verifyPhrases")}
+            >
+              <ThemedText type="link" style={styles.forgotAccountText}>
+                {t("forgotAccount.title")}
+              </ThemedText>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </AppLayout>
@@ -156,5 +166,11 @@ const styles = StyleSheet.create({
   logoImage: {
     width: widthPixel(220),
     height: heightPixel(50),
+  },
+  forgotAccountContainer: {
+    ...flexBox(1, "row", "flex-end"),
+  },
+  forgotAccountText: {
+    fontSize: fontPixel(14),
   },
 });

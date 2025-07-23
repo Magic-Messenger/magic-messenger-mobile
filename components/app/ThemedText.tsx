@@ -55,7 +55,6 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   link: {
-    lineHeight: fontPixel(30),
     fontSize: fontPixel(16),
     color: "#0a7ea4",
   },

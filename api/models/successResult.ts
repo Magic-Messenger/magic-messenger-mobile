@@ -8,5 +8,5 @@
 export interface SuccessResult {
   success?: boolean;
   /** @nullable */
-  message?: string | null;
+  messages?: string[] | null;
 }

@@ -9,7 +9,7 @@ import type { RefreshTokenCommandResultIDataResultData } from "./refreshTokenCom
 export interface RefreshTokenCommandResultIDataResult {
   readonly success?: boolean;
   /** @nullable */
-  readonly message?: string | null;
+  messages?: string[] | null;
   /** @nullable */
   readonly data?: RefreshTokenCommandResultIDataResultData;
 }

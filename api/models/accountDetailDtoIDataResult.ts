@@ -9,7 +9,7 @@ import type { AccountDetailDtoIDataResultData } from "./accountDetailDtoIDataRes
 export interface AccountDetailDtoIDataResult {
   readonly success?: boolean;
   /** @nullable */
-  readonly message?: string | null;
+  messages?: string[] | null;
   /** @nullable */
   readonly data?: AccountDetailDtoIDataResultData;
 }

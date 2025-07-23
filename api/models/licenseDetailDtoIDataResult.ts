@@ -9,7 +9,7 @@ import type { LicenseDetailDtoIDataResultData } from "./licenseDetailDtoIDataRes
 export interface LicenseDetailDtoIDataResult {
   readonly success?: boolean;
   /** @nullable */
-  readonly message?: string | null;
+  messages?: string[] | null;
   /** @nullable */
   readonly data?: LicenseDetailDtoIDataResultData;
 }

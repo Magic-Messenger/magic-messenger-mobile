@@ -51,6 +51,22 @@ export default function AuthScreen() {
           title: t("securityPhrases.title"),
         }}
       />
+
+      <Stack.Screen
+        name="verifyPhrases/index"
+        options={{
+          headerShown: true,
+          title: t("forgotAccount.verifyPhrases"),
+        }}
+      />
+
+      <Stack.Screen
+        name="resetPassword/index"
+        options={{
+          headerShown: true,
+          title: t("forgotAccount.resetPassword"),
+        }}
+      />
     </Stack>
   );
 }

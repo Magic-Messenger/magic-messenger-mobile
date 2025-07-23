@@ -142,3 +142,4 @@ export * from "./uploadFileCommandResultIDataResultData";
 export * from "./verifyPasswordCommandRequest";
 export * from "./verifyPhrasesCommandRequest";
 export * from "./verifyTwoFactorCommandRequest";
+export * from "./recoverPasswordCommandRequest";

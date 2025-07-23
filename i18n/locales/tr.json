@@ -18,6 +18,14 @@
     "passwordNotMatch": "Şifreler eşleşmiyor"
   },
 
+  "forgotAccount": {
+    "title": "Şifrenimi Unuttun?",
+    "verifyPhrases": "Güvenlik Anahtarı Doğrulama",
+    "resetPassword": "Şifre Sıfırlama",
+    "inputPhrases": "Güvenlik Anahtarı",
+    "userResetPassword": "Şifre Sıfırlama "
+  },
+
   "userName": "Kullanıcı Adı",
   "password": "Şifre",
   "confirmPassword": "Şifre Tekrar",

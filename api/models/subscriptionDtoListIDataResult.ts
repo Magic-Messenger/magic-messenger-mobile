@@ -9,7 +9,7 @@ import type { SubscriptionDto } from "./subscriptionDto";
 export interface SubscriptionDtoListIDataResult {
   readonly success?: boolean;
   /** @nullable */
-  readonly message?: string | null;
+  messages?: string[] | null;
   /** @nullable */
   readonly data?: readonly SubscriptionDto[] | null;
 }

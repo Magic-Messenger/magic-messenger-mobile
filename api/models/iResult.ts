@@ -8,5 +8,5 @@
 export interface IResult {
   readonly success?: boolean;
   /** @nullable */
-  readonly message?: string | null;
+  messages?: string[] | null;
 }

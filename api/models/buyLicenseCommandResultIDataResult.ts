@@ -9,7 +9,7 @@ import type { BuyLicenseCommandResultIDataResultData } from "./buyLicenseCommand
 export interface BuyLicenseCommandResultIDataResult {
   readonly success?: boolean;
   /** @nullable */
-  readonly message?: string | null;
+  messages?: string[] | null;
   /** @nullable */
   readonly data?: BuyLicenseCommandResultIDataResultData;
 }

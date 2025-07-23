@@ -9,7 +9,7 @@ import type { LicenseDto } from "./licenseDto";
 export interface LicenseDtoListPaginatedResult {
   success?: boolean;
   /** @nullable */
-  message?: string | null;
+  messages?: string[] | null;
   /** @nullable */
   data?: LicenseDto[] | null;
   pageNumber?: number;

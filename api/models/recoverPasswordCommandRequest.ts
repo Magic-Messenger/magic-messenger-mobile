@@ -5,9 +5,13 @@
  * OpenAPI spec version: v1
  */
 
-export interface VerifyPhrasesCommandRequest {
+export interface RecoverPasswordCommandRequest {
   /** @nullable */
   username?: string | null;
   /** @nullable */
   phrases?: string[] | null;
+  /** @nullable */
+  password?: string | null;
+  /** @nullable */
+  confirmPassword?: string | null;
 }

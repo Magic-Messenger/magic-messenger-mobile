@@ -9,7 +9,7 @@ import type { SubscriptionIDataResultData } from "./subscriptionIDataResultData"
 export interface SubscriptionIDataResult {
   readonly success?: boolean;
   /** @nullable */
-  readonly message?: string | null;
+  messages?: string[] | null;
   /** @nullable */
   readonly data?: SubscriptionIDataResultData;
 }

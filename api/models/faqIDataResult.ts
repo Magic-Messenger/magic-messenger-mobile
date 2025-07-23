@@ -9,7 +9,7 @@ import type { FaqIDataResultData } from "./faqIDataResultData";
 export interface FaqIDataResult {
   readonly success?: boolean;
   /** @nullable */
-  readonly message?: string | null;
+  messages?: string[] | null;
   /** @nullable */
   readonly data?: FaqIDataResultData;
 }

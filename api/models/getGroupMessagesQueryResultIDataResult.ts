@@ -9,7 +9,7 @@ import type { GetGroupMessagesQueryResultIDataResultData } from "./getGroupMessa
 export interface GetGroupMessagesQueryResultIDataResult {
   readonly success?: boolean;
   /** @nullable */
-  readonly message?: string | null;
+  messages?: string[] | null;
   /** @nullable */
   readonly data?: GetGroupMessagesQueryResultIDataResultData;
 }

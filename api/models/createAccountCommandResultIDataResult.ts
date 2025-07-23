@@ -9,7 +9,7 @@ import type { CreateAccountCommandResultIDataResultData } from "./createAccountC
 export interface CreateAccountCommandResultIDataResult {
   readonly success?: boolean;
   /** @nullable */
-  readonly message?: string | null;
+  messages?: string[] | null;
   /** @nullable */
   readonly data?: CreateAccountCommandResultIDataResultData;
 }

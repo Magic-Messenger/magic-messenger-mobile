@@ -73,6 +73,7 @@ import type {
   ObjectId,
   PostApiChatsClearParams,
   PostApiChatsUploadBody,
+  RecoverPasswordCommandRequest,
   RefreshTokenCommandRequest,
   RefreshTokenCommandResultIDataResult,
   RegisterCommandRequest,
@@ -125,7 +126,7 @@ export const postApiAccountLogin = (
 };
 
 export const getPostApiAccountLoginMutationOptions = <
-  TError = string,
+  TError = string[],
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -166,12 +167,12 @@ export type PostApiAccountLoginMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiAccountLogin>>
 >;
 export type PostApiAccountLoginMutationBody = LoginCommandRequest;
-export type PostApiAccountLoginMutationError = string;
+export type PostApiAccountLoginMutationError = string[];
 
 /**
  * @summary Account login operation
  */
-export const usePostApiAccountLogin = <TError = string, TContext = unknown>(
+export const usePostApiAccountLogin = <TError = string[], TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postApiAccountLogin>>,
@@ -214,7 +215,7 @@ export const postApiAccountAdminLogin = (
 };
 
 export const getPostApiAccountAdminLoginMutationOptions = <
-  TError = string,
+  TError = string[],
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -255,13 +256,13 @@ export type PostApiAccountAdminLoginMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiAccountAdminLogin>>
 >;
 export type PostApiAccountAdminLoginMutationBody = AdminLoginCommandRequest;
-export type PostApiAccountAdminLoginMutationError = string;
+export type PostApiAccountAdminLoginMutationError = string[];
 
 /**
  * @summary Admin account login operation
  */
 export const usePostApiAccountAdminLogin = <
-  TError = string,
+  TError = string[],
   TContext = unknown,
 >(
   options?: {
@@ -306,7 +307,7 @@ export const postApiAccountGenerateTwoFactor = (
 };
 
 export const getPostApiAccountGenerateTwoFactorMutationOptions = <
-  TError = string,
+  TError = string[],
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -348,13 +349,13 @@ export type PostApiAccountGenerateTwoFactorMutationResult = NonNullable<
 >;
 export type PostApiAccountGenerateTwoFactorMutationBody =
   SetupTwoFactorCommandRequest;
-export type PostApiAccountGenerateTwoFactorMutationError = string;
+export type PostApiAccountGenerateTwoFactorMutationError = string[];
 
 /**
  * @summary Account generate two-factor operation
  */
 export const usePostApiAccountGenerateTwoFactor = <
-  TError = string,
+  TError = string[],
   TContext = unknown,
 >(
   options?: {
@@ -400,7 +401,7 @@ export const postApiAccountVerifyTwoFactor = (
 };
 
 export const getPostApiAccountVerifyTwoFactorMutationOptions = <
-  TError = string,
+  TError = string[],
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -442,13 +443,13 @@ export type PostApiAccountVerifyTwoFactorMutationResult = NonNullable<
 >;
 export type PostApiAccountVerifyTwoFactorMutationBody =
   VerifyTwoFactorCommandRequest;
-export type PostApiAccountVerifyTwoFactorMutationError = string;
+export type PostApiAccountVerifyTwoFactorMutationError = string[];
 
 /**
  * @summary Account verify two-factor operation
  */
 export const usePostApiAccountVerifyTwoFactor = <
-  TError = string,
+  TError = string[],
   TContext = unknown,
 >(
   options?: {
@@ -494,7 +495,7 @@ export const postApiAccountRefreshToken = (
 };
 
 export const getPostApiAccountRefreshTokenMutationOptions = <
-  TError = string,
+  TError = string[],
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -535,13 +536,13 @@ export type PostApiAccountRefreshTokenMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiAccountRefreshToken>>
 >;
 export type PostApiAccountRefreshTokenMutationBody = RefreshTokenCommandRequest;
-export type PostApiAccountRefreshTokenMutationError = string;
+export type PostApiAccountRefreshTokenMutationError = string[];
 
 /**
  * @summary Refresh token operation
  */
 export const usePostApiAccountRefreshToken = <
-  TError = string,
+  TError = string[],
   TContext = unknown,
 >(
   options?: {
@@ -586,7 +587,7 @@ export const postApiAccountCreateAccount = (
 };
 
 export const getPostApiAccountCreateAccountMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -628,13 +629,13 @@ export type PostApiAccountCreateAccountMutationResult = NonNullable<
 >;
 export type PostApiAccountCreateAccountMutationBody =
   CreateAccountCommandRequest;
-export type PostApiAccountCreateAccountMutationError = string | void;
+export type PostApiAccountCreateAccountMutationError = string[] | void;
 
 /**
  * @summary Account create operation
  */
 export const usePostApiAccountCreateAccount = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -680,7 +681,7 @@ export const postApiAccountRegister = (
 };
 
 export const getPostApiAccountRegisterMutationOptions = <
-  TError = string,
+  TError = string[],
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -721,12 +722,15 @@ export type PostApiAccountRegisterMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiAccountRegister>>
 >;
 export type PostApiAccountRegisterMutationBody = RegisterCommandRequest;
-export type PostApiAccountRegisterMutationError = string;
+export type PostApiAccountRegisterMutationError = string[];
 
 /**
  * @summary Account register operation
  */
-export const usePostApiAccountRegister = <TError = string, TContext = unknown>(
+export const usePostApiAccountRegister = <
+  TError = string[],
+  TContext = unknown,
+>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postApiAccountRegister>>,
@@ -770,7 +774,7 @@ export const getGetApiAccountListQueryKey = (
 
 export const getGetApiAccountListQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiAccountList>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiAccountListParams,
   options?: {
@@ -809,11 +813,11 @@ export const getGetApiAccountListQueryOptions = <
 export type GetApiAccountListQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiAccountList>>
 >;
-export type GetApiAccountListQueryError = string | void;
+export type GetApiAccountListQueryError = string[] | void;
 
 export function useGetApiAccountList<
   TData = Awaited<ReturnType<typeof getApiAccountList>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params: undefined | GetApiAccountListParams,
   options: {
@@ -840,7 +844,7 @@ export function useGetApiAccountList<
 };
 export function useGetApiAccountList<
   TData = Awaited<ReturnType<typeof getApiAccountList>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiAccountListParams,
   options?: {
@@ -867,7 +871,7 @@ export function useGetApiAccountList<
 };
 export function useGetApiAccountList<
   TData = Awaited<ReturnType<typeof getApiAccountList>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiAccountListParams,
   options?: {
@@ -890,7 +894,7 @@ export function useGetApiAccountList<
 
 export function useGetApiAccountList<
   TData = Awaited<ReturnType<typeof getApiAccountList>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiAccountListParams,
   options?: {
@@ -941,7 +945,7 @@ export const getGetApiAccountGetQueryKey = (
 
 export const getGetApiAccountGetQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiAccountGet>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiAccountGetParams,
   options?: {
@@ -980,11 +984,11 @@ export const getGetApiAccountGetQueryOptions = <
 export type GetApiAccountGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiAccountGet>>
 >;
-export type GetApiAccountGetQueryError = string | void;
+export type GetApiAccountGetQueryError = string[] | void;
 
 export function useGetApiAccountGet<
   TData = Awaited<ReturnType<typeof getApiAccountGet>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params: undefined | GetApiAccountGetParams,
   options: {
@@ -1011,7 +1015,7 @@ export function useGetApiAccountGet<
 };
 export function useGetApiAccountGet<
   TData = Awaited<ReturnType<typeof getApiAccountGet>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiAccountGetParams,
   options?: {
@@ -1038,7 +1042,7 @@ export function useGetApiAccountGet<
 };
 export function useGetApiAccountGet<
   TData = Awaited<ReturnType<typeof getApiAccountGet>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiAccountGetParams,
   options?: {
@@ -1061,7 +1065,7 @@ export function useGetApiAccountGet<
 
 export function useGetApiAccountGet<
   TData = Awaited<ReturnType<typeof getApiAccountGet>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiAccountGetParams,
   options?: {
@@ -1111,7 +1115,7 @@ export const postApiAccountBuyLicense = (
 };
 
 export const getPostApiAccountBuyLicenseMutationOptions = <
-  TError = string,
+  TError = string[],
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -1152,13 +1156,13 @@ export type PostApiAccountBuyLicenseMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiAccountBuyLicense>>
 >;
 export type PostApiAccountBuyLicenseMutationBody = BuyLicenseCommandRequest;
-export type PostApiAccountBuyLicenseMutationError = string;
+export type PostApiAccountBuyLicenseMutationError = string[];
 
 /**
  * @summary Account buy license operation
  */
 export const usePostApiAccountBuyLicense = <
-  TError = string,
+  TError = string[],
   TContext = unknown,
 >(
   options?: {
@@ -1203,7 +1207,7 @@ export const postApiAccountChangeStatus = (
 };
 
 export const getPostApiAccountChangeStatusMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -1245,13 +1249,13 @@ export type PostApiAccountChangeStatusMutationResult = NonNullable<
 >;
 export type PostApiAccountChangeStatusMutationBody =
   ChangeAccountStatusCommandRequest;
-export type PostApiAccountChangeStatusMutationError = string | void;
+export type PostApiAccountChangeStatusMutationError = string[] | void;
 
 /**
  * @summary Change account status operation
  */
 export const usePostApiAccountChangeStatus = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -1296,7 +1300,7 @@ export const postApiAccountBlockAccount = (
 };
 
 export const getPostApiAccountBlockAccountMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -1337,13 +1341,13 @@ export type PostApiAccountBlockAccountMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiAccountBlockAccount>>
 >;
 export type PostApiAccountBlockAccountMutationBody = BlockAccountCommandRequest;
-export type PostApiAccountBlockAccountMutationError = string | void;
+export type PostApiAccountBlockAccountMutationError = string[] | void;
 
 /**
  * @summary Block account operation
  */
 export const usePostApiAccountBlockAccount = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -1388,7 +1392,7 @@ export const postApiAccountUnblockAccount = (
 };
 
 export const getPostApiAccountUnblockAccountMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -1430,13 +1434,13 @@ export type PostApiAccountUnblockAccountMutationResult = NonNullable<
 >;
 export type PostApiAccountUnblockAccountMutationBody =
   UnblockAccountCommandRequest;
-export type PostApiAccountUnblockAccountMutationError = string | void;
+export type PostApiAccountUnblockAccountMutationError = string[] | void;
 
 /**
  * @summary Unblock account operation
  */
 export const usePostApiAccountUnblockAccount = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -1462,6 +1466,100 @@ export const usePostApiAccountUnblockAccount = <
 };
 
 /**
+ * @summary Recover account password operation
+ */
+export const postApiAccountRecoverPassword = (
+  recoverPasswordCommandRequest: RecoverPasswordCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/account/recover-password`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: recoverPasswordCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiAccountRecoverPasswordMutationOptions = <
+  TError = string[],
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiAccountRecoverPassword>>,
+    TError,
+    { data: RecoverPasswordCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiAccountRecoverPassword>>,
+  TError,
+  { data: RecoverPasswordCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiAccountRecoverPassword"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiAccountRecoverPassword>>,
+    { data: RecoverPasswordCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiAccountRecoverPassword(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiAccountRecoverPasswordMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiAccountRecoverPassword>>
+>;
+export type PostApiAccountRecoverPasswordMutationBody =
+  RecoverPasswordCommandRequest;
+export type PostApiAccountRecoverPasswordMutationError = string[];
+
+/**
+ * @summary Recover account password operation
+ */
+export const usePostApiAccountRecoverPassword = <
+  TError = string[],
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiAccountRecoverPassword>>,
+      TError,
+      { data: RecoverPasswordCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiAccountRecoverPassword>>,
+  TError,
+  { data: RecoverPasswordCommandRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiAccountRecoverPasswordMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
  * @summary Reset account password operation
  */
 export const postApiAccountResetPassword = (
@@ -1482,7 +1580,7 @@ export const postApiAccountResetPassword = (
 };
 
 export const getPostApiAccountResetPasswordMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -1524,13 +1622,13 @@ export type PostApiAccountResetPasswordMutationResult = NonNullable<
 >;
 export type PostApiAccountResetPasswordMutationBody =
   ResetPasswordCommandRequest;
-export type PostApiAccountResetPasswordMutationError = string | void;
+export type PostApiAccountResetPasswordMutationError = string[] | void;
 
 /**
  * @summary Reset account password operation
  */
 export const usePostApiAccountResetPassword = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -1576,7 +1674,7 @@ export const postApiAccountResetPhrases = (
 };
 
 export const getPostApiAccountResetPhrasesMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -1617,13 +1715,13 @@ export type PostApiAccountResetPhrasesMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiAccountResetPhrases>>
 >;
 export type PostApiAccountResetPhrasesMutationBody = ResetPhrasesCommandRequest;
-export type PostApiAccountResetPhrasesMutationError = string | void;
+export type PostApiAccountResetPhrasesMutationError = string[] | void;
 
 /**
  * @summary Reset account phrases operation
  */
 export const usePostApiAccountResetPhrases = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -1668,7 +1766,7 @@ export const postApiAccountResetTwoFactor = (
 };
 
 export const getPostApiAccountResetTwoFactorMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -1710,13 +1808,13 @@ export type PostApiAccountResetTwoFactorMutationResult = NonNullable<
 >;
 export type PostApiAccountResetTwoFactorMutationBody =
   ResetTwoFactorCommandRequest;
-export type PostApiAccountResetTwoFactorMutationError = string | void;
+export type PostApiAccountResetTwoFactorMutationError = string[] | void;
 
 /**
  * @summary Reset two factor operation
  */
 export const usePostApiAccountResetTwoFactor = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -1762,7 +1860,7 @@ export const postApiAccountVerifyPassword = (
 };
 
 export const getPostApiAccountVerifyPasswordMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -1804,13 +1902,13 @@ export type PostApiAccountVerifyPasswordMutationResult = NonNullable<
 >;
 export type PostApiAccountVerifyPasswordMutationBody =
   VerifyPasswordCommandRequest;
-export type PostApiAccountVerifyPasswordMutationError = string | void;
+export type PostApiAccountVerifyPasswordMutationError = string[] | void;
 
 /**
  * @summary Verify account password operation
  */
 export const usePostApiAccountVerifyPassword = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -1856,7 +1954,7 @@ export const postApiAccountVerifyPhrases = (
 };
 
 export const getPostApiAccountVerifyPhrasesMutationOptions = <
-  TError = string | void,
+  TError = string[],
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -1898,13 +1996,13 @@ export type PostApiAccountVerifyPhrasesMutationResult = NonNullable<
 >;
 export type PostApiAccountVerifyPhrasesMutationBody =
   VerifyPhrasesCommandRequest;
-export type PostApiAccountVerifyPhrasesMutationError = string | void;
+export type PostApiAccountVerifyPhrasesMutationError = string[];
 
 /**
  * @summary Verify account phrases operation
  */
 export const usePostApiAccountVerifyPhrases = <
-  TError = string | void,
+  TError = string[],
   TContext = unknown,
 >(
   options?: {
@@ -1943,7 +2041,7 @@ export const deleteApiAccountDeleteAccount = (
 };
 
 export const getDeleteApiAccountDeleteAccountMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -1984,13 +2082,13 @@ export type DeleteApiAccountDeleteAccountMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteApiAccountDeleteAccount>>
 >;
 
-export type DeleteApiAccountDeleteAccountMutationError = string | void;
+export type DeleteApiAccountDeleteAccountMutationError = string[] | void;
 
 /**
  * @summary Delete an account
  */
 export const useDeleteApiAccountDeleteAccount = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -2029,7 +2127,7 @@ export const deleteApiAccountDeleteProfile = (
 };
 
 export const getDeleteApiAccountDeleteProfileMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -2070,13 +2168,13 @@ export type DeleteApiAccountDeleteProfileMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteApiAccountDeleteProfile>>
 >;
 
-export type DeleteApiAccountDeleteProfileMutationError = string | void;
+export type DeleteApiAccountDeleteProfileMutationError = string[] | void;
 
 /**
  * @summary Delete account profile operation
  */
 export const useDeleteApiAccountDeleteProfile = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -2122,7 +2220,7 @@ export const postApiChatsCreate = (
 };
 
 export const getPostApiChatsCreateMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -2163,13 +2261,13 @@ export type PostApiChatsCreateMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiChatsCreate>>
 >;
 export type PostApiChatsCreateMutationBody = CreateChatCommandRequest;
-export type PostApiChatsCreateMutationError = string | void;
+export type PostApiChatsCreateMutationError = string[] | void;
 
 /**
  * @summary Create a chat
  */
 export const usePostApiChatsCreate = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -2214,7 +2312,7 @@ export const postApiChatsUpdate = (
 };
 
 export const getPostApiChatsUpdateMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -2255,13 +2353,13 @@ export type PostApiChatsUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiChatsUpdate>>
 >;
 export type PostApiChatsUpdateMutationBody = UpdateChatCommandRequest;
-export type PostApiChatsUpdateMutationError = string | void;
+export type PostApiChatsUpdateMutationError = string[] | void;
 
 /**
  * @summary Update a chat
  */
 export const usePostApiChatsUpdate = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -2300,7 +2398,7 @@ export const postApiChatsClear = (
 };
 
 export const getPostApiChatsClearMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -2341,13 +2439,13 @@ export type PostApiChatsClearMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiChatsClear>>
 >;
 
-export type PostApiChatsClearMutationError = string | void;
+export type PostApiChatsClearMutationError = string[] | void;
 
 /**
  * @summary Clear a chat
  */
 export const usePostApiChatsClear = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -2385,7 +2483,7 @@ export const deleteApiChatsDelete = (
 };
 
 export const getDeleteApiChatsDeleteMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -2426,13 +2524,13 @@ export type DeleteApiChatsDeleteMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteApiChatsDelete>>
 >;
 
-export type DeleteApiChatsDeleteMutationError = string | void;
+export type DeleteApiChatsDeleteMutationError = string[] | void;
 
 /**
  * @summary Delete a chat
  */
 export const useDeleteApiChatsDelete = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -2478,7 +2576,7 @@ export const getGetApiChatsMessagesQueryKey = (
 
 export const getGetApiChatsMessagesQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiChatsMessages>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiChatsMessagesParams,
   options?: {
@@ -2517,11 +2615,11 @@ export const getGetApiChatsMessagesQueryOptions = <
 export type GetApiChatsMessagesQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiChatsMessages>>
 >;
-export type GetApiChatsMessagesQueryError = string | void;
+export type GetApiChatsMessagesQueryError = string[] | void;
 
 export function useGetApiChatsMessages<
   TData = Awaited<ReturnType<typeof getApiChatsMessages>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params: undefined | GetApiChatsMessagesParams,
   options: {
@@ -2548,7 +2646,7 @@ export function useGetApiChatsMessages<
 };
 export function useGetApiChatsMessages<
   TData = Awaited<ReturnType<typeof getApiChatsMessages>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiChatsMessagesParams,
   options?: {
@@ -2575,7 +2673,7 @@ export function useGetApiChatsMessages<
 };
 export function useGetApiChatsMessages<
   TData = Awaited<ReturnType<typeof getApiChatsMessages>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiChatsMessagesParams,
   options?: {
@@ -2598,7 +2696,7 @@ export function useGetApiChatsMessages<
 
 export function useGetApiChatsMessages<
   TData = Awaited<ReturnType<typeof getApiChatsMessages>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiChatsMessagesParams,
   options?: {
@@ -2649,7 +2747,7 @@ export const getGetApiChatsGroupMessagesQueryKey = (
 
 export const getGetApiChatsGroupMessagesQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiChatsGroupMessages>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiChatsGroupMessagesParams,
   options?: {
@@ -2688,11 +2786,11 @@ export const getGetApiChatsGroupMessagesQueryOptions = <
 export type GetApiChatsGroupMessagesQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiChatsGroupMessages>>
 >;
-export type GetApiChatsGroupMessagesQueryError = string | void;
+export type GetApiChatsGroupMessagesQueryError = string[] | void;
 
 export function useGetApiChatsGroupMessages<
   TData = Awaited<ReturnType<typeof getApiChatsGroupMessages>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params: undefined | GetApiChatsGroupMessagesParams,
   options: {
@@ -2719,7 +2817,7 @@ export function useGetApiChatsGroupMessages<
 };
 export function useGetApiChatsGroupMessages<
   TData = Awaited<ReturnType<typeof getApiChatsGroupMessages>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiChatsGroupMessagesParams,
   options?: {
@@ -2746,7 +2844,7 @@ export function useGetApiChatsGroupMessages<
 };
 export function useGetApiChatsGroupMessages<
   TData = Awaited<ReturnType<typeof getApiChatsGroupMessages>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiChatsGroupMessagesParams,
   options?: {
@@ -2769,7 +2867,7 @@ export function useGetApiChatsGroupMessages<
 
 export function useGetApiChatsGroupMessages<
   TData = Awaited<ReturnType<typeof getApiChatsGroupMessages>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiChatsGroupMessagesParams,
   options?: {
@@ -2824,7 +2922,7 @@ export const postApiChatsUpload = (
 };
 
 export const getPostApiChatsUploadMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -2865,13 +2963,13 @@ export type PostApiChatsUploadMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiChatsUpload>>
 >;
 export type PostApiChatsUploadMutationBody = PostApiChatsUploadBody;
-export type PostApiChatsUploadMutationError = string | void;
+export type PostApiChatsUploadMutationError = string[] | void;
 
 /**
  * @summary Upload file for chat
  */
 export const usePostApiChatsUpload = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -2916,7 +3014,7 @@ export const postApiFaqsCreate = (
 };
 
 export const getPostApiFaqsCreateMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -2957,13 +3055,13 @@ export type PostApiFaqsCreateMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiFaqsCreate>>
 >;
 export type PostApiFaqsCreateMutationBody = CreateFaqCommandRequest;
-export type PostApiFaqsCreateMutationError = string | void;
+export type PostApiFaqsCreateMutationError = string[] | void;
 
 /**
  * @summary Create a faq
  */
 export const usePostApiFaqsCreate = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -3008,7 +3106,7 @@ export const postApiFaqsUpdate = (
 };
 
 export const getPostApiFaqsUpdateMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -3049,13 +3147,13 @@ export type PostApiFaqsUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiFaqsUpdate>>
 >;
 export type PostApiFaqsUpdateMutationBody = UpdateFaqCommandRequest;
-export type PostApiFaqsUpdateMutationError = string | void;
+export type PostApiFaqsUpdateMutationError = string[] | void;
 
 /**
  * @summary Update a faq
  */
 export const usePostApiFaqsUpdate = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -3093,7 +3191,7 @@ export const deleteApiFaqsDelete = (
 };
 
 export const getDeleteApiFaqsDeleteMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -3134,13 +3232,13 @@ export type DeleteApiFaqsDeleteMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteApiFaqsDelete>>
 >;
 
-export type DeleteApiFaqsDeleteMutationError = string | void;
+export type DeleteApiFaqsDeleteMutationError = string[] | void;
 
 /**
  * @summary Delete a faq
  */
 export const useDeleteApiFaqsDelete = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -3184,7 +3282,7 @@ export const getGetApiFaqsQueryKey = (params?: GetApiFaqsParams) => {
 
 export const getGetApiFaqsQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiFaqs>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiFaqsParams,
   options?: {
@@ -3218,11 +3316,11 @@ export const getGetApiFaqsQueryOptions = <
 export type GetApiFaqsQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiFaqs>>
 >;
-export type GetApiFaqsQueryError = string | void;
+export type GetApiFaqsQueryError = string[] | void;
 
 export function useGetApiFaqs<
   TData = Awaited<ReturnType<typeof getApiFaqs>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params: undefined | GetApiFaqsParams,
   options: {
@@ -3245,7 +3343,7 @@ export function useGetApiFaqs<
 };
 export function useGetApiFaqs<
   TData = Awaited<ReturnType<typeof getApiFaqs>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiFaqsParams,
   options?: {
@@ -3268,7 +3366,7 @@ export function useGetApiFaqs<
 };
 export function useGetApiFaqs<
   TData = Awaited<ReturnType<typeof getApiFaqs>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiFaqsParams,
   options?: {
@@ -3287,7 +3385,7 @@ export function useGetApiFaqs<
 
 export function useGetApiFaqs<
   TData = Awaited<ReturnType<typeof getApiFaqs>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiFaqsParams,
   options?: {
@@ -3331,7 +3429,7 @@ export const getGetApiFaqsListQueryKey = () => {
 
 export const getGetApiFaqsListQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiFaqsList>>,
-  TError = string | void,
+  TError = string[] | void,
 >(options?: {
   query?: Partial<
     UseQueryOptions<Awaited<ReturnType<typeof getApiFaqsList>>, TError, TData>
@@ -3362,11 +3460,11 @@ export const getGetApiFaqsListQueryOptions = <
 export type GetApiFaqsListQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiFaqsList>>
 >;
-export type GetApiFaqsListQueryError = string | void;
+export type GetApiFaqsListQueryError = string[] | void;
 
 export function useGetApiFaqsList<
   TData = Awaited<ReturnType<typeof getApiFaqsList>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   options: {
     query: Partial<
@@ -3388,7 +3486,7 @@ export function useGetApiFaqsList<
 };
 export function useGetApiFaqsList<
   TData = Awaited<ReturnType<typeof getApiFaqsList>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   options?: {
     query?: Partial<
@@ -3410,7 +3508,7 @@ export function useGetApiFaqsList<
 };
 export function useGetApiFaqsList<
   TData = Awaited<ReturnType<typeof getApiFaqsList>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   options?: {
     query?: Partial<
@@ -3428,7 +3526,7 @@ export function useGetApiFaqsList<
 
 export function useGetApiFaqsList<
   TData = Awaited<ReturnType<typeof getApiFaqsList>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   options?: {
     query?: Partial<
@@ -3472,7 +3570,7 @@ export const getGetApiLanguagesQueryKey = () => {
 
 export const getGetApiLanguagesQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiLanguages>>,
-  TError = string | void,
+  TError = string[] | void,
 >(options?: {
   query?: Partial<
     UseQueryOptions<Awaited<ReturnType<typeof getApiLanguages>>, TError, TData>
@@ -3503,11 +3601,11 @@ export const getGetApiLanguagesQueryOptions = <
 export type GetApiLanguagesQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiLanguages>>
 >;
-export type GetApiLanguagesQueryError = string | void;
+export type GetApiLanguagesQueryError = string[] | void;
 
 export function useGetApiLanguages<
   TData = Awaited<ReturnType<typeof getApiLanguages>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   options: {
     query: Partial<
@@ -3533,7 +3631,7 @@ export function useGetApiLanguages<
 };
 export function useGetApiLanguages<
   TData = Awaited<ReturnType<typeof getApiLanguages>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   options?: {
     query?: Partial<
@@ -3559,7 +3657,7 @@ export function useGetApiLanguages<
 };
 export function useGetApiLanguages<
   TData = Awaited<ReturnType<typeof getApiLanguages>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   options?: {
     query?: Partial<
@@ -3581,7 +3679,7 @@ export function useGetApiLanguages<
 
 export function useGetApiLanguages<
   TData = Awaited<ReturnType<typeof getApiLanguages>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   options?: {
     query?: Partial<
@@ -3630,7 +3728,7 @@ export const getGetApiLanguagesIdQueryKey = (id: ObjectId) => {
 
 export const getGetApiLanguagesIdQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiLanguagesId>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   id: ObjectId,
   options?: {
@@ -3669,11 +3767,11 @@ export const getGetApiLanguagesIdQueryOptions = <
 export type GetApiLanguagesIdQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiLanguagesId>>
 >;
-export type GetApiLanguagesIdQueryError = string | void;
+export type GetApiLanguagesIdQueryError = string[] | void;
 
 export function useGetApiLanguagesId<
   TData = Awaited<ReturnType<typeof getApiLanguagesId>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   id: ObjectId,
   options: {
@@ -3700,7 +3798,7 @@ export function useGetApiLanguagesId<
 };
 export function useGetApiLanguagesId<
   TData = Awaited<ReturnType<typeof getApiLanguagesId>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   id: ObjectId,
   options?: {
@@ -3727,7 +3825,7 @@ export function useGetApiLanguagesId<
 };
 export function useGetApiLanguagesId<
   TData = Awaited<ReturnType<typeof getApiLanguagesId>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   id: ObjectId,
   options?: {
@@ -3750,7 +3848,7 @@ export function useGetApiLanguagesId<
 
 export function useGetApiLanguagesId<
   TData = Awaited<ReturnType<typeof getApiLanguagesId>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   id: ObjectId,
   options?: {
@@ -3793,7 +3891,7 @@ export const deleteApiLanguagesId = (
 };
 
 export const getDeleteApiLanguagesIdMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -3834,13 +3932,13 @@ export type DeleteApiLanguagesIdMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteApiLanguagesId>>
 >;
 
-export type DeleteApiLanguagesIdMutationError = string | void;
+export type DeleteApiLanguagesIdMutationError = string[] | void;
 
 /**
  * @summary Delete Language.
  */
 export const useDeleteApiLanguagesId = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -3885,7 +3983,7 @@ export const postApiLanguagesAdd = (
 };
 
 export const getPostApiLanguagesAddMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -3926,13 +4024,13 @@ export type PostApiLanguagesAddMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiLanguagesAdd>>
 >;
 export type PostApiLanguagesAddMutationBody = CreateLanguageCommand;
-export type PostApiLanguagesAddMutationError = string | void;
+export type PostApiLanguagesAddMutationError = string[] | void;
 
 /**
  * @summary Add Language.
  */
 export const usePostApiLanguagesAdd = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -3977,7 +4075,7 @@ export const postApiLanguagesUpdate = (
 };
 
 export const getPostApiLanguagesUpdateMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -4018,13 +4116,13 @@ export type PostApiLanguagesUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiLanguagesUpdate>>
 >;
 export type PostApiLanguagesUpdateMutationBody = UpdateLanguageCommand;
-export type PostApiLanguagesUpdateMutationError = string | void;
+export type PostApiLanguagesUpdateMutationError = string[] | void;
 
 /**
  * @summary Update Language.
  */
 export const usePostApiLanguagesUpdate = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -4069,7 +4167,7 @@ export const postApiLicensesCreate = (
 };
 
 export const getPostApiLicensesCreateMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -4110,13 +4208,13 @@ export type PostApiLicensesCreateMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiLicensesCreate>>
 >;
 export type PostApiLicensesCreateMutationBody = CreateLicenseCommandRequest;
-export type PostApiLicensesCreateMutationError = string | void;
+export type PostApiLicensesCreateMutationError = string[] | void;
 
 /**
  * @summary Create a license
  */
 export const usePostApiLicensesCreate = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -4161,7 +4259,7 @@ export const postApiLicensesAddTransaction = (
 };
 
 export const getPostApiLicensesAddTransactionMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -4203,13 +4301,13 @@ export type PostApiLicensesAddTransactionMutationResult = NonNullable<
 >;
 export type PostApiLicensesAddTransactionMutationBody =
   AddTransactionToLicenseCommandRequest;
-export type PostApiLicensesAddTransactionMutationError = string | void;
+export type PostApiLicensesAddTransactionMutationError = string[] | void;
 
 /**
  * @summary Add a transaction to the license
  */
 export const usePostApiLicensesAddTransaction = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -4255,7 +4353,7 @@ export const postApiLicensesChangeStatus = (
 };
 
 export const getPostApiLicensesChangeStatusMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -4297,13 +4395,13 @@ export type PostApiLicensesChangeStatusMutationResult = NonNullable<
 >;
 export type PostApiLicensesChangeStatusMutationBody =
   ChangeLicenseStatusCommandRequest;
-export type PostApiLicensesChangeStatusMutationError = string | void;
+export type PostApiLicensesChangeStatusMutationError = string[] | void;
 
 /**
  * @summary Change license status
  */
 export const usePostApiLicensesChangeStatus = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -4342,7 +4440,7 @@ export const deleteApiLicensesDelete = (
 };
 
 export const getDeleteApiLicensesDeleteMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -4383,13 +4481,13 @@ export type DeleteApiLicensesDeleteMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteApiLicensesDelete>>
 >;
 
-export type DeleteApiLicensesDeleteMutationError = string | void;
+export type DeleteApiLicensesDeleteMutationError = string[] | void;
 
 /**
  * @summary Delete a license
  */
 export const useDeleteApiLicensesDelete = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -4435,7 +4533,7 @@ export const getGetApiLicensesListQueryKey = (
 
 export const getGetApiLicensesListQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiLicensesList>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiLicensesListParams,
   options?: {
@@ -4474,11 +4572,11 @@ export const getGetApiLicensesListQueryOptions = <
 export type GetApiLicensesListQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiLicensesList>>
 >;
-export type GetApiLicensesListQueryError = string | void;
+export type GetApiLicensesListQueryError = string[] | void;
 
 export function useGetApiLicensesList<
   TData = Awaited<ReturnType<typeof getApiLicensesList>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params: undefined | GetApiLicensesListParams,
   options: {
@@ -4505,7 +4603,7 @@ export function useGetApiLicensesList<
 };
 export function useGetApiLicensesList<
   TData = Awaited<ReturnType<typeof getApiLicensesList>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiLicensesListParams,
   options?: {
@@ -4532,7 +4630,7 @@ export function useGetApiLicensesList<
 };
 export function useGetApiLicensesList<
   TData = Awaited<ReturnType<typeof getApiLicensesList>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiLicensesListParams,
   options?: {
@@ -4555,7 +4653,7 @@ export function useGetApiLicensesList<
 
 export function useGetApiLicensesList<
   TData = Awaited<ReturnType<typeof getApiLicensesList>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiLicensesListParams,
   options?: {
@@ -4606,7 +4704,7 @@ export const getGetApiLicensesGetQueryKey = (
 
 export const getGetApiLicensesGetQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiLicensesGet>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiLicensesGetParams,
   options?: {
@@ -4645,11 +4743,11 @@ export const getGetApiLicensesGetQueryOptions = <
 export type GetApiLicensesGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiLicensesGet>>
 >;
-export type GetApiLicensesGetQueryError = string | void;
+export type GetApiLicensesGetQueryError = string[] | void;
 
 export function useGetApiLicensesGet<
   TData = Awaited<ReturnType<typeof getApiLicensesGet>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params: undefined | GetApiLicensesGetParams,
   options: {
@@ -4676,7 +4774,7 @@ export function useGetApiLicensesGet<
 };
 export function useGetApiLicensesGet<
   TData = Awaited<ReturnType<typeof getApiLicensesGet>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiLicensesGetParams,
   options?: {
@@ -4703,7 +4801,7 @@ export function useGetApiLicensesGet<
 };
 export function useGetApiLicensesGet<
   TData = Awaited<ReturnType<typeof getApiLicensesGet>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiLicensesGetParams,
   options?: {
@@ -4726,7 +4824,7 @@ export function useGetApiLicensesGet<
 
 export function useGetApiLicensesGet<
   TData = Awaited<ReturnType<typeof getApiLicensesGet>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiLicensesGetParams,
   options?: {
@@ -4775,7 +4873,7 @@ export const getGetApiLogsQueryKey = () => {
 
 export const getGetApiLogsQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiLogs>>,
-  TError = string | void,
+  TError = string[] | void,
 >(options?: {
   query?: Partial<
     UseQueryOptions<Awaited<ReturnType<typeof getApiLogs>>, TError, TData>
@@ -4806,11 +4904,11 @@ export const getGetApiLogsQueryOptions = <
 export type GetApiLogsQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiLogs>>
 >;
-export type GetApiLogsQueryError = string | void;
+export type GetApiLogsQueryError = string[] | void;
 
 export function useGetApiLogs<
   TData = Awaited<ReturnType<typeof getApiLogs>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   options: {
     query: Partial<
@@ -4832,7 +4930,7 @@ export function useGetApiLogs<
 };
 export function useGetApiLogs<
   TData = Awaited<ReturnType<typeof getApiLogs>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   options?: {
     query?: Partial<
@@ -4854,7 +4952,7 @@ export function useGetApiLogs<
 };
 export function useGetApiLogs<
   TData = Awaited<ReturnType<typeof getApiLogs>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   options?: {
     query?: Partial<
@@ -4872,7 +4970,7 @@ export function useGetApiLogs<
 
 export function useGetApiLogs<
   TData = Awaited<ReturnType<typeof getApiLogs>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   options?: {
     query?: Partial<
@@ -4917,7 +5015,7 @@ export const postApiSubscriptionsCreate = (
 };
 
 export const getPostApiSubscriptionsCreateMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -4959,13 +5057,13 @@ export type PostApiSubscriptionsCreateMutationResult = NonNullable<
 >;
 export type PostApiSubscriptionsCreateMutationBody =
   CreateSubscriptionCommandRequest;
-export type PostApiSubscriptionsCreateMutationError = string | void;
+export type PostApiSubscriptionsCreateMutationError = string[] | void;
 
 /**
  * @summary Create a subscription
  */
 export const usePostApiSubscriptionsCreate = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -5010,7 +5108,7 @@ export const postApiSubscriptionsUpdate = (
 };
 
 export const getPostApiSubscriptionsUpdateMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -5052,13 +5150,13 @@ export type PostApiSubscriptionsUpdateMutationResult = NonNullable<
 >;
 export type PostApiSubscriptionsUpdateMutationBody =
   UpdateSubscriptionCommandRequest;
-export type PostApiSubscriptionsUpdateMutationError = string | void;
+export type PostApiSubscriptionsUpdateMutationError = string[] | void;
 
 /**
  * @summary Update a subscription
  */
 export const usePostApiSubscriptionsUpdate = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -5096,7 +5194,7 @@ export const deleteApiSubscriptionsDelete = (
 };
 
 export const getDeleteApiSubscriptionsDeleteMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -5137,13 +5235,13 @@ export type DeleteApiSubscriptionsDeleteMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteApiSubscriptionsDelete>>
 >;
 
-export type DeleteApiSubscriptionsDeleteMutationError = string | void;
+export type DeleteApiSubscriptionsDeleteMutationError = string[] | void;
 
 /**
  * @summary Delete a subscription
  */
 export const useDeleteApiSubscriptionsDelete = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -5190,7 +5288,7 @@ export const getGetApiSubscriptionsGetQueryKey = (
 
 export const getGetApiSubscriptionsGetQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiSubscriptionsGet>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiSubscriptionsGetParams,
   options?: {
@@ -5229,11 +5327,11 @@ export const getGetApiSubscriptionsGetQueryOptions = <
 export type GetApiSubscriptionsGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiSubscriptionsGet>>
 >;
-export type GetApiSubscriptionsGetQueryError = string | void;
+export type GetApiSubscriptionsGetQueryError = string[] | void;
 
 export function useGetApiSubscriptionsGet<
   TData = Awaited<ReturnType<typeof getApiSubscriptionsGet>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params: undefined | GetApiSubscriptionsGetParams,
   options: {
@@ -5260,7 +5358,7 @@ export function useGetApiSubscriptionsGet<
 };
 export function useGetApiSubscriptionsGet<
   TData = Awaited<ReturnType<typeof getApiSubscriptionsGet>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiSubscriptionsGetParams,
   options?: {
@@ -5287,7 +5385,7 @@ export function useGetApiSubscriptionsGet<
 };
 export function useGetApiSubscriptionsGet<
   TData = Awaited<ReturnType<typeof getApiSubscriptionsGet>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiSubscriptionsGetParams,
   options?: {
@@ -5310,7 +5408,7 @@ export function useGetApiSubscriptionsGet<
 
 export function useGetApiSubscriptionsGet<
   TData = Awaited<ReturnType<typeof getApiSubscriptionsGet>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiSubscriptionsGetParams,
   options?: {
@@ -5358,7 +5456,7 @@ export const getGetApiSubscriptionsListQueryKey = () => {
 
 export const getGetApiSubscriptionsListQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiSubscriptionsList>>,
-  TError = string | void,
+  TError = string[] | void,
 >(options?: {
   query?: Partial<
     UseQueryOptions<
@@ -5394,11 +5492,11 @@ export const getGetApiSubscriptionsListQueryOptions = <
 export type GetApiSubscriptionsListQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiSubscriptionsList>>
 >;
-export type GetApiSubscriptionsListQueryError = string | void;
+export type GetApiSubscriptionsListQueryError = string[] | void;
 
 export function useGetApiSubscriptionsList<
   TData = Awaited<ReturnType<typeof getApiSubscriptionsList>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   options: {
     query: Partial<
@@ -5424,7 +5522,7 @@ export function useGetApiSubscriptionsList<
 };
 export function useGetApiSubscriptionsList<
   TData = Awaited<ReturnType<typeof getApiSubscriptionsList>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   options?: {
     query?: Partial<
@@ -5450,7 +5548,7 @@ export function useGetApiSubscriptionsList<
 };
 export function useGetApiSubscriptionsList<
   TData = Awaited<ReturnType<typeof getApiSubscriptionsList>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   options?: {
     query?: Partial<
@@ -5472,7 +5570,7 @@ export function useGetApiSubscriptionsList<
 
 export function useGetApiSubscriptionsList<
   TData = Awaited<ReturnType<typeof getApiSubscriptionsList>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   options?: {
     query?: Partial<
@@ -5521,7 +5619,7 @@ export const postApiTicketsCreate = (
 };
 
 export const getPostApiTicketsCreateMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -5562,13 +5660,13 @@ export type PostApiTicketsCreateMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiTicketsCreate>>
 >;
 export type PostApiTicketsCreateMutationBody = CreateTicketCommandRequest;
-export type PostApiTicketsCreateMutationError = string | void;
+export type PostApiTicketsCreateMutationError = string[] | void;
 
 /**
  * @summary Create a ticket
  */
 export const usePostApiTicketsCreate = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -5613,7 +5711,7 @@ export const postApiTicketsAddMessage = (
 };
 
 export const getPostApiTicketsAddMessageMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -5655,13 +5753,13 @@ export type PostApiTicketsAddMessageMutationResult = NonNullable<
 >;
 export type PostApiTicketsAddMessageMutationBody =
   AddMessageToTicketCommandRequest;
-export type PostApiTicketsAddMessageMutationError = string | void;
+export type PostApiTicketsAddMessageMutationError = string[] | void;
 
 /**
  * @summary Add a message to the ticket
  */
 export const usePostApiTicketsAddMessage = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -5706,7 +5804,7 @@ export const postApiTicketsChangeStatus = (
 };
 
 export const getPostApiTicketsChangeStatusMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -5748,13 +5846,13 @@ export type PostApiTicketsChangeStatusMutationResult = NonNullable<
 >;
 export type PostApiTicketsChangeStatusMutationBody =
   ChangeTicketStatusCommandRequest;
-export type PostApiTicketsChangeStatusMutationError = string | void;
+export type PostApiTicketsChangeStatusMutationError = string[] | void;
 
 /**
  * @summary Change ticket status
  */
 export const usePostApiTicketsChangeStatus = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -5792,7 +5890,7 @@ export const deleteApiTicketsDelete = (
 };
 
 export const getDeleteApiTicketsDeleteMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -5833,13 +5931,13 @@ export type DeleteApiTicketsDeleteMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteApiTicketsDelete>>
 >;
 
-export type DeleteApiTicketsDeleteMutationError = string | void;
+export type DeleteApiTicketsDeleteMutationError = string[] | void;
 
 /**
  * @summary Delete a ticket
  */
 export const useDeleteApiTicketsDelete = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -5885,7 +5983,7 @@ export const getGetApiTicketsListQueryKey = (
 
 export const getGetApiTicketsListQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiTicketsList>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiTicketsListParams,
   options?: {
@@ -5924,11 +6022,11 @@ export const getGetApiTicketsListQueryOptions = <
 export type GetApiTicketsListQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiTicketsList>>
 >;
-export type GetApiTicketsListQueryError = string | void;
+export type GetApiTicketsListQueryError = string[] | void;
 
 export function useGetApiTicketsList<
   TData = Awaited<ReturnType<typeof getApiTicketsList>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params: undefined | GetApiTicketsListParams,
   options: {
@@ -5955,7 +6053,7 @@ export function useGetApiTicketsList<
 };
 export function useGetApiTicketsList<
   TData = Awaited<ReturnType<typeof getApiTicketsList>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiTicketsListParams,
   options?: {
@@ -5982,7 +6080,7 @@ export function useGetApiTicketsList<
 };
 export function useGetApiTicketsList<
   TData = Awaited<ReturnType<typeof getApiTicketsList>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiTicketsListParams,
   options?: {
@@ -6005,7 +6103,7 @@ export function useGetApiTicketsList<
 
 export function useGetApiTicketsList<
   TData = Awaited<ReturnType<typeof getApiTicketsList>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiTicketsListParams,
   options?: {
@@ -6056,7 +6154,7 @@ export const getGetApiTicketsGetQueryKey = (
 
 export const getGetApiTicketsGetQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiTicketsGet>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiTicketsGetParams,
   options?: {
@@ -6095,11 +6193,11 @@ export const getGetApiTicketsGetQueryOptions = <
 export type GetApiTicketsGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiTicketsGet>>
 >;
-export type GetApiTicketsGetQueryError = string | void;
+export type GetApiTicketsGetQueryError = string[] | void;
 
 export function useGetApiTicketsGet<
   TData = Awaited<ReturnType<typeof getApiTicketsGet>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params: undefined | GetApiTicketsGetParams,
   options: {
@@ -6126,7 +6224,7 @@ export function useGetApiTicketsGet<
 };
 export function useGetApiTicketsGet<
   TData = Awaited<ReturnType<typeof getApiTicketsGet>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiTicketsGetParams,
   options?: {
@@ -6153,7 +6251,7 @@ export function useGetApiTicketsGet<
 };
 export function useGetApiTicketsGet<
   TData = Awaited<ReturnType<typeof getApiTicketsGet>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiTicketsGetParams,
   options?: {
@@ -6176,7 +6274,7 @@ export function useGetApiTicketsGet<
 
 export function useGetApiTicketsGet<
   TData = Awaited<ReturnType<typeof getApiTicketsGet>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   params?: GetApiTicketsGetParams,
   options?: {
@@ -6227,7 +6325,7 @@ export const getGetApiTranslatesLanguagesLanguageQueryKey = (
 
 export const getGetApiTranslatesLanguagesLanguageQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiTranslatesLanguagesLanguage>>,
-  TError = string,
+  TError = string[],
 >(
   language: string,
   options?: {
@@ -6269,11 +6367,11 @@ export const getGetApiTranslatesLanguagesLanguageQueryOptions = <
 export type GetApiTranslatesLanguagesLanguageQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiTranslatesLanguagesLanguage>>
 >;
-export type GetApiTranslatesLanguagesLanguageQueryError = string;
+export type GetApiTranslatesLanguagesLanguageQueryError = string[];
 
 export function useGetApiTranslatesLanguagesLanguage<
   TData = Awaited<ReturnType<typeof getApiTranslatesLanguagesLanguage>>,
-  TError = string,
+  TError = string[],
 >(
   language: string,
   options: {
@@ -6300,7 +6398,7 @@ export function useGetApiTranslatesLanguagesLanguage<
 };
 export function useGetApiTranslatesLanguagesLanguage<
   TData = Awaited<ReturnType<typeof getApiTranslatesLanguagesLanguage>>,
-  TError = string,
+  TError = string[],
 >(
   language: string,
   options?: {
@@ -6327,7 +6425,7 @@ export function useGetApiTranslatesLanguagesLanguage<
 };
 export function useGetApiTranslatesLanguagesLanguage<
   TData = Awaited<ReturnType<typeof getApiTranslatesLanguagesLanguage>>,
-  TError = string,
+  TError = string[],
 >(
   language: string,
   options?: {
@@ -6350,7 +6448,7 @@ export function useGetApiTranslatesLanguagesLanguage<
 
 export function useGetApiTranslatesLanguagesLanguage<
   TData = Awaited<ReturnType<typeof getApiTranslatesLanguagesLanguage>>,
-  TError = string,
+  TError = string[],
 >(
   language: string,
   options?: {
@@ -6403,7 +6501,7 @@ export const getGetApiTranslatesIdQueryKey = (id: ObjectId) => {
 
 export const getGetApiTranslatesIdQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiTranslatesId>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   id: ObjectId,
   options?: {
@@ -6442,11 +6540,11 @@ export const getGetApiTranslatesIdQueryOptions = <
 export type GetApiTranslatesIdQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiTranslatesId>>
 >;
-export type GetApiTranslatesIdQueryError = string | void;
+export type GetApiTranslatesIdQueryError = string[] | void;
 
 export function useGetApiTranslatesId<
   TData = Awaited<ReturnType<typeof getApiTranslatesId>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   id: ObjectId,
   options: {
@@ -6473,7 +6571,7 @@ export function useGetApiTranslatesId<
 };
 export function useGetApiTranslatesId<
   TData = Awaited<ReturnType<typeof getApiTranslatesId>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   id: ObjectId,
   options?: {
@@ -6500,7 +6598,7 @@ export function useGetApiTranslatesId<
 };
 export function useGetApiTranslatesId<
   TData = Awaited<ReturnType<typeof getApiTranslatesId>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   id: ObjectId,
   options?: {
@@ -6523,7 +6621,7 @@ export function useGetApiTranslatesId<
 
 export function useGetApiTranslatesId<
   TData = Awaited<ReturnType<typeof getApiTranslatesId>>,
-  TError = string | void,
+  TError = string[] | void,
 >(
   id: ObjectId,
   options?: {
@@ -6566,7 +6664,7 @@ export const deleteApiTranslatesId = (
 };
 
 export const getDeleteApiTranslatesIdMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -6607,13 +6705,13 @@ export type DeleteApiTranslatesIdMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteApiTranslatesId>>
 >;
 
-export type DeleteApiTranslatesIdMutationError = string | void;
+export type DeleteApiTranslatesIdMutationError = string[] | void;
 
 /**
  * @summary Delete Translate.
  */
 export const useDeleteApiTranslatesId = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -6658,7 +6756,7 @@ export const postApiTranslatesAdd = (
 };
 
 export const getPostApiTranslatesAddMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -6699,13 +6797,13 @@ export type PostApiTranslatesAddMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiTranslatesAdd>>
 >;
 export type PostApiTranslatesAddMutationBody = CreateTranslateCommand;
-export type PostApiTranslatesAddMutationError = string | void;
+export type PostApiTranslatesAddMutationError = string[] | void;
 
 /**
  * @summary Add Translate.
  */
 export const usePostApiTranslatesAdd = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -6750,7 +6848,7 @@ export const postApiTranslatesUpdate = (
 };
 
 export const getPostApiTranslatesUpdateMutationOptions = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -6791,13 +6889,13 @@ export type PostApiTranslatesUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiTranslatesUpdate>>
 >;
 export type PostApiTranslatesUpdateMutationBody = UpdateTranslateCommand;
-export type PostApiTranslatesUpdateMutationError = string | void;
+export type PostApiTranslatesUpdateMutationError = string[] | void;
 
 /**
  * @summary Update Translate.
  */
 export const usePostApiTranslatesUpdate = <
-  TError = string | void,
+  TError = string[] | void,
   TContext = unknown,
 >(
   options?: {

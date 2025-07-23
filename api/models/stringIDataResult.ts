@@ -8,7 +8,7 @@
 export interface StringIDataResult {
   readonly success?: boolean;
   /** @nullable */
-  readonly message?: string | null;
+  messages?: string[] | null;
   /** @nullable */
   readonly data?: string | null;
 }

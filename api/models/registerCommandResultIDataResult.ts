@@ -9,7 +9,7 @@ import type { RegisterCommandResultIDataResultData } from "./registerCommandResu
 export interface RegisterCommandResultIDataResult {
   readonly success?: boolean;
   /** @nullable */
-  readonly message?: string | null;
+  messages?: string[] | null;
   /** @nullable */
   readonly data?: RegisterCommandResultIDataResultData;
 }

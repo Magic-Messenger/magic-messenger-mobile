@@ -9,7 +9,7 @@ import type { UploadFileCommandResultIDataResultData } from "./uploadFileCommand
 export interface UploadFileCommandResultIDataResult {
   readonly success?: boolean;
   /** @nullable */
-  readonly message?: string | null;
+  messages?: string[] | null;
   /** @nullable */
   readonly data?: UploadFileCommandResultIDataResultData;
 }

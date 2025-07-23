@@ -8,7 +8,7 @@
 export interface StringListIDataResult {
   readonly success?: boolean;
   /** @nullable */
-  readonly message?: string | null;
+  messages?: string[] | null;
   /** @nullable */
   readonly data?: readonly string[] | null;
 }

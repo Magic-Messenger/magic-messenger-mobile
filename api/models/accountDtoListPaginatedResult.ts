@@ -9,7 +9,7 @@ import type { AccountDto } from "./accountDto";
 export interface AccountDtoListPaginatedResult {
   success?: boolean;
   /** @nullable */
-  message?: string | null;
+  messages?: string[] | null;
   /** @nullable */
   data?: AccountDto[] | null;
   pageNumber?: number;
