@@ -82,7 +82,7 @@
     "deleteProfile": "Delete Profile",
     "askDeleteProfile": "Do you want to delete your profile?",
     "deleteProfileNote": "NOTE: THIS ACTION IS IRREVERSIBLE AND CANNOT BE UNDONE",
-    "successCopyUserId": "User ID successfully copied",
+    "successCopyUserId": "User Name successfully copied",
     "password": "Your Password",
     "passwordError": "Password must be at least 8 characters"
   }
