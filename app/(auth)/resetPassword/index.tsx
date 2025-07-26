@@ -57,6 +57,7 @@ export default function ResetPasswordScreen() {
     <AppLayout
       container
       scrollable
+      showBadge={false}
       footer={
         <Button
           type="primary"

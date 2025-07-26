@@ -93,8 +93,14 @@ export const commonStyle = StyleSheet.create({
   alignItemsCenter: {
     alignItems: "center",
   },
+  alignItemsEnd: {
+    alignItems: "flex-end",
+  },
   justifyContentBetween: {
     justifyContent: "space-between",
+  },
+  justifyContentEnd: {
+    justifyContent: "flex-end",
   },
   fullWidth: {
     width: "100%",

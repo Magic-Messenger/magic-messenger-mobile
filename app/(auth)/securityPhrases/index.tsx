@@ -36,7 +36,7 @@ const SecurityPhrasesScreen = () => {
   const handleNext = async () => {
     if (securityPhrases && params?.accessToken && params?.userName) {
       await login(params?.accessToken as string, params?.userName as string);
-      router.push("/(tabs)/home");
+      router.push("/home");
     }
   };
 
@@ -44,6 +44,7 @@ const SecurityPhrasesScreen = () => {
     <AppLayout
       container
       scrollable
+      showBadge={false}
       footer={
         <Button
           type="primary"

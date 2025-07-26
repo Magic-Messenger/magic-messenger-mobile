@@ -1,5 +1,5 @@
 import { AppLayout, Icon, ThemedText } from "@/components";
-import { Colors, commonStyle, flexBox, spacing } from "@/constants";
+import { Colors, flexBox, spacing } from "@/constants";
 import { fontPixel, widthPixel } from "@/utils";
 import { router } from "expo-router";
 import { useMemo } from "react";
@@ -79,18 +79,12 @@ export default function SettingsScreen() {
   );
 
   return (
-    <AppLayout container scrollable={false}>
+    <AppLayout container scrollable={false} title={t("settings.title")}>
       <FlatList
         data={settingList}
         keyExtractor={(_, index) => index.toString()}
         renderItem={renderItem}
         contentContainerStyle={{ ...spacing({ gap: 40 }) }}
-        ListHeaderComponent={
-          <View style={commonStyle.mb5}>
-            <ThemedText type="title">{t("settings.title")}</ThemedText>
-          </View>
-        }
-        stickyHeaderIndices={[0]}
       />
     </AppLayout>
   );

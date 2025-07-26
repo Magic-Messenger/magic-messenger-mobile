@@ -69,12 +69,8 @@ export default function ProfileScreen() {
   };
 
   return (
-    <AppLayout scrollable loading={isLoading}>
+    <AppLayout scrollable loading={isLoading} title={t("profile.yourProfile")}>
       <View style={styles.mainContainer}>
-        <ThemedText type="title" weight="semiBold">
-          {t("profile.yourProfile")}
-        </ThemedText>
-
         <View
           style={[
             commonStyle.flex,
@@ -185,7 +181,6 @@ const styles = StyleSheet.create({
   },
   userIDInfo: {
     ...spacing({
-      mt: 15,
       gap: 10,
     }),
   },

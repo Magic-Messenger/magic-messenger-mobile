@@ -10,6 +10,7 @@ interface SettingDto {
 interface AppStore {
   settings: SettingDto;
   appVersion: string;
+  tor: boolean | null;
   rehydrated: boolean;
   changeLanguage: (language: string) => void;
 }
@@ -22,6 +23,7 @@ export const useAppStore = create<AppStore>()(
         timeZone: null,
       },
       appVersion: "",
+      tor: null,
       rehydrated: false,
       changeLanguage: (language: string) => {
         set((state) => ({
@@ -29,6 +31,11 @@ export const useAppStore = create<AppStore>()(
             ...state.settings,
             language,
           },
+        }));
+      },
+      torStatus: (status: boolean) => {
+        set(() => ({
+          tor: status,
         }));
       },
     }),

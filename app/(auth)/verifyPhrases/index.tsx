@@ -58,6 +58,7 @@ export default function VerifyPhrasesScreen() {
     <AppLayout
       container
       scrollable
+      showBadge={false}
       footer={
         <Button
           type="primary"

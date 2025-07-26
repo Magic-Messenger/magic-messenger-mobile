@@ -65,6 +65,8 @@ export function Button({
     >
       <LinearGradient
         colors={backgroundColor() as never}
+        start={{ y: 0, x: 0 }}
+        end={{ y: 1, x: 0 }}
         style={[
           commonStyle.fullWidth,
           commonStyle.fullHeight,

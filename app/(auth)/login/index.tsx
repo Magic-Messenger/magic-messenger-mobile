@@ -63,6 +63,7 @@ export default function LoginScreen() {
     <AppLayout
       container
       scrollable
+      showBadge={false}
       footer={
         <Button
           type="primary"

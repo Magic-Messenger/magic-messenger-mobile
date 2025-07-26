@@ -8,6 +8,7 @@ export const Colors = {
   secondary: "#2A1243",
   secondarySelected: "#3b1a5d",
   danger: "#FF2D2D",
+  success: "#19CA16",
 
   background: "#fff",
   tint: "#0a7ea4",

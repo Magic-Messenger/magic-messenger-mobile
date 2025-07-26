@@ -12,6 +12,7 @@ export default function SettingsStack() {
         headerTransparent: true,
         headerTintColor: Colors.white,
         headerBackTitle: t("back"),
+        ...headerImage(),
         contentStyle: {
           backgroundColor: "transparent",
         },
@@ -22,7 +23,6 @@ export default function SettingsStack() {
       <Stack.Screen
         name="index"
         options={{
-          ...headerImage(),
           headerShown: true,
           title: t("settings.title"),
         }}
@@ -32,8 +32,6 @@ export default function SettingsStack() {
         name="profile/index"
         options={{
           headerShown: true,
-          title: "",
-          headerTitle: t("settings.profile"),
         }}
       />
     </Stack>

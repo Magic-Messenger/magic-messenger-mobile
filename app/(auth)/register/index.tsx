@@ -85,6 +85,7 @@ export default function RegisterScreen() {
     <AppLayout
       container
       scrollable
+      showBadge={false}
       footer={
         <Button
           type="primary"

@@ -9,6 +9,8 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ThemedText } from "./ThemedText";
+import { TorBadge } from "./TorBadge";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -17,6 +19,8 @@ interface AppLayoutProps {
   footer?: React.ReactNode;
   safeAreaPadding?: boolean;
   loading?: boolean;
+  title?: string | React.ReactNode;
+  showBadge?: boolean;
 }
 
 export function AppLayout({
@@ -25,6 +29,8 @@ export function AppLayout({
   container = false,
   scrollable = false,
   safeAreaPadding = true,
+  title,
+  showBadge = true,
   footer,
 }: AppLayoutProps) {
   const Container = scrollable ? ScrollView : View;
@@ -61,6 +67,36 @@ export function AppLayout({
               contentContainerStyle={styles.content}
               style={styles.content}
             >
+              {showBadge && (
+                <View
+                  style={[
+                    commonStyle.flexRow,
+                    commonStyle.alignItemsCenter,
+                    commonStyle.mt2,
+                    commonStyle.mb5,
+                    !container ? styles.container : undefined,
+                  ]}
+                >
+                  {typeof title === "string" ? (
+                    <ThemedText type="title" weight="semiBold">
+                      {title}
+                    </ThemedText>
+                  ) : (
+                    title
+                  )}
+
+                  <View
+                    style={[
+                      commonStyle.flex,
+                      commonStyle.justifyContentEnd,
+                      commonStyle.alignItemsEnd,
+                    ]}
+                  >
+                    <TorBadge />
+                  </View>
+                </View>
+              )}
+
               {children}
             </Container>
           </>
