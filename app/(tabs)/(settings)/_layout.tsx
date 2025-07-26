@@ -1,4 +1,5 @@
 import { Colors } from "@/constants";
+import { headerImage } from "@/utils";
 import { Stack } from "expo-router";
 import { useTranslation } from "react-i18next";
 
@@ -21,14 +22,19 @@ export default function SettingsStack() {
       <Stack.Screen
         name="index"
         options={{
-          headerShown: false,
+          ...headerImage(),
+          headerShown: true,
           title: t("settings.title"),
         }}
       />
 
       <Stack.Screen
         name="profile/index"
-        options={{ headerShown: true, title: "", headerTitle: "" }}
+        options={{
+          headerShown: true,
+          title: "",
+          headerTitle: t("settings.profile"),
+        }}
       />
     </Stack>
   );

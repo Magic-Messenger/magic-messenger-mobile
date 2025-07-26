@@ -1,10 +1,9 @@
 import { useFonts } from "expo-font";
-import { Image } from "expo-image";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet } from "react-native";
 import "react-native-reanimated";
 
-import { Colors, Images } from "@/constants";
+import { Colors } from "@/constants";
 import { useUserStore } from "@/store";
 import { toastConfig } from "@/utils";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -44,19 +43,12 @@ export default function RootLayout() {
       <QueryClientProvider client={queryClient}>
         <Stack
           screenOptions={{
+            headerTitleAlign: "center",
             headerTransparent: true,
             headerTintColor: Colors.white,
             contentStyle: {
               backgroundColor: "transparent",
             },
-            headerTitleAlign: "center",
-            headerTitle: () => (
-              <Image
-                source={Images.logo}
-                contentFit="contain"
-                style={styles.headerImage}
-              />
-            ),
           }}
         >
           <Stack.Screen name="index" options={{ headerShown: false }} />

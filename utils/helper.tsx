@@ -1,9 +1,12 @@
+import { Images } from "@/constants";
 import { useAppStore } from "@/store";
 import * as Application from "expo-application";
 import * as Clipboard from "expo-clipboard";
+import { Image } from "expo-image";
 import { changeLanguage as i18nChangeLanguage } from "i18next";
 import { Platform } from "react-native";
 import Toast, { ToastShowParams } from "react-native-toast-message";
+import { heightPixel, widthPixel } from "./PixelHelper";
 
 export const changeLanguage = (language: string) => {
   useAppStore.setState(() => ({
@@ -34,4 +37,19 @@ export const getInstallationId = async () => {
   } else if (Platform.OS === "android") {
     return await Application.getAndroidId();
   }
+};
+
+export const headerImage = () => {
+  return {
+    headerTitle: () => (
+      <Image
+        source={Images.logo}
+        contentFit="contain"
+        style={{
+          width: widthPixel(105),
+          height: heightPixel(30),
+        }}
+      />
+    ),
+  };
 };

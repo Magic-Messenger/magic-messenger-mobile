@@ -1,12 +1,10 @@
-import { Image } from "expo-image";
 import { Tabs } from "expo-router";
 import React from "react";
 
 import { Icon } from "@/components";
-import { Colors, Images, spacing } from "@/constants";
+import { Colors, spacing } from "@/constants";
 import { widthPixel } from "@/utils";
 import { useTranslation } from "react-i18next";
-import { StyleSheet } from "react-native";
 
 export default function TabLayout() {
   const { t } = useTranslation();
@@ -18,14 +16,8 @@ export default function TabLayout() {
         headerTintColor: Colors.white,
         tabBarActiveTintColor: Colors.white,
         tabBarInactiveTintColor: Colors.menuInactiveColor,
+        headerTitle: () => null,
         headerTitleAlign: "center",
-        headerTitle: () => (
-          <Image
-            source={Images.logo}
-            contentFit="contain"
-            style={styles.headerImage}
-          />
-        ),
         sceneStyle: {
           backgroundColor: "transparent",
         },
@@ -52,6 +44,7 @@ export default function TabLayout() {
           ),
         }}
       />
+
       <Tabs.Screen
         name="(groups)"
         options={{
@@ -67,6 +60,7 @@ export default function TabLayout() {
           ),
         }}
       />
+
       <Tabs.Screen
         name="(notes)"
         options={{
@@ -82,6 +76,7 @@ export default function TabLayout() {
           ),
         }}
       />
+
       <Tabs.Screen
         name="(settings)"
         options={{
@@ -100,10 +95,3 @@ export default function TabLayout() {
     </Tabs>
   );
 }
-
-const styles = StyleSheet.create({
-  headerImage: {
-    width: 105,
-    height: 30,
-  },
-});
