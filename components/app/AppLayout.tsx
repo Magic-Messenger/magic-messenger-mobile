@@ -9,12 +9,14 @@ interface AppLayoutProps {
   scrollable?: boolean;
   container?: boolean;
   footer?: React.ReactNode;
+  safeAreaPadding?: boolean;
 }
 
 export function AppLayout({
   children,
   container = false,
   scrollable = false,
+  safeAreaPadding = true,
   footer,
 }: AppLayoutProps) {
   const Container = scrollable ? ScrollView : View;
@@ -29,7 +31,12 @@ export function AppLayout({
         style={styles.imageBackground}
         resizeMode="cover"
       />
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView
+        style={[
+          styles.safeArea,
+          safeAreaPadding ? { ...spacing({ mt: 45 }) } : undefined,
+        ]}
+      >
         <Container
           contentContainerStyle={styles.content}
           style={styles.content}

@@ -125,9 +125,7 @@ export default function ResetPasswordScreen() {
 
 const styles = StyleSheet.create({
   mainContainer: {
-    ...spacing({
-      mt: 60,
-    }),
+    ...spacing({}),
   },
   formContainer: {
     ...spacing({

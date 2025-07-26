@@ -45,5 +45,23 @@
       "copy": "Kopyalamak için tıklayınız",
       "successCopyClipboard": "Başarıyla Kopyalandı"
     }
+  },
+
+  "tabs": {
+    "chat": "Sohbet",
+    "groups": "Guruplar",
+    "notes": "Notlar",
+    "settings": "Ayarlar"
+  },
+
+  "settings": {
+    "title": "Ayarlar",
+    "profile": "Profil",
+    "contact": "İletişim",
+    "scan-qr": "QR Okut",
+    "license": "Lisans",
+    "settings": "Ayarlar",
+    "server": "Servers",
+    "support": "Destek"
   }
 }

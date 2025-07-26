@@ -7,7 +7,7 @@ import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, StyleSheet, TouchableOpacity, View } from "react-native";
 
-export default function HomeScreen() {
+export default function ChatScreen() {
   const { t } = useTranslation();
   const { logout, isLogin } = useUserStore();
   const currentLanguage = useAppStore.getState()?.settings?.language;

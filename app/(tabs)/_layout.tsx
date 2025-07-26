@@ -2,12 +2,14 @@ import { Image } from "expo-image";
 import { Tabs } from "expo-router";
 import React from "react";
 
-import { IconSymbol } from "@/components/ui/IconSymbol";
-import { Colors, Images } from "@/constants";
+import { Icon } from "@/components";
+import { Colors, Images, spacing } from "@/constants";
 import { widthPixel } from "@/utils";
+import { useTranslation } from "react-i18next";
 import { StyleSheet } from "react-native";
 
 export default function TabLayout() {
+  const { t } = useTranslation();
   return (
     <Tabs
       screenOptions={{
@@ -36,26 +38,60 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="home"
+        name="(chat)"
         options={{
-          title: "Home",
+          title: t("tabs.chat"),
+          tabBarLabelStyle: { ...spacing({ mt: 5 }) },
           tabBarIcon: ({ focused }) => (
-            <IconSymbol
-              size={widthPixel(28)}
-              name="house.fill"
+            <Icon
+              type="ant"
+              size={widthPixel(22)}
+              name="message1"
               color={focused ? Colors.white : Colors.menuInactiveColor}
             />
           ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="(groups)"
         options={{
-          title: "Explore",
+          title: t("tabs.groups"),
+          tabBarLabelStyle: { ...spacing({ mt: 5 }) },
           tabBarIcon: ({ focused }) => (
-            <IconSymbol
-              size={widthPixel(28)}
-              name="paperplane.fill"
+            <Icon
+              type="feather"
+              size={widthPixel(23)}
+              name="users"
+              color={focused ? Colors.white : Colors.menuInactiveColor}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="(notes)"
+        options={{
+          title: t("tabs.notes"),
+          tabBarLabelStyle: { ...spacing({ mt: 5 }) },
+          tabBarIcon: ({ focused }) => (
+            <Icon
+              type="feather"
+              size={widthPixel(24)}
+              name="file"
+              color={focused ? Colors.white : Colors.menuInactiveColor}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="(settings)"
+        options={{
+          title: t("tabs.settings"),
+          tabBarLabelStyle: { ...spacing({ mt: 5 }) },
+          tabBarIcon: ({ focused }) => (
+            <Icon
+              type="feather"
+              size={widthPixel(23)}
+              name="settings"
               color={focused ? Colors.white : Colors.menuInactiveColor}
             />
           ),

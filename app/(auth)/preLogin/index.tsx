@@ -18,7 +18,7 @@ export default function PreLoginScreen() {
   };
 
   return (
-    <AppLayout container scrollable>
+    <AppLayout container scrollable safeAreaPadding={false}>
       <View
         style={[
           commonStyle.flex,

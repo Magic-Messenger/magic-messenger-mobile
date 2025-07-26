@@ -177,9 +177,7 @@ export default function RegisterScreen() {
 
 const styles = StyleSheet.create({
   mainContainer: {
-    ...spacing({
-      mt: 60,
-    }),
+    ...spacing({}),
   },
   formContainer: {
     ...spacing({

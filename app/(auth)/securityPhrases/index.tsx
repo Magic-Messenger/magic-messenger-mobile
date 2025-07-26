@@ -1,5 +1,5 @@
 import { AppLayout, Button, SectionHeader, ThemedText } from "@/components";
-import { Colors, commonStyle, spacing } from "@/constants";
+import { Colors, commonStyle } from "@/constants";
 import { useUserStore } from "@/store";
 import { copyToClipboard, shotToast, spacingPixel } from "@/utils";
 import { router, useLocalSearchParams } from "expo-router";
@@ -91,11 +91,7 @@ const SecurityPhrasesScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  mainContainer: {
-    ...spacing({
-      mt: 60,
-    }),
-  },
+  mainContainer: {},
   phrasesContainer: {
     flex: 4,
     flexDirection: "row",

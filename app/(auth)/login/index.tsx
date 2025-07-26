@@ -153,11 +153,7 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  mainContainer: {
-    ...spacing({
-      mt: 60,
-    }),
-  },
+  mainContainer: {},
   formContainer: {
     ...spacing({
       gap: 16,
