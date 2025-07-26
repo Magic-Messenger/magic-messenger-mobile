@@ -77,11 +77,17 @@ export function Button({
         {loading ? (
           <ActivityIndicator color={Colors.white} />
         ) : (
-          <>
+          <View
+            style={
+              leftIcon
+                ? [commonStyle.flexRow, commonStyle.alignItemsCenter]
+                : undefined
+            }
+          >
             {leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}
             <ThemedText {...textProps}>{label}</ThemedText>
             {rightIcon && <View style={styles.rightIcon}>{rightIcon}</View>}
-          </>
+          </View>
         )}
       </LinearGradient>
     </TouchableOpacity>
@@ -91,7 +97,7 @@ export function Button({
 const styles = StyleSheet.create({
   button: {
     width: "100%",
-    height: heightPixel(45),
+    maxHeight: heightPixel(45),
     borderRadius: 9,
     overflow: "hidden",
   },

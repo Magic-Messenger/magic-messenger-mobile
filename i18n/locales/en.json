@@ -85,5 +85,9 @@
     "successCopyUserId": "User Name successfully copied",
     "password": "Your Password",
     "passwordError": "Password must be at least 8 characters"
+  },
+
+  "home": {
+    "newChat": "New Chat"
   }
 }

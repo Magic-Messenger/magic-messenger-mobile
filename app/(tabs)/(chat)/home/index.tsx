@@ -1,11 +1,10 @@
-import { AppLayout, ThemedText } from "@/components";
-import { commonStyle } from "@/constants";
+import { AppLayout, Button, Icon, ThemedText } from "@/components";
 import { useAppStore, useUserStore } from "@/store";
-import { changeLanguage } from "@/utils";
+import { heightPixel, widthPixel } from "@/utils";
 import { router } from "expo-router";
 import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Button, StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function ChatScreen() {
   const { t } = useTranslation();
@@ -30,33 +29,22 @@ export default function ChatScreen() {
   };
 
   return (
-    <AppLayout>
-      <View
-        style={[
-          commonStyle.flex,
-          commonStyle.alignItemsCenter,
-          commonStyle.justifyContentCenter,
-        ]}
-      >
-        {/* <Button title="Chat Screen" onPress={() => router.push("/chat")} /> */}
-        <ThemedText type="title">{currentLanguage}</ThemedText>
-        <ThemedText type="title">{t("welcome")}</ThemedText>
-
-        <View style={commonStyle.flexRow}>
+    <AppLayout
+      container
+      title={
+        <View style={styles.newChatButton}>
           <Button
-            title="Türkçe"
-            disabled={currentLanguage === "tr"}
-            onPress={() => changeLanguage("tr")}
-          />
-          <Button
-            title="English"
-            disabled={currentLanguage === "en"}
-            onPress={() => changeLanguage("en")}
+            type="primary"
+            label={t("home.newChat")}
+            textProps={{
+              size: 14,
+            }}
+            leftIcon={<Icon type="feather" name="plus" size={18} />}
           />
         </View>
-
-        <ThemedText type="title">Home Page !</ThemedText>
-
+      }
+    >
+      <View>
         <TouchableOpacity
           onPress={handleLogout}
           style={{
@@ -75,4 +63,9 @@ export default function ChatScreen() {
   );
 }
 
-const style = StyleSheet.create({});
+const styles = StyleSheet.create({
+  newChatButton: {
+    width: widthPixel(110),
+    height: heightPixel(30),
+  },
+});
