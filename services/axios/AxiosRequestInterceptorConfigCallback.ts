@@ -1,12 +1,11 @@
-/* import { useSessionUser } from "@/store/authStore"; */
+import { useUserStore } from "@/store";
 import type { InternalAxiosRequestConfig } from "axios";
 
 const AxiosRequestIntrceptorConfigCallback = (
   config: InternalAxiosRequestConfig
 ) => {
-  /* const accessToken = useSessionUser.getState().accessToken?.token || "";
-  if (accessToken)
-    config.headers[REQUEST_HEADER_AUTH_KEY] = `${TOKEN_TYPE}${accessToken}`; */
+  const accessToken = useUserStore.getState()?.accessToken || "";
+  if (accessToken) config.headers["Authorization"] = `Bearer ${accessToken}`;
 
   return config;
 };

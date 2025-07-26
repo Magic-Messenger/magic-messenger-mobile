@@ -1,4 +1,5 @@
 import { Images } from "@/constants";
+import i18n from "@/i18n";
 import { useAppStore } from "@/store";
 import * as Application from "expo-application";
 import * as Clipboard from "expo-clipboard";
@@ -19,8 +20,18 @@ export const changeLanguage = (language: string) => {
   console.log(useAppStore.getState());
 };
 
-export const copyToClipboard = async (copyData: string) => {
+export const copyToClipboard = async (
+  copyData: string,
+  successMessage?: string
+) => {
   await Clipboard.setStringAsync(copyData);
+
+  if (successMessage) {
+    shotToast({
+      type: "success",
+      text1: successMessage ?? i18n.t("common.successCopy"),
+    });
+  }
 };
 
 export const shotToast = (toastConfig: ToastShowParams) => {
@@ -53,3 +64,20 @@ export const headerImage = () => {
     ),
   };
 };
+
+export function convertUserId(userID: string | any) {
+  return userID?.match(/.{1,4}/g).join("-") ?? "";
+}
+
+export function appSupportLanguages(): Array<{
+  label: string;
+  value: string | number;
+}> {
+  if (process.env?.EXPO_PUBLIC_SUPPORT_LANGUAGES) {
+    return process.env?.EXPO_PUBLIC_SUPPORT_LANGUAGES?.split(",")?.map(
+      (item) => ({ label: i18n.t(`languages.${item}`), value: item })
+    );
+  }
+
+  return [];
+}

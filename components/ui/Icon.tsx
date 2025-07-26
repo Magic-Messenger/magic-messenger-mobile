@@ -1,4 +1,5 @@
 // Enhanced IconSymbol component with dynamic name types based on icon library type
+import { Colors } from "@/constants";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Entypo from "@expo/vector-icons/Entypo";
 import Feather from "@expo/vector-icons/Feather";
@@ -128,7 +129,7 @@ export function Icon<T extends IconLibrary = "material">(props: {
   type?: T;
   name: IconNameForLibrary<T>;
   size?: number;
-  color: string | OpaqueColorValue;
+  color?: string | OpaqueColorValue;
   style?: StyleProp<TextStyle>;
   weight?: SymbolWeight;
 }): JSX.Element;
@@ -138,7 +139,7 @@ export function Icon<T extends IconLibrary = "material">({
   name,
   type = "material" as T,
   size = 24,
-  color,
+  color = Colors.white,
   style,
 }: {
   type?: T;

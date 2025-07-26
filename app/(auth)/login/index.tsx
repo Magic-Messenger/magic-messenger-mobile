@@ -31,7 +31,7 @@ export default function LoginScreen() {
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>({
     defaultValues: {
-      username: "kadirbarcin",
+      username: "cruznadin",
       password: "Kadir123*+",
     },
   });
@@ -45,14 +45,13 @@ export default function LoginScreen() {
             password: formValues?.password,
           },
         });
-        console.log("data: ", data);
 
         if (success && data?.accessToken) {
           await login(
-            data?.accessToken as string,
+            data?.accessToken?.token as string,
             data?.account?.username as string
           );
-          router.push("/(tabs)/home");
+          router.push("/home");
         }
       }
     } catch (error) {
@@ -74,9 +73,7 @@ export default function LoginScreen() {
         />
       }
     >
-      <View
-        style={[styles.mainContainer, userName ? commonStyle.pt10 : undefined]}
-      >
+      <View style={[userName ? commonStyle.pt10 : undefined]}>
         {!userName && (
           <SectionHeader
             title={t("login.title")}
@@ -153,7 +150,6 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  mainContainer: {},
   formContainer: {
     ...spacing({
       gap: 16,

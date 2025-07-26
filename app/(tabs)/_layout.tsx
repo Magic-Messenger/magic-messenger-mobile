@@ -3,7 +3,7 @@ import React from "react";
 
 import { Icon } from "@/components";
 import { Colors, spacing } from "@/constants";
-import { widthPixel } from "@/utils";
+import { spacingPixel, widthPixel } from "@/utils";
 import { useTranslation } from "react-i18next";
 
 export default function TabLayout() {
@@ -26,6 +26,7 @@ export default function TabLayout() {
           shadowOpacity: 0,
           borderTopWidth: 0,
           backgroundColor: Colors.secondaryBackground,
+          paddingTop: spacingPixel(5),
         },
       }}
     >

@@ -61,6 +61,7 @@ export function spacing(options: SpacingOptions) {
   if (options.pb !== undefined) style.paddingBottom = spacingPixel(options.pb);
   if (options.pl !== undefined) style.paddingLeft = spacingPixel(options.pl);
   if (options.pr !== undefined) style.paddingRight = spacingPixel(options.pr);
+  if (options.p !== undefined) style.padding = spacingPixel(options.p);
   if (options.gap !== undefined) style.gap = spacingPixel(options.gap);
   return style;
 }
@@ -92,7 +93,9 @@ export const commonStyle = StyleSheet.create({
   alignItemsCenter: {
     alignItems: "center",
   },
-
+  justifyContentBetween: {
+    justifyContent: "space-between",
+  },
   fullWidth: {
     width: "100%",
   },

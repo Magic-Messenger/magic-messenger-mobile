@@ -3,7 +3,9 @@
   "or": "veya",
   "back": "Geri",
 
-  "common": {},
+  "common": {
+    "successCopy": "Başarıyla Kopyalandı"
+  },
 
   "login": {
     "title": "Giriş Yap",
@@ -63,5 +65,22 @@
     "settings": "Ayarlar",
     "server": "Servers",
     "support": "Destek"
+  },
+
+  "languages": {
+    "tr": "Türkçe",
+    "en": "English"
+  },
+
+  "profile": {
+    "yourProfile": "Profilin",
+    "userID": "Kullanıcı ID",
+    "qr": "Magic Privacy Messenger için kişisel QR kodunuz",
+    "language": "Uygulama Dili",
+    "dangerzone": "Tehlikeli bölge",
+    "deleteProfile": "Profili Sil",
+    "deleteProfileNote": "NOT: BU İŞLEM GERİ ALINAMAYACAKTIR VE GERİ ALINAMAZ",
+    "successCopyUserId": "Kullanıcı ID'si başarıyla kopyalandı",
+    "password": "Şifreniz"
   }
 }

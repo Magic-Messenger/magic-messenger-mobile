@@ -6,6 +6,8 @@ export type ThemedTextProps = TextProps & {
   type?: "default" | "title" | "defaultSemiBold" | "subtitle" | "link";
   weight?: "bold" | "semiBold" | "light" | "medium" | "regular";
   center?: boolean;
+  size?: number;
+  shrink?: boolean;
 };
 
 export function ThemedText({
@@ -13,6 +15,8 @@ export function ThemedText({
   type = "default",
   weight,
   center,
+  size,
+  shrink,
   ...rest
 }: ThemedTextProps) {
   return (
@@ -27,6 +31,8 @@ export function ThemedText({
         type === "link" ? styles.link : undefined,
         weight ? styles?.[weight] : undefined,
         center ? styles.center : undefined,
+        size ? { fontSize: fontPixel(size) } : undefined,
+        shrink ? { flexShrink: 1 } : undefined,
         style,
       ]}
       {...rest}
@@ -52,7 +58,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontFamily: Fonts.SFProSemiBold,
-    opacity: 0.8,
   },
   link: {
     fontSize: fontPixel(16),

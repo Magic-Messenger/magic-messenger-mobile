@@ -66,6 +66,7 @@ export type SpacingKey =
   | "mb"
   | "ml"
   | "mr"
+  | "p"
   | "pt"
   | "pb"
   | "pl"

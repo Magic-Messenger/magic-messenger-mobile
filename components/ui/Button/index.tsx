@@ -12,7 +12,7 @@ import {
 import { ThemedText, ThemedTextProps } from "../../app/ThemedText";
 
 interface Props {
-  type?: "default" | "primary" | "secondary";
+  type?: "default" | "primary" | "secondary" | "danger";
   label: string;
   onPress?: () => void;
   disabled?: boolean;
@@ -51,6 +51,8 @@ export function Button({
       return Colors.buttonPrimary;
     } else if (type === "secondary") {
       return Colors.buttonSecondary;
+    } else if (type === "danger") {
+      return Colors.buttonDanger;
     }
   }
 
@@ -71,7 +73,7 @@ export function Button({
         ]}
       >
         {loading ? (
-          <ActivityIndicator />
+          <ActivityIndicator color={Colors.white} />
         ) : (
           <>
             {leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}

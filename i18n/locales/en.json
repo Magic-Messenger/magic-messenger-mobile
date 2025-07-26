@@ -1,6 +1,89 @@
 {
   "welcome": "Welcome",
-  "login": "Login",
-  "register": "Register",
-  "or": "or"
+  "or": "or",
+  "back": "Back",
+
+  "common": {
+    "successCopy": "Successfully Copied",
+    "cancel": "Cancel"
+  },
+
+  "login": {
+    "title": "Login",
+    "userName": "Hello {{userName}},"
+  },
+
+  "register": {
+    "title": "Register",
+    "button": "Next",
+    "selectLanguage": "Select Language",
+    "subtitle": "If you lose access to your chat space, you will need these 15 words in the correct sequence. To restore, you need the license key, your digit access, and these 15 words in the correct order.",
+    "passwordNotMatch": "Passwords do not match"
+  },
+
+  "forgotAccount": {
+    "title": "Forgot Your Password?",
+    "verifyPhrases": "Security Key Verification",
+    "resetPassword": "Reset Password",
+    "inputPhrases": "Security Key",
+    "userResetPassword": "Password Reset"
+  },
+
+  "userName": "Username",
+  "password": "Password",
+  "confirmPassword": "Confirm Password",
+
+  "inputError": {
+    "minLength": "{{field}} must be at least {{count}} characters",
+    "required": "{{field}} is required"
+  },
+
+  "securityPhrases": {
+    "title": "Security Screen",
+    "sectionTitle": "Write 15-word keyphrase",
+    "subtitle": "If you lose access to your chat space, you will need these 15 words in the correct sequence. To restore, you need the license key, your digit access, and these 15 words in the correct order.",
+    "phrases": {
+      "title": "Security Key",
+      "message": "Please save this security key",
+      "copy": "Click to copy",
+      "successCopyClipboard": "Successfully Copied"
+    }
+  },
+
+  "tabs": {
+    "chat": "Chat",
+    "groups": "Groups",
+    "notes": "Notes",
+    "settings": "Settings"
+  },
+
+  "settings": {
+    "title": "Settings",
+    "profile": "Profile",
+    "contact": "Contact",
+    "scan-qr": "Scan QR",
+    "license": "License",
+    "settings": "Settings",
+    "server": "Servers",
+    "support": "Support"
+  },
+
+  "languages": {
+    "tr": "Turkish",
+    "en": "English"
+  },
+
+  "profile": {
+    "yourProfile": "Your Profile",
+    "userName": "User Name",
+    "qr": "Your personal QR code for Magic Privacy Messenger",
+    "language": "Application Language",
+    "dangerzone": "Dangerzone",
+    "deleteProfile": "Delete Profile",
+    "askDeleteProfile": "Do you want to delete your profile?",
+    "deleteProfileNote": "NOTE: THIS ACTION IS IRREVERSIBLE AND CANNOT BE UNDONE",
+    "successCopyUserId": "User ID successfully copied",
+    "password": "Your Password",
+    "passwordError": "Password must be at least 8 characters"
+  }
 }

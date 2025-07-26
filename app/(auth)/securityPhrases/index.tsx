@@ -1,7 +1,7 @@
 import { AppLayout, Button, SectionHeader, ThemedText } from "@/components";
 import { Colors, commonStyle } from "@/constants";
 import { useUserStore } from "@/store";
-import { copyToClipboard, shotToast, spacingPixel } from "@/utils";
+import { copyToClipboard, spacingPixel } from "@/utils";
 import { router, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
@@ -27,13 +27,9 @@ const SecurityPhrasesScreen = () => {
           ?.map((itm) => itm)
           .toString()
           .replaceAll(",", "")
-          .trim()
+          .trim(),
+        t("securityPhrases.phrases.successCopyClipboard")
       );
-
-      shotToast({
-        type: "success",
-        text1: t("securityPhrases.phrases.successCopyClipboard"),
-      });
     }
   };
 

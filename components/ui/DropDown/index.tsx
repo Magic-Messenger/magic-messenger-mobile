@@ -42,8 +42,8 @@ interface ControlledDropdownProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > extends BaseDropdownProps {
-  control: Control<TFieldValues>;
-  name: TName;
+  control?: Control<TFieldValues>;
+  name?: TName;
   rules?: Parameters<typeof Controller>[0]["rules"];
   selectedValue?: never;
   onValueChange?: never;

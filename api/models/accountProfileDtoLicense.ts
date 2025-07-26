@@ -4,9 +4,9 @@
  * MagicMessenger
  * OpenAPI spec version: v1
  */
-import type { AdminAccountDto } from "./adminAccountDto";
+import type { LicenseProfileDto } from "./licenseProfileDto";
 
 /**
  * @nullable
  */
-export type AdminLoginCommandResultAccount = AdminAccountDto | null;
+export type AccountProfileDtoLicense = LicenseProfileDto | null;

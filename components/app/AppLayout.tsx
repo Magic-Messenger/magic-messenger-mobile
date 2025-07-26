@@ -1,7 +1,13 @@
-import { Colors, Images, spacing } from "@/constants";
+import { Colors, commonStyle, Images, spacing } from "@/constants";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { ImageBackground, ScrollView, StyleSheet, View } from "react-native";
+import {
+  ActivityIndicator,
+  ImageBackground,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 interface AppLayoutProps {
@@ -10,10 +16,12 @@ interface AppLayoutProps {
   container?: boolean;
   footer?: React.ReactNode;
   safeAreaPadding?: boolean;
+  loading?: boolean;
 }
 
 export function AppLayout({
   children,
+  loading = false,
   container = false,
   scrollable = false,
   safeAreaPadding = true,
@@ -37,12 +45,27 @@ export function AppLayout({
           safeAreaPadding ? { ...spacing({ mt: 45 }) } : undefined,
         ]}
       >
-        <Container
-          contentContainerStyle={styles.content}
-          style={styles.content}
-        >
-          {children}
-        </Container>
+        {loading ? (
+          <View
+            style={[
+              commonStyle.flex,
+              commonStyle.alignItemsCenter,
+              commonStyle.justifyContentCenter,
+            ]}
+          >
+            <ActivityIndicator />
+          </View>
+        ) : (
+          <>
+            <Container
+              contentContainerStyle={styles.content}
+              style={styles.content}
+            >
+              {children}
+            </Container>
+          </>
+        )}
+
         {footer && <>{footer}</>}
       </SafeAreaView>
     </LinearGradient>
@@ -68,6 +91,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flexGrow: 1,
+    position: "relative",
   },
   container: {
     ...spacing({

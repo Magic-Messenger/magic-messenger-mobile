@@ -7,6 +7,7 @@ export const toastConfig = {
   success: (props: any) => (
     <BaseToast
       {...props}
+      text1NumberOfLines={2}
       style={{
         borderLeftWidth: 0,
         backgroundColor: Colors.toatBackground,
@@ -23,6 +24,7 @@ export const toastConfig = {
   error: (props: any) => (
     <ErrorToast
       {...props}
+      text1NumberOfLines={2}
       style={{
         borderLeftWidth: 0,
         backgroundColor: Colors.toatBackgroundDanger,

@@ -7,8 +7,9 @@ import {
   SectionHeader,
 } from "@/components";
 import { spacing } from "@/constants";
-import { getInstallationId, shotToast } from "@/utils";
+import { appSupportLanguages, getInstallationId, shotToast } from "@/utils";
 import { router } from "expo-router";
+import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
@@ -17,17 +18,20 @@ interface RegisterFormData {
   username: string;
   password: string;
   confirmPassword: string;
-  language: number;
+  language: number | string;
 }
-
-const LANGUAGE_OPTIONS = [
-  { label: "Türkçe", value: 1 },
-  { label: "English", value: 2 },
-] as const;
 
 export default function RegisterScreen() {
   const { t } = useTranslation();
   const { mutateAsync: registerApi } = usePostApiAccountRegister();
+
+  const supportLanguages = useMemo(() => {
+    return appSupportLanguages();
+  }, [appSupportLanguages]);
+
+  const defaultLocale = useMemo(() => {
+    return process?.env?.EXPO_PUBLIC_DEFAULT_LANGUAGE;
+  }, [process?.env?.EXPO_PUBLIC_DEFAULT_LANGUAGE]);
 
   const {
     control,
@@ -38,7 +42,7 @@ export default function RegisterScreen() {
       username: `test-${Math.random()}`,
       password: "Kadir123*+",
       confirmPassword: "Kadir123*+",
-      language: 2,
+      language: defaultLocale,
     },
   });
 
@@ -161,7 +165,7 @@ export default function RegisterScreen() {
             control={control}
             name="language"
             label={t("register.selectLanguage")}
-            options={LANGUAGE_OPTIONS as never}
+            options={supportLanguages}
             rules={{
               required: t("inputError.required", {
                 field: t("register.selectLanguage"),

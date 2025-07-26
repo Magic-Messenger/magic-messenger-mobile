@@ -22,7 +22,10 @@ import type {
 
 import type {
   AccountDetailDtoIDataResult,
+  AccountDtoIDataResult,
   AccountDtoListPaginatedResult,
+  AccountProfileDtoIDataResult,
+  AccountSettingsCommandRequest,
   AddMessageToTicketCommandRequest,
   AddTransactionToLicenseCommandRequest,
   AdminLoginCommandRequest,
@@ -33,9 +36,11 @@ import type {
   ChangeAccountStatusCommandRequest,
   ChangeLicenseStatusCommandRequest,
   ChangeTicketStatusCommandRequest,
+  ContactDtoListIDataResult,
   CreateAccountCommandRequest,
   CreateAccountCommandResultIDataResult,
   CreateChatCommandRequest,
+  CreateContactCommandRequest,
   CreateFaqCommandRequest,
   CreateLanguageCommand,
   CreateLicenseCommandRequest,
@@ -45,6 +50,7 @@ import type {
   DeleteApiAccountDeleteAccountParams,
   DeleteApiAccountDeleteProfileParams,
   DeleteApiChatsDeleteParams,
+  DeleteApiContactsDeleteParams,
   DeleteApiFaqsDeleteParams,
   DeleteApiLicensesDeleteParams,
   DeleteApiSubscriptionsDeleteParams,
@@ -78,6 +84,7 @@ import type {
   RefreshTokenCommandResultIDataResult,
   RegisterCommandRequest,
   RegisterCommandResultIDataResult,
+  RegisterDeviceTokenCommandRequest,
   ResetPasswordCommandRequest,
   ResetPhrasesCommandRequest,
   ResetTwoFactorCommandRequest,
@@ -87,11 +94,12 @@ import type {
   SubscriptionDtoListIDataResult,
   SubscriptionIDataResult,
   SuccessResult,
-  TicketDtoListIDataResult,
-  TicketIDataResult,
+  TicketDetailDtoIDataResult,
+  TicketDtoListPaginatedResult,
   Translate,
   UnblockAccountCommandRequest,
   UpdateChatCommandRequest,
+  UpdateContactCommandRequest,
   UpdateFaqCommandRequest,
   UpdateLanguageCommand,
   UpdateSubscriptionCommandRequest,
@@ -1280,6 +1288,100 @@ export const usePostApiAccountChangeStatus = <
 };
 
 /**
+ * @summary Register device token operation
+ */
+export const postApiAccountRegisterDeviceToken = (
+  registerDeviceTokenCommandRequest: RegisterDeviceTokenCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/account/register-device-token`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: registerDeviceTokenCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiAccountRegisterDeviceTokenMutationOptions = <
+  TError = string[] | void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiAccountRegisterDeviceToken>>,
+    TError,
+    { data: RegisterDeviceTokenCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiAccountRegisterDeviceToken>>,
+  TError,
+  { data: RegisterDeviceTokenCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiAccountRegisterDeviceToken"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiAccountRegisterDeviceToken>>,
+    { data: RegisterDeviceTokenCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiAccountRegisterDeviceToken(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiAccountRegisterDeviceTokenMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiAccountRegisterDeviceToken>>
+>;
+export type PostApiAccountRegisterDeviceTokenMutationBody =
+  RegisterDeviceTokenCommandRequest;
+export type PostApiAccountRegisterDeviceTokenMutationError = string[] | void;
+
+/**
+ * @summary Register device token operation
+ */
+export const usePostApiAccountRegisterDeviceToken = <
+  TError = string[] | void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiAccountRegisterDeviceToken>>,
+      TError,
+      { data: RegisterDeviceTokenCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiAccountRegisterDeviceToken>>,
+  TError,
+  { data: RegisterDeviceTokenCommandRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiAccountRegisterDeviceTokenMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
  * @summary Block account operation
  */
 export const postApiAccountBlockAccount = (
@@ -1835,6 +1937,261 @@ export const usePostApiAccountResetTwoFactor = <
 > => {
   const mutationOptions =
     getPostApiAccountResetTwoFactorMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Get account profile operation
+ */
+export const getApiAccountGetProfile = (
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<AccountProfileDtoIDataResult>(
+    { url: `/api/account/get-profile`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetApiAccountGetProfileQueryKey = () => {
+  return [`/api/account/get-profile`] as const;
+};
+
+export const getGetApiAccountGetProfileQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiAccountGetProfile>>,
+  TError = string[] | void,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiAccountGetProfile>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetApiAccountGetProfileQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiAccountGetProfile>>
+  > = ({ signal }) => getApiAccountGetProfile(requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    staleTime: 10000,
+    refetchOnWindowFocus: false,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiAccountGetProfile>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiAccountGetProfileQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiAccountGetProfile>>
+>;
+export type GetApiAccountGetProfileQueryError = string[] | void;
+
+export function useGetApiAccountGetProfile<
+  TData = Awaited<ReturnType<typeof getApiAccountGetProfile>>,
+  TError = string[] | void,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiAccountGetProfile>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiAccountGetProfile>>,
+          TError,
+          Awaited<ReturnType<typeof getApiAccountGetProfile>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiAccountGetProfile<
+  TData = Awaited<ReturnType<typeof getApiAccountGetProfile>>,
+  TError = string[] | void,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiAccountGetProfile>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiAccountGetProfile>>,
+          TError,
+          Awaited<ReturnType<typeof getApiAccountGetProfile>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiAccountGetProfile<
+  TData = Awaited<ReturnType<typeof getApiAccountGetProfile>>,
+  TError = string[] | void,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiAccountGetProfile>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get account profile operation
+ */
+
+export function useGetApiAccountGetProfile<
+  TData = Awaited<ReturnType<typeof getApiAccountGetProfile>>,
+  TError = string[] | void,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiAccountGetProfile>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiAccountGetProfileQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Change account settings operation
+ */
+export const postApiAccountChangeAccountSettings = (
+  accountSettingsCommandRequest: AccountSettingsCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<AccountDtoIDataResult>(
+    {
+      url: `/api/account/change-account-settings`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: accountSettingsCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiAccountChangeAccountSettingsMutationOptions = <
+  TError = string[] | void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiAccountChangeAccountSettings>>,
+    TError,
+    { data: AccountSettingsCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiAccountChangeAccountSettings>>,
+  TError,
+  { data: AccountSettingsCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiAccountChangeAccountSettings"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiAccountChangeAccountSettings>>,
+    { data: AccountSettingsCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiAccountChangeAccountSettings(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiAccountChangeAccountSettingsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiAccountChangeAccountSettings>>
+>;
+export type PostApiAccountChangeAccountSettingsMutationBody =
+  AccountSettingsCommandRequest;
+export type PostApiAccountChangeAccountSettingsMutationError = string[] | void;
+
+/**
+ * @summary Change account settings operation
+ */
+export const usePostApiAccountChangeAccountSettings = <
+  TError = string[] | void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiAccountChangeAccountSettings>>,
+      TError,
+      { data: AccountSettingsCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiAccountChangeAccountSettings>>,
+  TError,
+  { data: AccountSettingsCommandRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiAccountChangeAccountSettingsMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };
@@ -2992,6 +3349,435 @@ export const usePostApiChatsUpload = <
 
   return useMutation(mutationOptions, queryClient);
 };
+
+/**
+ * @summary Create a contact
+ */
+export const postApiContactsCreate = (
+  createContactCommandRequest: CreateContactCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<SuccessResult>(
+    {
+      url: `/api/contacts/create`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: createContactCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiContactsCreateMutationOptions = <
+  TError = string[] | void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiContactsCreate>>,
+    TError,
+    { data: CreateContactCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiContactsCreate>>,
+  TError,
+  { data: CreateContactCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiContactsCreate"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiContactsCreate>>,
+    { data: CreateContactCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiContactsCreate(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiContactsCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiContactsCreate>>
+>;
+export type PostApiContactsCreateMutationBody = CreateContactCommandRequest;
+export type PostApiContactsCreateMutationError = string[] | void;
+
+/**
+ * @summary Create a contact
+ */
+export const usePostApiContactsCreate = <
+  TError = string[] | void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiContactsCreate>>,
+      TError,
+      { data: CreateContactCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiContactsCreate>>,
+  TError,
+  { data: CreateContactCommandRequest },
+  TContext
+> => {
+  const mutationOptions = getPostApiContactsCreateMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Update a contact
+ */
+export const postApiContactsUpdate = (
+  updateContactCommandRequest: UpdateContactCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<SuccessResult>(
+    {
+      url: `/api/contacts/update`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: updateContactCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiContactsUpdateMutationOptions = <
+  TError = string[] | void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiContactsUpdate>>,
+    TError,
+    { data: UpdateContactCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiContactsUpdate>>,
+  TError,
+  { data: UpdateContactCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiContactsUpdate"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiContactsUpdate>>,
+    { data: UpdateContactCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiContactsUpdate(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiContactsUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiContactsUpdate>>
+>;
+export type PostApiContactsUpdateMutationBody = UpdateContactCommandRequest;
+export type PostApiContactsUpdateMutationError = string[] | void;
+
+/**
+ * @summary Update a contact
+ */
+export const usePostApiContactsUpdate = <
+  TError = string[] | void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiContactsUpdate>>,
+      TError,
+      { data: UpdateContactCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiContactsUpdate>>,
+  TError,
+  { data: UpdateContactCommandRequest },
+  TContext
+> => {
+  const mutationOptions = getPostApiContactsUpdateMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Delete a contact
+ */
+export const deleteApiContactsDelete = (
+  params?: DeleteApiContactsDeleteParams,
+  options?: SecondParameter<typeof AxiosInstance>,
+) => {
+  return AxiosInstance<SuccessResult>(
+    { url: `/api/contacts/delete`, method: "DELETE", params },
+    options,
+  );
+};
+
+export const getDeleteApiContactsDeleteMutationOptions = <
+  TError = string[] | void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteApiContactsDelete>>,
+    TError,
+    { params?: DeleteApiContactsDeleteParams },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteApiContactsDelete>>,
+  TError,
+  { params?: DeleteApiContactsDeleteParams },
+  TContext
+> => {
+  const mutationKey = ["deleteApiContactsDelete"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteApiContactsDelete>>,
+    { params?: DeleteApiContactsDeleteParams }
+  > = (props) => {
+    const { params } = props ?? {};
+
+    return deleteApiContactsDelete(params, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteApiContactsDeleteMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteApiContactsDelete>>
+>;
+
+export type DeleteApiContactsDeleteMutationError = string[] | void;
+
+/**
+ * @summary Delete a contact
+ */
+export const useDeleteApiContactsDelete = <
+  TError = string[] | void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteApiContactsDelete>>,
+      TError,
+      { params?: DeleteApiContactsDeleteParams },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deleteApiContactsDelete>>,
+  TError,
+  { params?: DeleteApiContactsDeleteParams },
+  TContext
+> => {
+  const mutationOptions = getDeleteApiContactsDeleteMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Get contacts
+ */
+export const getApiContactsList = (
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<ContactDtoListIDataResult>(
+    { url: `/api/contacts/list`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetApiContactsListQueryKey = () => {
+  return [`/api/contacts/list`] as const;
+};
+
+export const getGetApiContactsListQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiContactsList>>,
+  TError = string[] | void,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiContactsList>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetApiContactsListQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiContactsList>>
+  > = ({ signal }) => getApiContactsList(requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    staleTime: 10000,
+    refetchOnWindowFocus: false,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiContactsList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiContactsListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiContactsList>>
+>;
+export type GetApiContactsListQueryError = string[] | void;
+
+export function useGetApiContactsList<
+  TData = Awaited<ReturnType<typeof getApiContactsList>>,
+  TError = string[] | void,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiContactsList>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiContactsList>>,
+          TError,
+          Awaited<ReturnType<typeof getApiContactsList>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiContactsList<
+  TData = Awaited<ReturnType<typeof getApiContactsList>>,
+  TError = string[] | void,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiContactsList>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiContactsList>>,
+          TError,
+          Awaited<ReturnType<typeof getApiContactsList>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiContactsList<
+  TData = Awaited<ReturnType<typeof getApiContactsList>>,
+  TError = string[] | void,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiContactsList>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get contacts
+ */
+
+export function useGetApiContactsList<
+  TData = Awaited<ReturnType<typeof getApiContactsList>>,
+  TError = string[] | void,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiContactsList>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiContactsListQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
 
 /**
  * @summary Create a faq
@@ -5969,7 +6755,7 @@ export const getApiTicketsList = (
   options?: SecondParameter<typeof AxiosInstance>,
   signal?: AbortSignal,
 ) => {
-  return AxiosInstance<TicketDtoListIDataResult>(
+  return AxiosInstance<TicketDtoListPaginatedResult>(
     { url: `/api/tickets/list`, method: "GET", params, signal },
     options,
   );
@@ -6140,7 +6926,7 @@ export const getApiTicketsGet = (
   options?: SecondParameter<typeof AxiosInstance>,
   signal?: AbortSignal,
 ) => {
-  return AxiosInstance<TicketIDataResult>(
+  return AxiosInstance<TicketDetailDtoIDataResult>(
     { url: `/api/tickets/get`, method: "GET", params, signal },
     options,
   );

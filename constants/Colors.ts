@@ -18,6 +18,9 @@ export const Colors = {
   menuInactiveColor: "#9DB2CE",
   white: "#fff",
 
+  /* accent */
+  mainAccent: "#521CB1",
+
   /* text */
   text: "#fff",
   textDisabled: "#555",
@@ -29,6 +32,7 @@ export const Colors = {
   buttonPrimary: ["#783ABF", "#39149E"],
   buttonSecondary: ["#2A1243", "#2A1243"],
   buttonTransparent: ["transparent", "transparent"],
+  buttonDanger: ["#FF2D2D", "#FF2D2D"],
 
   /* toast */
   toatBackground: "#2DC62A",

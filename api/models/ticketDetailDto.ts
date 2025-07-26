@@ -5,8 +5,9 @@
  * OpenAPI spec version: v1
  */
 import type { TicketStatus } from "./ticketStatus";
+import type { TicketMessagesDto } from "./ticketMessagesDto";
 
-export interface TicketDto {
+export interface TicketDetailDto {
   /** @nullable */
   readonly ticketId?: string | null;
   /** @nullable */
@@ -20,4 +21,6 @@ export interface TicketDto {
   username?: string | null;
   /** @nullable */
   licenseCode?: string | null;
+  /** @nullable */
+  ticketMessages?: TicketMessagesDto[] | null;
 }
