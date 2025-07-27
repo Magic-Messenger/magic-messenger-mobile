@@ -1,10 +1,49 @@
+import { AppLayout, ThemedText } from "@/components";
+import { Colors, commonStyle, Images } from "@/constants";
 import "@/i18n";
 import { useUserStore } from "@/store";
-import { Redirect } from "expo-router";
-import { useEffect } from "react";
+import { heightPixel, spacingPixel, widthPixel } from "@/utils";
+import { Image } from "expo-image";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
+import { StyleSheet, View } from "react-native";
 
 export default function IndexPage() {
   const { isLogin, rehydrated } = useUserStore();
+
+  const [connected, setConnected] = useState<boolean>(false);
+  const [dots, setDots] = useState<string>("");
+
+  let interval: any = null;
+
+  useEffect(() => {
+    interval = setInterval(() => {
+      setDots((prev) => {
+        if (prev.length >= 3) {
+          return "";
+        }
+        return prev + ".";
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setConnected(true);
+    }, 2500);
+
+    setTimeout(() => {
+      if (isLogin) {
+        router.dismissTo("/home");
+      } else {
+        router.dismissTo("/(auth)/preLogin");
+      }
+
+      clearTimeout(interval);
+    }, 3000);
+  }, [isLogin]);
 
   useEffect(() => {
     console.log("Index Page - isLogin:", isLogin, "rehydrated:", rehydrated);
@@ -14,9 +53,67 @@ export default function IndexPage() {
     return null;
   }
 
-  if (isLogin) {
-    return <Redirect href="/home" />;
-  } else {
-    return <Redirect href="/(auth)/preLogin" />;
-  }
+  return (
+    <AppLayout container showBadge={false}>
+      <View
+        style={[
+          commonStyle.flex,
+          commonStyle.alignItemsCenter,
+          commonStyle.justifyContentCenter,
+        ]}
+      >
+        <Image
+          source={Images.logo}
+          contentFit="contain"
+          style={{ width: widthPixel(200), height: heightPixel(60) }}
+        />
+
+        <View
+          style={[
+            commonStyle.mt4,
+            commonStyle.justifyContentStart,
+            commonStyle.gap3,
+            {
+              width: widthPixel(150),
+            },
+          ]}
+        >
+          <View style={[commonStyle.flexRow, commonStyle.gap3]}>
+            <View
+              style={[
+                styles.badgeStatus,
+                connected ? styles.active : styles.inActive,
+              ]}
+            />
+            <ThemedText type="default">Connecting{dots}</ThemedText>
+          </View>
+          <View style={[commonStyle.flexRow, commonStyle.gap3]}>
+            <View style={[styles.badgeStatus, styles.active]} />
+            <ThemedText type="default">TOR</ThemedText>
+          </View>
+          <View style={[commonStyle.flexRow, commonStyle.gap3]}>
+            <View style={[styles.badgeStatus, styles.active]} />
+            <ThemedText type="default">VPN</ThemedText>
+          </View>
+          <View style={[commonStyle.flexRow, commonStyle.gap3]}>
+            <View style={[styles.badgeStatus, styles.active]} />
+            <ThemedText type="default">Encryption</ThemedText>
+          </View>
+        </View>
+      </View>
+    </AppLayout>
+  );
 }
+
+const styles = StyleSheet.create({
+  badgeStatus: {
+    padding: spacingPixel(10),
+    borderRadius: widthPixel(100),
+  },
+  active: {
+    backgroundColor: Colors.success,
+  },
+  inActive: {
+    backgroundColor: Colors.danger,
+  },
+});
