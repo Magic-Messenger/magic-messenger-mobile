@@ -1,0 +1,94 @@
+import { usePostApiContactsCreate } from "@/api/endpoints/magicMessenger";
+import { CreateContactCommandRequest } from "@/api/models";
+import { AppLayout, Button, Input, ThemedText } from "@/components";
+import { commonStyle } from "@/constants";
+import { showToast } from "@/utils";
+import { router } from "expo-router";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { View } from "react-native";
+
+export default function ContactAdd() {
+  const { t } = useTranslation();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting, isLoading },
+  } = useForm<CreateContactCommandRequest>();
+
+  const { mutateAsync: addContact, isPending } = usePostApiContactsCreate();
+
+  const onSubmit = async (formValues: CreateContactCommandRequest) => {
+    const { success } = await addContact({
+      data: {
+        ...formValues,
+      },
+    });
+    if (success) {
+      showToast({
+        text1: t("contacts.successAddedContact"),
+      });
+      router.back();
+    }
+  };
+
+  return (
+    <AppLayout
+      container
+      scrollable
+      footer={
+        <Button
+          loading={isPending || isLoading}
+          disabled={isSubmitting}
+          type="primary"
+          label={t("contacts.addContact")}
+          onPress={handleSubmit(onSubmit)}
+        />
+      }
+    >
+      <ThemedText type="title" weight="semiBold" size={20}>
+        {t("contacts.addContact")}
+      </ThemedText>
+
+      <View style={[commonStyle.gap5, commonStyle.mt10]}>
+        <Input
+          control={control}
+          name="username"
+          label={t("contacts.userName")}
+          rules={{
+            required: t("inputError.required", {
+              field: t("userName"),
+            }),
+            minLength: {
+              value: 3,
+              message: t("inputError.minLength", {
+                field: t("userName"),
+                count: 3,
+              }),
+            },
+          }}
+          error={errors.username?.message}
+        />
+
+        <Input
+          control={control}
+          name="nickname"
+          label={t("contacts.nickName")}
+          rules={{
+            required: t("inputError.required", {
+              field: t("contacts.nickName"),
+            }),
+            minLength: {
+              value: 3,
+              message: t("inputError.minLength", {
+                field: t("contacts.nickName"),
+                count: 3,
+              }),
+            },
+          }}
+          error={errors.username?.message}
+        />
+      </View>
+    </AppLayout>
+  );
+}

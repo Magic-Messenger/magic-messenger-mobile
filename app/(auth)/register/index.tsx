@@ -7,7 +7,7 @@ import {
   SectionHeader,
 } from "@/components";
 import { spacing } from "@/constants";
-import { appSupportLanguages, getInstallationId, shotToast } from "@/utils";
+import { appSupportLanguages, getInstallationId, showToast } from "@/utils";
 import { router } from "expo-router";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
@@ -49,7 +49,7 @@ export default function RegisterScreen() {
   const onSubmit = async (formValues: RegisterFormData) => {
     try {
       if (formValues.password !== formValues.confirmPassword) {
-        shotToast({
+        showToast({
           type: "error",
           text1: t("register.passwordNotMatch"),
         });

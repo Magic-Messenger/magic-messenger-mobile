@@ -45,8 +45,8 @@ export const ContactItem = ({ nickname, contactUsername, onAction }: Props) => {
           style={styles.iconImage}
         />
 
-        <View style={commonStyle.flex}>
-          <ThemedText type="title" weight="semiBold" size={16}>
+        <View style={[commonStyle.flex, commonStyle.gap1]}>
+          <ThemedText type="default" weight="semiBold" size={16}>
             {nickname ?? ""}
           </ThemedText>
           <ThemedText type="default" weight="regular" size={12}>
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: spacingPixel(10),
     paddingHorizontal: spacingPixel(10),
-    paddingVertical: spacingPixel(5),
+    paddingVertical: spacingPixel(7),
     borderRadius: widthPixel(10),
   },
   iconImage: {

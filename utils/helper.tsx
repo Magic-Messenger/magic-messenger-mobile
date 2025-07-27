@@ -27,14 +27,14 @@ export const copyToClipboard = async (
   await Clipboard.setStringAsync(copyData);
 
   if (successMessage) {
-    shotToast({
+    showToast({
       type: "success",
       text1: successMessage ?? i18n.t("common.successCopy"),
     });
   }
 };
 
-export const shotToast = (toastConfig: ToastShowParams) => {
+export const showToast = (toastConfig: ToastShowParams) => {
   if (!toastConfig) return;
 
   Toast.show({

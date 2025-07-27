@@ -3,13 +3,14 @@ import { ContactDto } from "@/api/models";
 import { AppLayout, ContactHeader, ContactItem, EmptyList } from "@/components";
 import { commonStyle } from "@/constants";
 import { spacingPixel } from "@/utils";
-import { useMemo, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FlatList } from "react-native";
 
 export default function ContactsScreen() {
   const { t } = useTranslation();
-  const { data: contactData, isLoading } = useGetApiContactsList();
+  const { data: contactData, isLoading, refetch } = useGetApiContactsList();
 
   const [searchText, setSearchText] = useState<string>("");
 
@@ -26,11 +27,23 @@ export default function ContactsScreen() {
         contactUsername={item.contactUsername as string}
         onAction={{
           copy: true,
-          onEdit: () => {},
+          onEdit: () =>
+            router.push({
+              pathname: "/contacts/edit",
+              params: {
+                ...item,
+              },
+            }),
         }}
       />
     );
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [])
+  );
 
   return (
     <AppLayout container title={t("contacts.title")} loading={isLoading}>

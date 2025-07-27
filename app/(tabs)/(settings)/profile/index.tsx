@@ -17,7 +17,7 @@ import {
   changeLanguage,
   copyToClipboard,
   fontPixel,
-  shotToast,
+  showToast,
   widthPixel,
 } from "@/utils";
 import { Image } from "expo-image";
@@ -57,7 +57,7 @@ export default function ProfileScreen() {
           router.replace("/(auth)/preLogin");
         }
       } else {
-        shotToast({
+        showToast({
           type: "error",
           text1: t("profile.passwordError"),
         });

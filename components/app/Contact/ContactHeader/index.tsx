@@ -1,5 +1,6 @@
 import { commonStyle } from "@/constants";
 import { heightPixel, widthPixel } from "@/utils";
+import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
 import { Button, Input } from "../../../ui";
@@ -37,6 +38,7 @@ export const ContactHeader = ({ setSearchText }: Props) => {
           <Button
             type="secondary"
             label={t("contacts.addUser")}
+            onPress={() => router.push("/(tabs)/(settings)/contacts/add")}
             style={styles.contactButton}
             textProps={{
               size: 14,

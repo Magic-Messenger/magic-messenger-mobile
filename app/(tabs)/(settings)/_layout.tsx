@@ -36,7 +36,21 @@ export default function SettingsStack() {
       />
 
       <Stack.Screen
-        name="contacts/index"
+        name="contacts/list/index"
+        options={{
+          headerShown: true,
+        }}
+      />
+
+      <Stack.Screen
+        name="contacts/add/index"
+        options={{
+          headerShown: true,
+        }}
+      />
+
+      <Stack.Screen
+        name="contacts/edit/index"
         options={{
           headerShown: true,
         }}

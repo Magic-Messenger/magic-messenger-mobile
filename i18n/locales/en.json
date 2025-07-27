@@ -6,7 +6,8 @@
   "common": {
     "successCopy": "Successfully Copied",
     "cancel": "Cancel",
-    "search": "Search"
+    "search": "Search",
+    "delete": "Delete"
   },
 
   "login": {
@@ -101,7 +102,12 @@
     "scanQRCode": "Scan QR code",
     "scanSuccessfull": "Scan Successful",
     "successCopyUserName": "Username copied successfully",
-    "notFound": "Contact data not found"
+    "notFound": "Contact data not found",
+    "successAddedContact": "Contact added successfully",
+    "deleteContact": "Delete Contact",
+    "deleteContactMessageTitle": "Are you sure?",
+    "deleteContactMessageMessage": "Once a contact is deleted, it cannot be recovered.",
+    "successDeleteContact": "Contact was deleted successfully"
   },
 
   "home": {
