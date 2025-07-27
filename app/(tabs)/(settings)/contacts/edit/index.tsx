@@ -3,7 +3,14 @@ import {
   usePostApiContactsUpdate,
 } from "@/api/endpoints/magicMessenger";
 import { CreateContactCommandRequest } from "@/api/models";
-import { AppLayout, Button, Icon, Input, ThemedText } from "@/components";
+import {
+  AppLayout,
+  Button,
+  ContactScanQr,
+  Icon,
+  Input,
+  ThemedText,
+} from "@/components";
 import { commonStyle } from "@/constants";
 import { showToast } from "@/utils";
 import { router, useLocalSearchParams } from "expo-router";
@@ -14,12 +21,13 @@ import { Alert, View } from "react-native";
 
 export default function ContactEdit() {
   const { t } = useTranslation();
-  const { contactUsername, nickname } = useLocalSearchParams();
+  const { contactUsername, nickname, barcode } = useLocalSearchParams();
 
   const {
     control,
     handleSubmit,
     reset,
+    watch,
     formState: { errors, isSubmitting, isLoading, isSubmitted },
   } = useForm<CreateContactCommandRequest>();
 
@@ -79,10 +87,18 @@ export default function ContactEdit() {
     }
   }, [contactUsername, nickname]);
 
+  const nickNameField = watch()?.nickname;
+  useEffect(() => {
+    if (barcode) {
+      reset({ username: barcode as string, nickname: nickNameField });
+    }
+  }, [barcode, nickNameField]);
+
   return (
     <AppLayout
       container
       scrollable
+      title={<ContactScanQr />}
       footer={
         <Button
           loading={isPending || isLoading}

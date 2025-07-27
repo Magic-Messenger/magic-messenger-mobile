@@ -110,6 +110,11 @@
     "successDeleteContact": "Contact was deleted successfully"
   },
 
+  "barcode": {
+    "permissionTitle": "You must grant permission to use the camera.",
+    "grantPermission": "Grant Permission"
+  },
+
   "home": {
     "newChat": "New Chat"
   }

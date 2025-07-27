@@ -55,6 +55,13 @@ export default function SettingsStack() {
           headerShown: true,
         }}
       />
+
+      <Stack.Screen
+        name="contacts/scanQr/index"
+        options={{
+          headerShown: true,
+        }}
+      />
     </Stack>
   );
 }

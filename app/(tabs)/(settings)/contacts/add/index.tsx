@@ -1,18 +1,29 @@
 import { usePostApiContactsCreate } from "@/api/endpoints/magicMessenger";
 import { CreateContactCommandRequest } from "@/api/models";
-import { AppLayout, Button, Input, ThemedText } from "@/components";
+import {
+  AppLayout,
+  Button,
+  ContactScanQr,
+  Input,
+  ThemedText,
+} from "@/components";
 import { commonStyle } from "@/constants";
 import { showToast } from "@/utils";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 
 export default function ContactAdd() {
   const { t } = useTranslation();
+  const { barcode } = useLocalSearchParams();
+
   const {
     control,
     handleSubmit,
+    reset,
+    watch,
     formState: { errors, isSubmitting, isLoading },
   } = useForm<CreateContactCommandRequest>();
 
@@ -32,10 +43,18 @@ export default function ContactAdd() {
     }
   };
 
+  const nickNameField = watch()?.nickname;
+  useEffect(() => {
+    if (barcode) {
+      reset({ username: barcode as string, nickname: nickNameField });
+    }
+  }, [barcode, nickNameField]);
+
   return (
     <AppLayout
       container
       scrollable
+      title={<ContactScanQr />}
       footer={
         <Button
           loading={isPending || isLoading}

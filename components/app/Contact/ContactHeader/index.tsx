@@ -1,8 +1,8 @@
-import { commonStyle } from "@/constants";
-import { heightPixel, widthPixel } from "@/utils";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
+import { commonStyle } from "../../../../constants";
+import { heightPixel, widthPixel } from "../../../../utils";
 import { Button, Input } from "../../../ui";
 import { ThemedText } from "../../ThemedText";
 
