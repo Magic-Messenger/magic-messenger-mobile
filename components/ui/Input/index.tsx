@@ -22,7 +22,7 @@ interface BaseInputProps extends Omit<TextInputProps, "style"> {
   multiline?: boolean;
   numberOfLines?: number;
   editable?: boolean;
-  style?: ViewStyle;
+  style?: ViewStyle | any;
   inputStyle?: TextStyle;
   labelStyle?: TextStyle;
   required?: boolean;

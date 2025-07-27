@@ -1,5 +1,5 @@
 import { AppLayout, Button, Icon, ThemedText } from "@/components";
-import { useAppStore, useUserStore } from "@/store";
+import { useUserStore } from "@/store";
 import { heightPixel, widthPixel } from "@/utils";
 import { router } from "expo-router";
 import { useEffect, useMemo } from "react";
@@ -9,7 +9,6 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 export default function ChatScreen() {
   const { t } = useTranslation();
   const { logout, isLogin } = useUserStore();
-  const currentLanguage = useAppStore.getState()?.settings?.language;
 
   useEffect(() => {
     if (!isLogin) {

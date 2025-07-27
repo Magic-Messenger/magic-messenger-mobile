@@ -18,6 +18,7 @@ export default function SettingsScreen() {
     {
       label: t("settings.contact"),
       icon: "message-circle",
+      onPress: () => router.push("/(tabs)/(settings)/contacts"),
     },
     {
       label: t("settings.scan-qr"),

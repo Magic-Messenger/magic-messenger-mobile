@@ -5,7 +5,8 @@
 
   "common": {
     "successCopy": "Successfully Copied",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "search": "Search"
   },
 
   "login": {
@@ -60,7 +61,7 @@
   "settings": {
     "title": "Settings",
     "profile": "Profile",
-    "contact": "Contact",
+    "contact": "Contacts",
     "scan-qr": "Scan QR",
     "license": "License",
     "settings": "Settings",
@@ -85,6 +86,22 @@
     "successCopyUserId": "User Name successfully copied",
     "password": "Your Password",
     "passwordError": "Password must be at least 8 characters"
+  },
+
+  "contacts": {
+    "title": "Contacts",
+    "blocked": "Blocked",
+    "addUser": "Add User",
+    "yourContacts": "Your Contacts",
+    "editContact": "Edit Contact",
+    "userName": "User Name",
+    "nickName": "Nickname for this contact",
+    "addContact": "Add Contact",
+    "blockedContact": "Blocked Contacts",
+    "scanQRCode": "Scan QR code",
+    "scanSuccessfull": "Scan Successful",
+    "successCopyUserName": "Username copied successfully",
+    "notFound": "Contact data not found"
   },
 
   "home": {

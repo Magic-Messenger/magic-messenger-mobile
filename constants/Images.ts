@@ -6,4 +6,5 @@
 export const Images = {
   logo: require("@/assets/images/3d-logo.png"),
   backgroundImage: require("@/assets/images/background.png"),
+  icon: require("@/assets/images/icon.png"),
 };

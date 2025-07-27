@@ -11,7 +11,7 @@ export const TorBadge = () => {
   return (
     <LinearGradient
       colors={Colors.buttonPrimary as never}
-      start={{ y: 0, x: 0 }}
+      start={{ y: 0, x: 1 }}
       end={{ y: 1, x: 0 }}
       style={[
         styles.bedge,

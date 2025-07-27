@@ -34,6 +34,13 @@ export default function SettingsStack() {
           headerShown: true,
         }}
       />
+
+      <Stack.Screen
+        name="contacts/index"
+        options={{
+          headerShown: true,
+        }}
+      />
     </Stack>
   );
 }
