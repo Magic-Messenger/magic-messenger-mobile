@@ -1,4 +1,5 @@
-import { Colors, commonStyle, Images, spacing } from "@/constants";
+import { Colors, Images, spacing } from "@/constants";
+import { ColorDto, useThemedStyles } from "@/theme";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import {
@@ -34,6 +35,7 @@ export function AppLayout({
   footer,
 }: AppLayoutProps) {
   const Container = scrollable ? ScrollView : View;
+  const styles = useThemedStyles(createStyle);
 
   return (
     <LinearGradient
@@ -54,9 +56,9 @@ export function AppLayout({
         {loading ? (
           <View
             style={[
-              commonStyle.flex,
-              commonStyle.alignItemsCenter,
-              commonStyle.justifyContentCenter,
+              styles.flex,
+              styles.alignItemsCenter,
+              styles.justifyContentCenter,
             ]}
           >
             <ActivityIndicator />
@@ -70,10 +72,10 @@ export function AppLayout({
               {showBadge && (
                 <View
                   style={[
-                    commonStyle.flexRow,
-                    commonStyle.alignItemsCenter,
-                    commonStyle.mt2,
-                    commonStyle.mb5,
+                    styles.flexRow,
+                    styles.alignItemsCenter,
+                    styles.mt2,
+                    styles.mb5,
                     !container ? styles.container : undefined,
                   ]}
                 >
@@ -87,9 +89,9 @@ export function AppLayout({
 
                   <View
                     style={[
-                      commonStyle.flex,
-                      commonStyle.justifyContentEnd,
-                      commonStyle.alignItemsEnd,
+                      styles.flex,
+                      styles.justifyContentEnd,
+                      styles.alignItemsEnd,
                     ]}
                   >
                     <TorBadge />
@@ -108,31 +110,32 @@ export function AppLayout({
   );
 }
 
-const styles = StyleSheet.create({
-  gradient: {
-    flex: 1,
-    position: "relative",
-  },
-  imageBackground: {
-    position: "absolute",
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    opacity: 0.1,
-    height: "60%",
-  },
-  safeArea: {
-    flex: 1,
-  },
-  content: {
-    flexGrow: 1,
-    position: "relative",
-  },
-  container: {
-    ...spacing({
-      pl: 20,
-      pr: 20,
-    }),
-  },
-});
+const createStyle = (colors: ColorDto) =>
+  StyleSheet.create({
+    gradient: {
+      flex: 1,
+      position: "relative",
+    },
+    imageBackground: {
+      position: "absolute",
+      top: 0,
+      bottom: 0,
+      left: 0,
+      right: 0,
+      opacity: 0.1,
+      height: "60%",
+    },
+    safeArea: {
+      flex: 1,
+    },
+    content: {
+      flexGrow: 1,
+      position: "relative",
+    },
+    container: {
+      ...spacing({
+        pl: 20,
+        pr: 20,
+      }),
+    },
+  });

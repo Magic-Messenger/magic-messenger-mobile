@@ -1,9 +1,12 @@
 import { AppLayout, Button, LicenseInput, SectionHeader } from "@/components";
-import { commonStyle, spacing } from "@/constants";
+import { spacing } from "@/constants";
+import { ColorDto, useThemedStyles } from "@/theme";
 import { router } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
 export default function LicenseNumberScreen() {
+  const styles = useThemedStyles(createStyle);
+
   return (
     <AppLayout container scrollable>
       <View style={styles.mainContainer}>
@@ -24,16 +27,17 @@ export default function LicenseNumberScreen() {
           style={styles.licenseInput}
         />
 
-        <Button type="primary" label="Next" style={commonStyle.mt10} />
+        <Button type="primary" label="Next" style={styles.mt10} />
       </View>
     </AppLayout>
   );
 }
 
-const styles = StyleSheet.create({
-  mainContainer: {
-    ...spacing({
-      mt: 80,
-    }),
-  },
-});
+const createStyle = (colors: ColorDto) =>
+  StyleSheet.create({
+    mainContainer: {
+      ...spacing({
+        mt: 80,
+      }),
+    },
+  });

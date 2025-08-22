@@ -1,7 +1,7 @@
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
-import { commonStyle } from "../../../../constants";
+import { ColorDto, useThemedStyles } from "../../../../theme";
 import { heightPixel, widthPixel } from "../../../../utils";
 import { Button, Input } from "../../../ui";
 import { ThemedText } from "../../ThemedText";
@@ -12,19 +12,21 @@ interface Props {
 
 export const ContactHeader = ({ setSearchText }: Props) => {
   const { t } = useTranslation();
+  const styles = useThemedStyles(createStyle);
+
   return (
     <View>
-      <View style={commonStyle.flexRow}>
+      <View style={styles.flexRow}>
         <ThemedText type="title" weight="semiBold" size={20}>
           {t("contacts.title")}
         </ThemedText>
 
         <View
           style={[
-            commonStyle.flex,
-            commonStyle.gap3,
-            commonStyle.flexRow,
-            commonStyle.justifyContentEnd,
+            styles.flex,
+            styles.gap3,
+            styles.flexRow,
+            styles.justifyContentEnd,
           ]}
         >
           <Button
@@ -49,7 +51,7 @@ export const ContactHeader = ({ setSearchText }: Props) => {
 
       <Input
         placeholder={t("common.search")}
-        style={[commonStyle.mt5, commonStyle.mb5]}
+        style={[styles.mt5, styles.mb5]}
         onChangeText={(_text) => setSearchText(_text)}
       />
 
@@ -60,9 +62,10 @@ export const ContactHeader = ({ setSearchText }: Props) => {
   );
 };
 
-const styles = StyleSheet.create({
-  contactButton: {
-    width: widthPixel(85),
-    height: heightPixel(30),
-  },
-});
+const createStyle = (colors: ColorDto) =>
+  StyleSheet.create({
+    contactButton: {
+      width: widthPixel(85),
+      height: heightPixel(30),
+    },
+  });

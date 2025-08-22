@@ -1,6 +1,7 @@
 import { usePostApiAccountVerifyPhrases } from "@/api/endpoints/magicMessenger";
 import { AppImage, AppLayout, Button, Input, ThemedText } from "@/components";
-import { commonStyle, Images, spacing } from "@/constants";
+import { Images, spacing } from "@/constants";
+import { ColorDto, useThemedStyles } from "@/theme";
 import { fontPixel, heightPixel, spacingPixel, widthPixel } from "@/utils";
 import { router } from "expo-router";
 import { useForm } from "react-hook-form";
@@ -14,6 +15,7 @@ interface RegisterFormData {
 
 export default function VerifyPhrasesScreen() {
   const { t } = useTranslation();
+  const styles = useThemedStyles(createStyle);
   const { mutateAsync: verifyPhrases } = usePostApiAccountVerifyPhrases();
 
   const {
@@ -69,17 +71,15 @@ export default function VerifyPhrasesScreen() {
         />
       }
     >
-      <View style={[styles.mainContainer, commonStyle.pt10]}>
-        <View style={[commonStyle.alignItemsCenter, commonStyle.mb5]}>
+      <View style={[styles.mainContainer, styles.pt10]}>
+        <View style={[styles.alignItemsCenter, styles.mb5]}>
           <AppImage source={Images.logo} style={styles.logoImage} />
-          <ThemedText weight="semiBold" style={commonStyle.pt2}>
+          <ThemedText weight="semiBold" style={styles.pt2}>
             {t("forgotAccount.userResetPassword")}
           </ThemedText>
         </View>
 
-        <View
-          style={[styles.formContainer, commonStyle.fullWidth, commonStyle.mt7]}
-        >
+        <View style={[styles.formContainer, styles.fullWidth, styles.mt7]}>
           <Input
             control={control}
             name="username"
@@ -118,20 +118,21 @@ export default function VerifyPhrasesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  mainContainer: {},
-  formContainer: {
-    ...spacing({
-      gap: 16,
-    }),
-  },
-  logoImage: {
-    width: widthPixel(220),
-    height: heightPixel(50),
-  },
-  phrasesInput: {
-    padding: spacingPixel(15),
-    height: heightPixel(200),
-    fontSize: fontPixel(15),
-  },
-});
+const createStyle = (colors: ColorDto) =>
+  StyleSheet.create({
+    mainContainer: {},
+    formContainer: {
+      ...spacing({
+        gap: 16,
+      }),
+    },
+    logoImage: {
+      width: widthPixel(220),
+      height: heightPixel(50),
+    },
+    phrasesInput: {
+      padding: spacingPixel(15),
+      height: heightPixel(200),
+      fontSize: fontPixel(15),
+    },
+  });

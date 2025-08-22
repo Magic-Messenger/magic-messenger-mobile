@@ -1,6 +1,7 @@
 import { AppLayout, Button, SectionHeader, ThemedText } from "@/components";
-import { Colors, commonStyle } from "@/constants";
+import { Colors } from "@/constants";
 import { useUserStore } from "@/store";
+import { ColorDto, useThemedStyles } from "@/theme";
 import { copyToClipboard, spacingPixel } from "@/utils";
 import { router, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -15,6 +16,7 @@ type RouteParams = {
 const SecurityPhrasesScreen = () => {
   const { t } = useTranslation();
   const { login } = useUserStore();
+  const styles = useThemedStyles(createStyle);
 
   const params = useLocalSearchParams<RouteParams>();
 
@@ -67,7 +69,7 @@ const SecurityPhrasesScreen = () => {
           ))}
         </View>
 
-        <View style={commonStyle.mt5}>
+        <View style={styles.mt5}>
           <TouchableOpacity onPress={copyPhrases}>
             <View style={styles.phrasesInfoContainer}>
               <ThemedText type="title">
@@ -87,33 +89,34 @@ const SecurityPhrasesScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  mainContainer: {},
-  phrasesContainer: {
-    flex: 4,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    backgroundColor: Colors.secondary,
-    padding: spacingPixel(20),
-    justifyContent: "center",
-    borderRadius: 10,
-  },
-  phrasesItem: {
-    backgroundColor: Colors.primary,
-    borderRadius: 10,
-    padding: 15,
-    width: "30%",
-  },
-  phrasesInfoContainer: {
-    padding: spacingPixel(20),
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: Colors.white,
-    borderStyle: "dashed",
-    alignItems: "center",
-    gap: 2,
-  },
-});
+const createStyle = (colors: ColorDto) =>
+  StyleSheet.create({
+    mainContainer: {},
+    phrasesContainer: {
+      flex: 4,
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 8,
+      backgroundColor: Colors.secondary,
+      padding: spacingPixel(20),
+      justifyContent: "center",
+      borderRadius: 10,
+    },
+    phrasesItem: {
+      backgroundColor: Colors.primary,
+      borderRadius: 10,
+      padding: 15,
+      width: "30%",
+    },
+    phrasesInfoContainer: {
+      padding: spacingPixel(20),
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: Colors.white,
+      borderStyle: "dashed",
+      alignItems: "center",
+      gap: 2,
+    },
+  });
 
 export default SecurityPhrasesScreen;

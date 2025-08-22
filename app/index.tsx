@@ -1,7 +1,8 @@
 import { AppLayout, ThemedText } from "@/components";
-import { Colors, commonStyle, Images } from "@/constants";
+import { Colors, Images } from "@/constants";
 import "@/i18n";
 import { useUserStore } from "@/store";
+import { ColorDto, useThemedStyles } from "@/theme";
 import {
   checkUserCredentials,
   generateKeyPairs,
@@ -16,6 +17,7 @@ import { StyleSheet, View } from "react-native";
 
 export default function IndexPage() {
   const { isLogin, rehydrated } = useUserStore();
+  const styles = useThemedStyles(createStyle);
 
   const [connected, setConnected] = useState<boolean>(false);
   const [dots, setDots] = useState<string>("");
@@ -70,9 +72,9 @@ export default function IndexPage() {
     <AppLayout container showBadge={false}>
       <View
         style={[
-          commonStyle.flex,
-          commonStyle.alignItemsCenter,
-          commonStyle.justifyContentCenter,
+          styles.flex,
+          styles.alignItemsCenter,
+          styles.justifyContentCenter,
         ]}
       >
         <Image
@@ -83,15 +85,15 @@ export default function IndexPage() {
 
         <View
           style={[
-            commonStyle.mt4,
-            commonStyle.justifyContentStart,
-            commonStyle.gap3,
+            styles.mt4,
+            styles.justifyContentStart,
+            styles.gap3,
             {
               width: widthPixel(150),
             },
           ]}
         >
-          <View style={[commonStyle.flexRow, commonStyle.gap3]}>
+          <View style={[styles.flexRow, styles.gap3]}>
             <View
               style={[
                 styles.badgeStatus,
@@ -100,15 +102,15 @@ export default function IndexPage() {
             />
             <ThemedText type="default">Connecting{dots}</ThemedText>
           </View>
-          <View style={[commonStyle.flexRow, commonStyle.gap3]}>
+          <View style={[styles.flexRow, styles.gap3]}>
             <View style={[styles.badgeStatus, styles.active]} />
             <ThemedText type="default">TOR</ThemedText>
           </View>
-          <View style={[commonStyle.flexRow, commonStyle.gap3]}>
+          <View style={[styles.flexRow, styles.gap3]}>
             <View style={[styles.badgeStatus, styles.active]} />
             <ThemedText type="default">VPN</ThemedText>
           </View>
-          <View style={[commonStyle.flexRow, commonStyle.gap3]}>
+          <View style={[styles.flexRow, styles.gap3]}>
             <View style={[styles.badgeStatus, styles.active]} />
             <ThemedText type="default">Encryption</ThemedText>
           </View>
@@ -118,15 +120,16 @@ export default function IndexPage() {
   );
 }
 
-const styles = StyleSheet.create({
-  badgeStatus: {
-    padding: spacingPixel(10),
-    borderRadius: widthPixel(100),
-  },
-  active: {
-    backgroundColor: Colors.success,
-  },
-  inActive: {
-    backgroundColor: Colors.danger,
-  },
-});
+const createStyle = (colors: ColorDto) =>
+  StyleSheet.create({
+    badgeStatus: {
+      padding: spacingPixel(10),
+      borderRadius: widthPixel(100),
+    },
+    active: {
+      backgroundColor: Colors.success,
+    },
+    inActive: {
+      backgroundColor: Colors.danger,
+    },
+  });

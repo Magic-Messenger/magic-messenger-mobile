@@ -1,6 +1,7 @@
 import { usePostApiAccountRecoverPassword } from "@/api/endpoints/magicMessenger";
 import { AppImage, AppLayout, Button, Input, ThemedText } from "@/components";
-import { commonStyle, Images, spacing } from "@/constants";
+import { Images, spacing } from "@/constants";
+import { ColorDto, useThemedStyles } from "@/theme";
 import { heightPixel, widthPixel } from "@/utils";
 import { router, useLocalSearchParams } from "expo-router";
 import { useForm } from "react-hook-form";
@@ -18,6 +19,7 @@ type RouteParams = {
 
 export default function ResetPasswordScreen() {
   const { t } = useTranslation();
+  const styles = useThemedStyles(createStyle);
 
   const params = useLocalSearchParams<RouteParams>();
   const { mutateAsync: recoverPassword } = usePostApiAccountRecoverPassword();
@@ -68,17 +70,15 @@ export default function ResetPasswordScreen() {
         />
       }
     >
-      <View style={[styles.mainContainer, commonStyle.pt10]}>
-        <View style={[commonStyle.alignItemsCenter, commonStyle.mb5]}>
+      <View style={[styles.mainContainer, styles.pt10]}>
+        <View style={[styles.alignItemsCenter, styles.mb5]}>
           <AppImage source={Images.logo} style={styles.logoImage} />
-          <ThemedText weight="semiBold" style={commonStyle.pt2}>
+          <ThemedText weight="semiBold" style={styles.pt2}>
             {t("forgotAccount.userResetPassword")}
           </ThemedText>
         </View>
 
-        <View
-          style={[styles.formContainer, commonStyle.fullWidth, commonStyle.mt7]}
-        >
+        <View style={[styles.formContainer, styles.fullWidth, styles.mt7]}>
           <Input
             control={control}
             name="password"
@@ -124,17 +124,18 @@ export default function ResetPasswordScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  mainContainer: {
-    ...spacing({}),
-  },
-  formContainer: {
-    ...spacing({
-      gap: 16,
-    }),
-  },
-  logoImage: {
-    width: widthPixel(220),
-    height: heightPixel(50),
-  },
-});
+const createStyle = (colors: ColorDto) =>
+  StyleSheet.create({
+    mainContainer: {
+      ...spacing({}),
+    },
+    formContainer: {
+      ...spacing({
+        gap: 16,
+      }),
+    },
+    logoImage: {
+      width: widthPixel(220),
+      height: heightPixel(50),
+    },
+  });

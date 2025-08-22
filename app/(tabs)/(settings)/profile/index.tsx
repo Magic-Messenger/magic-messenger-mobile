@@ -10,8 +10,9 @@ import {
   Input,
   ThemedText,
 } from "@/components";
-import { Colors, commonStyle, flexBox, spacing } from "@/constants";
+import { Colors, flexBox, spacing } from "@/constants";
 import { useAppStore, useUserStore } from "@/store";
+import { ColorDto, useThemedStyles } from "@/theme";
 import {
   appSupportLanguages,
   changeLanguage,
@@ -30,6 +31,7 @@ export default function ProfileScreen() {
   const { t } = useTranslation();
   const { settings } = useAppStore();
   const { logout } = useUserStore();
+  const styles = useThemedStyles(createStyle);
 
   const { data, isLoading } = useGetApiAccountGetProfile();
   const { mutateAsync: deleteProfileRequest, isPending } =
@@ -73,10 +75,10 @@ export default function ProfileScreen() {
       <View style={styles.mainContainer}>
         <View
           style={[
-            commonStyle.flex,
-            commonStyle.flexRow,
-            commonStyle.alignItemsCenter,
-            commonStyle.justifyContentBetween,
+            styles.flex,
+            styles.flexRow,
+            styles.alignItemsCenter,
+            styles.justifyContentBetween,
           ]}
         >
           <View style={styles.userIDInfo}>
@@ -128,11 +130,11 @@ export default function ProfileScreen() {
           selectedValue={settings?.language as never}
           options={supportLanguages}
           onValueChange={(item) => changeLanguage(item as never)}
-          style={commonStyle.mt7}
+          style={styles.mt7}
         />
       </View>
 
-      <View style={[styles.mainContainer, commonStyle.mt5, commonStyle.gap2]}>
+      <View style={[styles.mainContainer, styles.mt5, styles.gap2]}>
         <ThemedText type="title" size={16}>
           {t("profile.dangerzone")}
         </ThemedText>
@@ -172,31 +174,32 @@ export default function ProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  mainContainer: {
-    ...spacing({
-      pl: 20,
-      pr: 20,
-    }),
-  },
-  userIDInfo: {
-    ...spacing({
-      gap: 10,
-    }),
-  },
-  qrSection: {
-    ...spacing({ p: 20, pt: 30, mt: 25 }),
-    borderTopWidth: 0.5,
-    borderBottomWidth: 0.5,
-    borderColor: Colors.mainAccent,
-  },
-  qrContainer: {
-    ...flexBox(1, "row", "center", "center"),
-    ...spacing({ gap: 15 }),
-  },
-  qrCodeImage: {
-    ...spacing({ p: 5 }),
-    borderRadius: widthPixel(5),
-    backgroundColor: Colors.white,
-  },
-});
+const createStyle = (colors: ColorDto) =>
+  StyleSheet.create({
+    mainContainer: {
+      ...spacing({
+        pl: 20,
+        pr: 20,
+      }),
+    },
+    userIDInfo: {
+      ...spacing({
+        gap: 10,
+      }),
+    },
+    qrSection: {
+      ...spacing({ p: 20, pt: 30, mt: 25 }),
+      borderTopWidth: 0.5,
+      borderBottomWidth: 0.5,
+      borderColor: Colors.mainAccent,
+    },
+    qrContainer: {
+      ...flexBox(1, "row", "center", "center"),
+      ...spacing({ gap: 15 }),
+    },
+    qrCodeImage: {
+      ...spacing({ p: 5 }),
+      borderRadius: widthPixel(5),
+      backgroundColor: Colors.white,
+    },
+  });

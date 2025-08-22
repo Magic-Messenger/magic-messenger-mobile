@@ -2,7 +2,8 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
-import { Colors, commonStyle, Images } from "../../../../constants";
+import { Colors, Images } from "../../../../constants";
+import { ColorDto, useThemedStyles } from "../../../../theme";
 import {
   copyToClipboard,
   heightPixel,
@@ -24,6 +25,7 @@ interface Props {
 
 export const ContactItem = ({ nickname, contactUsername, onAction }: Props) => {
   const { t } = useTranslation();
+  const styles = useThemedStyles(createStyle);
 
   const onCopy = () => {
     if (contactUsername) {
@@ -45,7 +47,7 @@ export const ContactItem = ({ nickname, contactUsername, onAction }: Props) => {
           style={styles.iconImage}
         />
 
-        <View style={[commonStyle.flex, commonStyle.gap1]}>
+        <View style={[styles.flex, styles.gap1]}>
           <ThemedText type="default" weight="semiBold" size={16}>
             {nickname ?? ""}
           </ThemedText>
@@ -54,13 +56,7 @@ export const ContactItem = ({ nickname, contactUsername, onAction }: Props) => {
           </ThemedText>
         </View>
 
-        <View
-          style={[
-            commonStyle.flexRow,
-            commonStyle.justifyContentEnd,
-            commonStyle.gap3,
-          ]}
-        >
+        <View style={[styles.flexRow, styles.justifyContentEnd, styles.gap3]}>
           {onAction?.copy && (
             <TouchableOpacity onPress={onCopy}>
               <Icon type="feather" name="copy" size={23} />
@@ -84,17 +80,18 @@ export const ContactItem = ({ nickname, contactUsername, onAction }: Props) => {
   );
 };
 
-const styles = StyleSheet.create({
-  contactItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacingPixel(10),
-    paddingHorizontal: spacingPixel(10),
-    paddingVertical: spacingPixel(7),
-    borderRadius: widthPixel(10),
-  },
-  iconImage: {
-    width: widthPixel(35),
-    height: heightPixel(35),
-  },
-});
+const createStyle = (colors: ColorDto) =>
+  StyleSheet.create({
+    contactItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacingPixel(10),
+      paddingHorizontal: spacingPixel(10),
+      paddingVertical: spacingPixel(7),
+      borderRadius: widthPixel(10),
+    },
+    iconImage: {
+      width: widthPixel(35),
+      height: heightPixel(35),
+    },
+  });

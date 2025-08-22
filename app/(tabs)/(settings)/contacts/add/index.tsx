@@ -7,7 +7,7 @@ import {
   Input,
   ThemedText,
 } from "@/components";
-import { commonStyle } from "@/constants";
+import { useThemedStyles } from "@/theme";
 import { showToast } from "@/utils";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
@@ -18,6 +18,7 @@ import { View } from "react-native";
 export default function ContactAdd() {
   const { t } = useTranslation();
   const { barcode } = useLocalSearchParams();
+  const styles = useThemedStyles();
 
   const {
     control,
@@ -69,7 +70,7 @@ export default function ContactAdd() {
         {t("contacts.addContact")}
       </ThemedText>
 
-      <View style={[commonStyle.gap5, commonStyle.mt10]}>
+      <View style={[styles.gap5, styles.mt10]}>
         <Input
           control={control}
           name="username"

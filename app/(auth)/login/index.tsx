@@ -7,8 +7,9 @@ import {
   SectionHeader,
   ThemedText,
 } from "@/components";
-import { commonStyle, flexBox, Images, spacing } from "@/constants";
+import { flexBox, Images, spacing } from "@/constants";
 import { useUserStore } from "@/store";
+import { ColorDto, useThemedStyles } from "@/theme";
 import { fontPixel, heightPixel, widthPixel } from "@/utils";
 import { router } from "expo-router";
 import { useForm } from "react-hook-form";
@@ -24,6 +25,7 @@ export default function LoginScreen() {
   const { t } = useTranslation();
   const { login, userName } = useUserStore();
   const { mutateAsync: loginApi } = usePostApiAccountLogin();
+  const styles = useThemedStyles(createStyle);
 
   const {
     control,
@@ -74,7 +76,7 @@ export default function LoginScreen() {
         />
       }
     >
-      <View style={[userName ? commonStyle.pt10 : undefined]}>
+      <View style={[userName ? styles.pt10 : undefined]}>
         {!userName && (
           <SectionHeader
             title={t("login.title")}
@@ -83,9 +85,9 @@ export default function LoginScreen() {
         )}
 
         {userName && (
-          <View style={[commonStyle.alignItemsCenter, commonStyle.mb5]}>
+          <View style={[styles.alignItemsCenter, styles.mb5]}>
             <AppImage source={Images.logo} style={styles.logoImage} />
-            <ThemedText weight="semiBold" style={commonStyle.pt2}>
+            <ThemedText weight="semiBold" style={styles.pt2}>
               {t("login.userName", {
                 userName,
               })}
@@ -93,7 +95,7 @@ export default function LoginScreen() {
           </View>
         )}
 
-        <View style={[styles.formContainer, commonStyle.fullWidth]}>
+        <View style={[styles.formContainer, styles.fullWidth]}>
           {!userName && (
             <Input
               control={control}
@@ -150,20 +152,21 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  formContainer: {
-    ...spacing({
-      gap: 16,
-    }),
-  },
-  logoImage: {
-    width: widthPixel(220),
-    height: heightPixel(50),
-  },
-  forgotAccountContainer: {
-    ...flexBox(1, "row", "flex-end"),
-  },
-  forgotAccountText: {
-    fontSize: fontPixel(14),
-  },
-});
+const createStyle = (colors: ColorDto) =>
+  StyleSheet.create({
+    formContainer: {
+      ...spacing({
+        gap: 16,
+      }),
+    },
+    logoImage: {
+      width: widthPixel(220),
+      height: heightPixel(50),
+    },
+    forgotAccountContainer: {
+      ...flexBox(1, "row", "flex-end"),
+    },
+    forgotAccountText: {
+      fontSize: fontPixel(14),
+    },
+  });

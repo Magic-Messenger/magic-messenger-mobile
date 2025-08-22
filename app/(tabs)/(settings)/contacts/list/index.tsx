@@ -1,7 +1,7 @@
 import { useGetApiContactsList } from "@/api/endpoints/magicMessenger";
 import { ContactDto } from "@/api/models";
 import { AppLayout, ContactHeader, ContactItem, EmptyList } from "@/components";
-import { commonStyle } from "@/constants";
+import { useThemedStyles } from "@/theme";
 import { spacingPixel } from "@/utils";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
@@ -11,6 +11,7 @@ import { FlatList } from "react-native";
 export default function ContactsScreen() {
   const { t } = useTranslation();
   const { data: contactData, isLoading, refetch } = useGetApiContactsList();
+  const styles = useThemedStyles();
 
   const [searchText, setSearchText] = useState<string>("");
 
@@ -59,7 +60,7 @@ export default function ContactsScreen() {
           <EmptyList
             label={t("contacts.notFound")}
             icon="frown"
-            style={commonStyle.mt10}
+            style={styles.mt10}
           />
         }
       />

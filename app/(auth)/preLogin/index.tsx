@@ -1,6 +1,7 @@
 import Logo from "@/assets/images/3d-logo.png";
 import { AppImage, AppLayout, Button, ThemedText } from "@/components";
-import { commonStyle, spacing } from "@/constants";
+import { spacing } from "@/constants";
+import { ColorDto, useThemedStyles } from "@/theme";
 import { heightPixel, widthPixel } from "@/utils";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -8,6 +9,7 @@ import { StyleSheet, View } from "react-native";
 
 export default function PreLoginScreen() {
   const { t } = useTranslation();
+  const styles = useThemedStyles(createStyle);
 
   const redirectLoginPage = () => {
     router.push("/(auth)/login");
@@ -21,23 +23,17 @@ export default function PreLoginScreen() {
     <AppLayout container scrollable safeAreaPadding={false} showBadge={false}>
       <View
         style={[
-          commonStyle.flex,
-          commonStyle.alignItemsCenter,
-          commonStyle.justifyContentCenter,
+          styles.flex,
+          styles.alignItemsCenter,
+          styles.justifyContentCenter,
         ]}
       >
         <AppImage source={Logo} style={styles.logoImage} />
-        <ThemedText weight="semiBold" style={commonStyle.pt2}>
+        <ThemedText weight="semiBold" style={styles.pt2}>
           {t("welcome")}
         </ThemedText>
 
-        <View
-          style={[
-            styles.mainContainer,
-            commonStyle.fullWidth,
-            commonStyle.gap5,
-          ]}
-        >
+        <View style={[styles.mainContainer, styles.fullWidth, styles.gap5]}>
           <Button
             type="primary"
             label={t("login.title")}
@@ -57,14 +53,15 @@ export default function PreLoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  mainContainer: {
-    ...spacing({
-      mt: 60,
-    }),
-  },
-  logoImage: {
-    width: widthPixel(220),
-    height: heightPixel(50),
-  },
-});
+const createStyle = (colors: ColorDto) =>
+  StyleSheet.create({
+    mainContainer: {
+      ...spacing({
+        mt: 60,
+      }),
+    },
+    logoImage: {
+      width: widthPixel(220),
+      height: heightPixel(50),
+    },
+  });

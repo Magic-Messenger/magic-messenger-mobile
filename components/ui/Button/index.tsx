@@ -1,4 +1,5 @@
-import { Colors, commonStyle, spacing } from "@/constants";
+import { Colors, spacing } from "@/constants";
+import { ColorDto, useThemedStyles } from "@/theme";
 import { heightPixel } from "@/utils";
 import { LinearGradient } from "expo-linear-gradient";
 import {
@@ -38,6 +39,7 @@ export function Button({
   style,
   activeOpacity = 0.8,
 }: Props) {
+  const styles = useThemedStyles(createStyle);
   const handlePress = (): void => {
     if (!disabled && !loading) {
       onPress();
@@ -68,10 +70,10 @@ export function Button({
         start={{ y: 0, x: 1 }}
         end={{ y: 1, x: 0 }}
         style={[
-          commonStyle.fullWidth,
-          commonStyle.fullHeight,
-          commonStyle.justifyContentCenter,
-          commonStyle.alignItemsCenter,
+          styles.fullWidth,
+          styles.fullHeight,
+          styles.justifyContentCenter,
+          styles.alignItemsCenter,
         ]}
       >
         {loading ? (
@@ -79,9 +81,7 @@ export function Button({
         ) : (
           <View
             style={
-              leftIcon
-                ? [commonStyle.flexRow, commonStyle.alignItemsCenter]
-                : undefined
+              leftIcon ? [styles.flexRow, styles.alignItemsCenter] : undefined
             }
           >
             {leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}
@@ -94,21 +94,22 @@ export function Button({
   );
 }
 
-const styles = StyleSheet.create({
-  button: {
-    width: "100%",
-    maxHeight: heightPixel(45),
-    borderRadius: 9,
-    overflow: "hidden",
-  },
-  leftIcon: {
-    ...spacing({
-      mr: 8,
-    }),
-  },
-  rightIcon: {
-    ...spacing({
-      ml: 8,
-    }),
-  },
-});
+const createStyle = (colors: ColorDto) =>
+  StyleSheet.create({
+    button: {
+      width: "100%",
+      maxHeight: heightPixel(45),
+      borderRadius: 9,
+      overflow: "hidden",
+    },
+    leftIcon: {
+      ...spacing({
+        mr: 8,
+      }),
+    },
+    rightIcon: {
+      ...spacing({
+        ml: 8,
+      }),
+    },
+  });
