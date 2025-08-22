@@ -2,7 +2,13 @@ import { AppLayout, ThemedText } from "@/components";
 import { Colors, commonStyle, Images } from "@/constants";
 import "@/i18n";
 import { useUserStore } from "@/store";
-import { heightPixel, spacingPixel, widthPixel } from "@/utils";
+import {
+  checkUserCredentials,
+  generateKeyPairs,
+  heightPixel,
+  spacingPixel,
+  widthPixel,
+} from "@/utils";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
@@ -48,6 +54,13 @@ export default function IndexPage() {
   useEffect(() => {
     console.log("Index Page - isLogin:", isLogin, "rehydrated:", rehydrated);
   }, [isLogin, rehydrated]);
+
+  useEffect(() => {
+    const userPublicKeyCheck = checkUserCredentials();
+    if (!userPublicKeyCheck) {
+      generateKeyPairs();
+    }
+  }, []);
 
   if (!rehydrated) {
     return null;

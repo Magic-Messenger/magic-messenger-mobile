@@ -7,7 +7,12 @@ import {
   SectionHeader,
 } from "@/components";
 import { spacing } from "@/constants";
-import { appSupportLanguages, getInstallationId, showToast } from "@/utils";
+import {
+  appSupportLanguages,
+  getInstallationId,
+  showToast,
+  userPublicKey,
+} from "@/utils";
 import { router } from "expo-router";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
@@ -62,9 +67,9 @@ export default function RegisterScreen() {
           password: formValues?.password,
           confirmPassword: formValues?.confirmPassword,
           deviceId: await getInstallationId(),
+          publicKey: userPublicKey(),
         },
       });
-      console.log("loginResponse: ", data);
 
       if (success) {
         router.push({

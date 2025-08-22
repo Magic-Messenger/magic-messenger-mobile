@@ -5,7 +5,6 @@
  * OpenAPI spec version: v1
  */
 import type { MessageType } from "./messageType";
-import type { ObjectId } from "./objectId";
 import type { MessageDtoContent } from "./messageDtoContent";
 import type { MessageDtoMedia } from "./messageDtoMedia";
 import type { MessageStatus } from "./messageStatus";
@@ -16,14 +15,17 @@ export interface MessageDto {
   messageType?: MessageType;
   /** @nullable */
   nickname?: string | null;
-  senderId?: ObjectId;
-  receiverId?: ObjectId;
+  /** @nullable */
+  senderUsername?: string | null;
+  /** @nullable */
+  receiverUsername?: string | null;
   /** @nullable */
   content?: MessageDtoContent;
   /** @nullable */
   media?: MessageDtoMedia;
   messageStatus?: MessageStatus;
-  repliedToMessage?: ObjectId;
   /** @nullable */
-  readBy?: ObjectId[] | null;
+  repliedToMessage?: string | null;
+  /** @nullable */
+  readBy?: string[] | null;
 }

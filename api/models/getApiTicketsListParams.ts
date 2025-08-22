@@ -7,5 +7,9 @@
 import type { TicketStatus } from "./ticketStatus";
 
 export type GetApiTicketsListParams = {
+  username?: string;
+  licenseCode?: string;
   status?: TicketStatus;
+  pageNumber?: number;
+  pageSize?: number;
 };

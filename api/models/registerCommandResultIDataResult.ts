@@ -4,12 +4,13 @@
  * MagicMessenger
  * OpenAPI spec version: v1
  */
+import type { ResultMessage } from "./resultMessage";
 import type { RegisterCommandResultIDataResultData } from "./registerCommandResultIDataResultData";
 
 export interface RegisterCommandResultIDataResult {
   readonly success?: boolean;
   /** @nullable */
-  messages?: string[] | null;
+  messages?: ResultMessage[] | null;
   /** @nullable */
   readonly data?: RegisterCommandResultIDataResultData;
 }

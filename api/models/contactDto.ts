@@ -11,7 +11,10 @@ export interface ContactDto {
   /** @nullable */
   nickname?: string | null;
   /** @nullable */
-  chatId?: string | null;
+  contactUsername?: string | null;
   /** @nullable */
-  contactAccountId?: string | null;
+  publicKey?: string | null;
+  isBlocked?: boolean;
+  /** @nullable */
+  chats?: string[] | null;
 }

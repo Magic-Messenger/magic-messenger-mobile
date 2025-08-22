@@ -4,6 +4,7 @@
  * MagicMessenger
  * OpenAPI spec version: v1
  */
+import type { EncryptedGroupKey } from "./encryptedGroupKey";
 
 export interface UpdateChatCommandRequest {
   /** @nullable */
@@ -11,6 +12,8 @@ export interface UpdateChatCommandRequest {
   /** @nullable */
   groupName?: string | null;
   /** @nullable */
-  accountIds?: string[] | null;
+  usernames?: string[] | null;
   isGroupChat?: boolean;
+  /** @nullable */
+  encryptedGroupKeys?: EncryptedGroupKey[] | null;
 }

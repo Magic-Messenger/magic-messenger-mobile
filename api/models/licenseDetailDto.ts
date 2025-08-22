@@ -21,6 +21,8 @@ export interface LicenseDetailDto {
   deviceId?: string | null;
   /** @nullable */
   subscriptionPlan?: LicenseDetailDtoSubscriptionPlan;
+  /** @nullable */
+  invoiceId?: string | null;
   expirationDate?: string;
   /** @nullable */
   transactions?: Transaction[] | null;

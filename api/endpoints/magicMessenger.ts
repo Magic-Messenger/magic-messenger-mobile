@@ -21,6 +21,7 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+  AccountContactDtoIDataResult,
   AccountDetailDtoIDataResult,
   AccountDtoIDataResult,
   AccountDtoListPaginatedResult,
@@ -34,6 +35,7 @@ import type {
   BuyLicenseCommandRequest,
   BuyLicenseCommandResultIDataResult,
   ChangeAccountStatusCommandRequest,
+  ChangeInvoiceStatusCommandRequest,
   ChangeLicenseStatusCommandRequest,
   ChangeTicketStatusCommandRequest,
   ContactDtoListIDataResult,
@@ -55,21 +57,35 @@ import type {
   DeleteApiLicensesDeleteParams,
   DeleteApiSubscriptionsDeleteParams,
   DeleteApiTicketsDeleteParams,
+  FaqDtoListPaginatedResult,
   FaqIDataResult,
-  FaqListIDataResult,
+  GetApiAccountGetAccountForContactParams,
   GetApiAccountGetParams,
   GetApiAccountListParams,
   GetApiChatsGroupMessagesParams,
   GetApiChatsMessagesParams,
-  GetApiFaqsParams,
+  GetApiFaqsGetParams,
+  GetApiFaqsListParams,
+  GetApiInvoicesGetParams,
+  GetApiInvoicesGetPdfParams,
+  GetApiInvoicesListParams,
+  GetApiLicensesGetInvoiceDetailsParams,
+  GetApiLicensesGetInvoicePdfParams,
   GetApiLicensesGetParams,
   GetApiLicensesListParams,
+  GetApiStatisticsGetTotalActiveAccountsParams,
+  GetApiStatisticsGetTotalActiveLicensesParams,
+  GetApiStatisticsGetTotalChatsParams,
+  GetApiStatisticsGetTotalIncomeParams,
   GetApiSubscriptionsGetParams,
   GetApiTicketsGetParams,
   GetApiTicketsListParams,
   GetGroupMessagesQueryResultIDataResult,
   GetMessagesQueryResultIDataResult,
   IResult,
+  InvoiceDetailDtoIDataResult,
+  InvoiceDtoListPaginatedResult,
+  InvoiceIDataResult,
   Language,
   LicenseDetailDtoIDataResult,
   LicenseDtoListPaginatedResult,
@@ -88,8 +104,12 @@ import type {
   ResetPasswordCommandRequest,
   ResetPhrasesCommandRequest,
   ResetTwoFactorCommandRequest,
+  ResultMessage,
+  SendMessageCommandRequest,
   SetupTwoFactorCommandRequest,
-  StringIDataResult,
+  SetupTwoFactorCommandResultIDataResult,
+  StatisticsDecimalResultIDataResult,
+  StatisticsResultIDataResult,
   StringListIDataResult,
   SubscriptionDtoListIDataResult,
   SubscriptionIDataResult,
@@ -105,6 +125,8 @@ import type {
   UpdateSubscriptionCommandRequest,
   UpdateTranslateCommand,
   UploadFileCommandResultIDataResult,
+  ValidateAppleReceiptCommandRequest,
+  ValidateGoogleReceiptCommandRequest,
   VerifyPasswordCommandRequest,
   VerifyPhrasesCommandRequest,
   VerifyTwoFactorCommandRequest,
@@ -134,7 +156,7 @@ export const postApiAccountLogin = (
 };
 
 export const getPostApiAccountLoginMutationOptions = <
-  TError = string[],
+  TError = ResultMessage[],
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -175,12 +197,15 @@ export type PostApiAccountLoginMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiAccountLogin>>
 >;
 export type PostApiAccountLoginMutationBody = LoginCommandRequest;
-export type PostApiAccountLoginMutationError = string[];
+export type PostApiAccountLoginMutationError = ResultMessage[];
 
 /**
  * @summary Account login operation
  */
-export const usePostApiAccountLogin = <TError = string[], TContext = unknown>(
+export const usePostApiAccountLogin = <
+  TError = ResultMessage[],
+  TContext = unknown,
+>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof postApiAccountLogin>>,
@@ -223,7 +248,7 @@ export const postApiAccountAdminLogin = (
 };
 
 export const getPostApiAccountAdminLoginMutationOptions = <
-  TError = string[],
+  TError = ResultMessage[],
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -264,13 +289,13 @@ export type PostApiAccountAdminLoginMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiAccountAdminLogin>>
 >;
 export type PostApiAccountAdminLoginMutationBody = AdminLoginCommandRequest;
-export type PostApiAccountAdminLoginMutationError = string[];
+export type PostApiAccountAdminLoginMutationError = ResultMessage[];
 
 /**
  * @summary Admin account login operation
  */
 export const usePostApiAccountAdminLogin = <
-  TError = string[],
+  TError = ResultMessage[],
   TContext = unknown,
 >(
   options?: {
@@ -295,16 +320,16 @@ export const usePostApiAccountAdminLogin = <
 };
 
 /**
- * @summary Account generate two-factor operation
+ * @summary Account setup two-factor operation
  */
-export const postApiAccountGenerateTwoFactor = (
+export const postApiAccountSetupTwoFactor = (
   setupTwoFactorCommandRequest: SetupTwoFactorCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
   signal?: AbortSignal,
 ) => {
-  return AxiosInstance<StringIDataResult>(
+  return AxiosInstance<SetupTwoFactorCommandResultIDataResult>(
     {
-      url: `/api/account/generate-two-factor`,
+      url: `/api/account/setup-two-factor`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
       data: setupTwoFactorCommandRequest,
@@ -314,24 +339,24 @@ export const postApiAccountGenerateTwoFactor = (
   );
 };
 
-export const getPostApiAccountGenerateTwoFactorMutationOptions = <
-  TError = string[],
+export const getPostApiAccountSetupTwoFactorMutationOptions = <
+  TError = ResultMessage[],
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postApiAccountGenerateTwoFactor>>,
+    Awaited<ReturnType<typeof postApiAccountSetupTwoFactor>>,
     TError,
     { data: SetupTwoFactorCommandRequest },
     TContext
   >;
   request?: SecondParameter<typeof AxiosInstance>;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof postApiAccountGenerateTwoFactor>>,
+  Awaited<ReturnType<typeof postApiAccountSetupTwoFactor>>,
   TError,
   { data: SetupTwoFactorCommandRequest },
   TContext
 > => {
-  const mutationKey = ["postApiAccountGenerateTwoFactor"];
+  const mutationKey = ["postApiAccountSetupTwoFactor"];
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       "mutationKey" in options.mutation &&
@@ -341,34 +366,34 @@ export const getPostApiAccountGenerateTwoFactorMutationOptions = <
     : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postApiAccountGenerateTwoFactor>>,
+    Awaited<ReturnType<typeof postApiAccountSetupTwoFactor>>,
     { data: SetupTwoFactorCommandRequest }
   > = (props) => {
     const { data } = props ?? {};
 
-    return postApiAccountGenerateTwoFactor(data, requestOptions);
+    return postApiAccountSetupTwoFactor(data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type PostApiAccountGenerateTwoFactorMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postApiAccountGenerateTwoFactor>>
+export type PostApiAccountSetupTwoFactorMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiAccountSetupTwoFactor>>
 >;
-export type PostApiAccountGenerateTwoFactorMutationBody =
+export type PostApiAccountSetupTwoFactorMutationBody =
   SetupTwoFactorCommandRequest;
-export type PostApiAccountGenerateTwoFactorMutationError = string[];
+export type PostApiAccountSetupTwoFactorMutationError = ResultMessage[];
 
 /**
- * @summary Account generate two-factor operation
+ * @summary Account setup two-factor operation
  */
-export const usePostApiAccountGenerateTwoFactor = <
-  TError = string[],
+export const usePostApiAccountSetupTwoFactor = <
+  TError = ResultMessage[],
   TContext = unknown,
 >(
   options?: {
     mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postApiAccountGenerateTwoFactor>>,
+      Awaited<ReturnType<typeof postApiAccountSetupTwoFactor>>,
       TError,
       { data: SetupTwoFactorCommandRequest },
       TContext
@@ -377,13 +402,13 @@ export const usePostApiAccountGenerateTwoFactor = <
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
-  Awaited<ReturnType<typeof postApiAccountGenerateTwoFactor>>,
+  Awaited<ReturnType<typeof postApiAccountSetupTwoFactor>>,
   TError,
   { data: SetupTwoFactorCommandRequest },
   TContext
 > => {
   const mutationOptions =
-    getPostApiAccountGenerateTwoFactorMutationOptions(options);
+    getPostApiAccountSetupTwoFactorMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };
@@ -409,7 +434,7 @@ export const postApiAccountVerifyTwoFactor = (
 };
 
 export const getPostApiAccountVerifyTwoFactorMutationOptions = <
-  TError = string[],
+  TError = ResultMessage[],
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -451,13 +476,13 @@ export type PostApiAccountVerifyTwoFactorMutationResult = NonNullable<
 >;
 export type PostApiAccountVerifyTwoFactorMutationBody =
   VerifyTwoFactorCommandRequest;
-export type PostApiAccountVerifyTwoFactorMutationError = string[];
+export type PostApiAccountVerifyTwoFactorMutationError = ResultMessage[];
 
 /**
  * @summary Account verify two-factor operation
  */
 export const usePostApiAccountVerifyTwoFactor = <
-  TError = string[],
+  TError = ResultMessage[],
   TContext = unknown,
 >(
   options?: {
@@ -503,7 +528,7 @@ export const postApiAccountRefreshToken = (
 };
 
 export const getPostApiAccountRefreshTokenMutationOptions = <
-  TError = string[],
+  TError = ResultMessage[],
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -544,13 +569,13 @@ export type PostApiAccountRefreshTokenMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiAccountRefreshToken>>
 >;
 export type PostApiAccountRefreshTokenMutationBody = RefreshTokenCommandRequest;
-export type PostApiAccountRefreshTokenMutationError = string[];
+export type PostApiAccountRefreshTokenMutationError = ResultMessage[];
 
 /**
  * @summary Refresh token operation
  */
 export const usePostApiAccountRefreshToken = <
-  TError = string[],
+  TError = ResultMessage[],
   TContext = unknown,
 >(
   options?: {
@@ -595,7 +620,7 @@ export const postApiAccountCreateAccount = (
 };
 
 export const getPostApiAccountCreateAccountMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -637,13 +662,13 @@ export type PostApiAccountCreateAccountMutationResult = NonNullable<
 >;
 export type PostApiAccountCreateAccountMutationBody =
   CreateAccountCommandRequest;
-export type PostApiAccountCreateAccountMutationError = string[] | void;
+export type PostApiAccountCreateAccountMutationError = ResultMessage[] | void;
 
 /**
  * @summary Account create operation
  */
 export const usePostApiAccountCreateAccount = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -689,7 +714,7 @@ export const postApiAccountRegister = (
 };
 
 export const getPostApiAccountRegisterMutationOptions = <
-  TError = string[],
+  TError = ResultMessage[],
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -730,13 +755,13 @@ export type PostApiAccountRegisterMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiAccountRegister>>
 >;
 export type PostApiAccountRegisterMutationBody = RegisterCommandRequest;
-export type PostApiAccountRegisterMutationError = string[];
+export type PostApiAccountRegisterMutationError = ResultMessage[];
 
 /**
  * @summary Account register operation
  */
 export const usePostApiAccountRegister = <
-  TError = string[],
+  TError = ResultMessage[],
   TContext = unknown,
 >(
   options?: {
@@ -782,7 +807,7 @@ export const getGetApiAccountListQueryKey = (
 
 export const getGetApiAccountListQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiAccountList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiAccountListParams,
   options?: {
@@ -821,11 +846,11 @@ export const getGetApiAccountListQueryOptions = <
 export type GetApiAccountListQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiAccountList>>
 >;
-export type GetApiAccountListQueryError = string[] | void;
+export type GetApiAccountListQueryError = ResultMessage[] | void;
 
 export function useGetApiAccountList<
   TData = Awaited<ReturnType<typeof getApiAccountList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params: undefined | GetApiAccountListParams,
   options: {
@@ -852,7 +877,7 @@ export function useGetApiAccountList<
 };
 export function useGetApiAccountList<
   TData = Awaited<ReturnType<typeof getApiAccountList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiAccountListParams,
   options?: {
@@ -879,7 +904,7 @@ export function useGetApiAccountList<
 };
 export function useGetApiAccountList<
   TData = Awaited<ReturnType<typeof getApiAccountList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiAccountListParams,
   options?: {
@@ -902,7 +927,7 @@ export function useGetApiAccountList<
 
 export function useGetApiAccountList<
   TData = Awaited<ReturnType<typeof getApiAccountList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiAccountListParams,
   options?: {
@@ -953,7 +978,7 @@ export const getGetApiAccountGetQueryKey = (
 
 export const getGetApiAccountGetQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiAccountGet>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiAccountGetParams,
   options?: {
@@ -992,11 +1017,11 @@ export const getGetApiAccountGetQueryOptions = <
 export type GetApiAccountGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiAccountGet>>
 >;
-export type GetApiAccountGetQueryError = string[] | void;
+export type GetApiAccountGetQueryError = ResultMessage[] | void;
 
 export function useGetApiAccountGet<
   TData = Awaited<ReturnType<typeof getApiAccountGet>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params: undefined | GetApiAccountGetParams,
   options: {
@@ -1023,7 +1048,7 @@ export function useGetApiAccountGet<
 };
 export function useGetApiAccountGet<
   TData = Awaited<ReturnType<typeof getApiAccountGet>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiAccountGetParams,
   options?: {
@@ -1050,7 +1075,7 @@ export function useGetApiAccountGet<
 };
 export function useGetApiAccountGet<
   TData = Awaited<ReturnType<typeof getApiAccountGet>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiAccountGetParams,
   options?: {
@@ -1073,7 +1098,7 @@ export function useGetApiAccountGet<
 
 export function useGetApiAccountGet<
   TData = Awaited<ReturnType<typeof getApiAccountGet>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiAccountGetParams,
   options?: {
@@ -1091,6 +1116,186 @@ export function useGetApiAccountGet<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetApiAccountGetQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const getApiAccountGetAccountForContact = (
+  params?: GetApiAccountGetAccountForContactParams,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<AccountContactDtoIDataResult>(
+    {
+      url: `/api/account/get-account-for-contact`,
+      method: "GET",
+      params,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getGetApiAccountGetAccountForContactQueryKey = (
+  params?: GetApiAccountGetAccountForContactParams,
+) => {
+  return [
+    `/api/account/get-account-for-contact`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetApiAccountGetAccountForContactQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiAccountGetAccountForContact>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiAccountGetAccountForContactParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiAccountGetAccountForContact>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetApiAccountGetAccountForContactQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiAccountGetAccountForContact>>
+  > = ({ signal }) =>
+    getApiAccountGetAccountForContact(params, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    staleTime: 10000,
+    refetchOnWindowFocus: false,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiAccountGetAccountForContact>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiAccountGetAccountForContactQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiAccountGetAccountForContact>>
+>;
+export type GetApiAccountGetAccountForContactQueryError =
+  | ResultMessage[]
+  | void;
+
+export function useGetApiAccountGetAccountForContact<
+  TData = Awaited<ReturnType<typeof getApiAccountGetAccountForContact>>,
+  TError = ResultMessage[] | void,
+>(
+  params: undefined | GetApiAccountGetAccountForContactParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiAccountGetAccountForContact>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiAccountGetAccountForContact>>,
+          TError,
+          Awaited<ReturnType<typeof getApiAccountGetAccountForContact>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiAccountGetAccountForContact<
+  TData = Awaited<ReturnType<typeof getApiAccountGetAccountForContact>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiAccountGetAccountForContactParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiAccountGetAccountForContact>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiAccountGetAccountForContact>>,
+          TError,
+          Awaited<ReturnType<typeof getApiAccountGetAccountForContact>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiAccountGetAccountForContact<
+  TData = Awaited<ReturnType<typeof getApiAccountGetAccountForContact>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiAccountGetAccountForContactParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiAccountGetAccountForContact>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetApiAccountGetAccountForContact<
+  TData = Awaited<ReturnType<typeof getApiAccountGetAccountForContact>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiAccountGetAccountForContactParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiAccountGetAccountForContact>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiAccountGetAccountForContactQueryOptions(
+    params,
+    options,
+  );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
@@ -1123,7 +1328,7 @@ export const postApiAccountBuyLicense = (
 };
 
 export const getPostApiAccountBuyLicenseMutationOptions = <
-  TError = string[],
+  TError = ResultMessage[],
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -1164,13 +1369,13 @@ export type PostApiAccountBuyLicenseMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiAccountBuyLicense>>
 >;
 export type PostApiAccountBuyLicenseMutationBody = BuyLicenseCommandRequest;
-export type PostApiAccountBuyLicenseMutationError = string[];
+export type PostApiAccountBuyLicenseMutationError = ResultMessage[];
 
 /**
  * @summary Account buy license operation
  */
 export const usePostApiAccountBuyLicense = <
-  TError = string[],
+  TError = ResultMessage[],
   TContext = unknown,
 >(
   options?: {
@@ -1215,7 +1420,7 @@ export const postApiAccountChangeStatus = (
 };
 
 export const getPostApiAccountChangeStatusMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -1257,13 +1462,13 @@ export type PostApiAccountChangeStatusMutationResult = NonNullable<
 >;
 export type PostApiAccountChangeStatusMutationBody =
   ChangeAccountStatusCommandRequest;
-export type PostApiAccountChangeStatusMutationError = string[] | void;
+export type PostApiAccountChangeStatusMutationError = ResultMessage[] | void;
 
 /**
  * @summary Change account status operation
  */
 export const usePostApiAccountChangeStatus = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -1308,7 +1513,7 @@ export const postApiAccountRegisterDeviceToken = (
 };
 
 export const getPostApiAccountRegisterDeviceTokenMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -1350,13 +1555,15 @@ export type PostApiAccountRegisterDeviceTokenMutationResult = NonNullable<
 >;
 export type PostApiAccountRegisterDeviceTokenMutationBody =
   RegisterDeviceTokenCommandRequest;
-export type PostApiAccountRegisterDeviceTokenMutationError = string[] | void;
+export type PostApiAccountRegisterDeviceTokenMutationError =
+  | ResultMessage[]
+  | void;
 
 /**
  * @summary Register device token operation
  */
 export const usePostApiAccountRegisterDeviceToken = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -1402,7 +1609,7 @@ export const postApiAccountBlockAccount = (
 };
 
 export const getPostApiAccountBlockAccountMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -1443,13 +1650,13 @@ export type PostApiAccountBlockAccountMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiAccountBlockAccount>>
 >;
 export type PostApiAccountBlockAccountMutationBody = BlockAccountCommandRequest;
-export type PostApiAccountBlockAccountMutationError = string[] | void;
+export type PostApiAccountBlockAccountMutationError = ResultMessage[] | void;
 
 /**
  * @summary Block account operation
  */
 export const usePostApiAccountBlockAccount = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -1494,7 +1701,7 @@ export const postApiAccountUnblockAccount = (
 };
 
 export const getPostApiAccountUnblockAccountMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -1536,13 +1743,13 @@ export type PostApiAccountUnblockAccountMutationResult = NonNullable<
 >;
 export type PostApiAccountUnblockAccountMutationBody =
   UnblockAccountCommandRequest;
-export type PostApiAccountUnblockAccountMutationError = string[] | void;
+export type PostApiAccountUnblockAccountMutationError = ResultMessage[] | void;
 
 /**
  * @summary Unblock account operation
  */
 export const usePostApiAccountUnblockAccount = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -1588,7 +1795,7 @@ export const postApiAccountRecoverPassword = (
 };
 
 export const getPostApiAccountRecoverPasswordMutationOptions = <
-  TError = string[],
+  TError = ResultMessage[],
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -1630,13 +1837,13 @@ export type PostApiAccountRecoverPasswordMutationResult = NonNullable<
 >;
 export type PostApiAccountRecoverPasswordMutationBody =
   RecoverPasswordCommandRequest;
-export type PostApiAccountRecoverPasswordMutationError = string[];
+export type PostApiAccountRecoverPasswordMutationError = ResultMessage[];
 
 /**
  * @summary Recover account password operation
  */
 export const usePostApiAccountRecoverPassword = <
-  TError = string[],
+  TError = ResultMessage[],
   TContext = unknown,
 >(
   options?: {
@@ -1682,7 +1889,7 @@ export const postApiAccountResetPassword = (
 };
 
 export const getPostApiAccountResetPasswordMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -1724,13 +1931,13 @@ export type PostApiAccountResetPasswordMutationResult = NonNullable<
 >;
 export type PostApiAccountResetPasswordMutationBody =
   ResetPasswordCommandRequest;
-export type PostApiAccountResetPasswordMutationError = string[] | void;
+export type PostApiAccountResetPasswordMutationError = ResultMessage[] | void;
 
 /**
  * @summary Reset account password operation
  */
 export const usePostApiAccountResetPassword = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -1776,7 +1983,7 @@ export const postApiAccountResetPhrases = (
 };
 
 export const getPostApiAccountResetPhrasesMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -1817,13 +2024,13 @@ export type PostApiAccountResetPhrasesMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiAccountResetPhrases>>
 >;
 export type PostApiAccountResetPhrasesMutationBody = ResetPhrasesCommandRequest;
-export type PostApiAccountResetPhrasesMutationError = string[] | void;
+export type PostApiAccountResetPhrasesMutationError = ResultMessage[] | void;
 
 /**
  * @summary Reset account phrases operation
  */
 export const usePostApiAccountResetPhrases = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -1868,7 +2075,7 @@ export const postApiAccountResetTwoFactor = (
 };
 
 export const getPostApiAccountResetTwoFactorMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -1910,13 +2117,13 @@ export type PostApiAccountResetTwoFactorMutationResult = NonNullable<
 >;
 export type PostApiAccountResetTwoFactorMutationBody =
   ResetTwoFactorCommandRequest;
-export type PostApiAccountResetTwoFactorMutationError = string[] | void;
+export type PostApiAccountResetTwoFactorMutationError = ResultMessage[] | void;
 
 /**
  * @summary Reset two factor operation
  */
 export const usePostApiAccountResetTwoFactor = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -1960,7 +2167,7 @@ export const getGetApiAccountGetProfileQueryKey = () => {
 
 export const getGetApiAccountGetProfileQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiAccountGetProfile>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(options?: {
   query?: Partial<
     UseQueryOptions<
@@ -1996,11 +2203,11 @@ export const getGetApiAccountGetProfileQueryOptions = <
 export type GetApiAccountGetProfileQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiAccountGetProfile>>
 >;
-export type GetApiAccountGetProfileQueryError = string[] | void;
+export type GetApiAccountGetProfileQueryError = ResultMessage[] | void;
 
 export function useGetApiAccountGetProfile<
   TData = Awaited<ReturnType<typeof getApiAccountGetProfile>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   options: {
     query: Partial<
@@ -2026,7 +2233,7 @@ export function useGetApiAccountGetProfile<
 };
 export function useGetApiAccountGetProfile<
   TData = Awaited<ReturnType<typeof getApiAccountGetProfile>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   options?: {
     query?: Partial<
@@ -2052,7 +2259,7 @@ export function useGetApiAccountGetProfile<
 };
 export function useGetApiAccountGetProfile<
   TData = Awaited<ReturnType<typeof getApiAccountGetProfile>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   options?: {
     query?: Partial<
@@ -2074,7 +2281,7 @@ export function useGetApiAccountGetProfile<
 
 export function useGetApiAccountGetProfile<
   TData = Awaited<ReturnType<typeof getApiAccountGetProfile>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   options?: {
     query?: Partial<
@@ -2123,7 +2330,7 @@ export const postApiAccountChangeAccountSettings = (
 };
 
 export const getPostApiAccountChangeAccountSettingsMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -2165,13 +2372,15 @@ export type PostApiAccountChangeAccountSettingsMutationResult = NonNullable<
 >;
 export type PostApiAccountChangeAccountSettingsMutationBody =
   AccountSettingsCommandRequest;
-export type PostApiAccountChangeAccountSettingsMutationError = string[] | void;
+export type PostApiAccountChangeAccountSettingsMutationError =
+  | ResultMessage[]
+  | void;
 
 /**
  * @summary Change account settings operation
  */
 export const usePostApiAccountChangeAccountSettings = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -2217,7 +2426,7 @@ export const postApiAccountVerifyPassword = (
 };
 
 export const getPostApiAccountVerifyPasswordMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -2259,13 +2468,13 @@ export type PostApiAccountVerifyPasswordMutationResult = NonNullable<
 >;
 export type PostApiAccountVerifyPasswordMutationBody =
   VerifyPasswordCommandRequest;
-export type PostApiAccountVerifyPasswordMutationError = string[] | void;
+export type PostApiAccountVerifyPasswordMutationError = ResultMessage[] | void;
 
 /**
  * @summary Verify account password operation
  */
 export const usePostApiAccountVerifyPassword = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -2311,7 +2520,7 @@ export const postApiAccountVerifyPhrases = (
 };
 
 export const getPostApiAccountVerifyPhrasesMutationOptions = <
-  TError = string[],
+  TError = ResultMessage[],
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -2353,13 +2562,13 @@ export type PostApiAccountVerifyPhrasesMutationResult = NonNullable<
 >;
 export type PostApiAccountVerifyPhrasesMutationBody =
   VerifyPhrasesCommandRequest;
-export type PostApiAccountVerifyPhrasesMutationError = string[];
+export type PostApiAccountVerifyPhrasesMutationError = ResultMessage[];
 
 /**
  * @summary Verify account phrases operation
  */
 export const usePostApiAccountVerifyPhrases = <
-  TError = string[],
+  TError = ResultMessage[],
   TContext = unknown,
 >(
   options?: {
@@ -2398,7 +2607,7 @@ export const deleteApiAccountDeleteAccount = (
 };
 
 export const getDeleteApiAccountDeleteAccountMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -2439,13 +2648,13 @@ export type DeleteApiAccountDeleteAccountMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteApiAccountDeleteAccount>>
 >;
 
-export type DeleteApiAccountDeleteAccountMutationError = string[] | void;
+export type DeleteApiAccountDeleteAccountMutationError = ResultMessage[] | void;
 
 /**
  * @summary Delete an account
  */
 export const useDeleteApiAccountDeleteAccount = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -2484,7 +2693,7 @@ export const deleteApiAccountDeleteProfile = (
 };
 
 export const getDeleteApiAccountDeleteProfileMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -2525,13 +2734,13 @@ export type DeleteApiAccountDeleteProfileMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteApiAccountDeleteProfile>>
 >;
 
-export type DeleteApiAccountDeleteProfileMutationError = string[] | void;
+export type DeleteApiAccountDeleteProfileMutationError = ResultMessage[] | void;
 
 /**
  * @summary Delete account profile operation
  */
 export const useDeleteApiAccountDeleteProfile = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -2577,7 +2786,7 @@ export const postApiChatsCreate = (
 };
 
 export const getPostApiChatsCreateMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -2618,13 +2827,13 @@ export type PostApiChatsCreateMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiChatsCreate>>
 >;
 export type PostApiChatsCreateMutationBody = CreateChatCommandRequest;
-export type PostApiChatsCreateMutationError = string[] | void;
+export type PostApiChatsCreateMutationError = ResultMessage[] | void;
 
 /**
  * @summary Create a chat
  */
 export const usePostApiChatsCreate = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -2669,7 +2878,7 @@ export const postApiChatsUpdate = (
 };
 
 export const getPostApiChatsUpdateMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -2710,13 +2919,13 @@ export type PostApiChatsUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiChatsUpdate>>
 >;
 export type PostApiChatsUpdateMutationBody = UpdateChatCommandRequest;
-export type PostApiChatsUpdateMutationError = string[] | void;
+export type PostApiChatsUpdateMutationError = ResultMessage[] | void;
 
 /**
  * @summary Update a chat
  */
 export const usePostApiChatsUpdate = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -2755,7 +2964,7 @@ export const postApiChatsClear = (
 };
 
 export const getPostApiChatsClearMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -2796,13 +3005,13 @@ export type PostApiChatsClearMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiChatsClear>>
 >;
 
-export type PostApiChatsClearMutationError = string[] | void;
+export type PostApiChatsClearMutationError = ResultMessage[] | void;
 
 /**
  * @summary Clear a chat
  */
 export const usePostApiChatsClear = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -2840,7 +3049,7 @@ export const deleteApiChatsDelete = (
 };
 
 export const getDeleteApiChatsDeleteMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -2881,13 +3090,13 @@ export type DeleteApiChatsDeleteMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteApiChatsDelete>>
 >;
 
-export type DeleteApiChatsDeleteMutationError = string[] | void;
+export type DeleteApiChatsDeleteMutationError = ResultMessage[] | void;
 
 /**
  * @summary Delete a chat
  */
 export const useDeleteApiChatsDelete = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -2907,6 +3116,98 @@ export const useDeleteApiChatsDelete = <
   TContext
 > => {
   const mutationOptions = getDeleteApiChatsDeleteMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Send message to chat
+ */
+export const postApiChatsSendMessage = (
+  sendMessageCommandRequest: SendMessageCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<SuccessResult>(
+    {
+      url: `/api/chats/send-message`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: sendMessageCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiChatsSendMessageMutationOptions = <
+  TError = ResultMessage[] | void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiChatsSendMessage>>,
+    TError,
+    { data: SendMessageCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiChatsSendMessage>>,
+  TError,
+  { data: SendMessageCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiChatsSendMessage"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiChatsSendMessage>>,
+    { data: SendMessageCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiChatsSendMessage(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiChatsSendMessageMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiChatsSendMessage>>
+>;
+export type PostApiChatsSendMessageMutationBody = SendMessageCommandRequest;
+export type PostApiChatsSendMessageMutationError = ResultMessage[] | void;
+
+/**
+ * @summary Send message to chat
+ */
+export const usePostApiChatsSendMessage = <
+  TError = ResultMessage[] | void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiChatsSendMessage>>,
+      TError,
+      { data: SendMessageCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiChatsSendMessage>>,
+  TError,
+  { data: SendMessageCommandRequest },
+  TContext
+> => {
+  const mutationOptions = getPostApiChatsSendMessageMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };
@@ -2933,7 +3234,7 @@ export const getGetApiChatsMessagesQueryKey = (
 
 export const getGetApiChatsMessagesQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiChatsMessages>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiChatsMessagesParams,
   options?: {
@@ -2972,11 +3273,11 @@ export const getGetApiChatsMessagesQueryOptions = <
 export type GetApiChatsMessagesQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiChatsMessages>>
 >;
-export type GetApiChatsMessagesQueryError = string[] | void;
+export type GetApiChatsMessagesQueryError = ResultMessage[] | void;
 
 export function useGetApiChatsMessages<
   TData = Awaited<ReturnType<typeof getApiChatsMessages>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params: undefined | GetApiChatsMessagesParams,
   options: {
@@ -3003,7 +3304,7 @@ export function useGetApiChatsMessages<
 };
 export function useGetApiChatsMessages<
   TData = Awaited<ReturnType<typeof getApiChatsMessages>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiChatsMessagesParams,
   options?: {
@@ -3030,7 +3331,7 @@ export function useGetApiChatsMessages<
 };
 export function useGetApiChatsMessages<
   TData = Awaited<ReturnType<typeof getApiChatsMessages>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiChatsMessagesParams,
   options?: {
@@ -3053,7 +3354,7 @@ export function useGetApiChatsMessages<
 
 export function useGetApiChatsMessages<
   TData = Awaited<ReturnType<typeof getApiChatsMessages>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiChatsMessagesParams,
   options?: {
@@ -3104,7 +3405,7 @@ export const getGetApiChatsGroupMessagesQueryKey = (
 
 export const getGetApiChatsGroupMessagesQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiChatsGroupMessages>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiChatsGroupMessagesParams,
   options?: {
@@ -3143,11 +3444,11 @@ export const getGetApiChatsGroupMessagesQueryOptions = <
 export type GetApiChatsGroupMessagesQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiChatsGroupMessages>>
 >;
-export type GetApiChatsGroupMessagesQueryError = string[] | void;
+export type GetApiChatsGroupMessagesQueryError = ResultMessage[] | void;
 
 export function useGetApiChatsGroupMessages<
   TData = Awaited<ReturnType<typeof getApiChatsGroupMessages>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params: undefined | GetApiChatsGroupMessagesParams,
   options: {
@@ -3174,7 +3475,7 @@ export function useGetApiChatsGroupMessages<
 };
 export function useGetApiChatsGroupMessages<
   TData = Awaited<ReturnType<typeof getApiChatsGroupMessages>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiChatsGroupMessagesParams,
   options?: {
@@ -3201,7 +3502,7 @@ export function useGetApiChatsGroupMessages<
 };
 export function useGetApiChatsGroupMessages<
   TData = Awaited<ReturnType<typeof getApiChatsGroupMessages>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiChatsGroupMessagesParams,
   options?: {
@@ -3224,7 +3525,7 @@ export function useGetApiChatsGroupMessages<
 
 export function useGetApiChatsGroupMessages<
   TData = Awaited<ReturnType<typeof getApiChatsGroupMessages>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiChatsGroupMessagesParams,
   options?: {
@@ -3279,7 +3580,7 @@ export const postApiChatsUpload = (
 };
 
 export const getPostApiChatsUploadMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -3320,13 +3621,13 @@ export type PostApiChatsUploadMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiChatsUpload>>
 >;
 export type PostApiChatsUploadMutationBody = PostApiChatsUploadBody;
-export type PostApiChatsUploadMutationError = string[] | void;
+export type PostApiChatsUploadMutationError = ResultMessage[] | void;
 
 /**
  * @summary Upload file for chat
  */
 export const usePostApiChatsUpload = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -3371,7 +3672,7 @@ export const postApiContactsCreate = (
 };
 
 export const getPostApiContactsCreateMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -3412,13 +3713,13 @@ export type PostApiContactsCreateMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiContactsCreate>>
 >;
 export type PostApiContactsCreateMutationBody = CreateContactCommandRequest;
-export type PostApiContactsCreateMutationError = string[] | void;
+export type PostApiContactsCreateMutationError = ResultMessage[] | void;
 
 /**
  * @summary Create a contact
  */
 export const usePostApiContactsCreate = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -3463,7 +3764,7 @@ export const postApiContactsUpdate = (
 };
 
 export const getPostApiContactsUpdateMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -3504,13 +3805,13 @@ export type PostApiContactsUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiContactsUpdate>>
 >;
 export type PostApiContactsUpdateMutationBody = UpdateContactCommandRequest;
-export type PostApiContactsUpdateMutationError = string[] | void;
+export type PostApiContactsUpdateMutationError = ResultMessage[] | void;
 
 /**
  * @summary Update a contact
  */
 export const usePostApiContactsUpdate = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -3548,7 +3849,7 @@ export const deleteApiContactsDelete = (
 };
 
 export const getDeleteApiContactsDeleteMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -3589,13 +3890,13 @@ export type DeleteApiContactsDeleteMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteApiContactsDelete>>
 >;
 
-export type DeleteApiContactsDeleteMutationError = string[] | void;
+export type DeleteApiContactsDeleteMutationError = ResultMessage[] | void;
 
 /**
  * @summary Delete a contact
  */
 export const useDeleteApiContactsDelete = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -3638,7 +3939,7 @@ export const getGetApiContactsListQueryKey = () => {
 
 export const getGetApiContactsListQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiContactsList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(options?: {
   query?: Partial<
     UseQueryOptions<
@@ -3673,11 +3974,11 @@ export const getGetApiContactsListQueryOptions = <
 export type GetApiContactsListQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiContactsList>>
 >;
-export type GetApiContactsListQueryError = string[] | void;
+export type GetApiContactsListQueryError = ResultMessage[] | void;
 
 export function useGetApiContactsList<
   TData = Awaited<ReturnType<typeof getApiContactsList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   options: {
     query: Partial<
@@ -3703,7 +4004,7 @@ export function useGetApiContactsList<
 };
 export function useGetApiContactsList<
   TData = Awaited<ReturnType<typeof getApiContactsList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   options?: {
     query?: Partial<
@@ -3729,7 +4030,7 @@ export function useGetApiContactsList<
 };
 export function useGetApiContactsList<
   TData = Awaited<ReturnType<typeof getApiContactsList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   options?: {
     query?: Partial<
@@ -3751,7 +4052,7 @@ export function useGetApiContactsList<
 
 export function useGetApiContactsList<
   TData = Awaited<ReturnType<typeof getApiContactsList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   options?: {
     query?: Partial<
@@ -3800,7 +4101,7 @@ export const postApiFaqsCreate = (
 };
 
 export const getPostApiFaqsCreateMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -3841,13 +4142,13 @@ export type PostApiFaqsCreateMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiFaqsCreate>>
 >;
 export type PostApiFaqsCreateMutationBody = CreateFaqCommandRequest;
-export type PostApiFaqsCreateMutationError = string[] | void;
+export type PostApiFaqsCreateMutationError = ResultMessage[] | void;
 
 /**
  * @summary Create a faq
  */
 export const usePostApiFaqsCreate = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -3892,7 +4193,7 @@ export const postApiFaqsUpdate = (
 };
 
 export const getPostApiFaqsUpdateMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -3933,13 +4234,13 @@ export type PostApiFaqsUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiFaqsUpdate>>
 >;
 export type PostApiFaqsUpdateMutationBody = UpdateFaqCommandRequest;
-export type PostApiFaqsUpdateMutationError = string[] | void;
+export type PostApiFaqsUpdateMutationError = ResultMessage[] | void;
 
 /**
  * @summary Update a faq
  */
 export const usePostApiFaqsUpdate = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -3977,7 +4278,7 @@ export const deleteApiFaqsDelete = (
 };
 
 export const getDeleteApiFaqsDeleteMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -4018,13 +4319,13 @@ export type DeleteApiFaqsDeleteMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteApiFaqsDelete>>
 >;
 
-export type DeleteApiFaqsDeleteMutationError = string[] | void;
+export type DeleteApiFaqsDeleteMutationError = ResultMessage[] | void;
 
 /**
  * @summary Delete a faq
  */
 export const useDeleteApiFaqsDelete = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -4051,40 +4352,40 @@ export const useDeleteApiFaqsDelete = <
 /**
  * @summary Get a faq
  */
-export const getApiFaqs = (
-  params?: GetApiFaqsParams,
+export const getApiFaqsGet = (
+  params?: GetApiFaqsGetParams,
   options?: SecondParameter<typeof AxiosInstance>,
   signal?: AbortSignal,
 ) => {
   return AxiosInstance<FaqIDataResult>(
-    { url: `/api/faqs`, method: "GET", params, signal },
+    { url: `/api/faqs/get`, method: "GET", params, signal },
     options,
   );
 };
 
-export const getGetApiFaqsQueryKey = (params?: GetApiFaqsParams) => {
-  return [`/api/faqs`, ...(params ? [params] : [])] as const;
+export const getGetApiFaqsGetQueryKey = (params?: GetApiFaqsGetParams) => {
+  return [`/api/faqs/get`, ...(params ? [params] : [])] as const;
 };
 
-export const getGetApiFaqsQueryOptions = <
-  TData = Awaited<ReturnType<typeof getApiFaqs>>,
-  TError = string[] | void,
+export const getGetApiFaqsGetQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiFaqsGet>>,
+  TError = ResultMessage[] | void,
 >(
-  params?: GetApiFaqsParams,
+  params?: GetApiFaqsGetParams,
   options?: {
     query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getApiFaqs>>, TError, TData>
+      UseQueryOptions<Awaited<ReturnType<typeof getApiFaqsGet>>, TError, TData>
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetApiFaqsQueryKey(params);
+  const queryKey = queryOptions?.queryKey ?? getGetApiFaqsGetQueryKey(params);
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiFaqs>>> = ({
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiFaqsGet>>> = ({
     signal,
-  }) => getApiFaqs(params, requestOptions, signal);
+  }) => getApiFaqsGet(params, requestOptions, signal);
 
   return {
     queryKey,
@@ -4093,31 +4394,31 @@ export const getGetApiFaqsQueryOptions = <
     refetchOnWindowFocus: false,
     ...queryOptions,
   } as UseQueryOptions<
-    Awaited<ReturnType<typeof getApiFaqs>>,
+    Awaited<ReturnType<typeof getApiFaqsGet>>,
     TError,
     TData
   > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
-export type GetApiFaqsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getApiFaqs>>
+export type GetApiFaqsGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiFaqsGet>>
 >;
-export type GetApiFaqsQueryError = string[] | void;
+export type GetApiFaqsGetQueryError = ResultMessage[] | void;
 
-export function useGetApiFaqs<
-  TData = Awaited<ReturnType<typeof getApiFaqs>>,
-  TError = string[] | void,
+export function useGetApiFaqsGet<
+  TData = Awaited<ReturnType<typeof getApiFaqsGet>>,
+  TError = ResultMessage[] | void,
 >(
-  params: undefined | GetApiFaqsParams,
+  params: undefined | GetApiFaqsGetParams,
   options: {
     query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getApiFaqs>>, TError, TData>
+      UseQueryOptions<Awaited<ReturnType<typeof getApiFaqsGet>>, TError, TData>
     > &
       Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getApiFaqs>>,
+          Awaited<ReturnType<typeof getApiFaqsGet>>,
           TError,
-          Awaited<ReturnType<typeof getApiFaqs>>
+          Awaited<ReturnType<typeof getApiFaqsGet>>
         >,
         "initialData"
       >;
@@ -4127,20 +4428,20 @@ export function useGetApiFaqs<
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
-export function useGetApiFaqs<
-  TData = Awaited<ReturnType<typeof getApiFaqs>>,
-  TError = string[] | void,
+export function useGetApiFaqsGet<
+  TData = Awaited<ReturnType<typeof getApiFaqsGet>>,
+  TError = ResultMessage[] | void,
 >(
-  params?: GetApiFaqsParams,
+  params?: GetApiFaqsGetParams,
   options?: {
     query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getApiFaqs>>, TError, TData>
+      UseQueryOptions<Awaited<ReturnType<typeof getApiFaqsGet>>, TError, TData>
     > &
       Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getApiFaqs>>,
+          Awaited<ReturnType<typeof getApiFaqsGet>>,
           TError,
-          Awaited<ReturnType<typeof getApiFaqs>>
+          Awaited<ReturnType<typeof getApiFaqsGet>>
         >,
         "initialData"
       >;
@@ -4150,14 +4451,14 @@ export function useGetApiFaqs<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
-export function useGetApiFaqs<
-  TData = Awaited<ReturnType<typeof getApiFaqs>>,
-  TError = string[] | void,
+export function useGetApiFaqsGet<
+  TData = Awaited<ReturnType<typeof getApiFaqsGet>>,
+  TError = ResultMessage[] | void,
 >(
-  params?: GetApiFaqsParams,
+  params?: GetApiFaqsGetParams,
   options?: {
     query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getApiFaqs>>, TError, TData>
+      UseQueryOptions<Awaited<ReturnType<typeof getApiFaqsGet>>, TError, TData>
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
@@ -4169,14 +4470,14 @@ export function useGetApiFaqs<
  * @summary Get a faq
  */
 
-export function useGetApiFaqs<
-  TData = Awaited<ReturnType<typeof getApiFaqs>>,
-  TError = string[] | void,
+export function useGetApiFaqsGet<
+  TData = Awaited<ReturnType<typeof getApiFaqsGet>>,
+  TError = ResultMessage[] | void,
 >(
-  params?: GetApiFaqsParams,
+  params?: GetApiFaqsGetParams,
   options?: {
     query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getApiFaqs>>, TError, TData>
+      UseQueryOptions<Awaited<ReturnType<typeof getApiFaqsGet>>, TError, TData>
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
@@ -4184,7 +4485,7 @@ export function useGetApiFaqs<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
-  const queryOptions = getGetApiFaqsQueryOptions(params, options);
+  const queryOptions = getGetApiFaqsGetQueryOptions(params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
@@ -4200,35 +4501,39 @@ export function useGetApiFaqs<
  * @summary Get faqs
  */
 export const getApiFaqsList = (
+  params?: GetApiFaqsListParams,
   options?: SecondParameter<typeof AxiosInstance>,
   signal?: AbortSignal,
 ) => {
-  return AxiosInstance<FaqListIDataResult>(
-    { url: `/api/faqs/list`, method: "GET", signal },
+  return AxiosInstance<FaqDtoListPaginatedResult>(
+    { url: `/api/faqs/list`, method: "GET", params, signal },
     options,
   );
 };
 
-export const getGetApiFaqsListQueryKey = () => {
-  return [`/api/faqs/list`] as const;
+export const getGetApiFaqsListQueryKey = (params?: GetApiFaqsListParams) => {
+  return [`/api/faqs/list`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetApiFaqsListQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiFaqsList>>,
-  TError = string[] | void,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<Awaited<ReturnType<typeof getApiFaqsList>>, TError, TData>
-  >;
-  request?: SecondParameter<typeof AxiosInstance>;
-}) => {
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiFaqsListParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getApiFaqsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetApiFaqsListQueryKey();
+  const queryKey = queryOptions?.queryKey ?? getGetApiFaqsListQueryKey(params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiFaqsList>>> = ({
     signal,
-  }) => getApiFaqsList(requestOptions, signal);
+  }) => getApiFaqsList(params, requestOptions, signal);
 
   return {
     queryKey,
@@ -4246,12 +4551,13 @@ export const getGetApiFaqsListQueryOptions = <
 export type GetApiFaqsListQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiFaqsList>>
 >;
-export type GetApiFaqsListQueryError = string[] | void;
+export type GetApiFaqsListQueryError = ResultMessage[] | void;
 
 export function useGetApiFaqsList<
   TData = Awaited<ReturnType<typeof getApiFaqsList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
+  params: undefined | GetApiFaqsListParams,
   options: {
     query: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getApiFaqsList>>, TError, TData>
@@ -4272,8 +4578,9 @@ export function useGetApiFaqsList<
 };
 export function useGetApiFaqsList<
   TData = Awaited<ReturnType<typeof getApiFaqsList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
+  params?: GetApiFaqsListParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getApiFaqsList>>, TError, TData>
@@ -4294,8 +4601,9 @@ export function useGetApiFaqsList<
 };
 export function useGetApiFaqsList<
   TData = Awaited<ReturnType<typeof getApiFaqsList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
+  params?: GetApiFaqsListParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getApiFaqsList>>, TError, TData>
@@ -4312,8 +4620,9 @@ export function useGetApiFaqsList<
 
 export function useGetApiFaqsList<
   TData = Awaited<ReturnType<typeof getApiFaqsList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
+  params?: GetApiFaqsListParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getApiFaqsList>>, TError, TData>
@@ -4324,7 +4633,814 @@ export function useGetApiFaqsList<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
-  const queryOptions = getGetApiFaqsListQueryOptions(options);
+  const queryOptions = getGetApiFaqsListQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Validate Google In App Purchase Receipt
+ */
+export const postApiInAppPurchaseValidateGoogleReceipt = (
+  validateGoogleReceiptCommandRequest: ValidateGoogleReceiptCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<SuccessResult>(
+    {
+      url: `/api/in-app-purchase/validate-google-receipt`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: validateGoogleReceiptCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiInAppPurchaseValidateGoogleReceiptMutationOptions = <
+  TError = ResultMessage[] | void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiInAppPurchaseValidateGoogleReceipt>>,
+    TError,
+    { data: ValidateGoogleReceiptCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiInAppPurchaseValidateGoogleReceipt>>,
+  TError,
+  { data: ValidateGoogleReceiptCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiInAppPurchaseValidateGoogleReceipt"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiInAppPurchaseValidateGoogleReceipt>>,
+    { data: ValidateGoogleReceiptCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiInAppPurchaseValidateGoogleReceipt(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiInAppPurchaseValidateGoogleReceiptMutationResult =
+  NonNullable<
+    Awaited<ReturnType<typeof postApiInAppPurchaseValidateGoogleReceipt>>
+  >;
+export type PostApiInAppPurchaseValidateGoogleReceiptMutationBody =
+  ValidateGoogleReceiptCommandRequest;
+export type PostApiInAppPurchaseValidateGoogleReceiptMutationError =
+  | ResultMessage[]
+  | void;
+
+/**
+ * @summary Validate Google In App Purchase Receipt
+ */
+export const usePostApiInAppPurchaseValidateGoogleReceipt = <
+  TError = ResultMessage[] | void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiInAppPurchaseValidateGoogleReceipt>>,
+      TError,
+      { data: ValidateGoogleReceiptCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiInAppPurchaseValidateGoogleReceipt>>,
+  TError,
+  { data: ValidateGoogleReceiptCommandRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiInAppPurchaseValidateGoogleReceiptMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Validate Apple In App Purchase Receipt
+ */
+export const postApiInAppPurchaseValidateAppleReceipt = (
+  validateAppleReceiptCommandRequest: ValidateAppleReceiptCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<SuccessResult>(
+    {
+      url: `/api/in-app-purchase/validate-apple-receipt`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: validateAppleReceiptCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiInAppPurchaseValidateAppleReceiptMutationOptions = <
+  TError = ResultMessage[] | void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiInAppPurchaseValidateAppleReceipt>>,
+    TError,
+    { data: ValidateAppleReceiptCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiInAppPurchaseValidateAppleReceipt>>,
+  TError,
+  { data: ValidateAppleReceiptCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiInAppPurchaseValidateAppleReceipt"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiInAppPurchaseValidateAppleReceipt>>,
+    { data: ValidateAppleReceiptCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiInAppPurchaseValidateAppleReceipt(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiInAppPurchaseValidateAppleReceiptMutationResult =
+  NonNullable<
+    Awaited<ReturnType<typeof postApiInAppPurchaseValidateAppleReceipt>>
+  >;
+export type PostApiInAppPurchaseValidateAppleReceiptMutationBody =
+  ValidateAppleReceiptCommandRequest;
+export type PostApiInAppPurchaseValidateAppleReceiptMutationError =
+  | ResultMessage[]
+  | void;
+
+/**
+ * @summary Validate Apple In App Purchase Receipt
+ */
+export const usePostApiInAppPurchaseValidateAppleReceipt = <
+  TError = ResultMessage[] | void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiInAppPurchaseValidateAppleReceipt>>,
+      TError,
+      { data: ValidateAppleReceiptCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiInAppPurchaseValidateAppleReceipt>>,
+  TError,
+  { data: ValidateAppleReceiptCommandRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiInAppPurchaseValidateAppleReceiptMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Get invoice pdf
+ */
+export const getApiInvoicesGetPdf = (
+  params?: GetApiInvoicesGetPdfParams,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<Blob>(
+    {
+      url: `/api/invoices/get-pdf`,
+      method: "GET",
+      params,
+      responseType: "blob",
+      signal,
+    },
+    options,
+  );
+};
+
+export const getGetApiInvoicesGetPdfQueryKey = (
+  params?: GetApiInvoicesGetPdfParams,
+) => {
+  return [`/api/invoices/get-pdf`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetApiInvoicesGetPdfQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiInvoicesGetPdf>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiInvoicesGetPdfParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiInvoicesGetPdf>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetApiInvoicesGetPdfQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiInvoicesGetPdf>>
+  > = ({ signal }) => getApiInvoicesGetPdf(params, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    staleTime: 10000,
+    refetchOnWindowFocus: false,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiInvoicesGetPdf>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiInvoicesGetPdfQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiInvoicesGetPdf>>
+>;
+export type GetApiInvoicesGetPdfQueryError = ResultMessage[] | void;
+
+export function useGetApiInvoicesGetPdf<
+  TData = Awaited<ReturnType<typeof getApiInvoicesGetPdf>>,
+  TError = ResultMessage[] | void,
+>(
+  params: undefined | GetApiInvoicesGetPdfParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiInvoicesGetPdf>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiInvoicesGetPdf>>,
+          TError,
+          Awaited<ReturnType<typeof getApiInvoicesGetPdf>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiInvoicesGetPdf<
+  TData = Awaited<ReturnType<typeof getApiInvoicesGetPdf>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiInvoicesGetPdfParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiInvoicesGetPdf>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiInvoicesGetPdf>>,
+          TError,
+          Awaited<ReturnType<typeof getApiInvoicesGetPdf>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiInvoicesGetPdf<
+  TData = Awaited<ReturnType<typeof getApiInvoicesGetPdf>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiInvoicesGetPdfParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiInvoicesGetPdf>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get invoice pdf
+ */
+
+export function useGetApiInvoicesGetPdf<
+  TData = Awaited<ReturnType<typeof getApiInvoicesGetPdf>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiInvoicesGetPdfParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiInvoicesGetPdf>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiInvoicesGetPdfQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Get invoice details
+ */
+export const getApiInvoicesGet = (
+  params?: GetApiInvoicesGetParams,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<InvoiceDetailDtoIDataResult>(
+    { url: `/api/invoices/get`, method: "GET", params, signal },
+    options,
+  );
+};
+
+export const getGetApiInvoicesGetQueryKey = (
+  params?: GetApiInvoicesGetParams,
+) => {
+  return [`/api/invoices/get`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetApiInvoicesGetQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiInvoicesGet>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiInvoicesGetParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiInvoicesGet>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetApiInvoicesGetQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiInvoicesGet>>
+  > = ({ signal }) => getApiInvoicesGet(params, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    staleTime: 10000,
+    refetchOnWindowFocus: false,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiInvoicesGet>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiInvoicesGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiInvoicesGet>>
+>;
+export type GetApiInvoicesGetQueryError = ResultMessage[] | void;
+
+export function useGetApiInvoicesGet<
+  TData = Awaited<ReturnType<typeof getApiInvoicesGet>>,
+  TError = ResultMessage[] | void,
+>(
+  params: undefined | GetApiInvoicesGetParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiInvoicesGet>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiInvoicesGet>>,
+          TError,
+          Awaited<ReturnType<typeof getApiInvoicesGet>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiInvoicesGet<
+  TData = Awaited<ReturnType<typeof getApiInvoicesGet>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiInvoicesGetParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiInvoicesGet>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiInvoicesGet>>,
+          TError,
+          Awaited<ReturnType<typeof getApiInvoicesGet>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiInvoicesGet<
+  TData = Awaited<ReturnType<typeof getApiInvoicesGet>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiInvoicesGetParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiInvoicesGet>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get invoice details
+ */
+
+export function useGetApiInvoicesGet<
+  TData = Awaited<ReturnType<typeof getApiInvoicesGet>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiInvoicesGetParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiInvoicesGet>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiInvoicesGetQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Change invoice status
+ */
+export const postApiInvoicesChangeStatus = (
+  changeInvoiceStatusCommandRequest: ChangeInvoiceStatusCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<SuccessResult>(
+    {
+      url: `/api/invoices/change-status`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: changeInvoiceStatusCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiInvoicesChangeStatusMutationOptions = <
+  TError = ResultMessage[] | void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiInvoicesChangeStatus>>,
+    TError,
+    { data: ChangeInvoiceStatusCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiInvoicesChangeStatus>>,
+  TError,
+  { data: ChangeInvoiceStatusCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiInvoicesChangeStatus"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiInvoicesChangeStatus>>,
+    { data: ChangeInvoiceStatusCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiInvoicesChangeStatus(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiInvoicesChangeStatusMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiInvoicesChangeStatus>>
+>;
+export type PostApiInvoicesChangeStatusMutationBody =
+  ChangeInvoiceStatusCommandRequest;
+export type PostApiInvoicesChangeStatusMutationError = ResultMessage[] | void;
+
+/**
+ * @summary Change invoice status
+ */
+export const usePostApiInvoicesChangeStatus = <
+  TError = ResultMessage[] | void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiInvoicesChangeStatus>>,
+      TError,
+      { data: ChangeInvoiceStatusCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiInvoicesChangeStatus>>,
+  TError,
+  { data: ChangeInvoiceStatusCommandRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiInvoicesChangeStatusMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Get all invoices
+ */
+export const getApiInvoicesList = (
+  params?: GetApiInvoicesListParams,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<InvoiceDtoListPaginatedResult>(
+    { url: `/api/invoices/list`, method: "GET", params, signal },
+    options,
+  );
+};
+
+export const getGetApiInvoicesListQueryKey = (
+  params?: GetApiInvoicesListParams,
+) => {
+  return [`/api/invoices/list`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetApiInvoicesListQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiInvoicesList>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiInvoicesListParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiInvoicesList>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetApiInvoicesListQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiInvoicesList>>
+  > = ({ signal }) => getApiInvoicesList(params, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    staleTime: 10000,
+    refetchOnWindowFocus: false,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiInvoicesList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiInvoicesListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiInvoicesList>>
+>;
+export type GetApiInvoicesListQueryError = ResultMessage[] | void;
+
+export function useGetApiInvoicesList<
+  TData = Awaited<ReturnType<typeof getApiInvoicesList>>,
+  TError = ResultMessage[] | void,
+>(
+  params: undefined | GetApiInvoicesListParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiInvoicesList>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiInvoicesList>>,
+          TError,
+          Awaited<ReturnType<typeof getApiInvoicesList>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiInvoicesList<
+  TData = Awaited<ReturnType<typeof getApiInvoicesList>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiInvoicesListParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiInvoicesList>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiInvoicesList>>,
+          TError,
+          Awaited<ReturnType<typeof getApiInvoicesList>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiInvoicesList<
+  TData = Awaited<ReturnType<typeof getApiInvoicesList>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiInvoicesListParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiInvoicesList>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get all invoices
+ */
+
+export function useGetApiInvoicesList<
+  TData = Awaited<ReturnType<typeof getApiInvoicesList>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiInvoicesListParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiInvoicesList>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiInvoicesListQueryOptions(params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
@@ -4356,7 +5472,7 @@ export const getGetApiLanguagesQueryKey = () => {
 
 export const getGetApiLanguagesQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiLanguages>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(options?: {
   query?: Partial<
     UseQueryOptions<Awaited<ReturnType<typeof getApiLanguages>>, TError, TData>
@@ -4387,11 +5503,11 @@ export const getGetApiLanguagesQueryOptions = <
 export type GetApiLanguagesQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiLanguages>>
 >;
-export type GetApiLanguagesQueryError = string[] | void;
+export type GetApiLanguagesQueryError = ResultMessage[] | void;
 
 export function useGetApiLanguages<
   TData = Awaited<ReturnType<typeof getApiLanguages>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   options: {
     query: Partial<
@@ -4417,7 +5533,7 @@ export function useGetApiLanguages<
 };
 export function useGetApiLanguages<
   TData = Awaited<ReturnType<typeof getApiLanguages>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   options?: {
     query?: Partial<
@@ -4443,7 +5559,7 @@ export function useGetApiLanguages<
 };
 export function useGetApiLanguages<
   TData = Awaited<ReturnType<typeof getApiLanguages>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   options?: {
     query?: Partial<
@@ -4465,7 +5581,7 @@ export function useGetApiLanguages<
 
 export function useGetApiLanguages<
   TData = Awaited<ReturnType<typeof getApiLanguages>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   options?: {
     query?: Partial<
@@ -4514,7 +5630,7 @@ export const getGetApiLanguagesIdQueryKey = (id: ObjectId) => {
 
 export const getGetApiLanguagesIdQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiLanguagesId>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   id: ObjectId,
   options?: {
@@ -4553,11 +5669,11 @@ export const getGetApiLanguagesIdQueryOptions = <
 export type GetApiLanguagesIdQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiLanguagesId>>
 >;
-export type GetApiLanguagesIdQueryError = string[] | void;
+export type GetApiLanguagesIdQueryError = ResultMessage[] | void;
 
 export function useGetApiLanguagesId<
   TData = Awaited<ReturnType<typeof getApiLanguagesId>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   id: ObjectId,
   options: {
@@ -4584,7 +5700,7 @@ export function useGetApiLanguagesId<
 };
 export function useGetApiLanguagesId<
   TData = Awaited<ReturnType<typeof getApiLanguagesId>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   id: ObjectId,
   options?: {
@@ -4611,7 +5727,7 @@ export function useGetApiLanguagesId<
 };
 export function useGetApiLanguagesId<
   TData = Awaited<ReturnType<typeof getApiLanguagesId>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   id: ObjectId,
   options?: {
@@ -4634,7 +5750,7 @@ export function useGetApiLanguagesId<
 
 export function useGetApiLanguagesId<
   TData = Awaited<ReturnType<typeof getApiLanguagesId>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   id: ObjectId,
   options?: {
@@ -4677,7 +5793,7 @@ export const deleteApiLanguagesId = (
 };
 
 export const getDeleteApiLanguagesIdMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -4718,13 +5834,13 @@ export type DeleteApiLanguagesIdMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteApiLanguagesId>>
 >;
 
-export type DeleteApiLanguagesIdMutationError = string[] | void;
+export type DeleteApiLanguagesIdMutationError = ResultMessage[] | void;
 
 /**
  * @summary Delete Language.
  */
 export const useDeleteApiLanguagesId = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -4769,7 +5885,7 @@ export const postApiLanguagesAdd = (
 };
 
 export const getPostApiLanguagesAddMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -4810,13 +5926,13 @@ export type PostApiLanguagesAddMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiLanguagesAdd>>
 >;
 export type PostApiLanguagesAddMutationBody = CreateLanguageCommand;
-export type PostApiLanguagesAddMutationError = string[] | void;
+export type PostApiLanguagesAddMutationError = ResultMessage[] | void;
 
 /**
  * @summary Add Language.
  */
 export const usePostApiLanguagesAdd = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -4861,7 +5977,7 @@ export const postApiLanguagesUpdate = (
 };
 
 export const getPostApiLanguagesUpdateMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -4902,13 +6018,13 @@ export type PostApiLanguagesUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiLanguagesUpdate>>
 >;
 export type PostApiLanguagesUpdateMutationBody = UpdateLanguageCommand;
-export type PostApiLanguagesUpdateMutationError = string[] | void;
+export type PostApiLanguagesUpdateMutationError = ResultMessage[] | void;
 
 /**
  * @summary Update Language.
  */
 export const usePostApiLanguagesUpdate = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -4953,7 +6069,7 @@ export const postApiLicensesCreate = (
 };
 
 export const getPostApiLicensesCreateMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -4994,13 +6110,13 @@ export type PostApiLicensesCreateMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiLicensesCreate>>
 >;
 export type PostApiLicensesCreateMutationBody = CreateLicenseCommandRequest;
-export type PostApiLicensesCreateMutationError = string[] | void;
+export type PostApiLicensesCreateMutationError = ResultMessage[] | void;
 
 /**
  * @summary Create a license
  */
 export const usePostApiLicensesCreate = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -5045,7 +6161,7 @@ export const postApiLicensesAddTransaction = (
 };
 
 export const getPostApiLicensesAddTransactionMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -5087,13 +6203,13 @@ export type PostApiLicensesAddTransactionMutationResult = NonNullable<
 >;
 export type PostApiLicensesAddTransactionMutationBody =
   AddTransactionToLicenseCommandRequest;
-export type PostApiLicensesAddTransactionMutationError = string[] | void;
+export type PostApiLicensesAddTransactionMutationError = ResultMessage[] | void;
 
 /**
  * @summary Add a transaction to the license
  */
 export const usePostApiLicensesAddTransaction = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -5119,6 +6235,369 @@ export const usePostApiLicensesAddTransaction = <
 };
 
 /**
+ * @summary Get license invoice pdf
+ */
+export const getApiLicensesGetInvoicePdf = (
+  params?: GetApiLicensesGetInvoicePdfParams,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<Blob>(
+    {
+      url: `/api/licenses/get-invoice-pdf`,
+      method: "GET",
+      params,
+      responseType: "blob",
+      signal,
+    },
+    options,
+  );
+};
+
+export const getGetApiLicensesGetInvoicePdfQueryKey = (
+  params?: GetApiLicensesGetInvoicePdfParams,
+) => {
+  return [
+    `/api/licenses/get-invoice-pdf`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetApiLicensesGetInvoicePdfQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiLicensesGetInvoicePdf>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiLicensesGetInvoicePdfParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiLicensesGetInvoicePdf>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetApiLicensesGetInvoicePdfQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiLicensesGetInvoicePdf>>
+  > = ({ signal }) =>
+    getApiLicensesGetInvoicePdf(params, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    staleTime: 10000,
+    refetchOnWindowFocus: false,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiLicensesGetInvoicePdf>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiLicensesGetInvoicePdfQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiLicensesGetInvoicePdf>>
+>;
+export type GetApiLicensesGetInvoicePdfQueryError = ResultMessage[] | void;
+
+export function useGetApiLicensesGetInvoicePdf<
+  TData = Awaited<ReturnType<typeof getApiLicensesGetInvoicePdf>>,
+  TError = ResultMessage[] | void,
+>(
+  params: undefined | GetApiLicensesGetInvoicePdfParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiLicensesGetInvoicePdf>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiLicensesGetInvoicePdf>>,
+          TError,
+          Awaited<ReturnType<typeof getApiLicensesGetInvoicePdf>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiLicensesGetInvoicePdf<
+  TData = Awaited<ReturnType<typeof getApiLicensesGetInvoicePdf>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiLicensesGetInvoicePdfParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiLicensesGetInvoicePdf>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiLicensesGetInvoicePdf>>,
+          TError,
+          Awaited<ReturnType<typeof getApiLicensesGetInvoicePdf>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiLicensesGetInvoicePdf<
+  TData = Awaited<ReturnType<typeof getApiLicensesGetInvoicePdf>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiLicensesGetInvoicePdfParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiLicensesGetInvoicePdf>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get license invoice pdf
+ */
+
+export function useGetApiLicensesGetInvoicePdf<
+  TData = Awaited<ReturnType<typeof getApiLicensesGetInvoicePdf>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiLicensesGetInvoicePdfParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiLicensesGetInvoicePdf>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiLicensesGetInvoicePdfQueryOptions(
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Get license invoice details
+ */
+export const getApiLicensesGetInvoiceDetails = (
+  params?: GetApiLicensesGetInvoiceDetailsParams,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<InvoiceIDataResult>(
+    { url: `/api/licenses/get-invoice-details`, method: "GET", params, signal },
+    options,
+  );
+};
+
+export const getGetApiLicensesGetInvoiceDetailsQueryKey = (
+  params?: GetApiLicensesGetInvoiceDetailsParams,
+) => {
+  return [
+    `/api/licenses/get-invoice-details`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetApiLicensesGetInvoiceDetailsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiLicensesGetInvoiceDetails>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiLicensesGetInvoiceDetailsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiLicensesGetInvoiceDetails>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetApiLicensesGetInvoiceDetailsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiLicensesGetInvoiceDetails>>
+  > = ({ signal }) =>
+    getApiLicensesGetInvoiceDetails(params, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    staleTime: 10000,
+    refetchOnWindowFocus: false,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiLicensesGetInvoiceDetails>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiLicensesGetInvoiceDetailsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiLicensesGetInvoiceDetails>>
+>;
+export type GetApiLicensesGetInvoiceDetailsQueryError = ResultMessage[] | void;
+
+export function useGetApiLicensesGetInvoiceDetails<
+  TData = Awaited<ReturnType<typeof getApiLicensesGetInvoiceDetails>>,
+  TError = ResultMessage[] | void,
+>(
+  params: undefined | GetApiLicensesGetInvoiceDetailsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiLicensesGetInvoiceDetails>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiLicensesGetInvoiceDetails>>,
+          TError,
+          Awaited<ReturnType<typeof getApiLicensesGetInvoiceDetails>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiLicensesGetInvoiceDetails<
+  TData = Awaited<ReturnType<typeof getApiLicensesGetInvoiceDetails>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiLicensesGetInvoiceDetailsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiLicensesGetInvoiceDetails>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiLicensesGetInvoiceDetails>>,
+          TError,
+          Awaited<ReturnType<typeof getApiLicensesGetInvoiceDetails>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiLicensesGetInvoiceDetails<
+  TData = Awaited<ReturnType<typeof getApiLicensesGetInvoiceDetails>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiLicensesGetInvoiceDetailsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiLicensesGetInvoiceDetails>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get license invoice details
+ */
+
+export function useGetApiLicensesGetInvoiceDetails<
+  TData = Awaited<ReturnType<typeof getApiLicensesGetInvoiceDetails>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiLicensesGetInvoiceDetailsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiLicensesGetInvoiceDetails>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiLicensesGetInvoiceDetailsQueryOptions(
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
  * @summary Change license status
  */
 export const postApiLicensesChangeStatus = (
@@ -5139,7 +6618,7 @@ export const postApiLicensesChangeStatus = (
 };
 
 export const getPostApiLicensesChangeStatusMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -5181,13 +6660,13 @@ export type PostApiLicensesChangeStatusMutationResult = NonNullable<
 >;
 export type PostApiLicensesChangeStatusMutationBody =
   ChangeLicenseStatusCommandRequest;
-export type PostApiLicensesChangeStatusMutationError = string[] | void;
+export type PostApiLicensesChangeStatusMutationError = ResultMessage[] | void;
 
 /**
  * @summary Change license status
  */
 export const usePostApiLicensesChangeStatus = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -5226,7 +6705,7 @@ export const deleteApiLicensesDelete = (
 };
 
 export const getDeleteApiLicensesDeleteMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -5267,13 +6746,13 @@ export type DeleteApiLicensesDeleteMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteApiLicensesDelete>>
 >;
 
-export type DeleteApiLicensesDeleteMutationError = string[] | void;
+export type DeleteApiLicensesDeleteMutationError = ResultMessage[] | void;
 
 /**
  * @summary Delete a license
  */
 export const useDeleteApiLicensesDelete = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -5319,7 +6798,7 @@ export const getGetApiLicensesListQueryKey = (
 
 export const getGetApiLicensesListQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiLicensesList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiLicensesListParams,
   options?: {
@@ -5358,11 +6837,11 @@ export const getGetApiLicensesListQueryOptions = <
 export type GetApiLicensesListQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiLicensesList>>
 >;
-export type GetApiLicensesListQueryError = string[] | void;
+export type GetApiLicensesListQueryError = ResultMessage[] | void;
 
 export function useGetApiLicensesList<
   TData = Awaited<ReturnType<typeof getApiLicensesList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params: undefined | GetApiLicensesListParams,
   options: {
@@ -5389,7 +6868,7 @@ export function useGetApiLicensesList<
 };
 export function useGetApiLicensesList<
   TData = Awaited<ReturnType<typeof getApiLicensesList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiLicensesListParams,
   options?: {
@@ -5416,7 +6895,7 @@ export function useGetApiLicensesList<
 };
 export function useGetApiLicensesList<
   TData = Awaited<ReturnType<typeof getApiLicensesList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiLicensesListParams,
   options?: {
@@ -5439,7 +6918,7 @@ export function useGetApiLicensesList<
 
 export function useGetApiLicensesList<
   TData = Awaited<ReturnType<typeof getApiLicensesList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiLicensesListParams,
   options?: {
@@ -5490,7 +6969,7 @@ export const getGetApiLicensesGetQueryKey = (
 
 export const getGetApiLicensesGetQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiLicensesGet>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiLicensesGetParams,
   options?: {
@@ -5529,11 +7008,11 @@ export const getGetApiLicensesGetQueryOptions = <
 export type GetApiLicensesGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiLicensesGet>>
 >;
-export type GetApiLicensesGetQueryError = string[] | void;
+export type GetApiLicensesGetQueryError = ResultMessage[] | void;
 
 export function useGetApiLicensesGet<
   TData = Awaited<ReturnType<typeof getApiLicensesGet>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params: undefined | GetApiLicensesGetParams,
   options: {
@@ -5560,7 +7039,7 @@ export function useGetApiLicensesGet<
 };
 export function useGetApiLicensesGet<
   TData = Awaited<ReturnType<typeof getApiLicensesGet>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiLicensesGetParams,
   options?: {
@@ -5587,7 +7066,7 @@ export function useGetApiLicensesGet<
 };
 export function useGetApiLicensesGet<
   TData = Awaited<ReturnType<typeof getApiLicensesGet>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiLicensesGetParams,
   options?: {
@@ -5610,7 +7089,7 @@ export function useGetApiLicensesGet<
 
 export function useGetApiLicensesGet<
   TData = Awaited<ReturnType<typeof getApiLicensesGet>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiLicensesGetParams,
   options?: {
@@ -5640,7 +7119,6 @@ export function useGetApiLicensesGet<
 }
 
 /**
- * bla bla bla AuditLogs
  * @summary List AuditLogs
  */
 export const getApiLogs = (
@@ -5659,7 +7137,7 @@ export const getGetApiLogsQueryKey = () => {
 
 export const getGetApiLogsQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiLogs>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(options?: {
   query?: Partial<
     UseQueryOptions<Awaited<ReturnType<typeof getApiLogs>>, TError, TData>
@@ -5690,11 +7168,11 @@ export const getGetApiLogsQueryOptions = <
 export type GetApiLogsQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiLogs>>
 >;
-export type GetApiLogsQueryError = string[] | void;
+export type GetApiLogsQueryError = ResultMessage[] | void;
 
 export function useGetApiLogs<
   TData = Awaited<ReturnType<typeof getApiLogs>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   options: {
     query: Partial<
@@ -5716,7 +7194,7 @@ export function useGetApiLogs<
 };
 export function useGetApiLogs<
   TData = Awaited<ReturnType<typeof getApiLogs>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   options?: {
     query?: Partial<
@@ -5738,7 +7216,7 @@ export function useGetApiLogs<
 };
 export function useGetApiLogs<
   TData = Awaited<ReturnType<typeof getApiLogs>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   options?: {
     query?: Partial<
@@ -5756,7 +7234,7 @@ export function useGetApiLogs<
 
 export function useGetApiLogs<
   TData = Awaited<ReturnType<typeof getApiLogs>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   options?: {
     query?: Partial<
@@ -5769,6 +7247,734 @@ export function useGetApiLogs<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetApiLogsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Get total income statistics
+ */
+export const getApiStatisticsGetTotalIncome = (
+  params?: GetApiStatisticsGetTotalIncomeParams,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<StatisticsDecimalResultIDataResult>(
+    { url: `/api/statistics/get-total-income`, method: "GET", params, signal },
+    options,
+  );
+};
+
+export const getGetApiStatisticsGetTotalIncomeQueryKey = (
+  params?: GetApiStatisticsGetTotalIncomeParams,
+) => {
+  return [
+    `/api/statistics/get-total-income`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetApiStatisticsGetTotalIncomeQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalIncome>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiStatisticsGetTotalIncomeParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsGetTotalIncome>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetApiStatisticsGetTotalIncomeQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiStatisticsGetTotalIncome>>
+  > = ({ signal }) =>
+    getApiStatisticsGetTotalIncome(params, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    staleTime: 10000,
+    refetchOnWindowFocus: false,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiStatisticsGetTotalIncome>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiStatisticsGetTotalIncomeQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiStatisticsGetTotalIncome>>
+>;
+export type GetApiStatisticsGetTotalIncomeQueryError = ResultMessage[] | void;
+
+export function useGetApiStatisticsGetTotalIncome<
+  TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalIncome>>,
+  TError = ResultMessage[] | void,
+>(
+  params: undefined | GetApiStatisticsGetTotalIncomeParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsGetTotalIncome>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiStatisticsGetTotalIncome>>,
+          TError,
+          Awaited<ReturnType<typeof getApiStatisticsGetTotalIncome>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiStatisticsGetTotalIncome<
+  TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalIncome>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiStatisticsGetTotalIncomeParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsGetTotalIncome>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiStatisticsGetTotalIncome>>,
+          TError,
+          Awaited<ReturnType<typeof getApiStatisticsGetTotalIncome>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiStatisticsGetTotalIncome<
+  TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalIncome>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiStatisticsGetTotalIncomeParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsGetTotalIncome>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get total income statistics
+ */
+
+export function useGetApiStatisticsGetTotalIncome<
+  TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalIncome>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiStatisticsGetTotalIncomeParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsGetTotalIncome>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiStatisticsGetTotalIncomeQueryOptions(
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Get total active licenses statistics
+ */
+export const getApiStatisticsGetTotalActiveLicenses = (
+  params?: GetApiStatisticsGetTotalActiveLicensesParams,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<StatisticsResultIDataResult>(
+    {
+      url: `/api/statistics/get-total-active-licenses`,
+      method: "GET",
+      params,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getGetApiStatisticsGetTotalActiveLicensesQueryKey = (
+  params?: GetApiStatisticsGetTotalActiveLicensesParams,
+) => {
+  return [
+    `/api/statistics/get-total-active-licenses`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetApiStatisticsGetTotalActiveLicensesQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveLicenses>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiStatisticsGetTotalActiveLicensesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveLicenses>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetApiStatisticsGetTotalActiveLicensesQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveLicenses>>
+  > = ({ signal }) =>
+    getApiStatisticsGetTotalActiveLicenses(params, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    staleTime: 10000,
+    refetchOnWindowFocus: false,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveLicenses>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiStatisticsGetTotalActiveLicensesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveLicenses>>
+>;
+export type GetApiStatisticsGetTotalActiveLicensesQueryError =
+  | ResultMessage[]
+  | void;
+
+export function useGetApiStatisticsGetTotalActiveLicenses<
+  TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveLicenses>>,
+  TError = ResultMessage[] | void,
+>(
+  params: undefined | GetApiStatisticsGetTotalActiveLicensesParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveLicenses>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveLicenses>>,
+          TError,
+          Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveLicenses>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiStatisticsGetTotalActiveLicenses<
+  TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveLicenses>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiStatisticsGetTotalActiveLicensesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveLicenses>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveLicenses>>,
+          TError,
+          Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveLicenses>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiStatisticsGetTotalActiveLicenses<
+  TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveLicenses>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiStatisticsGetTotalActiveLicensesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveLicenses>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get total active licenses statistics
+ */
+
+export function useGetApiStatisticsGetTotalActiveLicenses<
+  TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveLicenses>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiStatisticsGetTotalActiveLicensesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveLicenses>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiStatisticsGetTotalActiveLicensesQueryOptions(
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Get total active accounts statistics
+ */
+export const getApiStatisticsGetTotalActiveAccounts = (
+  params?: GetApiStatisticsGetTotalActiveAccountsParams,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<StatisticsResultIDataResult>(
+    {
+      url: `/api/statistics/get-total-active-accounts`,
+      method: "GET",
+      params,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getGetApiStatisticsGetTotalActiveAccountsQueryKey = (
+  params?: GetApiStatisticsGetTotalActiveAccountsParams,
+) => {
+  return [
+    `/api/statistics/get-total-active-accounts`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetApiStatisticsGetTotalActiveAccountsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveAccounts>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiStatisticsGetTotalActiveAccountsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveAccounts>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetApiStatisticsGetTotalActiveAccountsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveAccounts>>
+  > = ({ signal }) =>
+    getApiStatisticsGetTotalActiveAccounts(params, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    staleTime: 10000,
+    refetchOnWindowFocus: false,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveAccounts>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiStatisticsGetTotalActiveAccountsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveAccounts>>
+>;
+export type GetApiStatisticsGetTotalActiveAccountsQueryError =
+  | ResultMessage[]
+  | void;
+
+export function useGetApiStatisticsGetTotalActiveAccounts<
+  TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveAccounts>>,
+  TError = ResultMessage[] | void,
+>(
+  params: undefined | GetApiStatisticsGetTotalActiveAccountsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveAccounts>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveAccounts>>,
+          TError,
+          Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveAccounts>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiStatisticsGetTotalActiveAccounts<
+  TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveAccounts>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiStatisticsGetTotalActiveAccountsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveAccounts>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveAccounts>>,
+          TError,
+          Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveAccounts>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiStatisticsGetTotalActiveAccounts<
+  TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveAccounts>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiStatisticsGetTotalActiveAccountsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveAccounts>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get total active accounts statistics
+ */
+
+export function useGetApiStatisticsGetTotalActiveAccounts<
+  TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveAccounts>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiStatisticsGetTotalActiveAccountsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveAccounts>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiStatisticsGetTotalActiveAccountsQueryOptions(
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Get total chats statistics
+ */
+export const getApiStatisticsGetTotalChats = (
+  params?: GetApiStatisticsGetTotalChatsParams,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<StatisticsResultIDataResult>(
+    { url: `/api/statistics/get-total-chats`, method: "GET", params, signal },
+    options,
+  );
+};
+
+export const getGetApiStatisticsGetTotalChatsQueryKey = (
+  params?: GetApiStatisticsGetTotalChatsParams,
+) => {
+  return [
+    `/api/statistics/get-total-chats`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetApiStatisticsGetTotalChatsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalChats>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiStatisticsGetTotalChatsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsGetTotalChats>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetApiStatisticsGetTotalChatsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiStatisticsGetTotalChats>>
+  > = ({ signal }) =>
+    getApiStatisticsGetTotalChats(params, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    staleTime: 10000,
+    refetchOnWindowFocus: false,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiStatisticsGetTotalChats>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiStatisticsGetTotalChatsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiStatisticsGetTotalChats>>
+>;
+export type GetApiStatisticsGetTotalChatsQueryError = ResultMessage[] | void;
+
+export function useGetApiStatisticsGetTotalChats<
+  TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalChats>>,
+  TError = ResultMessage[] | void,
+>(
+  params: undefined | GetApiStatisticsGetTotalChatsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsGetTotalChats>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiStatisticsGetTotalChats>>,
+          TError,
+          Awaited<ReturnType<typeof getApiStatisticsGetTotalChats>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiStatisticsGetTotalChats<
+  TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalChats>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiStatisticsGetTotalChatsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsGetTotalChats>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiStatisticsGetTotalChats>>,
+          TError,
+          Awaited<ReturnType<typeof getApiStatisticsGetTotalChats>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiStatisticsGetTotalChats<
+  TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalChats>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiStatisticsGetTotalChatsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsGetTotalChats>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get total chats statistics
+ */
+
+export function useGetApiStatisticsGetTotalChats<
+  TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalChats>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiStatisticsGetTotalChatsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiStatisticsGetTotalChats>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiStatisticsGetTotalChatsQueryOptions(
+    params,
+    options,
+  );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
@@ -5801,7 +8007,7 @@ export const postApiSubscriptionsCreate = (
 };
 
 export const getPostApiSubscriptionsCreateMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -5843,13 +8049,13 @@ export type PostApiSubscriptionsCreateMutationResult = NonNullable<
 >;
 export type PostApiSubscriptionsCreateMutationBody =
   CreateSubscriptionCommandRequest;
-export type PostApiSubscriptionsCreateMutationError = string[] | void;
+export type PostApiSubscriptionsCreateMutationError = ResultMessage[] | void;
 
 /**
  * @summary Create a subscription
  */
 export const usePostApiSubscriptionsCreate = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -5894,7 +8100,7 @@ export const postApiSubscriptionsUpdate = (
 };
 
 export const getPostApiSubscriptionsUpdateMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -5936,13 +8142,13 @@ export type PostApiSubscriptionsUpdateMutationResult = NonNullable<
 >;
 export type PostApiSubscriptionsUpdateMutationBody =
   UpdateSubscriptionCommandRequest;
-export type PostApiSubscriptionsUpdateMutationError = string[] | void;
+export type PostApiSubscriptionsUpdateMutationError = ResultMessage[] | void;
 
 /**
  * @summary Update a subscription
  */
 export const usePostApiSubscriptionsUpdate = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -5980,7 +8186,7 @@ export const deleteApiSubscriptionsDelete = (
 };
 
 export const getDeleteApiSubscriptionsDeleteMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -6021,13 +8227,13 @@ export type DeleteApiSubscriptionsDeleteMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteApiSubscriptionsDelete>>
 >;
 
-export type DeleteApiSubscriptionsDeleteMutationError = string[] | void;
+export type DeleteApiSubscriptionsDeleteMutationError = ResultMessage[] | void;
 
 /**
  * @summary Delete a subscription
  */
 export const useDeleteApiSubscriptionsDelete = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -6074,7 +8280,7 @@ export const getGetApiSubscriptionsGetQueryKey = (
 
 export const getGetApiSubscriptionsGetQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiSubscriptionsGet>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiSubscriptionsGetParams,
   options?: {
@@ -6113,11 +8319,11 @@ export const getGetApiSubscriptionsGetQueryOptions = <
 export type GetApiSubscriptionsGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiSubscriptionsGet>>
 >;
-export type GetApiSubscriptionsGetQueryError = string[] | void;
+export type GetApiSubscriptionsGetQueryError = ResultMessage[] | void;
 
 export function useGetApiSubscriptionsGet<
   TData = Awaited<ReturnType<typeof getApiSubscriptionsGet>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params: undefined | GetApiSubscriptionsGetParams,
   options: {
@@ -6144,7 +8350,7 @@ export function useGetApiSubscriptionsGet<
 };
 export function useGetApiSubscriptionsGet<
   TData = Awaited<ReturnType<typeof getApiSubscriptionsGet>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiSubscriptionsGetParams,
   options?: {
@@ -6171,7 +8377,7 @@ export function useGetApiSubscriptionsGet<
 };
 export function useGetApiSubscriptionsGet<
   TData = Awaited<ReturnType<typeof getApiSubscriptionsGet>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiSubscriptionsGetParams,
   options?: {
@@ -6194,7 +8400,7 @@ export function useGetApiSubscriptionsGet<
 
 export function useGetApiSubscriptionsGet<
   TData = Awaited<ReturnType<typeof getApiSubscriptionsGet>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiSubscriptionsGetParams,
   options?: {
@@ -6242,7 +8448,7 @@ export const getGetApiSubscriptionsListQueryKey = () => {
 
 export const getGetApiSubscriptionsListQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiSubscriptionsList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(options?: {
   query?: Partial<
     UseQueryOptions<
@@ -6278,11 +8484,11 @@ export const getGetApiSubscriptionsListQueryOptions = <
 export type GetApiSubscriptionsListQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiSubscriptionsList>>
 >;
-export type GetApiSubscriptionsListQueryError = string[] | void;
+export type GetApiSubscriptionsListQueryError = ResultMessage[] | void;
 
 export function useGetApiSubscriptionsList<
   TData = Awaited<ReturnType<typeof getApiSubscriptionsList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   options: {
     query: Partial<
@@ -6308,7 +8514,7 @@ export function useGetApiSubscriptionsList<
 };
 export function useGetApiSubscriptionsList<
   TData = Awaited<ReturnType<typeof getApiSubscriptionsList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   options?: {
     query?: Partial<
@@ -6334,7 +8540,7 @@ export function useGetApiSubscriptionsList<
 };
 export function useGetApiSubscriptionsList<
   TData = Awaited<ReturnType<typeof getApiSubscriptionsList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   options?: {
     query?: Partial<
@@ -6356,7 +8562,7 @@ export function useGetApiSubscriptionsList<
 
 export function useGetApiSubscriptionsList<
   TData = Awaited<ReturnType<typeof getApiSubscriptionsList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   options?: {
     query?: Partial<
@@ -6405,7 +8611,7 @@ export const postApiTicketsCreate = (
 };
 
 export const getPostApiTicketsCreateMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -6446,13 +8652,13 @@ export type PostApiTicketsCreateMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiTicketsCreate>>
 >;
 export type PostApiTicketsCreateMutationBody = CreateTicketCommandRequest;
-export type PostApiTicketsCreateMutationError = string[] | void;
+export type PostApiTicketsCreateMutationError = ResultMessage[] | void;
 
 /**
  * @summary Create a ticket
  */
 export const usePostApiTicketsCreate = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -6497,7 +8703,7 @@ export const postApiTicketsAddMessage = (
 };
 
 export const getPostApiTicketsAddMessageMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -6539,13 +8745,13 @@ export type PostApiTicketsAddMessageMutationResult = NonNullable<
 >;
 export type PostApiTicketsAddMessageMutationBody =
   AddMessageToTicketCommandRequest;
-export type PostApiTicketsAddMessageMutationError = string[] | void;
+export type PostApiTicketsAddMessageMutationError = ResultMessage[] | void;
 
 /**
  * @summary Add a message to the ticket
  */
 export const usePostApiTicketsAddMessage = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -6590,7 +8796,7 @@ export const postApiTicketsChangeStatus = (
 };
 
 export const getPostApiTicketsChangeStatusMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -6632,13 +8838,13 @@ export type PostApiTicketsChangeStatusMutationResult = NonNullable<
 >;
 export type PostApiTicketsChangeStatusMutationBody =
   ChangeTicketStatusCommandRequest;
-export type PostApiTicketsChangeStatusMutationError = string[] | void;
+export type PostApiTicketsChangeStatusMutationError = ResultMessage[] | void;
 
 /**
  * @summary Change ticket status
  */
 export const usePostApiTicketsChangeStatus = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -6676,7 +8882,7 @@ export const deleteApiTicketsDelete = (
 };
 
 export const getDeleteApiTicketsDeleteMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -6717,13 +8923,13 @@ export type DeleteApiTicketsDeleteMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteApiTicketsDelete>>
 >;
 
-export type DeleteApiTicketsDeleteMutationError = string[] | void;
+export type DeleteApiTicketsDeleteMutationError = ResultMessage[] | void;
 
 /**
  * @summary Delete a ticket
  */
 export const useDeleteApiTicketsDelete = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -6769,7 +8975,7 @@ export const getGetApiTicketsListQueryKey = (
 
 export const getGetApiTicketsListQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiTicketsList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiTicketsListParams,
   options?: {
@@ -6808,11 +9014,11 @@ export const getGetApiTicketsListQueryOptions = <
 export type GetApiTicketsListQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiTicketsList>>
 >;
-export type GetApiTicketsListQueryError = string[] | void;
+export type GetApiTicketsListQueryError = ResultMessage[] | void;
 
 export function useGetApiTicketsList<
   TData = Awaited<ReturnType<typeof getApiTicketsList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params: undefined | GetApiTicketsListParams,
   options: {
@@ -6839,7 +9045,7 @@ export function useGetApiTicketsList<
 };
 export function useGetApiTicketsList<
   TData = Awaited<ReturnType<typeof getApiTicketsList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiTicketsListParams,
   options?: {
@@ -6866,7 +9072,7 @@ export function useGetApiTicketsList<
 };
 export function useGetApiTicketsList<
   TData = Awaited<ReturnType<typeof getApiTicketsList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiTicketsListParams,
   options?: {
@@ -6889,7 +9095,7 @@ export function useGetApiTicketsList<
 
 export function useGetApiTicketsList<
   TData = Awaited<ReturnType<typeof getApiTicketsList>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiTicketsListParams,
   options?: {
@@ -6940,7 +9146,7 @@ export const getGetApiTicketsGetQueryKey = (
 
 export const getGetApiTicketsGetQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiTicketsGet>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiTicketsGetParams,
   options?: {
@@ -6979,11 +9185,11 @@ export const getGetApiTicketsGetQueryOptions = <
 export type GetApiTicketsGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiTicketsGet>>
 >;
-export type GetApiTicketsGetQueryError = string[] | void;
+export type GetApiTicketsGetQueryError = ResultMessage[] | void;
 
 export function useGetApiTicketsGet<
   TData = Awaited<ReturnType<typeof getApiTicketsGet>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params: undefined | GetApiTicketsGetParams,
   options: {
@@ -7010,7 +9216,7 @@ export function useGetApiTicketsGet<
 };
 export function useGetApiTicketsGet<
   TData = Awaited<ReturnType<typeof getApiTicketsGet>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiTicketsGetParams,
   options?: {
@@ -7037,7 +9243,7 @@ export function useGetApiTicketsGet<
 };
 export function useGetApiTicketsGet<
   TData = Awaited<ReturnType<typeof getApiTicketsGet>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiTicketsGetParams,
   options?: {
@@ -7060,7 +9266,7 @@ export function useGetApiTicketsGet<
 
 export function useGetApiTicketsGet<
   TData = Awaited<ReturnType<typeof getApiTicketsGet>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   params?: GetApiTicketsGetParams,
   options?: {
@@ -7111,7 +9317,7 @@ export const getGetApiTranslatesLanguagesLanguageQueryKey = (
 
 export const getGetApiTranslatesLanguagesLanguageQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiTranslatesLanguagesLanguage>>,
-  TError = string[],
+  TError = ResultMessage[],
 >(
   language: string,
   options?: {
@@ -7153,11 +9359,11 @@ export const getGetApiTranslatesLanguagesLanguageQueryOptions = <
 export type GetApiTranslatesLanguagesLanguageQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiTranslatesLanguagesLanguage>>
 >;
-export type GetApiTranslatesLanguagesLanguageQueryError = string[];
+export type GetApiTranslatesLanguagesLanguageQueryError = ResultMessage[];
 
 export function useGetApiTranslatesLanguagesLanguage<
   TData = Awaited<ReturnType<typeof getApiTranslatesLanguagesLanguage>>,
-  TError = string[],
+  TError = ResultMessage[],
 >(
   language: string,
   options: {
@@ -7184,7 +9390,7 @@ export function useGetApiTranslatesLanguagesLanguage<
 };
 export function useGetApiTranslatesLanguagesLanguage<
   TData = Awaited<ReturnType<typeof getApiTranslatesLanguagesLanguage>>,
-  TError = string[],
+  TError = ResultMessage[],
 >(
   language: string,
   options?: {
@@ -7211,7 +9417,7 @@ export function useGetApiTranslatesLanguagesLanguage<
 };
 export function useGetApiTranslatesLanguagesLanguage<
   TData = Awaited<ReturnType<typeof getApiTranslatesLanguagesLanguage>>,
-  TError = string[],
+  TError = ResultMessage[],
 >(
   language: string,
   options?: {
@@ -7234,7 +9440,7 @@ export function useGetApiTranslatesLanguagesLanguage<
 
 export function useGetApiTranslatesLanguagesLanguage<
   TData = Awaited<ReturnType<typeof getApiTranslatesLanguagesLanguage>>,
-  TError = string[],
+  TError = ResultMessage[],
 >(
   language: string,
   options?: {
@@ -7287,7 +9493,7 @@ export const getGetApiTranslatesIdQueryKey = (id: ObjectId) => {
 
 export const getGetApiTranslatesIdQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiTranslatesId>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   id: ObjectId,
   options?: {
@@ -7326,11 +9532,11 @@ export const getGetApiTranslatesIdQueryOptions = <
 export type GetApiTranslatesIdQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiTranslatesId>>
 >;
-export type GetApiTranslatesIdQueryError = string[] | void;
+export type GetApiTranslatesIdQueryError = ResultMessage[] | void;
 
 export function useGetApiTranslatesId<
   TData = Awaited<ReturnType<typeof getApiTranslatesId>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   id: ObjectId,
   options: {
@@ -7357,7 +9563,7 @@ export function useGetApiTranslatesId<
 };
 export function useGetApiTranslatesId<
   TData = Awaited<ReturnType<typeof getApiTranslatesId>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   id: ObjectId,
   options?: {
@@ -7384,7 +9590,7 @@ export function useGetApiTranslatesId<
 };
 export function useGetApiTranslatesId<
   TData = Awaited<ReturnType<typeof getApiTranslatesId>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   id: ObjectId,
   options?: {
@@ -7407,7 +9613,7 @@ export function useGetApiTranslatesId<
 
 export function useGetApiTranslatesId<
   TData = Awaited<ReturnType<typeof getApiTranslatesId>>,
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
 >(
   id: ObjectId,
   options?: {
@@ -7450,7 +9656,7 @@ export const deleteApiTranslatesId = (
 };
 
 export const getDeleteApiTranslatesIdMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -7491,13 +9697,13 @@ export type DeleteApiTranslatesIdMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteApiTranslatesId>>
 >;
 
-export type DeleteApiTranslatesIdMutationError = string[] | void;
+export type DeleteApiTranslatesIdMutationError = ResultMessage[] | void;
 
 /**
  * @summary Delete Translate.
  */
 export const useDeleteApiTranslatesId = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -7542,7 +9748,7 @@ export const postApiTranslatesAdd = (
 };
 
 export const getPostApiTranslatesAddMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -7583,13 +9789,13 @@ export type PostApiTranslatesAddMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiTranslatesAdd>>
 >;
 export type PostApiTranslatesAddMutationBody = CreateTranslateCommand;
-export type PostApiTranslatesAddMutationError = string[] | void;
+export type PostApiTranslatesAddMutationError = ResultMessage[] | void;
 
 /**
  * @summary Add Translate.
  */
 export const usePostApiTranslatesAdd = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {
@@ -7634,7 +9840,7 @@ export const postApiTranslatesUpdate = (
 };
 
 export const getPostApiTranslatesUpdateMutationOptions = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -7675,13 +9881,13 @@ export type PostApiTranslatesUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof postApiTranslatesUpdate>>
 >;
 export type PostApiTranslatesUpdateMutationBody = UpdateTranslateCommand;
-export type PostApiTranslatesUpdateMutationError = string[] | void;
+export type PostApiTranslatesUpdateMutationError = ResultMessage[] | void;
 
 /**
  * @summary Update Translate.
  */
 export const usePostApiTranslatesUpdate = <
-  TError = string[] | void,
+  TError = ResultMessage[] | void,
   TContext = unknown,
 >(
   options?: {

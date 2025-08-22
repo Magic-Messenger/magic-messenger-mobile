@@ -21,6 +21,8 @@ export interface LicenseDto {
   /** @nullable */
   subscriptionPlan?: LicenseDtoSubscriptionPlan;
   /** @nullable */
+  invoiceId?: string | null;
+  /** @nullable */
   expirationDate?: string | null;
   createdAt?: string;
 }

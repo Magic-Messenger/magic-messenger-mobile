@@ -21,7 +21,9 @@
     "@tanstack/react-query": "^5.83.0",
     "axios": "^1.10.0",
     "expo": "~53.0.12",
+    "expo-application": "~6.1.5",
     "expo-blur": "~14.1.5",
+    "expo-camera": "~16.1.11",
     "expo-clipboard": "~7.1.5",
     "expo-constants": "~17.1.6",
     "expo-dev-client": "~5.2.1",
@@ -44,6 +46,7 @@
     "react-i18next": "^15.5.3",
     "react-native": "0.79.4",
     "react-native-gesture-handler": "~2.24.0",
+    "react-native-get-random-values": "~1.11.0",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
@@ -51,9 +54,10 @@
     "react-native-toast-message": "^2.3.3",
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5",
+    "tweetnacl": "^1.0.3",
+    "tweetnacl-util": "^0.15.1",
     "zustand": "^5.0.5",
-    "expo-application": "~6.1.5",
-    "expo-camera": "~16.1.11"
+    "expo-crypto": "~14.1.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

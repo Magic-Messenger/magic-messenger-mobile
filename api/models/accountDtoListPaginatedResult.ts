@@ -4,12 +4,13 @@
  * MagicMessenger
  * OpenAPI spec version: v1
  */
+import type { ResultMessage } from "./resultMessage";
 import type { AccountDto } from "./accountDto";
 
 export interface AccountDtoListPaginatedResult {
   success?: boolean;
   /** @nullable */
-  messages?: string[] | null;
+  messages?: ResultMessage[] | null;
   /** @nullable */
   data?: AccountDto[] | null;
   pageNumber?: number;

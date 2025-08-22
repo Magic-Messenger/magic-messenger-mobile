@@ -4,12 +4,13 @@
  * MagicMessenger
  * OpenAPI spec version: v1
  */
+import type { ResultMessage } from "./resultMessage";
 import type { LicenseDto } from "./licenseDto";
 
 export interface LicenseDtoListPaginatedResult {
   success?: boolean;
   /** @nullable */
-  messages?: string[] | null;
+  messages?: ResultMessage[] | null;
   /** @nullable */
   data?: LicenseDto[] | null;
   pageNumber?: number;

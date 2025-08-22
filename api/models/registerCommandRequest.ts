@@ -14,4 +14,8 @@ export interface RegisterCommandRequest {
   confirmPassword?: string | null;
   /** @nullable */
   deviceId?: string | null;
+  /** @nullable */
+  deviceToken?: string | null;
+  /** @nullable */
+  publicKey?: string | null;
 }

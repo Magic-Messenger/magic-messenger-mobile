@@ -13,11 +13,10 @@ export interface TicketDto {
   ticketCode?: string | null;
   /** @nullable */
   subject?: string | null;
-  /** @nullable */
-  content?: string | null;
   ticketStatus?: TicketStatus;
   /** @nullable */
   username?: string | null;
   /** @nullable */
   licenseCode?: string | null;
+  createdAt?: string;
 }

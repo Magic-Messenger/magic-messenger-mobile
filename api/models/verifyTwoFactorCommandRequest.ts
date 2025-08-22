@@ -14,4 +14,6 @@ export interface VerifyTwoFactorCommandRequest {
   deviceId?: string | null;
   /** @nullable */
   code?: string | null;
+  /** @nullable */
+  secretKey?: string | null;
 }

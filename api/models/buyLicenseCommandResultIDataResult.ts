@@ -4,12 +4,13 @@
  * MagicMessenger
  * OpenAPI spec version: v1
  */
+import type { ResultMessage } from "./resultMessage";
 import type { BuyLicenseCommandResultIDataResultData } from "./buyLicenseCommandResultIDataResultData";
 
 export interface BuyLicenseCommandResultIDataResult {
   readonly success?: boolean;
   /** @nullable */
-  messages?: string[] | null;
+  messages?: ResultMessage[] | null;
   /** @nullable */
   readonly data?: BuyLicenseCommandResultIDataResultData;
 }

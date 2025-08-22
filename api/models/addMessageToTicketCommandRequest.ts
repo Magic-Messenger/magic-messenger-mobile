@@ -7,7 +7,7 @@
 
 export interface AddMessageToTicketCommandRequest {
   /** @nullable */
-  id?: string | null;
+  ticketId?: string | null;
   /** @nullable */
   content?: string | null;
 }

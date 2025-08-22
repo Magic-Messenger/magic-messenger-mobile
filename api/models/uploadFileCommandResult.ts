@@ -10,4 +10,7 @@ export interface UploadFileCommandResult {
   fileName?: string | null;
   /** @nullable */
   fileUrl?: string | null;
+  /** @nullable */
+  contentType?: string | null;
+  contentLength?: number;
 }
