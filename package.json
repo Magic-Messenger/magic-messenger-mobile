@@ -9,6 +9,8 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
+    "create-page": "node scripts/create-page.js",
+    "create-component": "node scripts/create-component.js",
     "generate-api": "orval --config orval.config.ts",
     "generate-api:watch": "orval --config orval.config.ts --watch"
   },
