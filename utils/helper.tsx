@@ -68,10 +68,10 @@ export function convertUserId(userID: string | any) {
   return userID?.match(/.{1,4}/g).join("-") ?? "";
 }
 
-export function appSupportLanguages(): Array<{
+export function appSupportLanguages(): {
   label: string;
   value: string | number;
-}> {
+}[] {
   if (process.env?.EXPO_PUBLIC_SUPPORT_LANGUAGES) {
     return process.env?.EXPO_PUBLIC_SUPPORT_LANGUAGES?.split(",")?.map(
       (item) => ({ label: i18n.t(`languages.${item}`), value: item })

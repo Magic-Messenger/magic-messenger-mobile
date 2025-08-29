@@ -13,6 +13,7 @@ import {
   View,
 } from "react-native";
 import { ThemedText } from "../../app/ThemedText";
+import {Icon} from "@/components";
 
 export interface DropdownOption {
   label: string;
@@ -130,7 +131,7 @@ const DropdownComponent = forwardRef<
           >
             {displayText}
           </ThemedText>
-          <Text style={[styles.arrow, !enabled && styles.disabledText]}>▼</Text>
+          <Icon type="feather" name="chevron-down" style={[styles.arrow, !enabled && styles.disabledText]} />
         </TouchableOpacity>
 
         {error && <ThemedText style={styles.errorText}>{error}</ThemedText>}
@@ -181,7 +182,7 @@ export const Dropdown = <
   if (props.control && props.name) {
     return (
       <Controller
-        control={props.control}
+        control={props.control as never}
         name={props.name}
         rules={props.rules}
         render={({ field: { onChange, value }, fieldState: { error } }) => (
@@ -241,7 +242,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   dropdownText: {
-    fontSize: fontPixel(13),
+    fontSize: fontPixel(16),
+    fontFamily: Fonts.SFProMedium,
     color: Colors.white,
     flex: 1,
   },
@@ -249,7 +251,7 @@ const styles = StyleSheet.create({
     color: Colors.textDisabled,
   },
   arrow: {
-    fontSize: fontPixel(12),
+    fontSize: fontPixel(24),
     color: Colors.white,
     marginLeft: spacingPixel(8),
   },

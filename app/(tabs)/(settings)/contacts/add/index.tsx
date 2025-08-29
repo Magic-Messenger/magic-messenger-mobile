@@ -49,7 +49,7 @@ export default function ContactAdd() {
     if (barcode) {
       reset({ username: barcode as string, nickname: nickNameField });
     }
-  }, [barcode, nickNameField]);
+  }, [barcode, nickNameField, reset]);
 
   return (
     <AppLayout
@@ -75,6 +75,9 @@ export default function ContactAdd() {
           control={control}
           name="username"
           label={t("contacts.userName")}
+          autoCorrect={false}
+          autoCapitalize="none"
+          autoComplete="off"
           rules={{
             required: t("inputError.required", {
               field: t("userName"),
@@ -94,6 +97,9 @@ export default function ContactAdd() {
           control={control}
           name="nickname"
           label={t("contacts.nickName")}
+          autoCorrect={false}
+          autoCapitalize="none"
+          autoComplete="off"
           rules={{
             required: t("inputError.required", {
               field: t("contacts.nickName"),

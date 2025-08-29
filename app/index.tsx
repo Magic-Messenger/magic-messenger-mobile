@@ -35,10 +35,13 @@ export default function IndexPage() {
     }, 1000);
   }
 
+
   useEffect(() => {
     setupInterval();
 
-    return () => interval && clearInterval(interval);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, []);
 
   useEffect(() => {

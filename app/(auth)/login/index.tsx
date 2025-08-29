@@ -3,7 +3,7 @@ import {
   AppImage,
   AppLayout,
   Button,
-  Input,
+  Input, PasswordInput,
   SectionHeader,
   ThemedText,
 } from "@/components";
@@ -15,6 +15,7 @@ import { router } from "expo-router";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
+import {useState} from "react";
 
 interface RegisterFormData {
   username: string;
@@ -26,6 +27,8 @@ export default function LoginScreen() {
   const { login, userName } = useUserStore();
   const { mutateAsync: loginApi } = usePostApiAccountLogin();
   const styles = useThemedStyles(createStyle);
+
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
   const {
     control,
@@ -63,7 +66,7 @@ export default function LoginScreen() {
       footer={
         <Button
           type="primary"
-          label={t("register.button")}
+          label={t("login.button")}
           onPress={handleSubmit(onSubmit)}
           loading={isSubmitting}
           disabled={isSubmitting}
@@ -114,25 +117,7 @@ export default function LoginScreen() {
             />
           )}
 
-          <Input
-            control={control}
-            name="password"
-            label={t("password")}
-            secureTextEntry
-            rules={{
-              required: t("inputError.required", {
-                field: t("password"),
-              }),
-              minLength: {
-                value: 8,
-                message: t("inputError.minLength", {
-                  field: t("password"),
-                  count: 8,
-                }),
-              },
-            }}
-            error={errors.password?.message}
-          />
+          <PasswordInput control={control} error={errors.password?.message} />
 
           <View style={styles.forgotAccountContainer}>
             <TouchableOpacity

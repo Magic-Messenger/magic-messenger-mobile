@@ -7,12 +7,22 @@
     "successCopy": "Successfully Copied",
     "cancel": "Cancel",
     "search": "Search",
-    "delete": "Delete"
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "edit": "Edit",
+    "save": "Save",
+    "close": "Close",
+    "ok": "OK",
+    "block": "Block",
+    "unblock": "Unblock",
+    "yes": "Yes",
+    "no": "No"
   },
 
   "login": {
     "title": "Login",
-    "userName": "Hello {{userName}}"
+    "userName": "Hello {{userName}}",
+    "button": "Login"
   },
 
   "register": {
@@ -67,12 +77,15 @@
     "license": "License",
     "settings": "Settings",
     "server": "Servers",
-    "support": "Support"
+    "support": "Support",
+    "logout": "Logout"
   },
 
   "languages": {
-    "tr": "Turkish",
-    "en": "English"
+    "en": "English",
+    "es": "Spanish",
+    "fr": "French",
+    "nl": "Dutch"
   },
 
   "profile": {
@@ -92,6 +105,7 @@
   "contacts": {
     "title": "Contacts",
     "blocked": "Blocked",
+    "allContacts": "All Contacts",
     "addUser": "Add User",
     "yourContacts": "Your Contacts",
     "editContact": "Edit Contact",
@@ -104,10 +118,19 @@
     "successCopyUserName": "Username copied successfully",
     "notFound": "Contact data not found",
     "successAddedContact": "Contact added successfully",
+    "successEditedContact": "Contact updated successfully",
     "deleteContact": "Delete Contact",
     "deleteContactMessageTitle": "Are you sure?",
     "deleteContactMessageMessage": "Once a contact is deleted, it cannot be recovered.",
-    "successDeleteContact": "Contact was deleted successfully"
+    "successDeleteContact": "Contact was deleted successfully",
+    "blockContact": "Block Contact",
+    "unblockContact": "Unblock Contact",
+    "successBlockContact": "Contact was blocked successfully",
+    "successUnblockContact": "Contact was unblocked successfully",
+    "blockContactAlertTitle": "Are you sure to block contact?",
+    "blockContactAlertMessage": "You will no longer receive messages from this contact.",
+    "unblockContactAlertTitle": "Are you sure to unblock contact?",
+    "unblockContactAlertMessage": "You will start receiving messages from this contact."
   },
 
   "barcode": {

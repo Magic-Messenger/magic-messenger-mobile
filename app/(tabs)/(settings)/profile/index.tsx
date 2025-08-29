@@ -40,14 +40,9 @@ export default function ProfileScreen() {
   const [userPassword, setUserPassword] = useState<string | null>(null);
   const [deleteApprove, setDeleteApprove] = useState<boolean>(false);
 
-  const supportLanguages = useMemo(() => {
-    return appSupportLanguages();
-  }, [appSupportLanguages]);
-
   const deleteProfile = async () => {
     if (deleteApprove) {
       if (userPassword && userPassword?.length >= 8) {
-        console.log({ userPassword });
         const { success } = await deleteProfileRequest({
           params: {
             password: userPassword,
@@ -64,7 +59,6 @@ export default function ProfileScreen() {
           text1: t("profile.passwordError"),
         });
       }
-      console.log({ userPassword });
     } else {
       setDeleteApprove(true);
     }
@@ -127,9 +121,9 @@ export default function ProfileScreen() {
           labelStyle={{
             fontSize: fontPixel(16),
           }}
-          selectedValue={settings?.language as never}
-          options={supportLanguages}
-          onValueChange={(item) => changeLanguage(item as never)}
+          selectedValue={settings?.language ?? "en"}
+          options={appSupportLanguages()}
+          onValueChange={(item) => changeLanguage(item as string)}
           style={styles.mt7}
         />
       </View>
@@ -198,8 +192,8 @@ const createStyle = (colors: ColorDto) =>
       ...spacing({ gap: 15 }),
     },
     qrCodeImage: {
-      ...spacing({ p: 5 }),
-      borderRadius: widthPixel(5),
+      ...spacing({ p: 8 }),
+      borderRadius: widthPixel(8),
       backgroundColor: Colors.white,
     },
   });

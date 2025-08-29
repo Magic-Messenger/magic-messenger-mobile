@@ -2,7 +2,6 @@ import { useAppStore } from "@/store";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import en from "./locales/en.json";
-import tr from "./locales/tr.json";
 
 const initI18n = async () => {
   const waitForRehydrate = () =>
@@ -25,10 +24,16 @@ const initI18n = async () => {
     lng: currentLanguage,
     fallbackLng: process?.env?.EXPO_PUBLIC_DEFAULT_LANGUAGE ?? "en",
     resources: {
-      tr: {
-        translation: tr,
-      },
       en: {
+        translation: en,
+      },
+      es: {
+        translation: en,
+      },
+      fr: {
+        translation: en,
+      },
+      nl: {
         translation: en,
       },
     },

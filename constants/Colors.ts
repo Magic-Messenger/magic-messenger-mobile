@@ -24,6 +24,7 @@ export const Colors = {
 
   /* text */
   text: "#fff",
+  placeholder: "#fff",
   textDisabled: "#555",
 
   /* gradient */

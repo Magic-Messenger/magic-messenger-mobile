@@ -21,7 +21,6 @@ export default function VerifyPhrasesScreen() {
   const {
     control,
     handleSubmit,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>({
     defaultValues: {

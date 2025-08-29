@@ -124,16 +124,6 @@ const IconRenderer = ({
   }
 };
 
-// Component with function overloads for different type scenarios
-export function Icon<T extends IconLibrary = "material">(props: {
-  type?: T;
-  name: IconNameForLibrary<T>;
-  size?: number;
-  color?: string | OpaqueColorValue;
-  style?: StyleProp<TextStyle>;
-  weight?: SymbolWeight;
-}): JSX.Element;
-
 // Implementation
 export function Icon<T extends IconLibrary = "material">({
   name,
@@ -145,7 +135,7 @@ export function Icon<T extends IconLibrary = "material">({
   type?: T;
   name: IconNameForLibrary<T>;
   size?: number;
-  color: string | OpaqueColorValue;
+  color?: string | OpaqueColorValue;
   style?: StyleProp<TextStyle>;
   weight?: SymbolWeight;
 }) {
@@ -161,4 +151,4 @@ export function Icon<T extends IconLibrary = "material">({
 }
 
 // Export types for external use
-export type { IconLibrary, IconNameForLibrary };
+export type { IconLibrary };

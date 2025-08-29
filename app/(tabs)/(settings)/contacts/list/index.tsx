@@ -14,12 +14,13 @@ export default function ContactsScreen() {
   const styles = useThemedStyles();
 
   const [searchText, setSearchText] = useState<string>("");
+  const [displayOnlyBlocked, setDisplayOnlyBlocked] = useState<boolean>(false);
 
   const filteredData = useMemo(() => {
     return contactData?.data?.filter((x) =>
-      x.nickname?.toLocaleLowerCase()?.includes(searchText?.toLowerCase())
+      x.nickname?.toLocaleLowerCase()?.includes(searchText?.toLowerCase()) && (displayOnlyBlocked ? x.isBlocked : !x.isBlocked)
     );
-  }, [searchText, contactData?.data]);
+  }, [searchText, displayOnlyBlocked, contactData?.data]);
 
   const renderContactItem = ({ item }: { item: ContactDto }) => {
     return (
@@ -32,8 +33,8 @@ export default function ContactsScreen() {
             router.push({
               pathname: "/contacts/edit",
               params: {
-                ...item,
-              },
+                ...item
+              } as never,
             }),
         }}
       />
@@ -50,7 +51,7 @@ export default function ContactsScreen() {
     <AppLayout container title={t("contacts.title")} loading={isLoading}>
       <FlatList
         ListHeaderComponent={
-          <ContactHeader setSearchText={(_text) => setSearchText(_text)} />
+          <ContactHeader setSearchText={(_text) => setSearchText(_text)} onBlockedPress={() => setDisplayOnlyBlocked(!displayOnlyBlocked)} isBlocked={displayOnlyBlocked} />
         }
         data={filteredData}
         contentContainerStyle={{ gap: spacingPixel(10) }}

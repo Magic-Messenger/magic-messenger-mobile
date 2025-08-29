@@ -3,8 +3,8 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 interface SettingDto {
-  language: string | null;
-  timeZone?: string | null;
+  language?: string;
+  timeZone?: string;
 }
 
 interface AppStore {
@@ -19,8 +19,8 @@ export const useAppStore = create<AppStore>()(
   persist(
     (set) => ({
       settings: {
-        language: null,
-        timeZone: null,
+        language: 'en',
+        timeZone: undefined,
       },
       appVersion: "",
       tor: null,
