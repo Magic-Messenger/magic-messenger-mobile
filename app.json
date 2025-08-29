@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Magic",
-    "slug": "magic-mobil-expo",
+    "slug": "magic-messenger",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -21,7 +21,11 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.magicapp.magic"
+      "package": "com.magicapp.magic",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -63,9 +67,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "69b8d425-13b6-41fd-9bb5-5c8dae0fc021"
+        "projectId": "d0e79472-8b27-49b6-b3f5-9e1553818db8"
       }
     },
-    "owner": "kadirbarcin"
+    "owner": "tulpar-yazilim"
   }
 }

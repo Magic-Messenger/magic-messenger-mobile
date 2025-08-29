@@ -19,11 +19,11 @@ const initI18n = async () => {
 
   const currentLanguage =
     useAppStore.getState()?.settings?.language ??
-    process?.env?.EXPO_PUBLIC_DEFAULT_LANGUAGE;
+    process?.env?.EXPO_PUBLIC_DEFAULT_LANGUAGE ?? "en";
 
   i18n.use(initReactI18next).init({
     lng: currentLanguage,
-    fallbackLng: process?.env?.EXPO_PUBLIC_DEFAULT_LANGUAGE,
+    fallbackLng: process?.env?.EXPO_PUBLIC_DEFAULT_LANGUAGE ?? "en",
     resources: {
       tr: {
         translation: tr,

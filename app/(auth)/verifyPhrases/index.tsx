@@ -33,13 +33,12 @@ export default function VerifyPhrasesScreen() {
   const onSubmit = async (formValues: RegisterFormData) => {
     try {
       if (formValues) {
-        const { success, data } = await verifyPhrases({
+        const { success } = await verifyPhrases({
           data: {
             username: formValues?.username,
             phrases: formValues?.phrases?.match(/.{1,4}/g),
           },
         });
-        console.log("data: ", data);
 
         if (success) {
           router.push({
