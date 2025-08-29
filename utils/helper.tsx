@@ -17,7 +17,6 @@ export const changeLanguage = (language: string) => {
   }));
 
   i18nChangeLanguage(language);
-  console.log(useAppStore.getState());
 };
 
 export const copyToClipboard = async (

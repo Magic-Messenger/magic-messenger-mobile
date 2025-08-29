@@ -33,32 +33,25 @@ export default function LoginScreen() {
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>({
     defaultValues: {
-      username: userName ?? "cruznadin",
-      password: "Kadir123*+",
+      username: userName ?? undefined,
+      password: undefined,
     },
   });
 
   const onSubmit = async (formValues: RegisterFormData) => {
-    try {
-      if (formValues) {
-        const { success, data } = await loginApi({
-          data: {
-            username: formValues?.username,
-            password: formValues?.password,
-            deviceId: await getInstallationId(),
-          },
-        });
-
-        if (success && data?.accessToken) {
-          await login(
-            data?.accessToken?.token as string,
-            data?.account?.username as string
-          );
-          router.push("/home");
-        }
-      }
-    } catch (error) {
-      console.error("Kayıt sırasında hata:", error);
+    const { success, data } = await loginApi({
+      data: {
+        username: formValues?.username,
+        password: formValues?.password,
+        deviceId: await getInstallationId(),
+      },
+    });
+    if (success && data?.accessToken) {
+      login(
+          data?.accessToken?.token as string,
+          data?.account?.username as string
+      );
+      router.push("/home");
     }
   };
 
@@ -102,6 +95,9 @@ export default function LoginScreen() {
               control={control}
               name="username"
               label={t("userName")}
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="off"
               rules={{
                 required: t("inputError.required", {
                   field: t("userName"),

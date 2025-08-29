@@ -9,7 +9,7 @@
 
   "login": {
     "title": "Giriş Yap",
-    "userName": "Merhaba {{userName}},"
+    "userName": "Merhaba {{userName}}"
   },
 
   "register": {

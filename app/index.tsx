@@ -22,9 +22,9 @@ export default function IndexPage() {
   const [connected, setConnected] = useState<boolean>(false);
   const [dots, setDots] = useState<string>("");
 
-  let interval: any = null;
+  let interval: number = 0;
 
-  useEffect(() => {
+  const setupInterval = () => {
     interval = setInterval(() => {
       setDots((prev) => {
         if (prev.length >= 3) {
@@ -33,8 +33,12 @@ export default function IndexPage() {
         return prev + ".";
       });
     }, 1000);
+  }
 
-    return () => clearInterval(interval);
+  useEffect(() => {
+    setupInterval();
+
+    return () => interval && clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -51,7 +55,7 @@ export default function IndexPage() {
 
       clearTimeout(interval);
     }, 3000);
-  }, [isLogin]);
+  }, [interval, isLogin]);
 
   useEffect(() => {
     console.log("Index Page - isLogin:", isLogin, "rehydrated:", rehydrated);

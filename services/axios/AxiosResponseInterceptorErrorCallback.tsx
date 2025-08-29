@@ -1,23 +1,41 @@
 import { useUserStore } from "@/store";
 import { showToast } from "@/utils";
 import type { AxiosError } from "axios";
+import {TWO_FACTOR_NOT_SETUP, TWO_FACTOR_VERIFY_REQUIRED} from "@/constants";
+import {ResultMessage} from "@/api/models";
 
 const unauthorizedCode = [401, 419, 440];
 
+const notShowErrorMessages = [
+  TWO_FACTOR_NOT_SETUP,
+  TWO_FACTOR_VERIFY_REQUIRED,
+]
+
 const AxiosResponseInterceptorErrorCallback = (error: AxiosError) => {
-  const { response, code } = error;
-  if (code === "ERR_CANCELED") return;
-  console.log("ERROR Response: ", response);
-  showToast({
-    text1: (response?.data as { message: string })?.message ?? response?.data,
-    type: "error",
-  });
-  if (response && unauthorizedCode.includes(response.status)) {
-    useUserStore.setState({
-      isLogin: false,
-      accessToken: null,
-    });
+  const { response } = error
+  if (response) {
+    if (unauthorizedCode.includes(response.status)) {
+      useUserStore.setState({
+        isLogin: false,
+        accessToken: null,
+      });
+    } else {
+      const messages =
+          (response?.data as { messages: ResultMessage[] })?.messages ||
+          (response?.data as ResultMessage[]) ||
+          []
+      console.warn('Magic Error Messages: ', messages)
+      if (messages?.length > 0) {
+        if (!messages.some(message => notShowErrorMessages.includes(message.code!)))
+          messages?.forEach((message) => {
+            showToast({
+              text1: message.description ?? message.code!,
+              type: "error",
+            });
+          })
+      }
+    }
   }
-};
+}
 
 export default AxiosResponseInterceptorErrorCallback;
