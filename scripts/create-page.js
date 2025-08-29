@@ -23,6 +23,7 @@ import { ColorDto, useThemedStyles } from "@/theme";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
+import { AppLayout } from "@/components";
 
 export default function ${componentName}() {
   const { t } = useTranslation();
@@ -30,9 +31,11 @@ export default function ${componentName}() {
   const router = useRouter();
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{t("${componentName}")}</Text>
-    </View>
+    <AppLayout container>
+      <View style={styles.container}>
+        <Text style={styles.title}>{t("${componentName}")}</Text>
+      </View>
+    </AppLayout>
   );
 }
 

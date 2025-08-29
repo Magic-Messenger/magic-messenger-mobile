@@ -10,7 +10,7 @@ import {
 import { flexBox, Images, spacing } from "@/constants";
 import { useUserStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { fontPixel, heightPixel, widthPixel } from "@/utils";
+import { fontPixel, getInstallationId, heightPixel, widthPixel } from "@/utils";
 import { router } from "expo-router";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -33,7 +33,7 @@ export default function LoginScreen() {
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>({
     defaultValues: {
-      username: "cruznadin",
+      username: userName ?? "cruznadin",
       password: "Kadir123*+",
     },
   });
@@ -45,6 +45,7 @@ export default function LoginScreen() {
           data: {
             username: formValues?.username,
             password: formValues?.password,
+            deviceId: await getInstallationId(),
           },
         });
 
