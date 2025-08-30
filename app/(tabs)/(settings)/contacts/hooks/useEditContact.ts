@@ -1,25 +1,20 @@
-import {
-    useDeleteApiContactsDelete, usePostApiAccountBlockAccount, usePostApiAccountUnblockAccount,
-    usePostApiContactsUpdate,
-} from "@/api/endpoints/magicMessenger";
+import {useEffect} from "react";
+import {Alert} from "react-native";
+import {router, useLocalSearchParams} from "expo-router";
+import {showToast} from "@/utils";
 import {UpdateContactCommandRequest} from "@/api/models";
 import {
-    AppLayout,
-    Button,
-    ContactScanQr,
-    Icon,
-    Input,
-    ThemedText,
-} from "@/components";
-import {useThemedStyles} from "@/theme";
-import {showToast} from "@/utils";
-import {router, useLocalSearchParams} from "expo-router";
-import {useEffect} from "react";
-import {useForm} from "react-hook-form";
+    useDeleteApiContactsDelete,
+    usePostApiAccountBlockAccount,
+    usePostApiAccountUnblockAccount,
+    usePostApiContactsUpdate
+} from "@/api/endpoints/magicMessenger";
 import {useTranslation} from "react-i18next";
-import {Alert, View} from "react-native";
+import {useThemedStyles} from "@/theme";
+import {useForm} from "react-hook-form";
 
-export default function ContactEdit() {
+export const useEditContact = () => {
+
     const {t} = useTranslation();
     const {contactUsername, nickname, barcode, isBlocked} = useLocalSearchParams();
     const styles = useThemedStyles();
@@ -155,84 +150,23 @@ export default function ContactEdit() {
         }
     }, [barcode, nickNameField, reset]);
 
-    return (
-        <AppLayout
-            container
-            scrollable
-            title={<ContactScanQr/>}
-            footer={
-                <>
-                    <Button
-                        type="secondary"
-                        label={isContactBlocked ? t("contacts.unblockContact") : t("contacts.blockContact")}
-                        leftIcon={isContactBlocked ? <Icon type="material-community" name="account-check-outline"/> : <Icon type="material-community" name="account-cancel-outline"/>}
-                        onPress={isContactBlocked ? handleUnblockAccount : handleBlockAccount}
-                        style={styles.mb2}
-                        loading={isBlockPending || isUnblockPending}
-                        disabled={isBlockPending || isUnblockPending}
-                    />
-                    <Button
-                        type="danger"
-                        label={t("contacts.deleteContact")}
-                        leftIcon={<Icon type="feather" name="trash"/>}
-                        onPress={handleDeleteContact}
-                        style={styles.mb2}
-                    />
-                    <Button
-                        loading={isPending || isLoading}
-                        disabled={isSubmitting}
-                        type="primary"
-                        label={t("contacts.editContact")}
-                        onPress={handleSubmit(onSubmit)}
-                    />
-                </>
-            }
-        >
-            <ThemedText type="title" weight="semiBold" size={20}>
-                {t("contacts.editContact")}
-            </ThemedText>
 
-            <View style={[styles.gap5, styles.mt10]}>
-                <Input
-                    control={control}
-                    name="username"
-                    label={t("contacts.userName")}
-                    rules={{
-                        required: t("inputError.required", {
-                            field: t("userName"),
-                        }),
-                        minLength: {
-                            value: 3,
-                            message: t("inputError.minLength", {
-                                field: t("userName"),
-                                count: 3,
-                            }),
-                        },
-                    }}
-                    error={errors.username?.message}
-                />
+    return {
+        t,
+        errors,
+        styles,
+        isContactBlocked,
+        isBlockPending,
+        isUnblockPending,
+        control,
+        handleSubmit,
+        isSubmitting,
+        isPending,
+        isLoading,
+        onSubmit,
+        handleBlockAccount,
+        handleUnblockAccount,
+        handleDeleteContact,
+    }
 
-                <Input
-                    control={control}
-                    name="nickname"
-                    label={t("contacts.nickName")}
-                    rules={{
-                        required: t("inputError.required", {
-                            field: t("contacts.nickName"),
-                        }),
-                        minLength: {
-                            value: 3,
-                            message: t("inputError.minLength", {
-                                field: t("contacts.nickName"),
-                                count: 3,
-                            }),
-                        },
-                    }}
-                    error={errors.username?.message}
-                />
-
-
-            </View>
-        </AppLayout>
-    );
 }

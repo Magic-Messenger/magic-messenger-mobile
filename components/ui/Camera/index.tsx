@@ -18,13 +18,13 @@ export function Camera({ ...props }: CameraViewProps) {
       <View style={styles.container}>
         <ThemedText type="subtitle">{t("barcode.permissionTitle")}</ThemedText>
 
-        <Button type="primary" label={t("barcode.grantPermission")} />
+        <Button type="primary" label={t("barcode.grantPermission")} onPress={requestPermission} />
       </View>
     );
   }
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.flex}>
       <CameraView style={styles.camera} facing="back" {...props}>
         {props?.children}
       </CameraView>
@@ -33,6 +33,9 @@ export function Camera({ ...props }: CameraViewProps) {
 }
 
 const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     alignItems: "center",

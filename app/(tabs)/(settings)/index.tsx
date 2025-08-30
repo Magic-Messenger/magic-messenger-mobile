@@ -23,18 +23,19 @@ export default function SettingsScreen() {
       label: t("settings.profile"),
       iconType: "feather",
       iconName: "user",
-      onPress: () => router.push("/(tabs)/(settings)/profile"),
+      onPress: () => router.push("/(tabs)/(settings)/profile/screens/profile"),
     },
     {
       label: t("settings.contact"),
       iconType: "feather",
       iconName: "message-circle",
-      onPress: () => router.push("/(tabs)/(settings)/contacts/list"),
+      onPress: () => router.push("/(tabs)/(settings)/contacts/screens/list"),
     },
     {
       label: t("settings.scan-qr"),
       iconType: "ionicons",
       iconName: "qr-code-outline",
+      onPress: () => router.push("/(tabs)/(settings)/scanQr/screens/scanQr"),
     },
     {
       label: t("settings.license"),

@@ -1,5 +1,3 @@
-import { usePostApiContactsCreate } from "@/api/endpoints/magicMessenger";
-import { CreateContactCommandRequest } from "@/api/models";
 import {
   AppLayout,
   Button,
@@ -7,49 +5,11 @@ import {
   Input,
   ThemedText,
 } from "@/components";
-import { useThemedStyles } from "@/theme";
-import { showToast } from "@/utils";
-import { router, useLocalSearchParams } from "expo-router";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
 import { View } from "react-native";
+import {useAddContact} from "../hooks";
 
 export default function ContactAdd() {
-  const { t } = useTranslation();
-  const { barcode } = useLocalSearchParams();
-  const styles = useThemedStyles();
-
-  const {
-    control,
-    handleSubmit,
-    reset,
-    watch,
-    formState: { errors, isSubmitting, isLoading },
-  } = useForm<CreateContactCommandRequest>();
-
-  const { mutateAsync: addContact, isPending } = usePostApiContactsCreate();
-
-  const onSubmit = async (formValues: CreateContactCommandRequest) => {
-    const { success } = await addContact({
-      data: {
-        ...formValues,
-      },
-    });
-    if (success) {
-      showToast({
-        text1: t("contacts.successAddedContact"),
-      });
-      router.back();
-    }
-  };
-
-  const nickNameField = watch()?.nickname;
-  useEffect(() => {
-    if (barcode) {
-      reset({ username: barcode as string, nickname: nickNameField });
-    }
-  }, [barcode, nickNameField, reset]);
+  const {t, control, errors, styles, isPending, isLoading, isSubmitting, handleSubmit, onSubmit} = useAddContact()
 
   return (
     <AppLayout

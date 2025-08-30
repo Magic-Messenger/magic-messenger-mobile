@@ -133,6 +133,13 @@
     "unblockContactAlertMessage": "You will start receiving messages from this contact."
   },
 
+  "scanQr": {
+    "title": "Scan QR Code",
+    "inputUserName": "Input User Name",
+    "inputUserNamePlaceholder": "Type the username here",
+    "goToCamera": "Go to Camera"
+  },
+
   "barcode": {
     "permissionTitle": "You must grant permission to use the camera.",
     "grantPermission": "Grant Permission"

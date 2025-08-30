@@ -64,13 +64,22 @@ export default function LoginScreen() {
       scrollable
       showBadge={false}
       footer={
-        <Button
-          type="primary"
-          label={t("login.button")}
-          onPress={handleSubmit(onSubmit)}
-          loading={isSubmitting}
-          disabled={isSubmitting}
-        />
+        <>
+          <Button
+              type="primary"
+              label={t("login.button")}
+              onPress={handleSubmit(onSubmit)}
+              loading={isSubmitting}
+              disabled={isSubmitting}
+          />
+
+          <Button
+              type="secondary"
+              label={t("forgotAccount.title")}
+              onPress={() => router.push("/(auth)/verifyPhrases")}
+              style={styles.mt2}
+          />
+        </>
       }
     >
       <View style={[userName ? styles.pt10 : undefined]}>
@@ -118,16 +127,6 @@ export default function LoginScreen() {
           )}
 
           <PasswordInput control={control} error={errors.password?.message} />
-
-          <View style={styles.forgotAccountContainer}>
-            <TouchableOpacity
-              onPress={() => router.push("/(auth)/verifyPhrases")}
-            >
-              <ThemedText type="link" style={styles.forgotAccountText}>
-                {t("forgotAccount.title")}
-              </ThemedText>
-            </TouchableOpacity>
-          </View>
         </View>
       </View>
     </AppLayout>

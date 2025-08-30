@@ -29,35 +29,35 @@ export default function SettingsStack() {
       />
 
       <Stack.Screen
-        name="profile/index"
+        name="profile/screens/profile"
         options={{
           headerShown: true,
         }}
       />
 
       <Stack.Screen
-        name="contacts/list/index"
+        name="contacts/screens/list"
         options={{
           headerShown: true,
         }}
       />
 
       <Stack.Screen
-        name="contacts/add/index"
+        name="contacts/screens/add"
         options={{
           headerShown: true,
         }}
       />
 
       <Stack.Screen
-        name="contacts/edit/index"
+        name="contacts/screens/edit"
         options={{
           headerShown: true,
         }}
       />
 
       <Stack.Screen
-        name="contacts/scanQr/index"
+        name="scanQr/screens/scanQr"
         options={{
           headerShown: true,
         }}
