@@ -1,6 +1,7 @@
 import { CameraView, CameraViewProps, useCameraPermissions } from "expo-camera";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
+
 import { spacing } from "../../../constants";
 import { ThemedText } from "../../app";
 import { Button } from "../Button";
@@ -18,7 +19,11 @@ export function Camera({ ...props }: CameraViewProps) {
       <View style={styles.container}>
         <ThemedText type="subtitle">{t("barcode.permissionTitle")}</ThemedText>
 
-        <Button type="primary" label={t("barcode.grantPermission")} onPress={requestPermission} />
+        <Button
+          type="primary"
+          label={t("barcode.grantPermission")}
+          onPress={requestPermission}
+        />
       </View>
     );
   }

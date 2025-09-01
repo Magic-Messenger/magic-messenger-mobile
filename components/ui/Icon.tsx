@@ -1,5 +1,4 @@
 // Enhanced IconSymbol component with dynamic name types based on icon library type
-import { Colors } from "@/constants";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Entypo from "@expo/vector-icons/Entypo";
 import Feather from "@expo/vector-icons/Feather";
@@ -11,6 +10,8 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { SymbolViewProps, SymbolWeight } from "expo-symbols";
 import { ComponentProps } from "react";
 import { OpaqueColorValue, type StyleProp, type TextStyle } from "react-native";
+
+import { Colors } from "@/constants";
 
 // Icon library types
 type IconLibrary =

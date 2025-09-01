@@ -1,9 +1,11 @@
+import { LinearGradient } from "expo-linear-gradient";
+import { StyleSheet, View } from "react-native";
+
 import { Colors } from "@/constants";
 import { useAppStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
 import { heightPixel, spacingPixel, widthPixel } from "@/utils";
-import { LinearGradient } from "expo-linear-gradient";
-import { StyleSheet, View } from "react-native";
+
 import { ThemedText } from "../ThemedText";
 
 export const TorBadge = () => {

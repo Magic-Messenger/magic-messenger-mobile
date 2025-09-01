@@ -19,7 +19,7 @@ export const useAppStore = create<AppStore>()(
   persist(
     (set) => ({
       settings: {
-        language: 'en',
+        language: "en",
         timeZone: undefined,
       },
       appVersion: "",
@@ -45,6 +45,6 @@ export const useAppStore = create<AppStore>()(
       onRehydrateStorage: () => () => {
         useAppStore.setState({ rehydrated: true });
       },
-    }
-  )
+    },
+  ),
 );

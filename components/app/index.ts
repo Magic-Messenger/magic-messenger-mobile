@@ -5,7 +5,7 @@ export * from "./Contact/ContactScanQr";
 export * from "./EmptyList";
 export * from "./ExternalLink";
 export * from "./HapticTab";
+export * from "./PasswordInput";
 export * from "./SectionHeader";
 export * from "./ThemedText";
 export * from "./TorBadge";
-export * from './PasswordInput';

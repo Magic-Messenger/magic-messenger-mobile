@@ -4,18 +4,25 @@
  * MagicMessenger
  * OpenAPI spec version: v1
  */
-import type { ObjectId } from "./objectId";
 import type { EntityStatus } from "./entityStatus";
-import type { InvoiceStatus } from "./invoiceStatus";
+import type { InvoiceDeletedBy } from "./invoiceDeletedBy";
 import type { InvoiceLine } from "./invoiceLine";
+import type { InvoiceStatus } from "./invoiceStatus";
+import type { InvoiceUpdatedBy } from "./invoiceUpdatedBy";
+import type { ObjectId } from "./objectId";
 
 export interface Invoice {
   id?: ObjectId;
   createdAt?: string;
+  createdBy?: ObjectId;
   /** @nullable */
   updatedAt?: string | null;
   /** @nullable */
+  updatedBy?: InvoiceUpdatedBy;
+  /** @nullable */
   deletedAt?: string | null;
+  /** @nullable */
+  deletedBy?: InvoiceDeletedBy;
   status?: EntityStatus;
   invoiceStatus?: InvoiceStatus;
   /** @nullable */

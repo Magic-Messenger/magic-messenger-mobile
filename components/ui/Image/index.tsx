@@ -1,4 +1,3 @@
-import { fontPixel, heightPixel, spacingPixel } from "@/utils";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -11,6 +10,8 @@ import {
   View,
   ViewStyle,
 } from "react-native";
+
+import { fontPixel, heightPixel, spacingPixel } from "@/utils";
 
 interface AppImageProps extends Omit<ImageProps, "onLoad" | "onError"> {
   source: ImageProps["source"];

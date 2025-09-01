@@ -1,3 +1,5 @@
+import { View } from "react-native";
+
 import {
   AppLayout,
   Button,
@@ -5,11 +7,21 @@ import {
   Input,
   ThemedText,
 } from "@/components";
-import { View } from "react-native";
-import {useAddContact} from "../hooks";
+
+import { useAddContact } from "../hooks";
 
 export default function ContactAdd() {
-  const {t, control, errors, styles, isPending, isLoading, isSubmitting, handleSubmit, onSubmit} = useAddContact()
+  const {
+    t,
+    control,
+    errors,
+    styles,
+    isPending,
+    isLoading,
+    isSubmitting,
+    handleSubmit,
+    onSubmit,
+  } = useAddContact();
 
   return (
     <AppLayout

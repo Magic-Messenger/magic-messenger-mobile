@@ -1,4 +1,3 @@
-import { Colors, Fonts } from "@/constants";
 import React, { useEffect, useRef, useState } from "react";
 import {
   KeyboardType,
@@ -8,6 +7,8 @@ import {
   View,
   ViewStyle,
 } from "react-native";
+
+import { Colors, Fonts } from "@/constants";
 
 interface LicenseInputProps {
   groupCount?: number;
@@ -42,7 +43,7 @@ export const LicenseInput: React.FC<LicenseInputProps> = ({
 }) => {
   const [inputValues, setInputValues] = useState<string[]>([]);
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
-  const inputRefs = useRef<Array<TextInput | null>>([]);
+  const inputRefs = useRef<(TextInput | null)[]>([]);
 
   // Initialize input values
   useEffect(() => {
@@ -90,7 +91,7 @@ export const LicenseInput: React.FC<LicenseInputProps> = ({
       // Focus next empty group or last group
       const nextGroupIndex = Math.min(
         groupIndex + Math.ceil(cleanText.length / charactersPerGroup),
-        groupCount - 1
+        groupCount - 1,
       );
       inputRefs.current[nextGroupIndex]?.focus();
     } else {

@@ -1,6 +1,3 @@
-import { Colors, spacing } from "@/constants";
-import { ColorDto, useThemedStyles } from "@/theme";
-import { heightPixel } from "@/utils";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   ActivityIndicator,
@@ -10,6 +7,11 @@ import {
   View,
   ViewStyle,
 } from "react-native";
+
+import { Colors, spacing } from "@/constants";
+import { ColorDto, useThemedStyles } from "@/theme";
+import { heightPixel } from "@/utils";
+
 import { ThemedText, ThemedTextProps } from "../../app/ThemedText";
 
 interface Props {

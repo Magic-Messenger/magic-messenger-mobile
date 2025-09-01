@@ -2,6 +2,7 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
+
 import { Colors, Images } from "../../../../constants";
 import { ColorDto, useThemedStyles } from "../../../../theme";
 import {

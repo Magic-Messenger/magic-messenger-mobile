@@ -1,5 +1,6 @@
 import type { AxiosError, AxiosRequestConfig } from "axios";
 import axios from "axios";
+
 import AxiosRequestInterceptorConfigCallback from "./AxiosRequestInterceptorConfigCallback";
 import AxiosResponseInterceptorErrorCallback from "./AxiosResponseInterceptorErrorCallback";
 
@@ -14,7 +15,7 @@ AxiosBase.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 AxiosBase.interceptors.response.use(
@@ -22,12 +23,12 @@ AxiosBase.interceptors.response.use(
   (error: AxiosError) => {
     AxiosResponseInterceptorErrorCallback(error);
     return Promise.reject(error);
-  }
+  },
 );
 
 export const AxiosInstance = <T>(
   config: AxiosRequestConfig,
-  options?: AxiosRequestConfig
+  options?: AxiosRequestConfig,
 ): Promise<T> => {
   return AxiosBase({ ...config, ...options }).then((response) => response.data);
 };

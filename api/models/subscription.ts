@@ -4,16 +4,23 @@
  * MagicMessenger
  * OpenAPI spec version: v1
  */
-import type { ObjectId } from "./objectId";
 import type { EntityStatus } from "./entityStatus";
+import type { ObjectId } from "./objectId";
+import type { SubscriptionDeletedBy } from "./subscriptionDeletedBy";
+import type { SubscriptionUpdatedBy } from "./subscriptionUpdatedBy";
 
 export interface Subscription {
   id?: ObjectId;
   createdAt?: string;
+  createdBy?: ObjectId;
   /** @nullable */
   updatedAt?: string | null;
   /** @nullable */
+  updatedBy?: SubscriptionUpdatedBy;
+  /** @nullable */
   deletedAt?: string | null;
+  /** @nullable */
+  deletedBy?: SubscriptionDeletedBy;
   status?: EntityStatus;
   /** @nullable */
   title?: string | null;

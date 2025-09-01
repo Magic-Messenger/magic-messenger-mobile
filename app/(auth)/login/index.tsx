@@ -1,9 +1,16 @@
+import { router } from "expo-router";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { StyleSheet, View } from "react-native";
+
 import { usePostApiAccountLogin } from "@/api/endpoints/magicMessenger";
 import {
   AppImage,
   AppLayout,
   Button,
-  Input, PasswordInput,
+  Input,
+  PasswordInput,
   SectionHeader,
   ThemedText,
 } from "@/components";
@@ -11,11 +18,6 @@ import { flexBox, Images, spacing } from "@/constants";
 import { useUserStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
 import { fontPixel, getInstallationId, heightPixel, widthPixel } from "@/utils";
-import { router } from "expo-router";
-import { useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
-import {useState} from "react";
 
 interface RegisterFormData {
   username: string;
@@ -51,8 +53,8 @@ export default function LoginScreen() {
     });
     if (success && data?.accessToken) {
       login(
-          data?.accessToken?.token as string,
-          data?.account?.username as string
+        data?.accessToken?.token as string,
+        data?.account?.username as string,
       );
       router.push("/home");
     }
@@ -66,18 +68,18 @@ export default function LoginScreen() {
       footer={
         <>
           <Button
-              type="primary"
-              label={t("login.button")}
-              onPress={handleSubmit(onSubmit)}
-              loading={isSubmitting}
-              disabled={isSubmitting}
+            type="primary"
+            label={t("login.button")}
+            onPress={handleSubmit(onSubmit)}
+            loading={isSubmitting}
+            disabled={isSubmitting}
           />
 
           <Button
-              type="secondary"
-              label={t("forgotAccount.title")}
-              onPress={() => router.push("/(auth)/verifyPhrases")}
-              style={styles.mt2}
+            type="secondary"
+            label={t("forgotAccount.title")}
+            onPress={() => router.push("/(auth)/verifyPhrases")}
+            style={styles.mt2}
           />
         </>
       }

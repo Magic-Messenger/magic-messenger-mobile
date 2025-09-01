@@ -4,7 +4,6 @@
  * MagicMessenger
  * OpenAPI spec version: v1
  */
-import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -19,7 +18,9 @@ import type {
   UseQueryOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
+import { AxiosInstance } from "../../services/axios/AxiosBase";
 import type {
   AccountContactDtoIDataResult,
   AccountDetailDtoIDataResult,
@@ -82,10 +83,10 @@ import type {
   GetApiTicketsListParams,
   GetGroupMessagesQueryResultIDataResult,
   GetMessagesQueryResultIDataResult,
-  IResult,
   InvoiceDetailDtoIDataResult,
   InvoiceDtoListPaginatedResult,
   InvoiceIDataResult,
+  IResult,
   Language,
   LicenseDetailDtoIDataResult,
   LicenseDtoListPaginatedResult,
@@ -110,6 +111,7 @@ import type {
   SetupTwoFactorCommandResultIDataResult,
   StatisticsDecimalResultIDataResult,
   StatisticsResultIDataResult,
+  StringIDataResult,
   StringListIDataResult,
   SubscriptionDtoListIDataResult,
   SubscriptionIDataResult,
@@ -131,8 +133,6 @@ import type {
   VerifyPhrasesCommandRequest,
   VerifyTwoFactorCommandRequest,
 } from "../models";
-
-import { AxiosInstance } from "../../services/axios/AxiosBase";
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 /**
@@ -2806,7 +2806,7 @@ export const postApiChatsCreate = (
   options?: SecondParameter<typeof AxiosInstance>,
   signal?: AbortSignal,
 ) => {
-  return AxiosInstance<SuccessResult>(
+  return AxiosInstance<StringIDataResult>(
     {
       url: `/api/chats/create`,
       method: "POST",

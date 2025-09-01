@@ -1,11 +1,12 @@
+import { router } from "expo-router";
+import { useTranslation } from "react-i18next";
+import { StyleSheet, View } from "react-native";
+
 import Logo from "@/assets/images/3d-logo.png";
 import { AppImage, AppLayout, Button, ThemedText } from "@/components";
 import { spacing } from "@/constants";
 import { ColorDto, useThemedStyles } from "@/theme";
 import { heightPixel, widthPixel } from "@/utils";
-import { router } from "expo-router";
-import { useTranslation } from "react-i18next";
-import { StyleSheet, View } from "react-native";
 
 export default function PreLoginScreen() {
   const { t } = useTranslation();

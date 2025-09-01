@@ -1,11 +1,12 @@
+import { router, useLocalSearchParams } from "expo-router";
+import { useTranslation } from "react-i18next";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+
 import { AppLayout, Button, SectionHeader, ThemedText } from "@/components";
 import { Colors } from "@/constants";
 import { useUserStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
 import { copyToClipboard, spacingPixel } from "@/utils";
-import { router, useLocalSearchParams } from "expo-router";
-import { useTranslation } from "react-i18next";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 type RouteParams = {
   accessToken: string;
@@ -30,7 +31,7 @@ const SecurityPhrasesScreen = () => {
           .toString()
           .replaceAll(",", "")
           .trim(),
-        t("securityPhrases.phrases.successCopyClipboard")
+        t("securityPhrases.phrases.successCopyClipboard"),
       );
     }
   };

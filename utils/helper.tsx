@@ -1,13 +1,15 @@
-import { Images } from "@/constants";
-import i18n from "@/i18n";
-import { useAppStore } from "@/store";
 import * as Application from "expo-application";
 import * as Clipboard from "expo-clipboard";
 import { Image } from "expo-image";
 import { changeLanguage as i18nChangeLanguage } from "i18next";
 import { Platform } from "react-native";
 import Toast, { ToastShowParams } from "react-native-toast-message";
-import { heightPixel, widthPixel } from "./PixelHelper";
+
+import { Images } from "@/constants";
+import i18n from "@/i18n";
+import { useAppStore } from "@/store";
+
+import { heightPixel, widthPixel } from "./pixelHelper";
 
 export const changeLanguage = (language: string) => {
   useAppStore.setState(() => ({
@@ -21,7 +23,7 @@ export const changeLanguage = (language: string) => {
 
 export const copyToClipboard = async (
   copyData: string,
-  successMessage?: string
+  successMessage?: string,
 ) => {
   await Clipboard.setStringAsync(copyData);
 
@@ -74,7 +76,7 @@ export function appSupportLanguages(): {
 }[] {
   if (process.env?.EXPO_PUBLIC_SUPPORT_LANGUAGES) {
     return process.env?.EXPO_PUBLIC_SUPPORT_LANGUAGES?.split(",")?.map(
-      (item) => ({ label: i18n.t(`languages.${item}`), value: item })
+      (item) => ({ label: i18n.t(`languages.${item}`), value: item }),
     );
   }
 

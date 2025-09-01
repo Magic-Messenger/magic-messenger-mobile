@@ -4,10 +4,10 @@
  * MagicMessenger
  * OpenAPI spec version: v1
  */
-import type { ObjectId } from "./objectId";
 import type { EntityStatus } from "./entityStatus";
-import type { TicketStatus } from "./ticketStatus";
+import type { ObjectId } from "./objectId";
 import type { TicketMessage } from "./ticketMessage";
+import type { TicketStatus } from "./ticketStatus";
 
 export interface Ticket {
   id?: ObjectId;

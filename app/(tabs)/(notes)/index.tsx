@@ -1,5 +1,6 @@
-import { AppLayout, ThemedText } from "@/components";
 import { View } from "react-native";
+
+import { AppLayout, ThemedText } from "@/components";
 
 export default function NotesScreen() {
   return (

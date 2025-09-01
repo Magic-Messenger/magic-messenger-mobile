@@ -1,16 +1,17 @@
-import { useFonts } from "expo-font";
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet } from "react-native";
 import "react-native-reanimated";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useFonts } from "expo-font";
+import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
+import { StyleSheet } from "react-native";
+import Toast from "react-native-toast-message";
 
 import { Colors } from "@/constants";
 import { useUserStore } from "@/store";
 import { toastConfig } from "@/utils";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Stack } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
-import Toast from "react-native-toast-message";
 
 const queryClient = new QueryClient();
 SplashScreen.preventAutoHideAsync();

@@ -1,5 +1,7 @@
-import { fontPixel, spacingPixel } from "@/utils/PixelHelper";
 import { StyleSheet } from "react-native";
+
+import { fontPixel, spacingPixel } from "@/utils";
+
 import {
   AlignContent,
   AlignItems,
@@ -19,7 +21,7 @@ export function flexBox(
   justify: JustifyContent = "flex-start",
   align: AlignItems = "stretch",
   wrap?: FlexWrap,
-  alignContent?: AlignContent
+  alignContent?: AlignContent,
 ) {
   const style: any = {
     flex,
@@ -38,7 +40,7 @@ export function textStyle(
   weight: FontWeight = "normal",
   align: TextAlign = "left",
   decoration: TextDecoration = "none",
-  italic: boolean = false
+  italic: boolean = false,
 ) {
   const style: any = {
     fontSize: fontPixel(size),

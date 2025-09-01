@@ -53,6 +53,6 @@ export const useUserStore = create<UserStore>()(
       onRehydrateStorage: () => () => {
         useUserStore.setState({ rehydrated: true });
       },
-    }
-  )
+    },
+  ),
 );

@@ -4,16 +4,23 @@
  * MagicMessenger
  * OpenAPI spec version: v1
  */
-import type { ObjectId } from "./objectId";
 import type { EntityStatus } from "./entityStatus";
+import type { ObjectId } from "./objectId";
+import type { TranslateDeletedBy } from "./translateDeletedBy";
+import type { TranslateUpdatedBy } from "./translateUpdatedBy";
 
 export interface Translate {
   id?: ObjectId;
   createdAt?: string;
+  createdBy?: ObjectId;
   /** @nullable */
   updatedAt?: string | null;
   /** @nullable */
+  updatedBy?: TranslateUpdatedBy;
+  /** @nullable */
   deletedAt?: string | null;
+  /** @nullable */
+  deletedBy?: TranslateDeletedBy;
   status?: EntityStatus;
   /** @nullable */
   language?: string | null;

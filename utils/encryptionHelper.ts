@@ -1,6 +1,5 @@
 import "react-native-get-random-values";
 
-import { useUserStore } from "@/store";
 import * as Crypto from "expo-crypto";
 import nacl from "tweetnacl";
 import {
@@ -9,6 +8,8 @@ import {
   encodeBase64,
   encodeUTF8,
 } from "tweetnacl-util";
+
+import { useUserStore } from "@/store";
 
 if (typeof global.crypto !== "object") {
   global.crypto = {} as any;
@@ -106,14 +107,14 @@ export const generateGroupKey = () => {
 export const encrypt = (
   data: string,
   receiverPublicKey: string,
-  senderPrivateKey: string
+  senderPrivateKey: string,
 ) => {
   const nonce = nacl.randomBytes(24);
   const cipher = nacl.box(
     decodeUTF8(data),
     nonce,
     decodeBase64(receiverPublicKey),
-    decodeBase64(senderPrivateKey)
+    decodeBase64(senderPrivateKey),
   );
   return {
     cipherText: encodeBase64(cipher),
@@ -154,7 +155,7 @@ export const decrypt = (
   cipherText: string,
   nonce: string,
   senderPublicKey: string,
-  receiverPrivateKey: string
+  receiverPrivateKey: string,
 ) => {
   if (!senderPublicKey || !receiverPrivateKey || !cipherText || !nonce) return;
 
@@ -162,7 +163,7 @@ export const decrypt = (
     decodeBase64(cipherText),
     decodeBase64(nonce),
     decodeBase64(senderPublicKey),
-    decodeBase64(receiverPrivateKey)
+    decodeBase64(receiverPrivateKey),
   );
 
   if (!decrypted) {
@@ -184,14 +185,14 @@ export const decrypt = (
 export const decryptForGroup = (
   cipherText: string,
   nonce: string,
-  groupKey: string
+  groupKey: string,
 ) => {
   if (!groupKey || !cipherText || !nonce) return;
 
   const decrypted = nacl.secretbox.open(
     decodeBase64(cipherText),
     decodeBase64(nonce),
-    decodeBase64(groupKey)
+    decodeBase64(groupKey),
   );
 
   if (!decrypted) {
@@ -213,7 +214,7 @@ export const decryptForGroup = (
 export const encryptGroupKeyForUser = (
   groupKey: string,
   userPublicKey: string,
-  senderPrivateKey: string
+  senderPrivateKey: string,
 ) => {
   if (!groupKey || !userPublicKey || !senderPrivateKey) return;
 
@@ -222,7 +223,7 @@ export const encryptGroupKeyForUser = (
     decodeBase64(groupKey),
     nonce,
     decodeBase64(userPublicKey),
-    decodeBase64(senderPrivateKey)
+    decodeBase64(senderPrivateKey),
   );
 
   return {
@@ -244,7 +245,7 @@ export const decryptGroupKeyForUser = (
   encryptedGroupKey: string,
   encryptedGroupKeyNonce: string,
   receiverPrivateKey: string,
-  senderPublicKey: string
+  senderPublicKey: string,
 ) => {
   if (
     !encryptedGroupKey ||
@@ -258,7 +259,7 @@ export const decryptGroupKeyForUser = (
     decodeBase64(encryptedGroupKey),
     decodeBase64(encryptedGroupKeyNonce),
     decodeBase64(senderPublicKey),
-    decodeBase64(receiverPrivateKey)
+    decodeBase64(receiverPrivateKey),
   );
 
   if (!decrypted) {

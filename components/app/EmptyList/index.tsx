@@ -1,5 +1,7 @@
-import { useThemedStyles } from "@/theme";
 import { View, ViewStyle } from "react-native";
+
+import { useThemedStyles } from "@/theme";
+
 import { Icon, IconLibrary } from "../../ui";
 import { ThemedText } from "../ThemedText";
 

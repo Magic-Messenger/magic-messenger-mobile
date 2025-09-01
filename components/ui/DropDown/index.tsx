@@ -1,5 +1,3 @@
-import { Colors, Fonts } from "@/constants";
-import { fontPixel, heightPixel, spacingPixel } from "@/utils";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { forwardRef, useState } from "react";
 import { Control, Controller, FieldPath, FieldValues } from "react-hook-form";
@@ -12,8 +10,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
+import { Icon } from "@/components";
+import { Colors, Fonts } from "@/constants";
+import { fontPixel, heightPixel, spacingPixel } from "@/utils";
+
 import { ThemedText } from "../../app/ThemedText";
-import {Icon} from "@/components";
 
 export interface DropdownOption {
   label: string;
@@ -75,7 +77,7 @@ const DropdownComponent = forwardRef<
       required = false,
       error,
     },
-    ref
+    ref,
   ) => {
     const [isVisible, setIsVisible] = useState(false);
 
@@ -131,7 +133,11 @@ const DropdownComponent = forwardRef<
           >
             {displayText}
           </ThemedText>
-          <Icon type="feather" name="chevron-down" style={[styles.arrow, !enabled && styles.disabledText]} />
+          <Icon
+            type="feather"
+            name="chevron-down"
+            style={[styles.arrow, !enabled && styles.disabledText]}
+          />
         </TouchableOpacity>
 
         {error && <ThemedText style={styles.errorText}>{error}</ThemedText>}
@@ -168,7 +174,7 @@ const DropdownComponent = forwardRef<
         </Modal>
       </View>
     );
-  }
+  },
 );
 
 DropdownComponent.displayName = "DropdownComponent";
@@ -177,7 +183,7 @@ export const Dropdown = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >(
-  props: ModernDropdownProps<TFieldValues, TName>
+  props: ModernDropdownProps<TFieldValues, TName>,
 ) => {
   if (props.control && props.name) {
     return (

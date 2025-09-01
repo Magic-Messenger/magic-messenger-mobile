@@ -1,6 +1,7 @@
-import { Colors } from "@/constants";
 import { useMemo } from "react";
 import { useColorScheme } from "react-native";
+
+import { Colors } from "@/constants";
 
 interface ColorDto {
   colors: typeof Colors;

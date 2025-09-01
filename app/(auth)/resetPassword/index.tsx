@@ -1,12 +1,13 @@
+import { router, useLocalSearchParams } from "expo-router";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { StyleSheet, View } from "react-native";
+
 import { usePostApiAccountRecoverPassword } from "@/api/endpoints/magicMessenger";
 import { AppImage, AppLayout, Button, Input, ThemedText } from "@/components";
 import { Images, spacing } from "@/constants";
 import { ColorDto, useThemedStyles } from "@/theme";
 import { heightPixel, widthPixel } from "@/utils";
-import { router, useLocalSearchParams } from "expo-router";
-import { useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
-import { StyleSheet, View } from "react-native";
 interface FormData {
   password: string;
   confirmPassword: string;

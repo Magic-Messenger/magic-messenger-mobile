@@ -1,3 +1,9 @@
+import { router } from "expo-router";
+import { useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { StyleSheet, View } from "react-native";
+
 import { usePostApiAccountRegister } from "@/api/endpoints/magicMessenger";
 import {
   AppLayout,
@@ -13,11 +19,6 @@ import {
   showToast,
   userPublicKey,
 } from "@/utils";
-import { router } from "expo-router";
-import { useMemo } from "react";
-import { useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
-import { StyleSheet, View } from "react-native";
 
 interface RegisterFormData {
   username: string;

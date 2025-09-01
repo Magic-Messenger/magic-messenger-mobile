@@ -4,17 +4,24 @@
  * MagicMessenger
  * OpenAPI spec version: v1
  */
-import type { ObjectId } from "./objectId";
 import type { EntityStatus } from "./entityStatus";
 import type { FaqCategory } from "./faqCategory";
+import type { FaqDeletedBy } from "./faqDeletedBy";
+import type { FaqUpdatedBy } from "./faqUpdatedBy";
+import type { ObjectId } from "./objectId";
 
 export interface Faq {
   id?: ObjectId;
   createdAt?: string;
+  createdBy?: ObjectId;
   /** @nullable */
   updatedAt?: string | null;
   /** @nullable */
+  updatedBy?: FaqUpdatedBy;
+  /** @nullable */
   deletedAt?: string | null;
+  /** @nullable */
+  deletedBy?: FaqDeletedBy;
   status?: EntityStatus;
   /** @nullable */
   faqQuestion?: string | null;

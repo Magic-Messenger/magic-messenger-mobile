@@ -1,7 +1,9 @@
-import { Colors, Fonts } from "@/constants";
 import { Text, View } from "react-native";
 import { BaseToast, ErrorToast } from "react-native-toast-message";
-import { heightPixel, spacingPixel } from "./PixelHelper";
+
+import { Colors, Fonts } from "@/constants";
+
+import { heightPixel, spacingPixel } from "./pixelHelper";
 
 export const toastConfig = {
   success: (props: any) => (

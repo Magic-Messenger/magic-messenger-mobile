@@ -1,8 +1,9 @@
+import { router } from "expo-router";
+import { StyleSheet, View } from "react-native";
+
 import { AppLayout, Button, LicenseInput, SectionHeader } from "@/components";
 import { spacing } from "@/constants";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { router } from "expo-router";
-import { StyleSheet, View } from "react-native";
 
 export default function LicenseNumberScreen() {
   const styles = useThemedStyles(createStyle);

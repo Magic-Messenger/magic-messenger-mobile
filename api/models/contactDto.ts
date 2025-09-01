@@ -16,5 +16,5 @@ export interface ContactDto {
   publicKey?: string | null;
   isBlocked?: boolean;
   /** @nullable */
-  chats?: string[] | null;
+  chatId?: string | null;
 }

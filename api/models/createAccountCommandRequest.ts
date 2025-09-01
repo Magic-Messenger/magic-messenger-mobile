@@ -4,10 +4,13 @@
  * MagicMessenger
  * OpenAPI spec version: v1
  */
+import type { CreateAccountCommandRequestAccountType } from "./createAccountCommandRequestAccountType";
 
 export interface CreateAccountCommandRequest {
   /** @nullable */
   licenseCode?: string | null;
+  /** @nullable */
+  accountType?: CreateAccountCommandRequestAccountType;
   /** @nullable */
   transactionId?: string | null;
   /** @nullable */

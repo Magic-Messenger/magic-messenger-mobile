@@ -1,7 +1,8 @@
-import { Colors } from "@/constants";
-import { headerImage } from "@/utils";
 import { Stack } from "expo-router";
 import { useTranslation } from "react-i18next";
+
+import { Colors } from "@/constants";
+import { headerImage } from "@/utils";
 
 export default function GroupsStack() {
   const { t } = useTranslation();

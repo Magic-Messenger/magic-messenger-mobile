@@ -1,6 +1,12 @@
+import "@/i18n";
+
+import { Image } from "expo-image";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
+import { StyleSheet, View } from "react-native";
+
 import { AppLayout, ThemedText } from "@/components";
 import { Colors, Images } from "@/constants";
-import "@/i18n";
 import { useUserStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
 import {
@@ -10,10 +16,6 @@ import {
   spacingPixel,
   widthPixel,
 } from "@/utils";
-import { Image } from "expo-image";
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
 
 export default function IndexPage() {
   const { isLogin, rehydrated } = useUserStore();
@@ -33,8 +35,7 @@ export default function IndexPage() {
         return prev + ".";
       });
     }, 1000);
-  }
-
+  };
 
   useEffect(() => {
     setupInterval();

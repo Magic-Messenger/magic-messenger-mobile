@@ -1,5 +1,3 @@
-import { Colors, Images, spacing } from "@/constants";
-import { ColorDto, useThemedStyles } from "@/theme";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import {
@@ -10,6 +8,10 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import { Colors, Images, spacing } from "@/constants";
+import { ColorDto, useThemedStyles } from "@/theme";
+
 import { ThemedText } from "./ThemedText";
 import { TorBadge } from "./TorBadge";
 

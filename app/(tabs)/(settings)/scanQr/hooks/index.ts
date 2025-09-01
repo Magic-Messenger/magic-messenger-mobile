@@ -1,1 +1,1 @@
-export * from './useScanQr'
+export * from "./useScanQr";

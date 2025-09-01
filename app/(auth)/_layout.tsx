@@ -1,6 +1,7 @@
-import { Colors } from "@/constants";
 import { Stack } from "expo-router";
 import { useTranslation } from "react-i18next";
+
+import { Colors } from "@/constants";
 
 export default function AuthScreen() {
   const { t } = useTranslation();

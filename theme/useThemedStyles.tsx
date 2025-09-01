@@ -1,6 +1,8 @@
-import { Colors, commonStyle } from "@/constants";
 import { useMemo } from "react";
 import { ImageStyle, StyleSheet, TextStyle, ViewStyle } from "react-native";
+
+import { Colors, commonStyle } from "@/constants";
+
 import { useColor } from "./useColor";
 
 type NamedStyles<T> = { [P in keyof T]: ViewStyle | TextStyle | ImageStyle };
@@ -8,7 +10,7 @@ type NamedStyles<T> = { [P in keyof T]: ViewStyle | TextStyle | ImageStyle };
 export type ColorDto = typeof Colors;
 
 export const useThemedStyles = <T extends NamedStyles<T>>(
-  styleFunction?: (colors: ColorDto) => T
+  styleFunction?: (colors: ColorDto) => T,
 ) => {
   const { colors, mode } = useColor();
 

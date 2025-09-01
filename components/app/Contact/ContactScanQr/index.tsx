@@ -2,6 +2,7 @@ import { Image } from "expo-image";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { TouchableOpacity, View } from "react-native";
+
 import { Images } from "../../../../constants";
 import { useThemedStyles } from "../../../../theme";
 import { heightPixel, widthPixel } from "../../../../utils";

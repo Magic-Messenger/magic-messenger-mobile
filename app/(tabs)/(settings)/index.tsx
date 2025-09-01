@@ -1,11 +1,18 @@
-import {AppLayout, Icon, IconLibrary, IconNameForLibrary, ThemedText} from "@/components";
-import { Colors, flexBox, spacing } from "@/constants";
-import { fontPixel, widthPixel } from "@/utils";
 import { router } from "expo-router";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
-import {useUserStore} from "@/store";
+
+import {
+  AppLayout,
+  Icon,
+  IconLibrary,
+  IconNameForLibrary,
+  ThemedText,
+} from "@/components";
+import { Colors, flexBox, spacing } from "@/constants";
+import { useUserStore } from "@/store";
+import { fontPixel, widthPixel } from "@/utils";
 
 type SettingsItem = {
   label: string;
@@ -61,14 +68,13 @@ export default function SettingsScreen() {
       label: t("settings.logout"),
       iconType: "feather",
       iconName: "log-out",
-      onPress: logout
+      onPress: logout,
     },
   ] as SettingsItem[];
 
-
   const renderItem = useMemo(
     () =>
-        ({ item }: { item: SettingsItem }) => {
+      ({ item }: { item: SettingsItem }) => {
         return (
           <TouchableOpacity onPress={item?.onPress}>
             <View style={styles.settingItem}>
@@ -100,7 +106,7 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         );
       },
-    []
+    [],
   );
 
   return (
