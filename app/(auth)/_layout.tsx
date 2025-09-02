@@ -22,7 +22,7 @@ export default function AuthScreen() {
       <Stack.Screen name="preLogin/index" />
 
       <Stack.Screen
-        name="login/index"
+        name="login/screens/login"
         options={{
           headerShown: true,
           title: t("login.title"),

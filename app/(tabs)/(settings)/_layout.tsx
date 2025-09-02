@@ -63,6 +63,13 @@ export default function SettingsStack() {
           headerShown: true,
         }}
       />
+
+      <Stack.Screen
+        name="settings/screens/settings"
+        options={{
+          headerShown: true,
+        }}
+      />
     </Stack>
   );
 }

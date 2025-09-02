@@ -84,6 +84,9 @@ export default function ContactEdit() {
           control={control}
           name="username"
           label={t("contacts.userName")}
+          autoCorrect={false}
+          autoComplete="off"
+          autoCapitalize="none"
           rules={{
             required: t("inputError.required", {
               field: t("userName"),
@@ -103,6 +106,9 @@ export default function ContactEdit() {
           control={control}
           name="nickname"
           label={t("contacts.nickName")}
+          autoCorrect={false}
+          autoComplete="off"
+          autoCapitalize="none"
           rules={{
             required: t("inputError.required", {
               field: t("contacts.nickName"),

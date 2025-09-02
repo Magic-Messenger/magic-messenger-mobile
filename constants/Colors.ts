@@ -19,24 +19,28 @@ export const Colors = {
   menuInactiveColor: "#9DB2CE",
   white: "#fff",
 
+  inactiveColor: "#938F99",
+
   /* accent */
   mainAccent: "#521CB1",
 
   /* text */
   text: "#fff",
-  placeholder: "#fff",
+  placeholder: "#9DB2CE",
   textDisabled: "#555",
 
   /* gradient */
   backgroundColor: ["rgba(23, 7, 50, 1)", "rgba(1, 1, 3, 1)"],
+
   backgroundGradientColor: ["#521CB152", "#521CB100"],
-  secondaryBackground: "rgba(21, 9, 34, 1)",
+  secondaryBackground: "#2A1243",
+  secondaryBackgroundAlpha: "rgba(1, 1, 3, 0.4)",
   buttonPrimary: ["#783ABF", "#39149E"],
   buttonSecondary: ["#2A1243", "#2A1243"],
   buttonTransparent: ["transparent", "transparent"],
   buttonDanger: ["#FF2D2D", "#FF2D2D"],
 
   /* toast */
-  toatBackground: "#2DC62A",
-  toatBackgroundDanger: "#CB4848",
+  toastBackground: "#2DC62A",
+  toastBackgroundDanger: "#CB4848",
 };

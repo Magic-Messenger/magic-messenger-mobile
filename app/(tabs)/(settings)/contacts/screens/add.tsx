@@ -23,9 +23,12 @@ export default function ContactAdd() {
     onSubmit,
   } = useAddContact();
 
+  console.log("sadasdsadsa");
+
   return (
     <AppLayout
       container
+      keyboardAvoiding
       scrollable
       title={<ContactScanQr />}
       footer={
@@ -48,8 +51,8 @@ export default function ContactAdd() {
           name="username"
           label={t("contacts.userName")}
           autoCorrect={false}
-          autoCapitalize="none"
           autoComplete="off"
+          autoCapitalize="none"
           rules={{
             required: t("inputError.required", {
               field: t("userName"),
@@ -70,8 +73,8 @@ export default function ContactAdd() {
           name="nickname"
           label={t("contacts.nickName")}
           autoCorrect={false}
-          autoCapitalize="none"
           autoComplete="off"
+          autoCapitalize="none"
           rules={{
             required: t("inputError.required", {
               field: t("contacts.nickName"),
@@ -84,7 +87,7 @@ export default function ContactAdd() {
               }),
             },
           }}
-          error={errors.username?.message}
+          error={errors.nickname?.message}
         />
       </View>
     </AppLayout>

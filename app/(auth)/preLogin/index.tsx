@@ -2,9 +2,8 @@ import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
 
-import Logo from "@/assets/images/3d-logo.png";
 import { AppImage, AppLayout, Button, ThemedText } from "@/components";
-import { spacing } from "@/constants";
+import { Images, spacing } from "@/constants";
 import { ColorDto, useThemedStyles } from "@/theme";
 import { heightPixel, widthPixel } from "@/utils";
 
@@ -13,7 +12,7 @@ export default function PreLoginScreen() {
   const styles = useThemedStyles(createStyle);
 
   const redirectLoginPage = () => {
-    router.push("/(auth)/login");
+    router.push("/(auth)/login/screens/login");
   };
 
   const redirectRegisterPage = () => {
@@ -29,7 +28,7 @@ export default function PreLoginScreen() {
           styles.justifyContentCenter,
         ]}
       >
-        <AppImage source={Logo} style={styles.logoImage} />
+        <AppImage source={Images.logo} style={styles.logoImage} />
         <ThemedText weight="semiBold" style={styles.pt2}>
           {t("welcome")}
         </ThemedText>

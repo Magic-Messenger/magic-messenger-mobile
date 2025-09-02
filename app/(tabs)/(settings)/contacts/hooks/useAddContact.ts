@@ -17,7 +17,6 @@ export const useAddContact = () => {
     control,
     handleSubmit,
     reset,
-    watch,
     formState: { errors, isSubmitting, isLoading },
   } = useForm<CreateContactCommandRequest>();
 
@@ -37,12 +36,11 @@ export const useAddContact = () => {
     }
   };
 
-  const nickNameField = watch()?.nickname;
   useEffect(() => {
     if (username) {
-      reset({ username: username as string, nickname: nickNameField });
+      reset({ username: username as string, nickname: "" });
     }
-  }, [username, nickNameField, reset]);
+  }, [username, reset]);
 
   return {
     t,

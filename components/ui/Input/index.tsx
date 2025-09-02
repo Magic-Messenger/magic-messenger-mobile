@@ -20,7 +20,7 @@ import { Icon, IconLibrary, IconNameForLibrary } from "../Icon";
 
 interface IconProps {
   type?: IconLibrary;
-  name: IconNameForLibrary;
+  name: IconNameForLibrary<any>;
   size?: number;
   color?: string;
   onPress?: () => void;

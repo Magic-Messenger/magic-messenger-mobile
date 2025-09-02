@@ -1,10 +1,6 @@
 import { router } from "expo-router";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 
-import { usePostApiAccountLogin } from "@/api/endpoints/magicMessenger";
 import {
   AppImage,
   AppLayout,
@@ -14,56 +10,26 @@ import {
   SectionHeader,
   ThemedText,
 } from "@/components";
-import { flexBox, Images, spacing } from "@/constants";
-import { useUserStore } from "@/store";
-import { ColorDto, useThemedStyles } from "@/theme";
-import { fontPixel, getInstallationId, heightPixel, widthPixel } from "@/utils";
+import { Images } from "@/constants";
 
-interface RegisterFormData {
-  username: string;
-  password: string;
-}
+import { useLogin } from "../hooks";
 
 export default function LoginScreen() {
-  const { t } = useTranslation();
-  const { login, userName } = useUserStore();
-  const { mutateAsync: loginApi } = usePostApiAccountLogin();
-  const styles = useThemedStyles(createStyle);
-
-  const [passwordVisible, setPasswordVisible] = useState(false);
-
   const {
+    t,
     control,
+    errors,
+    styles,
+    isSubmitting,
     handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<RegisterFormData>({
-    defaultValues: {
-      username: userName ?? undefined,
-      password: undefined,
-    },
-  });
-
-  const onSubmit = async (formValues: RegisterFormData) => {
-    const { success, data } = await loginApi({
-      data: {
-        username: formValues?.username,
-        password: formValues?.password,
-        deviceId: await getInstallationId(),
-      },
-    });
-    if (success && data?.accessToken) {
-      login(
-        data?.accessToken?.token as string,
-        data?.account?.username as string,
-      );
-      router.push("/home");
-    }
-  };
+    onSubmit,
+    userName,
+  } = useLogin();
 
   return (
     <AppLayout
       container
-      scrollable
+      keyboardAvoiding
       showBadge={false}
       footer={
         <>
@@ -128,28 +94,14 @@ export default function LoginScreen() {
             />
           )}
 
-          <PasswordInput control={control} error={errors.password?.message} />
+          <PasswordInput
+            autoFocus={!!userName}
+            control={control}
+            errors={errors.password?.message}
+            placeholder="login.password"
+          />
         </View>
       </View>
     </AppLayout>
   );
 }
-
-const createStyle = (colors: ColorDto) =>
-  StyleSheet.create({
-    formContainer: {
-      ...spacing({
-        gap: 16,
-      }),
-    },
-    logoImage: {
-      width: widthPixel(220),
-      height: heightPixel(50),
-    },
-    forgotAccountContainer: {
-      ...flexBox(1, "row", "flex-end"),
-    },
-    forgotAccountText: {
-      fontSize: fontPixel(14),
-    },
-  });

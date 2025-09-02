@@ -2,7 +2,6 @@
   "welcome": "Welcome",
   "or": "or",
   "back": "Back",
-
   "common": {
     "successCopy": "Successfully Copied",
     "cancel": "Cancel",
@@ -18,13 +17,12 @@
     "yes": "Yes",
     "no": "No"
   },
-
   "login": {
     "title": "Login",
     "userName": "Hello {{userName}}",
+    "password": "Your password",
     "button": "Login"
   },
-
   "register": {
     "title": "Register",
     "button": "Next",
@@ -32,7 +30,6 @@
     "subtitle": "If you lose access to your chat space, you will need these 15 words in the correct sequence. To restore, you need the license key, your digit access, and these 15 words in the correct order.",
     "passwordNotMatch": "Passwords do not match"
   },
-
   "forgotAccount": {
     "title": "Forgot Your Password?",
     "verifyPhrases": "Security Key Verification",
@@ -40,16 +37,13 @@
     "inputPhrases": "Security Key",
     "userResetPassword": "Password Reset"
   },
-
   "userName": "Username",
   "password": "Password",
   "confirmPassword": "Confirm Password",
-
   "inputError": {
     "minLength": "{{field}} must be at least {{count}} characters",
     "required": "{{field}} is required"
   },
-
   "securityPhrases": {
     "title": "Security Screen",
     "sectionTitle": "Write 15-word keyphrase",
@@ -61,14 +55,12 @@
       "successCopyClipboard": "Successfully Copied"
     }
   },
-
   "tabs": {
     "chat": "Chat",
     "groups": "Groups",
     "notes": "Notes",
     "settings": "Settings"
   },
-
   "settings": {
     "title": "Settings",
     "profile": "Profile",
@@ -78,16 +70,32 @@
     "settings": "Settings",
     "server": "Servers",
     "support": "Support",
-    "logout": "Logout"
+    "logout": "Logout",
+    "deleteButton": "Delete button",
+    "deleteButtonDescription": "On start screen or icon touch",
+    "deleteMyMessages": "Delete my messages",
+    "deleteMyMessagesDescription": "For single chats and groups",
+    "voiceMessageTransformer": "Voice message transformer",
+    "voiceMessageTransformerDescription": "Automatically transform your voice",
+    "askForSpacePassword": "Ask for space password",
+    "askForSpacePasswordDescription": "After certain time in minutes",
+    "torNetwork": "TOR network",
+    "torNetworkDescription": "Route your traffic through the TOR",
+    "pushNotifications": "Push notifications",
+    "pushNotificationsDescription": "Enable or disable push notifications",
+    "showOnlineStatus": "Show online status",
+    "showOnlineStatusDescription": "Display your online status to others",
+    "blockScreenshots": "Block screenshots",
+    "blockScreenshotsDescription": "Enable or disable screenshot function",
+    "readReceipts": "Read receipts",
+    "readReceiptsDescription": "Enable or disable read receipt"
   },
-
   "languages": {
     "en": "English",
     "es": "Spanish",
     "fr": "French",
     "nl": "Dutch"
   },
-
   "profile": {
     "yourProfile": "Profile",
     "userName": "User Name",
@@ -101,7 +109,6 @@
     "password": "Your Password",
     "passwordError": "Password must be at least 8 characters"
   },
-
   "contacts": {
     "title": "Contacts",
     "blocked": "Blocked",
@@ -132,19 +139,16 @@
     "unblockContactAlertTitle": "Are you sure to unblock contact?",
     "unblockContactAlertMessage": "You will start receiving messages from this contact."
   },
-
   "scanQr": {
     "title": "Scan QR Code",
     "inputUserName": "Input User Name",
     "inputUserNamePlaceholder": "Type the username here",
     "goToCamera": "Go to Camera"
   },
-
   "barcode": {
     "permissionTitle": "You must grant permission to use the camera.",
     "grantPermission": "Grant Permission"
   },
-
   "home": {
     "newChat": "New Chat"
   }

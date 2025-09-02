@@ -12,7 +12,7 @@ export const toastConfig = {
       text1NumberOfLines={2}
       style={{
         borderLeftWidth: 0,
-        backgroundColor: Colors.toatBackground,
+        backgroundColor: Colors.toastBackground,
         borderRadius: 20,
         marginTop: spacingPixel(20),
       }}
@@ -29,7 +29,7 @@ export const toastConfig = {
       text1NumberOfLines={2}
       style={{
         borderLeftWidth: 0,
-        backgroundColor: Colors.toatBackgroundDanger,
+        backgroundColor: Colors.toastBackgroundDanger,
         borderRadius: 20,
         marginTop: spacingPixel(20),
       }}

@@ -10,6 +10,8 @@ import {
   Button,
   Dropdown,
   Input,
+  PasswordChecklist,
+  PasswordInput,
   SectionHeader,
 } from "@/components";
 import { spacing } from "@/constants";
@@ -36,54 +38,55 @@ export default function RegisterScreen() {
   }, [appSupportLanguages]);
 
   const defaultLocale = useMemo(() => {
-    return process?.env?.EXPO_PUBLIC_DEFAULT_LANGUAGE;
+    return process?.env?.EXPO_PUBLIC_DEFAULT_LANGUAGE ?? "en";
   }, [process?.env?.EXPO_PUBLIC_DEFAULT_LANGUAGE]);
 
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
+    watch,
   } = useForm<RegisterFormData>({
     defaultValues: {
-      username: `test-${Math.random()}`,
-      password: "Kadir123*+",
-      confirmPassword: "Kadir123*+",
+      username: undefined,
+      password: undefined,
+      confirmPassword: undefined,
       language: defaultLocale,
     },
   });
 
-  const onSubmit = async (formValues: RegisterFormData) => {
-    try {
-      if (formValues.password !== formValues.confirmPassword) {
-        showToast({
-          type: "error",
-          text1: t("register.passwordNotMatch"),
-        });
-        return;
-      }
+  const password = watch("password");
+  const confirmPassword = watch("confirmPassword");
+  const language = watch("language");
 
-      const { success, data } = await registerApi({
-        data: {
-          username: formValues?.username,
-          password: formValues?.password,
-          confirmPassword: formValues?.confirmPassword,
-          deviceId: await getInstallationId(),
-          publicKey: userPublicKey(),
+  const onSubmit = async (formValues: RegisterFormData) => {
+    if (formValues.password !== formValues.confirmPassword) {
+      showToast({
+        type: "error",
+        text1: t("register.passwordNotMatch"),
+      });
+      return;
+    }
+
+    const { success, data } = await registerApi({
+      data: {
+        username: formValues?.username,
+        password: formValues?.password,
+        confirmPassword: formValues?.confirmPassword,
+        deviceId: await getInstallationId(),
+        publicKey: userPublicKey(),
+      },
+    });
+
+    if (success) {
+      router.push({
+        pathname: "/(auth)/securityPhrases",
+        params: {
+          accessToken: data?.accessToken?.token,
+          securityPhrases: data?.securityPhrases,
+          userName: data?.account?.username,
         },
       });
-
-      if (success) {
-        router.push({
-          pathname: "/(auth)/securityPhrases",
-          params: {
-            accessToken: data?.accessToken?.token,
-            securityPhrases: data?.securityPhrases,
-            userName: data?.account?.username,
-          },
-        });
-      }
-    } catch (error) {
-      console.error("Kayıt sırasında hata:", error);
     }
   };
 
@@ -91,6 +94,7 @@ export default function RegisterScreen() {
     <AppLayout
       container
       scrollable
+      keyboardAvoiding
       showBadge={false}
       footer={
         <Button
@@ -102,17 +106,34 @@ export default function RegisterScreen() {
         />
       }
     >
-      <View style={styles.mainContainer}>
+      <View>
         <SectionHeader
           title={t("register.title")}
           description={t("register.subtitle")}
         />
 
         <View style={styles.formContainer}>
+          <Dropdown
+            control={control}
+            name="language"
+            label={t("register.selectLanguage")}
+            options={supportLanguages}
+            rules={{
+              required: t("inputError.required", {
+                field: t("register.selectLanguage"),
+              }),
+            }}
+            error={errors.language?.message}
+            style={styles.dropDown}
+          />
+
           <Input
             control={control}
             name="username"
             label={t("userName")}
+            autoCorrect={false}
+            autoComplete="off"
+            autoCapitalize="none"
             rules={{
               required: t("inputError.required", {
                 field: t("userName"),
@@ -128,11 +149,10 @@ export default function RegisterScreen() {
             error={errors.username?.message}
           />
 
-          <Input
+          <PasswordInput
             control={control}
             name="password"
             label={t("password")}
-            secureTextEntry
             rules={{
               required: t("inputError.required", {
                 field: t("password"),
@@ -145,14 +165,13 @@ export default function RegisterScreen() {
                 }),
               },
             }}
-            error={errors.password?.message}
+            errors={errors.password?.message}
           />
 
-          <Input
+          <PasswordInput
             control={control}
             name="confirmPassword"
             label={t("confirmPassword")}
-            secureTextEntry
             rules={{
               required: t("inputError.required", {
                 field: t("password"),
@@ -165,20 +184,22 @@ export default function RegisterScreen() {
                 }),
               },
             }}
-            error={errors.confirmPassword?.message}
+            errors={errors.confirmPassword?.message}
           />
 
-          <Dropdown
-            control={control}
-            name="language"
-            label={t("register.selectLanguage")}
-            options={supportLanguages}
-            rules={{
-              required: t("inputError.required", {
-                field: t("register.selectLanguage"),
-              }),
-            }}
-            error={errors.language?.message}
+          <PasswordChecklist
+            rules={[
+              "minLength",
+              "capital",
+              "lowercase",
+              "number",
+              "specialChar",
+              "match",
+            ]}
+            language={(language as string) ?? "en"}
+            minLength={8}
+            value={password}
+            valueAgain={confirmPassword}
           />
         </View>
       </View>
@@ -187,12 +208,15 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
-  mainContainer: {
-    ...spacing({}),
-  },
   formContainer: {
     ...spacing({
       gap: 16,
+      pb: 120,
+    }),
+  },
+  dropDown: {
+    ...spacing({
+      mb: 0,
     }),
   },
 });

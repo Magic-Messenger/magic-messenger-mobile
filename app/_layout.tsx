@@ -6,7 +6,6 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import { StyleSheet } from "react-native";
 import Toast from "react-native-toast-message";
 
 import { Colors } from "@/constants";
@@ -64,10 +63,3 @@ export default function RootLayout() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  headerImage: {
-    width: 105,
-    height: 30,
-  },
-});
