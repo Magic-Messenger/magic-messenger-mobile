@@ -2,6 +2,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
+import { AccountProfileDto } from "@/api/models";
+
 interface UserStore {
   rehydrated: boolean;
   isLogin: boolean;
@@ -11,6 +13,8 @@ interface UserStore {
     publicKey: string | null;
     privateKey: string | null;
   };
+  profile?: AccountProfileDto;
+  setProfile: (profile: AccountProfileDto) => void;
   login: (accessToken: string | null, userName: string | null) => void;
   logout: () => void;
   setUserKey: (publicKey: string | null, privateKey: string | null) => void;
@@ -23,6 +27,7 @@ export const useUserStore = create<UserStore>()(
       isLogin: false,
       userName: null,
       accessToken: null,
+      profile: undefined,
       credentials: {
         publicKey: null,
         privateKey: null,
@@ -32,6 +37,9 @@ export const useUserStore = create<UserStore>()(
       },
       logout: () => {
         set({ isLogin: false, accessToken: null, userName: null });
+      },
+      setProfile: (profile: AccountProfileDto) => {
+        set({ profile });
       },
       setUserKey: (publicKey, privateKey) => {
         set((state) => ({

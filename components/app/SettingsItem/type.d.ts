@@ -3,7 +3,7 @@ export type SettingsItemType = {
   description: string;
   value: boolean | number;
   options?: SettingsItemOption[];
-  onSettingsChanged?: (value: boolean | number) => void;
+  onSettingsChanged?: (value: boolean | number) => Promise<void> | void;
 };
 
 export type SettingsItemOption = {

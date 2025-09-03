@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import {
   FlatList,
@@ -14,13 +15,27 @@ import { fontPixel, heightPixel, widthPixel } from "@/utils";
 
 import { SettingsItemOption, SettingsItemType } from "./type";
 
-export const SettingsItem = (props: SettingsItemType) => {
+const SettingsItem = (props: SettingsItemType) => {
   const { title, description, value, options, onSettingsChanged } = props;
   const styles = useThemedStyles(createStyle);
   const { t } = useTranslation();
 
+  const handleOnPress = useCallback(
+    (val: number) => {
+      onSettingsChanged?.(val);
+    },
+    [onSettingsChanged],
+  );
+
+  const handleOnValueChanged = useCallback(
+    (val: boolean) => {
+      onSettingsChanged?.(val);
+    },
+    [onSettingsChanged],
+  );
+
   const renderItem = ({ item }: { item: SettingsItemOption }) => (
-    <TouchableOpacity onPress={() => onSettingsChanged?.(item.value)}>
+    <TouchableOpacity onPress={() => handleOnPress(item.value)}>
       <View
         style={[
           styles.option,
@@ -41,7 +56,7 @@ export const SettingsItem = (props: SettingsItemType) => {
         <ThemedText style={styles.description}>{t(description)}</ThemedText>
       </View>
       <View style={styles.rightContainer}>
-        {options ? (
+        {options && options?.length > 0 ? (
           <FlatList
             contentContainerStyle={styles.optionsContainer}
             data={options}
@@ -57,13 +72,16 @@ export const SettingsItem = (props: SettingsItemType) => {
             }}
             ios_backgroundColor={value ? Colors.primary : Colors.inactiveColor}
             value={value as boolean}
-            onValueChange={onSettingsChanged}
+            onValueChange={handleOnValueChanged}
+            style={{ transform: [{ scale: 0.75 }] }}
           />
         )}
       </View>
     </View>
   );
 };
+
+export default SettingsItem;
 
 const createStyle = (colors: ColorDto) =>
   StyleSheet.create({
@@ -102,7 +120,7 @@ const createStyle = (colors: ColorDto) =>
       }),
     },
     optionsContainer: {
-      ...flexBox(1, "row", "space-between", "center"),
+      ...flexBox(1, "row", "flex-end", "center"),
       gap: widthPixel(5),
       borderRadius: widthPixel(5),
     },

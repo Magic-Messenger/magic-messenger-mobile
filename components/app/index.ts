@@ -1,5 +1,7 @@
+import AppLayout from "./AppLayout";
 import PasswordChecklist from "./PasswordChecklist";
-export * from "./AppLayout";
+import SettingsItem from "./SettingsItem";
+
 export * from "./Contact/ContactHeader";
 export * from "./Contact/ContactItem";
 export * from "./Contact/ContactScanQr";
@@ -8,8 +10,7 @@ export * from "./ExternalLink";
 export * from "./HapticTab";
 export * from "./PasswordInput";
 export * from "./SectionHeader";
-export * from "./SettingsItem";
 export * from "./ThemedText";
 export * from "./TorBadge";
 
-export { PasswordChecklist };
+export { AppLayout, PasswordChecklist, SettingsItem };

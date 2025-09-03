@@ -37,9 +37,11 @@ export default function TabLayout() {
           tabBarLabelStyle: { ...spacing({ mt: 5 }) },
           tabBarIcon: ({ focused }) => (
             <Icon
-              type="ant"
-              size={widthPixel(22)}
-              name="message1"
+              type="ionicons"
+              size={widthPixel(24)}
+              name={
+                focused ? "chatbubble-ellipses" : "chatbubble-ellipses-outline"
+              }
               color={focused ? Colors.white : Colors.menuInactiveColor}
             />
           ),
@@ -53,9 +55,9 @@ export default function TabLayout() {
           tabBarLabelStyle: { ...spacing({ mt: 5 }) },
           tabBarIcon: ({ focused }) => (
             <Icon
-              type="feather"
-              size={widthPixel(23)}
-              name="users"
+              type="material-community"
+              size={widthPixel(24)}
+              name={focused ? "account-group" : "account-group-outline"}
               color={focused ? Colors.white : Colors.menuInactiveColor}
             />
           ),
@@ -69,9 +71,9 @@ export default function TabLayout() {
           tabBarLabelStyle: { ...spacing({ mt: 5 }) },
           tabBarIcon: ({ focused }) => (
             <Icon
-              type="feather"
+              type="ionicons"
               size={widthPixel(24)}
-              name="file"
+              name={focused ? "document-text" : "document-text-outline"}
               color={focused ? Colors.white : Colors.menuInactiveColor}
             />
           ),
@@ -85,9 +87,9 @@ export default function TabLayout() {
           tabBarLabelStyle: { ...spacing({ mt: 5 }) },
           tabBarIcon: ({ focused }) => (
             <Icon
-              type="feather"
-              size={widthPixel(23)}
-              name="settings"
+              type="ionicons"
+              size={widthPixel(24)}
+              name={focused ? "settings" : "settings-outline"}
               color={focused ? Colors.white : Colors.menuInactiveColor}
             />
           ),

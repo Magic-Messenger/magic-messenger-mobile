@@ -23,8 +23,6 @@ export default function ContactAdd() {
     onSubmit,
   } = useAddContact();
 
-  console.log("sadasdsadsa");
-
   return (
     <AppLayout
       container
