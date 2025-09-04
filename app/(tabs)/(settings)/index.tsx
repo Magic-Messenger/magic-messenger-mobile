@@ -48,6 +48,7 @@ export default function SettingsScreen() {
       label: t("settings.license"),
       iconType: "entypo",
       iconName: "text-document",
+      onPress: () => router.push("/(tabs)/(settings)/license/screens/license"),
     },
     {
       label: t("settings.settings"),

@@ -70,6 +70,13 @@ export default function SettingsStack() {
           headerShown: true,
         }}
       />
+
+      <Stack.Screen
+        name="license/screens/license"
+        options={{
+          headerShown: true,
+        }}
+      />
     </Stack>
   );
 }

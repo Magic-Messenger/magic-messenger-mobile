@@ -73,7 +73,7 @@ function AppLayout({
               styles.justifyContentCenter,
             ]}
           >
-            <ActivityIndicator />
+            <ActivityIndicator size="large" />
           </View>
         ) : (
           <>
@@ -84,11 +84,15 @@ function AppLayout({
                     enableAutomaticScroll: true,
                     keyboardShouldPersistTaps: "handled",
                     contentContainerStyle: styles.content,
+                    showsVerticalScrollIndicator: false,
+                    showsHorizontalScrollIndicator: false,
                   }
                 : scrollable
                   ? {
                       contentContainerStyle: styles.content,
                       keyboardShouldPersistTaps: "handled",
+                      showsVerticalScrollIndicator: false,
+                      showsHorizontalScrollIndicator: false,
                     }
                   : { style: styles.content })}
             >

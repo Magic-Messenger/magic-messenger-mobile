@@ -5,6 +5,7 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
+import { useGetApiAccountGetProfile } from "@/api/endpoints/magicMessenger";
 import { AppLayout, ThemedText } from "@/components";
 import { Colors, Images } from "@/constants";
 import { useUserStore } from "@/store";
@@ -18,8 +19,14 @@ import {
 } from "@/utils";
 
 export default function IndexPage() {
-  const { isLogin, rehydrated } = useUserStore();
+  const isLogin = useUserStore((state) => state.isLogin);
+  const rehydrated = useUserStore((state) => state.rehydrated);
+  const setProfile = useUserStore((state) => state.setProfile);
   const styles = useThemedStyles(createStyle);
+
+  const { data: profileResponse, refetch } = useGetApiAccountGetProfile({
+    query: { enabled: isLogin },
+  });
 
   const [connected, setConnected] = useState<boolean>(false);
   const [dots, setDots] = useState<string>("");
@@ -64,6 +71,14 @@ export default function IndexPage() {
   useEffect(() => {
     console.log("Index Page - isLogin:", isLogin, "rehydrated:", rehydrated);
   }, [isLogin, rehydrated]);
+
+  useEffect(() => {
+    if (profileResponse?.data) setProfile(profileResponse?.data);
+  }, [profileResponse?.data]);
+
+  useEffect(() => {
+    if (isLogin) refetch();
+  }, [isLogin]);
 
   useEffect(() => {
     const userPublicKeyCheck = checkUserCredentials();

@@ -10,6 +10,8 @@ export const Colors = {
   danger: "#FF2D2D",
   success: "#19CA16",
 
+  black: "#000000",
+
   background: "#fff",
   tint: "#0a7ea4",
   icon: "#687076",

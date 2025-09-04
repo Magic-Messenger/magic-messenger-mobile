@@ -151,5 +151,19 @@
   },
   "home": {
     "newChat": "New Chat"
+  },
+  "license": {
+    "title": "License",
+    "yourLicense": "Your License",
+    "upgrade": "Upgrade",
+    "price": "PRICE",
+    "oneTime": "ONE TIME",
+    "buyNow": "BUY NOW",
+    "optionsForRenewal": "Options for Renewal",
+    "copyLicenseCode": "Copy License Code",
+    "activeLicenseText": "Active license code",
+    "expireLicenseDate": "Activated until {{expireDate}}",
+    "successCopy": "License code is copied!",
+    "successUpgrade": "License is upgraded successfully!"
   }
 }
