@@ -77,6 +77,13 @@ export default function SettingsStack() {
           headerShown: true,
         }}
       />
+
+      <Stack.Screen
+        name="servers/screens/servers"
+        options={{
+          headerShown: true,
+        }}
+      />
     </Stack>
   );
 }

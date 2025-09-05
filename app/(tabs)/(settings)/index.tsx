@@ -61,6 +61,7 @@ export default function SettingsScreen() {
       label: t("settings.server"),
       iconType: "feather",
       iconName: "server",
+      onPress: () => router.push("/(tabs)/(settings)/servers/screens/servers"),
     },
     {
       label: t("settings.support"),

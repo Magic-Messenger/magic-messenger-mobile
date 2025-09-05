@@ -165,5 +165,19 @@
     "expireLicenseDate": "Activated until {{expireDate}}",
     "successCopy": "License code is copied!",
     "successUpgrade": "License is upgraded successfully!"
+  },
+  "servers": {
+    "title": "Connected ({{status}})",
+    "connections": "Connections",
+    "connection": "connection",
+    "encryption": "encryption",
+    "magicServer": "Magic Server",
+    "step1": "TOR",
+    "step2": "End-to-end",
+    "step3": "Connected to",
+    "trafficRoute": "Traffic Route",
+    "disconnect": "Disconnect",
+    "startConnection": "Start Connection",
+    "restartConnection": "Restart Connection"
   }
 }

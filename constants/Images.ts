@@ -9,4 +9,8 @@ export const Images = {
   scanQrBgImage: require("@/assets/images/scan-qr-bg.png"),
   icon: require("@/assets/images/icon.png"),
   logoSymbol: require("@/assets/images/logo-symbol.png"),
+  connectionImage: require("@/assets/images/connection.png"),
+  noConnectionImage: require("@/assets/images/no-connection.png"),
+  serverImage: require("@/assets/images/server.png"),
+  magicServerImage: require("@/assets/images/server-magic.png"),
 };
