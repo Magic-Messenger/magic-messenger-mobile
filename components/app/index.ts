@@ -2,6 +2,7 @@ import AppLayout from "./AppLayout";
 import PasswordChecklist from "./PasswordChecklist";
 import SettingsItem from "./SettingsItem";
 
+export * from "./Collapsible";
 export * from "./Contact/ContactHeader";
 export * from "./Contact/ContactItem";
 export * from "./Contact/ContactScanQr";

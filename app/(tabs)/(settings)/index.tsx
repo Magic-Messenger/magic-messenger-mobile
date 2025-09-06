@@ -67,6 +67,7 @@ export default function SettingsScreen() {
       label: t("settings.support"),
       iconType: "material-community",
       iconName: "comment-question-outline",
+      onPress: () => router.push("/(tabs)/(settings)/support/screens/support"),
     },
     {
       label: t("settings.logout"),

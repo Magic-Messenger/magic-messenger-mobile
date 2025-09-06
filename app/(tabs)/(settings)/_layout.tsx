@@ -84,6 +84,27 @@ export default function SettingsStack() {
           headerShown: true,
         }}
       />
+
+      <Stack.Screen
+        name="support/screens/support"
+        options={{
+          headerShown: true,
+        }}
+      />
+
+      <Stack.Screen
+        name="support/screens/faq"
+        options={{
+          headerShown: true,
+        }}
+      />
+
+      <Stack.Screen
+        name="support/screens/faqDetail"
+        options={{
+          headerShown: true,
+        }}
+      />
     </Stack>
   );
 }

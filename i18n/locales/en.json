@@ -179,5 +179,19 @@
     "disconnect": "Disconnect",
     "startConnection": "Start Connection",
     "restartConnection": "Restart Connection"
+  },
+  "support": {
+    "title": "Support",
+    "view": "View",
+    "browse": "Browse",
+    "faqTitle": "Frequently Asked Questions",
+    "faqDescription": "Browse the FAQ Categories",
+    "ticketsTitle": "My Support Tickets",
+    "ticketsDescription": "View your support tickets",
+    "startSupportTicketTitle": "Start Support Ticket",
+    "startSupportTicketDescription": "Start a new support ticket",
+    "faqCategoryGeneral": "General",
+    "faqCategoryPrivacy": "Privacy",
+    "faqCategoryPricing": "Pricing"
   }
 }
