@@ -1,8 +1,33 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 import { AccountProfileDto } from "@/api/models";
+
+const SecureStoreStorage = {
+  getItem: async (key: string): Promise<string | null> => {
+    try {
+      return await SecureStore.getItemAsync(key);
+    } catch (e) {
+      console.error("SecureStore getItem error:", e);
+      return null;
+    }
+  },
+  setItem: async (key: string, value: string): Promise<void> => {
+    try {
+      await SecureStore.setItemAsync(key, value);
+    } catch (e) {
+      console.error("SecureStore setItem error:", e);
+    }
+  },
+  removeItem: async (key: string): Promise<void> => {
+    try {
+      await SecureStore.deleteItemAsync(key);
+    } catch (e) {
+      console.error("SecureStore removeItem error:", e);
+    }
+  },
+};
 
 interface UserStore {
   rehydrated: boolean;
@@ -57,7 +82,7 @@ export const useUserStore = create<UserStore>()(
     }),
     {
       name: "user-store",
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => SecureStoreStorage),
       partialize: (state) => ({
         userName: state.userName,
         credentials: state.credentials,

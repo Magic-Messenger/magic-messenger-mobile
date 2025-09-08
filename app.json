@@ -61,6 +61,7 @@
       ],
       "expo-localization",
       "expo-iap",
+      "expo-secure-store",
       [
         "expo-build-properties",
         {

@@ -9,7 +9,7 @@ import {
   encodeUTF8,
 } from "tweetnacl-util";
 
-import { useUserStore } from "@/store";
+import { useUserStore } from "../store";
 
 if (typeof global.crypto !== "object") {
   global.crypto = {} as any;
