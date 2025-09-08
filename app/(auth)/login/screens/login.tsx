@@ -24,6 +24,7 @@ export default function LoginScreen() {
     handleSubmit,
     onSubmit,
     userName,
+    handleChangeAccount,
   } = useLogin();
 
   return (
@@ -40,6 +41,15 @@ export default function LoginScreen() {
             loading={isSubmitting}
             disabled={isSubmitting}
           />
+
+          {userName && (
+            <Button
+              type="danger"
+              label={t("login.changeAccount")}
+              onPress={handleChangeAccount}
+              style={styles.mt2}
+            />
+          )}
 
           <Button
             type="secondary"

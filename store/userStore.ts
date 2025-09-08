@@ -18,6 +18,7 @@ interface UserStore {
   login: (accessToken: string | null, userName: string | null) => void;
   logout: () => void;
   setUserKey: (publicKey: string | null, privateKey: string | null) => void;
+  setUsername: (userName?: string | null) => void;
 }
 
 export const useUserStore = create<UserStore>()(
@@ -36,7 +37,7 @@ export const useUserStore = create<UserStore>()(
         set({ isLogin: true, accessToken, userName });
       },
       logout: () => {
-        set({ isLogin: false, accessToken: null, userName: null });
+        set({ isLogin: false, accessToken: null });
       },
       setProfile: (profile: AccountProfileDto) => {
         set({ profile });
@@ -49,6 +50,9 @@ export const useUserStore = create<UserStore>()(
             privateKey,
           },
         }));
+      },
+      setUsername: (userName?: string | null) => {
+        set({ userName });
       },
     }),
     {

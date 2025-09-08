@@ -21,7 +21,10 @@
     "title": "Login",
     "userName": "Hello {{userName}}",
     "password": "Your password",
-    "button": "Login"
+    "button": "Login",
+    "changeAccount": "Change Account",
+    "changeAccountAlertTitle": "Change Account",
+    "changeAccountAlertMessage": "Do you want to login with another username? This will clear your current session."
   },
   "register": {
     "title": "Register",

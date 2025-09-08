@@ -1,9 +1,13 @@
 import { router } from "expo-router";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { StyleSheet } from "react-native";
+import { Alert, StyleSheet } from "react-native";
 
-import { usePostApiAccountLogin } from "@/api/endpoints/magicMessenger";
+import {
+  useGetApiAccountGetProfile,
+  usePostApiAccountLogin,
+} from "@/api/endpoints/magicMessenger";
 import { flexBox, spacing } from "@/constants";
 import { useUserStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
@@ -16,18 +20,23 @@ interface RegisterFormData {
 
 export const useLogin = () => {
   const { t } = useTranslation();
-  const { login, userName } = useUserStore();
+  const { login, userName, isLogin, setProfile, setUsername } = useUserStore();
   const { mutateAsync: loginApi } = usePostApiAccountLogin();
+  const { data: profileResponse, refetch } = useGetApiAccountGetProfile({
+    query: { enabled: isLogin },
+  });
+
   const styles = useThemedStyles(createStyle);
 
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>({
     defaultValues: {
       username: userName ?? undefined,
-      password: undefined,
+      password: __DEV__ ? "Omer123*+!" : undefined,
     },
   });
 
@@ -48,6 +57,36 @@ export const useLogin = () => {
     }
   };
 
+  const onChangeAccount = () => {
+    setUsername(undefined);
+    reset({ username: undefined, password: undefined });
+  };
+  const handleChangeAccount = () => {
+    Alert.alert(
+      t("login.changeAccountAlertTitle"),
+      t("login.changeAccountAlertMessage"),
+      [
+        {
+          text: t("common.cancel"),
+          style: "cancel",
+        },
+        {
+          text: t("login.changeAccount"),
+          style: "destructive",
+          onPress: onChangeAccount,
+        },
+      ],
+    );
+  };
+
+  useEffect(() => {
+    if (profileResponse?.data) setProfile(profileResponse?.data);
+  }, [profileResponse?.data]);
+
+  useEffect(() => {
+    if (isLogin) refetch();
+  }, [isLogin]);
+
   return {
     t,
     styles,
@@ -57,6 +96,7 @@ export const useLogin = () => {
     onSubmit,
     isSubmitting,
     userName,
+    handleChangeAccount,
   };
 };
 
