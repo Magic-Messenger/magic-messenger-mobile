@@ -31,27 +31,23 @@ export default function VerifyPhrasesScreen() {
   });
 
   const onSubmit = async (formValues: RegisterFormData) => {
-    try {
-      if (formValues) {
-        const { success } = await verifyPhrases({
-          data: {
+    if (formValues) {
+      const { success } = await verifyPhrases({
+        data: {
+          username: formValues?.username,
+          phrases: formValues?.phrases?.match(/.{1,4}/g),
+        },
+      });
+
+      if (success) {
+        router.push({
+          pathname: "/(auth)/resetPassword",
+          params: {
             username: formValues?.username,
             phrases: formValues?.phrases?.match(/.{1,4}/g),
           },
         });
-
-        if (success) {
-          router.push({
-            pathname: "/(auth)/resetPassword",
-            params: {
-              username: formValues?.username,
-              phrases: formValues?.phrases?.match(/.{1,4}/g),
-            },
-          });
-        }
       }
-    } catch (error) {
-      console.error("Kayıt sırasında hata:", error);
     }
   };
 

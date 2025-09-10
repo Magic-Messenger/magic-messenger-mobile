@@ -21,7 +21,7 @@ export default function LicenseNumberScreen() {
           groupCount={4}
           charactersPerGroup={4}
           onChangeText={(text) => console.log("result:", text)}
-          onComplete={(_text) => router.push("/login/screens/login")}
+          onComplete={(_text) => router.push("/(auth)/login/screens/login")}
         />
 
         <Button type="primary" label="Next" style={styles.mt10} />

@@ -37,22 +37,18 @@ export default function ResetPasswordScreen() {
   });
 
   const onSubmit = async (formValues: FormData) => {
-    try {
-      if (formValues) {
-        const { success } = await recoverPassword({
-          data: {
-            ...params,
-            phrases: params?.phrases?.split(","),
-            ...formValues,
-          },
-        });
+    if (formValues) {
+      const { success } = await recoverPassword({
+        data: {
+          ...params,
+          phrases: params?.phrases?.split(","),
+          ...formValues,
+        },
+      });
 
-        if (success) {
-          router.dismissTo("/(auth)/login");
-        }
+      if (success) {
+        router.dismissTo("/(auth)/login/screens/login");
       }
-    } catch (error) {
-      console.error("Kayıt sırasında hata:", error);
     }
   };
 

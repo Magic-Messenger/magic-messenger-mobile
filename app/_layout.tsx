@@ -1,11 +1,14 @@
 import "react-native-reanimated";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BlurView } from "expo-blur";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
+import * as ScreenCapture from "expo-screen-capture";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { AppState, StyleSheet } from "react-native";
 import Toast from "react-native-toast-message";
 
 import { Colors } from "@/constants";
@@ -28,11 +31,30 @@ export default function RootLayout() {
 
   const { rehydrated } = useUserStore();
 
+  const [showOverlay, setShowOverlay] = useState(false);
+
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
     }
   }, [loaded]);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener(
+      "change",
+      async (nextAppState) => {
+        if (nextAppState === "background" || nextAppState === "inactive") {
+          setShowOverlay(true);
+          await ScreenCapture.preventScreenCaptureAsync();
+        } else {
+          setShowOverlay(false);
+          await ScreenCapture.allowScreenCaptureAsync();
+        }
+      },
+    );
+
+    return () => subscription.remove();
+  }, []);
 
   if (!loaded || !rehydrated) {
     return null;
@@ -60,6 +82,10 @@ export default function RootLayout() {
         <Toast config={toastConfig as never} />
         <StatusBar style="light" />
       </QueryClientProvider>
+
+      {showOverlay && (
+        <BlurView intensity={90} style={StyleSheet.absoluteFill} tint="dark" />
+      )}
     </>
   );
 }

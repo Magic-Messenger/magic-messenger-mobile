@@ -4397,6 +4397,11 @@ expo-router@~5.1.4:
     server-only "^0.0.1"
     shallowequal "^1.1.0"
 
+expo-screen-capture@~7.2.0:
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/expo-screen-capture/-/expo-screen-capture-7.2.0.tgz#213a2621c1e15fb306d164454b1bf0180b8766b2"
+  integrity sha512-eeLPQ4Ise+G5Gqp+RKtgf7qEqKB/kSXwP7OaW4KGnTYBub+a5h5VnYNrrJJUtY9XNVOpRWxWivPgVxjJd5ioBg==
+
 expo-secure-store@~14.2.4:
   version "14.2.4"
   resolved "https://registry.yarnpkg.com/expo-secure-store/-/expo-secure-store-14.2.4.tgz#673743567a6459fb4b5f9406d57d9a3b16bca69f"

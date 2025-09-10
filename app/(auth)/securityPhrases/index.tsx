@@ -36,9 +36,9 @@ const SecurityPhrasesScreen = () => {
     }
   };
 
-  const handleNext = async () => {
+  const handleNext = () => {
     if (securityPhrases && params?.accessToken && params?.userName) {
-      await login(params?.accessToken as string, params?.userName as string);
+      login(params.accessToken, params.userName);
       router.push("/home");
     }
   };
