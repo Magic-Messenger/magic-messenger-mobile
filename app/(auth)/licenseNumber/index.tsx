@@ -3,7 +3,7 @@ import { StyleSheet, View } from "react-native";
 
 import { AppLayout, Button, LicenseInput, SectionHeader } from "@/components";
 import { spacing } from "@/constants";
-import { ColorDto, useThemedStyles } from "@/theme";
+import { useThemedStyles } from "@/theme";
 
 export default function LicenseNumberScreen() {
   const styles = useThemedStyles(createStyle);
@@ -21,11 +21,7 @@ export default function LicenseNumberScreen() {
           groupCount={4}
           charactersPerGroup={4}
           onChangeText={(text) => console.log("result:", text)}
-          onComplete={(text) => {
-            console.log("complete:", text);
-            router.push("/(auth)/login");
-          }}
-          style={styles.licenseInput}
+          onComplete={(_text) => router.push("/login/screens/login")}
         />
 
         <Button type="primary" label="Next" style={styles.mt10} />
@@ -34,7 +30,7 @@ export default function LicenseNumberScreen() {
   );
 }
 
-const createStyle = (colors: ColorDto) =>
+const createStyle = () =>
   StyleSheet.create({
     mainContainer: {
       ...spacing({

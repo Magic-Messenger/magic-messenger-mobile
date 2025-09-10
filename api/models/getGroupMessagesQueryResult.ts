@@ -4,12 +4,12 @@
  * MagicMessenger
  * OpenAPI spec version: v1
  */
-import type { MessageDto } from "./messageDto";
 import type { ContactDto } from "./contactDto";
+import type { GetGroupMessagesQueryResultMessages } from "./getGroupMessagesQueryResultMessages";
 
 export interface GetGroupMessagesQueryResult {
   /** @nullable */
-  messages?: MessageDto[] | null;
+  messages?: GetGroupMessagesQueryResultMessages;
   /** @nullable */
   contacts?: ContactDto[] | null;
 }

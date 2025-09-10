@@ -13,7 +13,19 @@ export const useSupport = () => {
   const handleGoToFaq = () =>
     router.push("/(tabs)/(settings)/support/screens/faq");
 
-  return { t, styles, handleGoToFaq };
+  const handleGoToTickets = () =>
+    router.push("/(tabs)/(settings)/support/screens/tickets");
+
+  const handleGoToCreateTicket = () =>
+    router.push("/(tabs)/(settings)/support/screens/createTicket");
+
+  return {
+    t,
+    styles,
+    handleGoToFaq,
+    handleGoToTickets,
+    handleGoToCreateTicket,
+  };
 };
 
 const createStyle = (colors: ColorDto) =>

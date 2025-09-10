@@ -1,5 +1,6 @@
 import React, { forwardRef } from "react";
 import { Control, Controller, FieldPath, FieldValues } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import {
   KeyboardTypeOptions,
   StyleSheet,
@@ -34,6 +35,7 @@ interface BaseInputProps extends Omit<TextInputProps, "style"> {
   multiline?: boolean;
   numberOfLines?: number;
   editable?: boolean;
+  editableStyle?: TextStyle;
   style?: ViewStyle | any;
   inputStyle?: TextStyle;
   labelStyle?: TextStyle;
@@ -44,7 +46,6 @@ interface BaseInputProps extends Omit<TextInputProps, "style"> {
   rightIcon?: IconProps;
 }
 
-// React Hook Form ile kullanım için props
 interface ControlledInputProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
@@ -55,7 +56,6 @@ interface ControlledInputProps<
   rules?: Parameters<typeof Controller>[0]["rules"];
 }
 
-// Standalone kullanım için props
 interface UncontrolledInputProps extends BaseInputProps {
   value?: string;
   onChangeText?: (text: string) => void;
@@ -69,7 +69,6 @@ type CustomInputProps<
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = ControlledInputProps<TFieldValues, TName> | UncontrolledInputProps;
 
-// Input bileşenini forwardRef ile sarmalayalım
 const InputComponent = forwardRef<
   TextInput,
   BaseInputProps & {
@@ -88,6 +87,7 @@ const InputComponent = forwardRef<
       multiline = false,
       numberOfLines = 1,
       editable = true,
+      editableStyle,
       style,
       inputStyle,
       labelStyle,
@@ -99,6 +99,8 @@ const InputComponent = forwardRef<
     },
     ref,
   ) => {
+    const { t } = useTranslation();
+
     const renderIcon = (iconProps: IconProps, position: "left" | "right") => {
       const IconComponent = (
         <Icon
@@ -144,7 +146,7 @@ const InputComponent = forwardRef<
       <View style={[style]}>
         {label && (
           <ThemedText style={[styles.label, labelStyle]}>
-            {label}
+            {t(label)}
             {required && (
               <Text style={[styles.required, labelStyle]}>{`*`}</Text>
             )}
@@ -162,10 +164,11 @@ const InputComponent = forwardRef<
               leftIcon && styles.inputWithLeftIcon,
               rightIcon && styles.inputWithRightIcon,
               inputStyle,
+              editableStyle,
             ]}
             value={value}
             onChangeText={onChangeText}
-            placeholder={placeholder}
+            placeholder={placeholder ? t(placeholder) : undefined}
             secureTextEntry={secureTextEntry}
             keyboardType={keyboardType}
             multiline={multiline}
@@ -194,14 +197,13 @@ export const Input = <
   defaultValue,
   ...props
 }: CustomInputProps<TFieldValues, TName>) => {
-  // Eğer control prop'u varsa, React Hook Form Controller kullan
   if (control && name) {
     return (
       <Controller
         control={control as never}
         name={name}
         rules={props.rules}
-        defaultValue={defaultValue || ""}
+        defaultValue={(defaultValue || "") as never}
         render={({
           field: { onChange, onBlur, value, ref },
           fieldState: { error },
@@ -259,8 +261,8 @@ const styles = StyleSheet.create({
     paddingRight: spacingPixel(40),
   },
   multilineInput: {
-    height: heightPixel(100),
-    textAlignVertical: "top",
+    paddingVertical: spacingPixel(12),
+    height: heightPixel(125),
   },
   disabledInput: {
     color: Colors.tint,

@@ -9,6 +9,7 @@ export const Colors = {
   secondarySelected: "#3b1a5d",
   danger: "#FF2D2D",
   success: "#19CA16",
+  warning: "#FF9600",
 
   black: "#000000",
 

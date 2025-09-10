@@ -4,10 +4,10 @@
  * MagicMessenger
  * OpenAPI spec version: v1
  */
-import type { MessageDto } from "./messageDto";
+import type { GetMessagesQueryResultMessages } from "./getMessagesQueryResultMessages";
 
 export interface GetMessagesQueryResult {
   isScreenShotEnable?: boolean;
   /** @nullable */
-  messages?: MessageDto[] | null;
+  messages?: GetMessagesQueryResultMessages;
 }

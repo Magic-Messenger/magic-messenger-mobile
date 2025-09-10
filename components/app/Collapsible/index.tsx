@@ -53,13 +53,11 @@ export const Collapsible = ({
   }, [isActive, measuredHeight]);
 
   const animatedStyle = useAnimatedStyle(() => {
-    const active = height.value > 0.5;
     return {
       height: height.value,
       opacity: opacity.value,
+      width: "100%",
       overflow: "hidden",
-      paddingHorizontal: active ? 12 : 0,
-      paddingVertical: active ? 8 : 0,
     };
   });
 
@@ -83,7 +81,7 @@ export const Collapsible = ({
         start={{ y: 0, x: 1 }}
         end={{ y: 1, x: 0 }}
       >
-        <Animated.View style={[animatedStyle]}>
+        <Animated.View style={animatedStyle}>
           <ThemedText style={styles.answer}>{answer}</ThemedText>
         </Animated.View>
 
@@ -140,6 +138,10 @@ const createStyle = (colors: ColorDto) =>
       flexShrink: 1,
       flexWrap: "wrap",
       width: "100%",
+      wordWrap: "break-word",
+      textOverflow: "ellipsis",
+      paddingHorizontal: spacingPixel(12),
+      paddingVertical: spacingPixel(8),
     },
     hiddenMeasure: {
       position: "absolute",
@@ -147,5 +149,6 @@ const createStyle = (colors: ColorDto) =>
       zIndex: -1,
       left: 0,
       right: 0,
+      width: "100%",
     },
   });

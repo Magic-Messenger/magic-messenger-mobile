@@ -7,4 +7,6 @@
 
 export type GetApiChatsGroupMessagesParams = {
   chatId?: string;
+  pageNumber?: number;
+  pageSize?: number;
 };

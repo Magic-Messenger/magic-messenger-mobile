@@ -14,6 +14,7 @@
     "ok": "OK",
     "block": "Block",
     "unblock": "Unblock",
+    "select": "Please select...",
     "yes": "Yes",
     "no": "No"
   },
@@ -196,5 +197,19 @@
     "faqCategoryGeneral": "General",
     "faqCategoryPrivacy": "Privacy",
     "faqCategoryPricing": "Pricing"
+  },
+  "tickets": {
+    "subject": "Subject",
+    "content": "Content",
+    "createTicketTitle": "New Support Ticket",
+    "createTicket": "Create Ticket",
+    "subjectPlaceholder": "Enter your subject",
+    "contentPlaceholder": "Write your message here",
+    "successAddedTicket": "Ticket added successfully",
+    "successEditedTicket": "Ticket updated successfully",
+    "myTickets": "My Tickets",
+    "open": "Open",
+    "waiting": "Waiting",
+    "closed": "Closed"
   }
 }

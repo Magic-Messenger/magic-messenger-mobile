@@ -105,6 +105,20 @@ export default function SettingsStack() {
           headerShown: true,
         }}
       />
+
+      <Stack.Screen
+        name="support/screens/createTicket"
+        options={{
+          headerShown: true,
+        }}
+      />
+
+      <Stack.Screen
+        name="support/screens/tickets"
+        options={{
+          headerShown: true,
+        }}
+      />
     </Stack>
   );
 }

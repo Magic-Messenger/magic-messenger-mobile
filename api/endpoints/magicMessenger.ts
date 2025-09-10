@@ -93,6 +93,7 @@ import type {
   LogDto,
   LoginCommandRequest,
   LoginCommandResultIDataResult,
+  MessageDtoIDataResult,
   ObjectId,
   PostApiChatsClearParams,
   PostApiChatsUploadBody,
@@ -3161,7 +3162,7 @@ export const postApiChatsSendMessage = (
   options?: SecondParameter<typeof AxiosInstance>,
   signal?: AbortSignal,
 ) => {
-  return AxiosInstance<SuccessResult>(
+  return AxiosInstance<MessageDtoIDataResult>(
     {
       url: `/api/chats/send-message`,
       method: "POST",

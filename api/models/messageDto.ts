@@ -4,28 +4,34 @@
  * MagicMessenger
  * OpenAPI spec version: v1
  */
-import type { MessageType } from "./messageType";
 import type { MessageDtoContent } from "./messageDtoContent";
 import type { MessageDtoFile } from "./messageDtoFile";
+import type { MessageDtoRepliedToMessage } from "./messageDtoRepliedToMessage";
 import type { MessageStatus } from "./messageStatus";
+import type { MessageType } from "./messageType";
 
 export interface MessageDto {
   /** @nullable */
   readonly messageId?: string | null;
-  messageType?: MessageType;
+  createdAt?: string;
+  readonly messageStatus?: MessageStatus;
   /** @nullable */
   nickname?: string | null;
+  messageType?: MessageType;
   /** @nullable */
   senderUsername?: string | null;
-  /** @nullable */
-  receiverUsername?: string | null;
   /** @nullable */
   content?: MessageDtoContent;
   /** @nullable */
   file?: MessageDtoFile;
-  messageStatus?: MessageStatus;
   /** @nullable */
-  repliedToMessage?: string | null;
+  repliedToMessage?: MessageDtoRepliedToMessage;
+  /** @nullable */
+  receivers?: string[] | null;
+  /** @nullable */
+  deliveredTo?: string[] | null;
   /** @nullable */
   readBy?: string[] | null;
+  /** @nullable */
+  deletedFor?: string[] | null;
 }

@@ -6,7 +6,13 @@ import { AppLayout, ThemedText } from "@/components";
 import { useSupport } from "../hooks";
 
 export default function SupportScreen() {
-  const { t, styles, handleGoToFaq } = useSupport();
+  const {
+    t,
+    styles,
+    handleGoToFaq,
+    handleGoToTickets,
+    handleGoToCreateTicket,
+  } = useSupport();
 
   return (
     <AppLayout container title={t("support.title")}>
@@ -41,7 +47,11 @@ export default function SupportScreen() {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.supportItem} activeOpacity={0.5}>
+        <TouchableOpacity
+          style={styles.supportItem}
+          activeOpacity={0.5}
+          onPress={handleGoToTickets}
+        >
           <View
             style={[
               styles.flexRow,
@@ -67,7 +77,11 @@ export default function SupportScreen() {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.supportItem} activeOpacity={0.5}>
+        <TouchableOpacity
+          style={styles.supportItem}
+          activeOpacity={0.5}
+          onPress={handleGoToCreateTicket}
+        >
           <View
             style={[
               styles.flexRow,
