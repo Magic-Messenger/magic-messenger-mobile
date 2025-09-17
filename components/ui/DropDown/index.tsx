@@ -2,7 +2,13 @@ import { Picker } from "@react-native-picker/picker";
 import React, { useState } from "react";
 import { Control, Controller, FieldPath, FieldValues } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { Modal, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  Modal,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import { Button, Icon, Input } from "@/components";
 import { Colors, Fonts } from "@/constants";
@@ -70,24 +76,94 @@ const DropdownComponent: React.FC<
   const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
 
-  // Modal içi geçici seçim
   const [tempValue, setTempValue] = useState<string | number>(value);
 
   const selectedOption = options.find((o) => o.value === value);
 
   const handleOpen = () => {
-    setTempValue(value); // Modal açılınca mevcut değeri set et
+    setTempValue(value);
     setVisible(true);
   };
 
   const handleConfirm = () => {
-    onChange(tempValue); // Confirm ile değer dışarıya yansır
+    onChange(tempValue);
     setVisible(false);
   };
 
   const handleCancel = () => {
-    setVisible(false); // İptal, değişiklik yapmadan kapatır
+    setVisible(false);
   };
+
+  if (Platform.OS === "android") {
+    return (
+      <View style={[styles.container, style]}>
+        {label && (
+          <ThemedText style={styles.label}>
+            {label}
+            {required && <ThemedText style={styles.required}> *</ThemedText>}
+          </ThemedText>
+        )}
+
+        <View
+          style={[
+            styles.androidInputWrapper,
+            error && styles.errorInput,
+            !enabled && styles.disabledInput,
+          ]}
+        >
+          <View
+            style={[
+              styles.androidPickerContainer,
+              !enabled && styles.disabledInput,
+            ]}
+          >
+            <Picker
+              selectedValue={value}
+              onValueChange={onChange}
+              enabled={enabled}
+              style={styles.androidPicker}
+              dropdownIconRippleColor="transparent"
+              dropdownIconColor="transparent"
+            >
+              {placeholder && (
+                <Picker.Item
+                  label={t(placeholder)}
+                  value=""
+                  color={Colors.secondary}
+                />
+              )}
+              {options.map((opt) => (
+                <Picker.Item
+                  key={opt.value.toString()}
+                  label={opt.label}
+                  value={opt.value}
+                  color={Colors.secondary}
+                />
+              ))}
+            </Picker>
+            <View style={styles.androidDropdownIconOverlay}>
+              <Icon
+                type="feather"
+                name="chevron-down"
+                style={styles.androidDropdownIcon}
+              />
+            </View>
+          </View>
+
+          {clearable && value && enabled && (
+            <TouchableOpacity
+              onPress={() => onChange("")}
+              style={styles.clearButton}
+            >
+              <Icon type="feather" name="x" style={styles.clearIcon} />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {error && <ThemedText style={styles.errorText}>{error}</ThemedText>}
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.container, style]}>
@@ -152,6 +228,7 @@ const DropdownComponent: React.FC<
               enabled={enabled}
               style={styles.picker}
               itemStyle={styles.itemStyle}
+              dropdownIconColor={Colors.white}
             >
               {options.map((opt) => (
                 <Picker.Item
@@ -239,6 +316,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacingPixel(8),
     height: heightPixel(45),
   },
+  androidInputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: Colors.secondary,
+    borderRadius: spacingPixel(10),
+    paddingHorizontal: spacingPixel(8),
+  },
   input: {
     flex: 1,
     color: Colors.white,
@@ -254,6 +338,28 @@ const styles = StyleSheet.create({
   },
   disabledText: {
     color: Colors.textDisabled,
+  },
+  androidPickerContainer: {
+    flex: 1,
+    backgroundColor: "transparent",
+    justifyContent: "center",
+    position: "relative",
+  },
+  androidPicker: {
+    flex: 1,
+    color: Colors.white,
+    backgroundColor: "transparent",
+  },
+  androidDropdownIconOverlay: {
+    position: "absolute",
+    right: spacingPixel(10),
+    top: "50%",
+    transform: [{ translateY: -fontPixel(11) }],
+    pointerEvents: "none",
+  },
+  androidDropdownIcon: {
+    fontSize: fontPixel(22),
+    color: Colors.white,
   },
   clearButton: {
     paddingHorizontal: spacingPixel(4),

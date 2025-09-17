@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "magicmobilexpo",
+    "scheme": "magicmessenger",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
@@ -17,15 +17,19 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.magicmessenger.app",
+      "namespace": "com.magicmessenger.app",
       "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE",
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
-      ]
+      ],
+      "usesCleartextTraffic": true
     },
     "web": {
       "bundler": "metro",
@@ -62,10 +66,12 @@
       "expo-localization",
       "expo-iap",
       "expo-secure-store",
+      "./plugins/trust-local-certs.js",
       [
         "expo-build-properties",
         {
           "android": {
+            "usesCleartextTraffic": true,
             "kotlinVersion": "2.0.21"
           }
         }

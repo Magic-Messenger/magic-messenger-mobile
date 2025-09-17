@@ -5,9 +5,8 @@
  * OpenAPI spec version: v1
  */
 
-export interface RefreshTokenCommandRequest {
+export interface MessageActionTime {
+  createdAt?: string;
   /** @nullable */
-  accessToken?: string | null;
-  /** @nullable */
-  refreshToken?: string | null;
+  username?: string | null;
 }

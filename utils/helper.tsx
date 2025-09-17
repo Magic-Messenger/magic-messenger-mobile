@@ -47,7 +47,7 @@ export const getInstallationId = async () => {
   if (Platform.OS === "ios") {
     return await Application.getIosIdForVendorAsync();
   } else if (Platform.OS === "android") {
-    return await Application.getAndroidId();
+    return Application.getAndroidId();
   }
 };
 

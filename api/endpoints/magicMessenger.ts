@@ -39,6 +39,7 @@ import type {
   ChangeInvoiceStatusCommandRequest,
   ChangeLicenseStatusCommandRequest,
   ChangeTicketStatusCommandRequest,
+  ChatDtoListPaginatedResultIDataResult,
   ContactDtoListIDataResult,
   CreateAccountCommandRequest,
   CreateAccountCommandResultIDataResult,
@@ -64,6 +65,7 @@ import type {
   GetApiAccountGetParams,
   GetApiAccountListParams,
   GetApiChatsGroupMessagesParams,
+  GetApiChatsListParams,
   GetApiChatsMessagesParams,
   GetApiFaqsGetParams,
   GetApiFaqsListParams,
@@ -3248,6 +3250,174 @@ export const usePostApiChatsSendMessage = <
 
   return useMutation(mutationOptions, queryClient);
 };
+
+/**
+ * @summary Get chats
+ */
+export const getApiChatsList = (
+  params?: GetApiChatsListParams,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<ChatDtoListPaginatedResultIDataResult>(
+    { url: `/api/chats/list`, method: "GET", params, signal },
+    options,
+  );
+};
+
+export const getGetApiChatsListQueryKey = (params?: GetApiChatsListParams) => {
+  return [`/api/chats/list`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetApiChatsListQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiChatsList>>,
+  TError = ResultMessage[] | null | null,
+>(
+  params?: GetApiChatsListParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiChatsList>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetApiChatsListQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiChatsList>>> = ({
+    signal,
+  }) => getApiChatsList(params, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    staleTime: 10000,
+    refetchOnWindowFocus: false,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiChatsList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiChatsListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiChatsList>>
+>;
+export type GetApiChatsListQueryError = ResultMessage[] | null | null;
+
+export function useGetApiChatsList<
+  TData = Awaited<ReturnType<typeof getApiChatsList>>,
+  TError = ResultMessage[] | null | null,
+>(
+  params: undefined | GetApiChatsListParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiChatsList>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiChatsList>>,
+          TError,
+          Awaited<ReturnType<typeof getApiChatsList>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiChatsList<
+  TData = Awaited<ReturnType<typeof getApiChatsList>>,
+  TError = ResultMessage[] | null | null,
+>(
+  params?: GetApiChatsListParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiChatsList>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiChatsList>>,
+          TError,
+          Awaited<ReturnType<typeof getApiChatsList>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiChatsList<
+  TData = Awaited<ReturnType<typeof getApiChatsList>>,
+  TError = ResultMessage[] | null | null,
+>(
+  params?: GetApiChatsListParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiChatsList>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get chats
+ */
+
+export function useGetApiChatsList<
+  TData = Awaited<ReturnType<typeof getApiChatsList>>,
+  TError = ResultMessage[] | null | null,
+>(
+  params?: GetApiChatsListParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiChatsList>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiChatsListQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
 
 /**
  * @summary Get messages in chat

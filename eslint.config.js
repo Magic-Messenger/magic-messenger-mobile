@@ -16,6 +16,7 @@ module.exports = defineConfig([
       "react/display-name": "off",
       "no-unused-vars": "off",
       "unused-imports/no-unused-imports": "error",
+      "react-hooks/exhaustive-deps": "off",
       "unused-imports/no-unused-vars": [
         "warn",
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },

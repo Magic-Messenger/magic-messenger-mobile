@@ -7,7 +7,7 @@ import { StyleSheet, View } from "react-native";
 
 import { useGetApiAccountGetProfile } from "@/api/endpoints/magicMessenger";
 import { AppLayout, ThemedText } from "@/components";
-import { Colors, Images } from "@/constants";
+import { Images } from "@/constants";
 import { useUserStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
 import {
@@ -116,7 +116,14 @@ export default function IndexPage() {
             },
           ]}
         >
-          <View style={[styles.flexRow, styles.gap3]}>
+          <View
+            style={[
+              styles.flexRow,
+              styles.justifyContentStart,
+              styles.alignItemsCenter,
+              styles.gap3,
+            ]}
+          >
             <View
               style={[
                 styles.badgeStatus,
@@ -125,15 +132,36 @@ export default function IndexPage() {
             />
             <ThemedText type="default">Connecting{dots}</ThemedText>
           </View>
-          <View style={[styles.flexRow, styles.gap3]}>
+          <View
+            style={[
+              styles.flexRow,
+              styles.justifyContentStart,
+              styles.alignItemsCenter,
+              styles.gap3,
+            ]}
+          >
             <View style={[styles.badgeStatus, styles.active]} />
             <ThemedText type="default">TOR</ThemedText>
           </View>
-          <View style={[styles.flexRow, styles.gap3]}>
+          <View
+            style={[
+              styles.flexRow,
+              styles.justifyContentStart,
+              styles.alignItemsCenter,
+              styles.gap3,
+            ]}
+          >
             <View style={[styles.badgeStatus, styles.active]} />
             <ThemedText type="default">VPN</ThemedText>
           </View>
-          <View style={[styles.flexRow, styles.gap3]}>
+          <View
+            style={[
+              styles.flexRow,
+              styles.justifyContentStart,
+              styles.alignItemsCenter,
+              styles.gap3,
+            ]}
+          >
             <View style={[styles.badgeStatus, styles.active]} />
             <ThemedText type="default">Encryption</ThemedText>
           </View>
@@ -147,12 +175,14 @@ const createStyle = (colors: ColorDto) =>
   StyleSheet.create({
     badgeStatus: {
       padding: spacingPixel(10),
-      borderRadius: widthPixel(100),
+      borderRadius: widthPixel(20),
+      width: widthPixel(20),
+      height: widthPixel(20),
     },
     active: {
-      backgroundColor: Colors.success,
+      backgroundColor: colors.success,
     },
     inActive: {
-      backgroundColor: Colors.danger,
+      backgroundColor: colors.danger,
     },
   });

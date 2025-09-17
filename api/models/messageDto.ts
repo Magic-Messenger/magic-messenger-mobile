@@ -4,6 +4,7 @@
  * MagicMessenger
  * OpenAPI spec version: v1
  */
+import type { MessageActionTime } from "./messageActionTime";
 import type { MessageDtoContent } from "./messageDtoContent";
 import type { MessageDtoFile } from "./messageDtoFile";
 import type { MessageDtoRepliedToMessage } from "./messageDtoRepliedToMessage";
@@ -29,9 +30,7 @@ export interface MessageDto {
   /** @nullable */
   receivers?: string[] | null;
   /** @nullable */
-  deliveredTo?: string[] | null;
+  deliveredTo?: MessageActionTime[] | null;
   /** @nullable */
-  readBy?: string[] | null;
-  /** @nullable */
-  deletedFor?: string[] | null;
+  readBy?: MessageActionTime[] | null;
 }
