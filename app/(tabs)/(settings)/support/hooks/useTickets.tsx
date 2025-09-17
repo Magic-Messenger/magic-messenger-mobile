@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 import { useGetApiTicketsList } from "@/api/endpoints/magicMessenger";
-import { FaqCategory, TicketDto } from "@/api/models";
+import { TicketDto } from "@/api/models";
 import { Icon, ThemedText } from "@/components";
 import { spacing } from "@/constants";
 import { ColorDto, useThemedStyles } from "@/theme";
@@ -18,11 +18,11 @@ export const useTickets = () => {
     pageSize: 999,
   });
 
-  const handleGoToDetail = (faqCategory: FaqCategory) => {
+  const handleGoToDetail = (ticketId: string) => {
     router.push({
-      pathname: "/(tabs)/(settings)/support/screens/faqDetail",
+      pathname: "/ticketDetail/screens/ticketDetail",
       params: {
-        category: faqCategory,
+        ticketId,
       } as never,
     });
   };
@@ -32,6 +32,7 @@ export const useTickets = () => {
       key={item.ticketId}
       style={styles.ticketItem}
       activeOpacity={0.5}
+      onPress={() => handleGoToDetail(item.ticketId!)}
     >
       <View
         style={[

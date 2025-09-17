@@ -21,6 +21,7 @@ interface Props {
     copy?: boolean;
     onEdit?: () => void;
     onRedirect?: () => void;
+    onPress?: () => void;
   };
 }
 
@@ -35,7 +36,7 @@ export const ContactItem = ({ nickname, contactUsername, onAction }: Props) => {
   };
 
   return (
-    <TouchableOpacity activeOpacity={0.5}>
+    <TouchableOpacity activeOpacity={0.5} onPress={onAction?.onPress}>
       <LinearGradient
         colors={Colors.buttonPrimary as never}
         start={{ y: 0, x: 1 }}

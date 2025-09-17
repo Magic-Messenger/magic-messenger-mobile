@@ -167,7 +167,7 @@ export const decrypt = (
   );
 
   if (!decrypted) {
-    console.error("❌ Decryption failed");
+    console.log("❌ Decryption failed");
     return null; // Decryption failed
   }
 

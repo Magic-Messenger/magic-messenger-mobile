@@ -8,12 +8,15 @@ import * as ScreenCapture from "expo-screen-capture";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { AppState, StyleSheet } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Toast from "react-native-toast-message";
 
 import { Colors } from "@/constants";
+import { SignalRProvider } from "@/providers";
 import { useUserStore } from "@/store";
-import { toastConfig } from "@/utils";
+import { headerImage, toastConfig } from "@/utils";
 
 const queryClient = new QueryClient();
 SplashScreen.preventAutoHideAsync();
@@ -30,6 +33,8 @@ export default function RootLayout() {
   });
 
   const { rehydrated } = useUserStore();
+
+  const { t } = useTranslation();
 
   const [showOverlay, setShowOverlay] = useState(false);
 
@@ -61,31 +66,37 @@ export default function RootLayout() {
   }
 
   return (
-    <>
+    <GestureHandlerRootView>
       <QueryClientProvider client={queryClient}>
-        <Stack
-          screenOptions={{
-            headerTitleAlign: "center",
-            headerTransparent: true,
-            headerTintColor: Colors.white,
-            contentStyle: {
-              backgroundColor: "transparent",
-            },
-          }}
-        >
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
+        <SignalRProvider>
+          <Stack
+            screenOptions={{
+              headerTransparent: true,
+              headerTintColor: Colors.white,
+              headerBackTitle: t("back"),
+              ...headerImage(),
+              contentStyle: {
+                backgroundColor: "transparent",
+              },
+              headerTitleAlign: "center",
+            }}
+          >
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="chatDetail" options={{ headerShown: true }} />
+            <Stack.Screen name="ticketDetail" options={{ headerShown: true }} />
+            <Stack.Screen name="+not-found" />
+          </Stack>
 
-        <Toast config={toastConfig as never} />
-        <StatusBar style="light" />
+          <Toast config={toastConfig as never} />
+          <StatusBar style="light" />
+        </SignalRProvider>
       </QueryClientProvider>
 
       {showOverlay && (
         <BlurView intensity={90} style={StyleSheet.absoluteFill} tint="dark" />
       )}
-    </>
+    </GestureHandlerRootView>
   );
 }

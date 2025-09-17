@@ -16,7 +16,10 @@
     "unblock": "Unblock",
     "select": "Please select...",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "image": "Image",
+    "video": "Video",
+    "audio": "Audio"
   },
   "login": {
     "title": "Login",
@@ -211,5 +214,21 @@
     "open": "Open",
     "waiting": "Waiting",
     "closed": "Closed"
+  },
+
+  "chat": {
+    "title": "Chat",
+    "newChat": "New Chat",
+    "newMessage": "New Message",
+    "reply": "Reply",
+    "delete": "Delete",
+    "online": "online",
+    "offline": "offline",
+    "typing": "is typing..."
+  },
+
+  "chatDetail": {
+    "writeMessage": "Write a message...",
+    "replyingTo": "Replying to"
   }
 }

@@ -1,4 +1,4 @@
-import { Tabs } from "expo-router";
+import { Tabs, useSegments } from "expo-router";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
@@ -8,6 +8,10 @@ import { spacingPixel, widthPixel } from "@/utils";
 
 export default function TabLayout() {
   const { t } = useTranslation();
+  const segment = useSegments();
+  const page = segment[segment.length - 1];
+  const pagesToHideTabBar = ["(chat)", "detail", "screens", "ticketDetail"];
+
   return (
     <Tabs
       screenOptions={{
@@ -27,6 +31,7 @@ export default function TabLayout() {
           borderTopWidth: 0,
           backgroundColor: Colors.secondaryBackground,
           paddingTop: spacingPixel(5),
+          //display: pagesToHideTabBar.includes(page) ? "none" : "flex",
         },
       }}
     >

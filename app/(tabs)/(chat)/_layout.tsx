@@ -28,6 +28,14 @@ export default function ChatStack() {
           title: t("settings.title"),
         }}
       />
+      <Stack.Screen
+        name="create/index"
+        options={{
+          ...headerImage(),
+          headerShown: true,
+          title: t("settings.title"),
+        }}
+      />
     </Stack>
   );
 }

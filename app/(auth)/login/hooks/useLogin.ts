@@ -35,10 +35,19 @@ export const useLogin = () => {
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>({
     defaultValues: {
-      username: userName ?? undefined,
+      username: userName ?? (__DEV__ ? "omer-test-user-3" : undefined),
       password: __DEV__ ? "Omer123*+!" : undefined,
     },
   });
+
+  useEffect(() => {
+    if (__DEV__) {
+      reset({
+        username: userName ?? (__DEV__ ? "omer-test-user-3" : undefined),
+        password: __DEV__ ? "Omer123*+!" : undefined,
+      });
+    }
+  }, [__DEV__]);
 
   const onSubmit = async (formValues: RegisterFormData) => {
     const { success, data } = await loginApi({

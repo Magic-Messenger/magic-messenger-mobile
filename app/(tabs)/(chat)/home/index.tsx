@@ -32,10 +32,11 @@ export default function ChatScreen() {
           <Button
             type="primary"
             label={t("home.newChat")}
+            leftIcon={<Icon type="feather" name="plus" size={18} />}
             textProps={{
               size: 14,
             }}
-            leftIcon={<Icon type="feather" name="plus" size={18} />}
+            onPress={() => router.push("/(tabs)/(chat)/create")}
           />
         </View>
       }

@@ -1,0 +1,273 @@
+import React, { useMemo } from "react";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
+
+import { MessageDto, MessageType } from "@/api/models";
+import { AppImage, Icon, ThemedText, VideoPreview } from "@/components";
+import { Images } from "@/constants";
+import { useAudioPlayer, useChatHelper } from "@/hooks";
+import { ColorDto, useThemedStyles } from "@/theme";
+import { dateFormatter, spacingPixel } from "@/utils";
+
+interface MessageItemProps {
+  message?: MessageDto;
+  receiverPublicKey: string;
+  onReply?: (message: MessageDto) => void;
+}
+
+const SWIPE_THRESHOLD = 60;
+const REPLY_ICON_WIDTH = 30;
+
+export function MessageItem({
+  message,
+  receiverPublicKey,
+  onReply,
+}: MessageItemProps) {
+  const styles = useThemedStyles(createStyle);
+  const { decryptedContent, isSentByCurrentUser } = useChatHelper(
+    message as MessageDto,
+    receiverPublicKey,
+  );
+
+  const { loadAndPlay, pause, isPlaying } = useAudioPlayer();
+
+  const translateX = useSharedValue(0);
+  const opacity = useSharedValue(0);
+
+  const triggerReply = () => {
+    if (message && onReply) {
+      onReply({
+        ...message,
+        content: decryptedContent as string,
+      } as MessageDto);
+    }
+  };
+
+  const panGesture = Gesture.Pan()
+    .onUpdate((event) => {
+      "worklet";
+      if (event.translationX > 0) {
+        translateX.value = Math.min(event.translationX, SWIPE_THRESHOLD * 1.2);
+
+        const progress = Math.min(event.translationX / SWIPE_THRESHOLD, 1);
+        opacity.value = progress;
+      }
+    })
+    .onEnd((event) => {
+      "worklet";
+      if (event.translationX > SWIPE_THRESHOLD) {
+        runOnJS(triggerReply)();
+      }
+
+      translateX.value = withSpring(0, {
+        damping: 20,
+        stiffness: 300,
+      });
+      opacity.value = withSpring(0);
+    });
+
+  const animatedStyle = useAnimatedStyle(() => {
+    "worklet";
+    return {
+      transform: [{ translateX: translateX.value }],
+    };
+  });
+
+  const replyIconStyle = useAnimatedStyle(() => {
+    "worklet";
+    return {
+      opacity: opacity.value,
+      transform: [
+        {
+          translateX:
+            translateX.value > 0 ? translateX.value - REPLY_ICON_WIDTH - 10 : 0,
+        },
+      ],
+    };
+  });
+
+  const renderMessageContent = useMemo(() => {
+    if (message?.messageType === MessageType.Text) {
+      return (
+        <>
+          <ThemedText>{decryptedContent}</ThemedText>
+          <ThemedText
+            style={
+              isSentByCurrentUser
+                ? styles.messageDateSender
+                : styles.messageDateReceiver
+            }
+          >
+            {dateFormatter(message?.createdAt!, "HH:mm")}
+          </ThemedText>
+        </>
+      );
+    } else if (message?.messageType === MessageType.Audio) {
+      return (
+        <View>
+          <View style={[styles.flex, styles.flexRow]}>
+            <TouchableOpacity
+              onPress={() => {
+                if (isPlaying) {
+                  pause();
+                } else {
+                  loadAndPlay(decryptedContent as string);
+                }
+              }}
+            >
+              <Icon
+                name={isPlaying ? "pause-circle" : "play-circle"}
+                size={30}
+              />
+            </TouchableOpacity>
+
+            <AppImage
+              source={Images.soundPreview}
+              resizeMode="contain"
+              width={100}
+              height={30}
+              style={isPlaying ? { opacity: 1 } : { opacity: 0.5 }}
+            />
+          </View>
+          <ThemedText
+            style={
+              isSentByCurrentUser
+                ? styles.messageDateSender
+                : styles.messageDateReceiver
+            }
+          >
+            {dateFormatter(message?.createdAt!, "HH:mm")}
+          </ThemedText>
+        </View>
+      );
+    } else if (message?.messageType === MessageType.Image) {
+      return (
+        <View style={styles.gap2}>
+          <AppImage
+            source={{ uri: decryptedContent as string }}
+            style={{
+              width: spacingPixel(200),
+              height: spacingPixel(200),
+              borderRadius: spacingPixel(8),
+            }}
+            resizeMode="cover"
+          />
+          <ThemedText
+            style={
+              isSentByCurrentUser
+                ? styles.messageDateSender
+                : styles.messageDateReceiver
+            }
+          >
+            {dateFormatter(message?.createdAt!, "HH:mm")}
+          </ThemedText>
+        </View>
+      );
+    } else if (message?.messageType === MessageType.Video) {
+      return (
+        <>
+          <VideoPreview source={decryptedContent as string} />
+
+          <ThemedText
+            style={[
+              isSentByCurrentUser
+                ? styles.messageDateSender
+                : styles.messageDateReceiver,
+              styles.mt2,
+            ]}
+          >
+            {dateFormatter(message?.createdAt!, "HH:mm")}
+          </ThemedText>
+        </>
+      );
+    }
+
+    return null;
+  }, [
+    styles,
+    message,
+    decryptedContent,
+    isSentByCurrentUser,
+    styles.messageDateSender,
+    styles.messageDateReceiver,
+    isPlaying,
+    pause,
+    loadAndPlay,
+  ]);
+
+  return (
+    <View style={styles.messageWrapper}>
+      <Animated.View style={[styles.replyIconContainer, replyIconStyle]}>
+        <Icon name="reply" size={20} />
+      </Animated.View>
+
+      <GestureDetector gesture={panGesture}>
+        <Animated.View
+          style={[
+            animatedStyle,
+            isSentByCurrentUser
+              ? styles.senderContainer
+              : styles.receiverContainer,
+          ]}
+        >
+          {renderMessageContent}
+        </Animated.View>
+      </GestureDetector>
+    </View>
+  );
+}
+
+const createStyle = (colors: ColorDto) =>
+  StyleSheet.create({
+    messageWrapper: {
+      position: "relative",
+      width: "100%",
+      justifyContent: "center",
+      gap: spacingPixel(5),
+    },
+    senderContainer: {
+      alignSelf: "flex-end",
+      backgroundColor: colors.primary,
+      borderRadius: spacingPixel(8),
+      borderBottomRightRadius: 0,
+      padding: spacingPixel(10),
+      paddingHorizontal: spacingPixel(15),
+      marginVertical: spacingPixel(4),
+      maxWidth: "80%",
+    },
+    receiverContainer: {
+      alignSelf: "flex-start",
+      backgroundColor: colors.secondary,
+      borderRadius: spacingPixel(8),
+      borderBottomLeftRadius: 0,
+      padding: spacingPixel(10),
+      marginVertical: spacingPixel(4),
+      maxWidth: "80%",
+    },
+    messageDateSender: {
+      alignSelf: "flex-end",
+      fontSize: spacingPixel(12),
+      color: colors.white,
+    },
+    messageDateReceiver: {
+      alignSelf: "flex-end",
+      fontSize: spacingPixel(12),
+      color: colors.textDisabled,
+    },
+    replyIconContainer: {
+      position: "absolute",
+      justifyContent: "center",
+      alignItems: "center",
+      width: REPLY_ICON_WIDTH,
+      height: REPLY_ICON_WIDTH,
+      backgroundColor: colors.secondary,
+      borderRadius: REPLY_ICON_WIDTH / 2,
+      transform: [{ translateY: -REPLY_ICON_WIDTH / 2 }],
+    },
+  });

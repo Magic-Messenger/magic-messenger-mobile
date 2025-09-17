@@ -13,4 +13,5 @@ export const Images = {
   noConnectionImage: require("@/assets/images/no-connection.png"),
   serverImage: require("@/assets/images/server.png"),
   magicServerImage: require("@/assets/images/server-magic.png"),
+  soundPreview: require("@/assets/images/sound-preview.png"),
 };

@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import * as Application from "expo-application";
 import * as Clipboard from "expo-clipboard";
 import { Image } from "expo-image";
@@ -82,3 +83,7 @@ export function appSupportLanguages(): {
 
   return [];
 }
+
+export const dateFormatter = (dateString: string, format: string) => {
+  return dateString ? dayjs(dateString).format(format ?? "MM.DD.YYYY") : "";
+};

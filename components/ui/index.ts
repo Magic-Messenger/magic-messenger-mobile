@@ -5,3 +5,6 @@ export * from "./Icon";
 export * from "./Image";
 export * from "./Input";
 export * from "./LicenceInput";
+export * from "./LoadingProvider";
+export * from "./LottiePlayer";
+export * from "./VideoPreview";

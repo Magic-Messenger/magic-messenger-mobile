@@ -23,7 +23,7 @@ type SettingsItem = {
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
-  const { logout, isLogin } = useUserStore();
+  const logout = useUserStore((state) => state.logout);
 
   const settingList = [
     {

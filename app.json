@@ -68,6 +68,20 @@
       "expo-secure-store",
       "./plugins/trust-local-certs.js",
       [
+        "expo-av",
+        {
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ],
+      "expo-localization",
+      "expo-video",
+      [
         "expo-build-properties",
         {
           "android": {

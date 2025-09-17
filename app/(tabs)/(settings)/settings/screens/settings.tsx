@@ -8,9 +8,15 @@ import { useSettings } from "../hooks";
 
 const SettingsScreen = () => {
   const { t, styles, isLoading, settingsItems, renderItem } = useSettings();
+  console.log("settingsItems: ", settingsItems);
 
   return (
-    <AppLayout container title={t("settings.title")} loading={isLoading}>
+    <AppLayout
+      container
+      scrollable={false}
+      title={t("settings.title")}
+      loading={isLoading}
+    >
       <View style={styles.flex}>
         <FlashList
           keyExtractor={(item) => item.id.toString()}
