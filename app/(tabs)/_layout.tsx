@@ -9,8 +9,6 @@ import { spacingPixel, widthPixel } from "@/utils";
 export default function TabLayout() {
   const { t } = useTranslation();
   const segment = useSegments();
-  const page = segment[segment.length - 1];
-  const pagesToHideTabBar = ["(chat)", "detail", "screens", "ticketDetail"];
 
   return (
     <Tabs

@@ -57,7 +57,7 @@ export const useDetail = () => {
     if (contactChatId) {
       loadMessages();
     }
-  }, [contactChatId, listRef]);
+  }, [contactChatId, listRef, chatId]);
 
   const usersPublicKey = useMemo(() => {
     return {
@@ -77,6 +77,9 @@ export const useDetail = () => {
       });
       if (response?.success && response?.data) {
         setChatId(response?.data as string);
+        /* setTimeout(() => {
+          loadMessages();
+        }, 500); */
       }
     }
   };

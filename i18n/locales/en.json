@@ -19,7 +19,12 @@
     "no": "No",
     "image": "Image",
     "video": "Video",
-    "audio": "Audio"
+    "audio": "Audio",
+    "minutesAgo": "{{count}} minute ago",
+    "hoursAgo": "{{count}} hour ago",
+    "daysAgo": "{{count}} day ago",
+    "unread": "Unread",
+    "read": "Read"
   },
   "login": {
     "title": "Login",

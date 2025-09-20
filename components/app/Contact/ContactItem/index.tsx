@@ -14,7 +14,7 @@ import {
 import { Icon } from "../../../ui";
 import { ThemedText } from "../../ThemedText";
 
-interface Props {
+export interface ContactItemProps {
   nickname: string;
   contactUsername: string;
   onAction?: {
@@ -23,9 +23,15 @@ interface Props {
     onRedirect?: () => void;
     onPress?: () => void;
   };
+  customAction?: React.ReactNode;
 }
 
-export const ContactItem = ({ nickname, contactUsername, onAction }: Props) => {
+export const ContactItem = ({
+  nickname,
+  contactUsername,
+  onAction,
+  customAction,
+}: ContactItemProps) => {
   const { t } = useTranslation();
   const styles = useThemedStyles(createStyle);
 
@@ -76,6 +82,8 @@ export const ContactItem = ({ nickname, contactUsername, onAction }: Props) => {
               <Icon type="feather" name="chevron-right" size={23} />
             </TouchableOpacity>
           )}
+
+          {customAction && customAction}
         </View>
       </LinearGradient>
     </TouchableOpacity>

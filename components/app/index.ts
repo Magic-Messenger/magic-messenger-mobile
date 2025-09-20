@@ -4,6 +4,7 @@ import SettingsItem from "./SettingsItem";
 
 export * from "./Chat/ChatFooter";
 export * from "./Chat/ChatHeader";
+export * from "./Chat/ChatItem";
 export * from "./Chat/ChatLayout";
 export * from "./Chat/ChatTyping";
 export * from "./Chat/MessageItem";

@@ -87,3 +87,24 @@ export function appSupportLanguages(): {
 export const dateFormatter = (dateString: string, format: string) => {
   return dateString ? dayjs(dateString).format(format ?? "MM.DD.YYYY") : "";
 };
+
+export const chatDateFormatter = (dateString: string) => {
+  if (!dateString) return "";
+
+  const date = dayjs(dateString);
+  const now = dayjs();
+  const diffInMinutes = now.diff(date, "minute");
+  const diffInHours = now.diff(date, "hour");
+  const diffInDays = now.diff(date, "day");
+  const diffInMonths = now.diff(date, "month");
+
+  if (diffInMinutes < 60) {
+    return i18n.t("common.minutesAgo", { count: diffInMinutes });
+  } else if (diffInHours < 24) {
+    return i18n.t("common.hoursAgo", { count: diffInHours });
+  } else if (diffInDays < 30) {
+    return i18n.t("common.daysAgo", { count: diffInDays });
+  } else {
+    return date.format("MM/DD/YYYY");
+  }
+};

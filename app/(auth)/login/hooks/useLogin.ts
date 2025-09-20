@@ -36,7 +36,7 @@ export const useLogin = () => {
   } = useForm<RegisterFormData>({
     defaultValues: {
       username: userName ?? (__DEV__ ? "omer-test-user-3" : undefined),
-      password: __DEV__ ? "Omer123*+!" : undefined,
+      password: __DEV__ ? "Kadir123*+" : undefined,
     },
   });
 
@@ -44,7 +44,7 @@ export const useLogin = () => {
     if (__DEV__) {
       reset({
         username: userName ?? (__DEV__ ? "omer-test-user-3" : undefined),
-        password: __DEV__ ? "Omer123*+!" : undefined,
+        password: __DEV__ ? "Kadir123*+" : undefined,
       });
     }
   }, [__DEV__]);
