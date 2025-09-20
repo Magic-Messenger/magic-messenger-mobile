@@ -9,7 +9,7 @@ import { UploadFileResultDto } from "@/constants";
 import { useAudioRecorder, usePicker } from "@/hooks";
 import { useSignalRStore, useUserStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { heightPixel, spacingPixel } from "@/utils";
+import { heightPixel, spacingPixel, trackEvent } from "@/utils";
 
 interface ChatFooterProps {
   identifier: string;
@@ -87,7 +87,7 @@ export function ChatFooter({
         }
       }
     } catch (error) {
-      console.log("error: ", error);
+      trackEvent("send_audio_message_error", { error });
     }
   };
 
@@ -116,7 +116,7 @@ export function ChatFooter({
         }
       }
     } catch (error) {
-      console.log("error: ", error);
+      trackEvent("send_image_message_error", { error });
     }
   };
 

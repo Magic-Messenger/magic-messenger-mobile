@@ -10,7 +10,7 @@ import {
   usePostApiInAppPurchaseValidateGoogleReceipt,
 } from "@/api/endpoints/magicMessenger";
 import { useUserStore } from "@/store";
-import { getInstallationId, showToast } from "@/utils";
+import { getInstallationId, showToast, trackEvent } from "@/utils";
 
 const productIds = [
   "one_month",
@@ -61,7 +61,7 @@ export const useInAppPurchase = () => {
   const completePurchase = async () => {
     try {
       if (currentPurchase) {
-        console.log("Purchase completed: ", currentPurchase.id);
+        trackEvent("purchase_completed", { productId: currentPurchase.id });
         const transactionResponse = await finishTransaction({
           purchase: currentPurchase,
           isConsumable: true,
@@ -90,7 +90,7 @@ export const useInAppPurchase = () => {
           validateResponse = googleValidateResponse.success ?? false;
         }
 
-        console.log("Purchase completed:", transactionResponse);
+        trackEvent("purchase_completed", { productId: currentPurchase.id });
         if (validateResponse) await refreshAfterCompletePurchase();
       }
     } catch (error) {

@@ -108,3 +108,11 @@ export const chatDateFormatter = (dateString: string) => {
     return date.format("MM/DD/YYYY");
   }
 };
+
+export const trackEvent = (eventName: string, params?: object) => {
+  if (params) {
+    console.log(`Event: ${eventName}`, params);
+  } else {
+    console.log(`Event: ${eventName}`);
+  }
+};

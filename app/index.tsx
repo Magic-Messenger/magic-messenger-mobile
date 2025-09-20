@@ -15,6 +15,7 @@ import {
   generateKeyPairs,
   heightPixel,
   spacingPixel,
+  trackEvent,
   widthPixel,
 } from "@/utils";
 
@@ -69,7 +70,7 @@ export default function IndexPage() {
   }, [interval, isLogin]);
 
   useEffect(() => {
-    console.log("Index Page - isLogin:", isLogin, "rehydrated:", rehydrated);
+    trackEvent("app_open", { isLogin, rehydrated });
   }, [isLogin, rehydrated]);
 
   useEffect(() => {

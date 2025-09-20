@@ -1,6 +1,8 @@
 import { Audio, AVPlaybackStatus } from "expo-av";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { trackEvent } from "@/utils";
+
 function formatTime(ms: number) {
   const totalSeconds = Math.floor(ms / 1000);
   const minutes = Math.floor(totalSeconds / 60);
@@ -44,7 +46,7 @@ export function useAudioPlayer() {
         setDuration(status.durationMillis ?? 0);
       });
     } catch (e) {
-      console.log("loadAndPlay error:", e);
+      trackEvent("audio_playback_error", { error: e });
     }
   };
 

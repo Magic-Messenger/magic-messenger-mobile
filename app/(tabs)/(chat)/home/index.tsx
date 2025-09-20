@@ -8,7 +8,7 @@ import { useGetApiChatsList } from "@/api/endpoints/magicMessenger";
 import { AppLayout, Button, ChatItem, Icon, ThemedText } from "@/components";
 import { useUserStore } from "@/store";
 import { useThemedStyles } from "@/theme";
-import { heightPixel, widthPixel } from "@/utils";
+import { heightPixel, trackEvent, widthPixel } from "@/utils";
 
 export default function ChatScreen() {
   const { t } = useTranslation();
@@ -28,7 +28,7 @@ export default function ChatScreen() {
 
   useMemo(() => {
     if (__DEV__) {
-      console.log("process.env:", JSON.stringify(process.env, null, 2));
+      trackEvent("env_variables", { ...process.env });
     }
     return null;
   }, []);
