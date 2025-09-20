@@ -58,6 +58,7 @@ export default function ChatScreen() {
           contentContainerStyle={styles.contentContainerStyle}
           renderItem={({ item }) => (
             <MessageItem
+              identifier={chatId!}
               message={item as never}
               receiverPublicKey={usersPublicKey.receiverPublicKey}
               onReply={handleReply}

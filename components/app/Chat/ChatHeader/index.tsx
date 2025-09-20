@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
 
@@ -19,6 +19,11 @@ export function ChatHeader({
 }: ChatHeaderProps) {
   const styles = useThemedStyles(createStyle);
   const { t } = useTranslation();
+
+  const checkIsOnline = useMemo(() => {
+    if (!userName || !onlineUsers) return false;
+    return onlineUsers.includes(userName);
+  }, [onlineUsers, userName]);
 
   return (
     <View
@@ -43,7 +48,11 @@ export function ChatHeader({
             {userName}
           </ThemedText>
           <ThemedText type="subtitle">
-            {typingUsername ? t("chat.typing") : t("chat.online")}
+            {typingUsername
+              ? t("chat.typing")
+              : checkIsOnline
+                ? t("chat.online")
+                : t("chat.offline")}
           </ThemedText>
         </View>
       </View>

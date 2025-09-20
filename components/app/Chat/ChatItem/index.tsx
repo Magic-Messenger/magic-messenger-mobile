@@ -30,7 +30,9 @@ export function ChatItem({
   return (
     <ContactItem
       nickname={isGroupChat ? (groupName ?? "") : (contactUsername ?? "")}
-      contactUsername={chatDateFormatter(lastMessageTime ?? "")}
+      contactUsername={
+        lastMessageTime ? chatDateFormatter(lastMessageTime ?? "") : "-"
+      }
       customAction={
         unreadMessagesCount &&
         unreadMessagesCount > 0 && (

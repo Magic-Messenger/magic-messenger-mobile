@@ -6,6 +6,7 @@ import { changeLanguage as i18nChangeLanguage } from "i18next";
 import { Platform } from "react-native";
 import Toast, { ToastShowParams } from "react-native-toast-message";
 
+import { MessageStatus, MessageType } from "@/api/models";
 import { Images } from "@/constants";
 import i18n from "@/i18n";
 import { useAppStore } from "@/store";
@@ -114,5 +115,33 @@ export const trackEvent = (eventName: string, params?: object) => {
     console.log(`Event: ${eventName}`, params);
   } else {
     console.log(`Event: ${eventName}`);
+  }
+};
+
+export const convertMessageType = (messageType: number) => {
+  switch (messageType) {
+    case 0:
+      return MessageType.Text;
+    case 1:
+      return MessageType.Image;
+    case 2:
+      return MessageType.Video;
+    case 3:
+      return MessageType.Audio;
+    default:
+      return MessageType.Text;
+  }
+};
+
+export const convertMessageStatus = (messageStatus: number) => {
+  switch (messageStatus) {
+    case 0:
+      return MessageStatus.Sent;
+    case 1:
+      return MessageStatus.Delivered;
+    case 2:
+      return MessageStatus.Seen;
+    default:
+      return MessageStatus.Sent;
   }
 };

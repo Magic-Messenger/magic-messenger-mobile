@@ -8,14 +8,16 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 
-import { MessageDto, MessageType } from "@/api/models";
+import { MessageDto, MessageStatus, MessageType } from "@/api/models";
 import { AppImage, Icon, ThemedText, VideoPreview } from "@/components";
 import { Images } from "@/constants";
 import { useAudioPlayer, useChatHelper } from "@/hooks";
+import { useSignalRStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { dateFormatter, spacingPixel } from "@/utils";
+import { dateFormatter, spacingPixel, trackEvent } from "@/utils";
 
 interface MessageItemProps {
+  identifier: string;
   message?: MessageDto;
   receiverPublicKey: string;
   onReply?: (message: MessageDto) => void;
@@ -25,11 +27,14 @@ const SWIPE_THRESHOLD = 60;
 const REPLY_ICON_WIDTH = 30;
 
 export function MessageItem({
+  identifier,
   message,
   receiverPublicKey,
   onReply,
 }: MessageItemProps) {
   const styles = useThemedStyles(createStyle);
+  const magicHubClient = useSignalRStore((s) => s.magicHubClient);
+
   const { decryptedContent, isSentByCurrentUser } = useChatHelper(
     message as MessageDto,
     receiverPublicKey,
@@ -92,20 +97,84 @@ export function MessageItem({
     };
   });
 
+  useMemo(() => {
+    if (
+      magicHubClient &&
+      !isSentByCurrentUser &&
+      message?.messageStatus !== MessageStatus.Seen
+    ) {
+      trackEvent("message_seen", { messageId: message?.messageId });
+      magicHubClient.viewedMessage(identifier, message?.messageId as string);
+    }
+  }, [
+    identifier,
+    isSentByCurrentUser,
+    magicHubClient,
+    message?.messageId,
+    message?.messageStatus,
+  ]);
+
+  const renderMessageStatus = useMemo(() => {
+    if (isSentByCurrentUser) {
+      if (message?.messageStatus === MessageStatus.Sent) {
+        return (
+          <Icon
+            type="ionicons"
+            name="checkmark"
+            size={16}
+            color="white"
+            style={{ marginLeft: spacingPixel(5), opacity: 0.6 }}
+          />
+        );
+      } else if (message?.messageStatus === MessageStatus.Delivered) {
+        return (
+          <Icon
+            type="ionicons"
+            name="checkmark-done"
+            size={16}
+            color="white"
+            style={{ marginLeft: spacingPixel(5), opacity: 0.6 }}
+          />
+        );
+      } else if (message?.messageStatus === MessageStatus.Seen) {
+        return (
+          <Icon
+            type="ionicons"
+            name="checkmark-done"
+            size={16}
+            color="lightblue"
+            style={{ marginLeft: spacingPixel(5) }}
+          />
+        );
+      }
+    }
+    return null;
+  }, [isSentByCurrentUser, message?.messageStatus]);
+
   const renderMessageContent = useMemo(() => {
     if (message?.messageType === MessageType.Text) {
       return (
         <>
           <ThemedText>{decryptedContent}</ThemedText>
-          <ThemedText
-            style={
-              isSentByCurrentUser
-                ? styles.messageDateSender
-                : styles.messageDateReceiver
-            }
+          <View
+            style={[
+              styles.flex,
+              styles.flexRow,
+              styles.alignItemsCenter,
+              styles.justifyContentEnd,
+            ]}
           >
-            {dateFormatter(message?.createdAt!, "HH:mm")}
-          </ThemedText>
+            <ThemedText
+              style={
+                isSentByCurrentUser
+                  ? styles.messageDateSender
+                  : styles.messageDateReceiver
+              }
+            >
+              {dateFormatter(message?.createdAt!, "HH:mm")}
+            </ThemedText>
+            {renderMessageStatus}
+          </View>
         </>
       );
     } else if (message?.messageType === MessageType.Audio) {
@@ -135,15 +204,18 @@ export function MessageItem({
               style={isPlaying ? { opacity: 1 } : { opacity: 0.5 }}
             />
           </View>
-          <ThemedText
-            style={
-              isSentByCurrentUser
-                ? styles.messageDateSender
-                : styles.messageDateReceiver
-            }
-          >
-            {dateFormatter(message?.createdAt!, "HH:mm")}
-          </ThemedText>
+          <View style={[styles.flex, styles.flexRow, styles.alignItemsCenter]}>
+            <ThemedText
+              style={
+                isSentByCurrentUser
+                  ? styles.messageDateSender
+                  : styles.messageDateReceiver
+              }
+            >
+              {dateFormatter(message?.createdAt!, "HH:mm")}
+            </ThemedText>
+            {renderMessageStatus}
+          </View>
         </View>
       );
     } else if (message?.messageType === MessageType.Image) {
@@ -158,15 +230,18 @@ export function MessageItem({
             }}
             resizeMode="cover"
           />
-          <ThemedText
-            style={
-              isSentByCurrentUser
-                ? styles.messageDateSender
-                : styles.messageDateReceiver
-            }
-          >
-            {dateFormatter(message?.createdAt!, "HH:mm")}
-          </ThemedText>
+          <View style={[styles.flex, styles.flexRow, styles.alignItemsCenter]}>
+            <ThemedText
+              style={
+                isSentByCurrentUser
+                  ? styles.messageDateSender
+                  : styles.messageDateReceiver
+              }
+            >
+              {dateFormatter(message?.createdAt!, "HH:mm")}
+            </ThemedText>
+            {renderMessageStatus}
+          </View>
         </View>
       );
     } else if (message?.messageType === MessageType.Video) {
@@ -174,16 +249,18 @@ export function MessageItem({
         <>
           <VideoPreview source={decryptedContent as string} />
 
-          <ThemedText
-            style={[
-              isSentByCurrentUser
-                ? styles.messageDateSender
-                : styles.messageDateReceiver,
-              styles.mt2,
-            ]}
-          >
-            {dateFormatter(message?.createdAt!, "HH:mm")}
-          </ThemedText>
+          <View style={[styles.flex, styles.flexRow, styles.alignItemsCenter]}>
+            <ThemedText
+              style={
+                isSentByCurrentUser
+                  ? styles.messageDateSender
+                  : styles.messageDateReceiver
+              }
+            >
+              {dateFormatter(message?.createdAt!, "HH:mm")}
+            </ThemedText>
+            {renderMessageStatus}
+          </View>
         </>
       );
     }

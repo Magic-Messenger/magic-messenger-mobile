@@ -11,7 +11,13 @@ import {
 import { MessageDto, MessageType } from "@/api/models";
 import { UploadFileResultDto } from "@/constants";
 import { useSignalRStore, useUserStore } from "@/store";
-import { encrypt, userPublicKey } from "@/utils";
+import {
+  convertMessageStatus,
+  convertMessageType,
+  encrypt,
+  trackEvent,
+  userPublicKey,
+} from "@/utils";
 
 export const useDetail = () => {
   const { t } = useTranslation();
@@ -44,7 +50,6 @@ export const useDetail = () => {
     if (success && data?.messages?.data) {
       setLoading(false);
       setMessages(data?.messages?.data as never[]);
-      console.log("data?.messages?.data: ", data?.messages?.data);
       if (!chatId) setChatId(contactChatId as string);
       if (listRef.current) {
         listRef.current.scrollToEnd({ animated: true });
@@ -54,10 +59,10 @@ export const useDetail = () => {
   };
 
   useEffect(() => {
-    if (contactChatId) {
+    if (contactChatId || chatId) {
       loadMessages();
     }
-  }, [contactChatId, listRef, chatId]);
+  }, [contactChatId, listRef, chatId, listRef]);
 
   const usersPublicKey = useMemo(() => {
     return {
@@ -143,9 +148,14 @@ export const useDetail = () => {
         (data) => currentUserName !== data.username && setTypingUsername(""),
       );
       magicHubClient.on("message_received", (message) => {
+        trackEvent("message_received", { message });
         setMessages((prev) => [
           ...prev,
-          { ...message, messageType: MessageType.Text },
+          {
+            ...message,
+            messageType: convertMessageType(message.messageType as never),
+            messageStatus: convertMessageStatus(message.messageStatus as never),
+          },
         ]);
         if (listRef.current) {
           listRef.current.scrollToEnd({ animated: true });

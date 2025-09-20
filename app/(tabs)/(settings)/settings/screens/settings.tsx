@@ -8,7 +8,6 @@ import { useSettings } from "../hooks";
 
 const SettingsScreen = () => {
   const { t, styles, isLoading, settingsItems, renderItem } = useSettings();
-  console.log("settingsItems: ", settingsItems);
 
   return (
     <AppLayout
