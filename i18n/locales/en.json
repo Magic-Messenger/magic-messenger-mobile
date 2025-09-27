@@ -232,6 +232,17 @@
     "typing": "is typing..."
   },
 
+  "groups": {
+    "title": "Groups",
+    "newGroup": "New Group",
+    "groupName": "Enter group chat name",
+    "addParticipants": "Add participants",
+    "searchContacts": "Search from contact list to add in group",
+    "inThisGroup": "In this group (max. 15 users)",
+    "create": "Create",
+    "selectParticipants": "Select participants"
+  },
+
   "chatDetail": {
     "writeMessage": "Write a message...",
     "replyingTo": "Replying to"

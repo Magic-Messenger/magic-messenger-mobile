@@ -31,6 +31,7 @@ export const ContactItem = ({
   contactUsername,
   onAction,
   customAction,
+  ...props
 }: ContactItemProps) => {
   const { t } = useTranslation();
   const styles = useThemedStyles(createStyle);
@@ -42,7 +43,11 @@ export const ContactItem = ({
   };
 
   return (
-    <TouchableOpacity activeOpacity={0.5} onPress={onAction?.onPress}>
+    <TouchableOpacity
+      activeOpacity={0.5}
+      onPress={onAction?.onPress}
+      {...props}
+    >
       <LinearGradient
         colors={Colors.buttonPrimary as never}
         start={{ y: 0, x: 1 }}

@@ -18,14 +18,31 @@ export default function GroupsStack() {
         },
         headerTitleAlign: "center",
       }}
-      initialRouteName="index"
+      initialRouteName="home/index"
     >
       <Stack.Screen
-        name="index"
+        name="home/index"
         options={{
           ...headerImage(),
           headerShown: true,
           title: t("settings.title"),
+        }}
+      />
+      <Stack.Screen
+        name="create/screens/index"
+        options={{
+          ...headerImage(),
+          headerShown: true,
+          title: t("settings.title"),
+        }}
+      />
+      <Stack.Screen
+        name="participants/screens/index"
+        options={{
+          headerShown: true,
+          presentation: "modal",
+          headerBackButtonDisplayMode: "default",
+          headerBackButtonMenuEnabled: true,
         }}
       />
     </Stack>
