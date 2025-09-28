@@ -1,11 +1,18 @@
-import { router, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { router } from "expo-router";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { StyleSheet } from "react-native";
 
+import { usePostApiChatsCreate } from "@/api/endpoints/magicMessenger";
+import { useGroupChatCreateStore } from "@/store";
 import { ColorDto, useColor, useThemedStyles } from "@/theme";
-import { spacingPixel } from "@/utils";
+import {
+  encryptGroupKeyForUser,
+  generateGroupKey,
+  spacingPixel,
+  userPublicKey,
+} from "@/utils";
 
 interface CreateGroupFormData {
   groupName: string;
@@ -39,38 +46,54 @@ export const useCreateGroup = () => {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<CreateGroupFormData>();
-  const { participants: selectedParticipants } = useLocalSearchParams();
 
-  const [participants, setParticipants] = useState<string[]>([]);
+  const { mutateAsync: createGroup } = usePostApiChatsCreate();
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const { participants, removeParticipant, clearParticipants } =
+    useGroupChatCreateStore();
+
+  const onSubmit = async (data: CreateGroupFormData) => {
+    if (data && participants.length > 0) {
+      const groupKey = generateGroupKey();
+
+      const encryptedUserNames = participants.map(
+        ({ contactUsername, publicKey }) => {
+          const encryptedData = encryptGroupKeyForUser(
+            groupKey,
+            publicKey as never,
+            userPublicKey() as string,
+          );
+          return {
+            username: contactUsername as string,
+            groupKey: encryptedData?.cipherText,
+            none: encryptedData?.nonce,
+          };
+        },
+      );
+
+      const { success, data: responseData } = await createGroup({
+        data: {
+          usernames: participants?.map((p) => p.contactUsername) as string[],
+          groupName: data.groupName,
+          isGroupChat: true,
+          encryptedGroupKeys: encryptedUserNames,
+        },
+      });
+      if (success && responseData) {
+        router.replace("/(tabs)/(groups)/home");
+      }
+    }
   };
 
   const goToAddParticipants = () => {
     router.push("/(tabs)/(groups)/participants/screens");
   };
 
-  const removeParticipant = (participant: string) => {
-    console.log("participant: ", participant);
-    setParticipants((prev) => prev.filter((p) => p !== participant));
-  };
-
-  /* useEffect(() => {
-    let participantsArray: string[] = [];
-    if (Array.isArray(selectedParticipants)) {
-      participantsArray = selectedParticipants;
-    } else if (typeof selectedParticipants === "string") {
-      participantsArray = [selectedParticipants];
-    }
-
-    if (
-      participantsArray.length !== participants.length ||
-      participantsArray.some((p, i) => p !== participants[i])
-    ) {
-      setParticipants(participantsArray);
-    }
-  }, [selectedParticipants]); */
+  useEffect(() => {
+    return () => {
+      clearParticipants();
+    };
+  }, []);
 
   return {
     t,

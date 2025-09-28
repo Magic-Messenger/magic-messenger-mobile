@@ -18,6 +18,7 @@ export default function ChatScreen() {
   const { data, isLoading, refetch } = useGetApiChatsList({
     pageNumber: 1,
     pageSize: 40,
+    isGroupChat: true,
   });
 
   useEffect(() => {

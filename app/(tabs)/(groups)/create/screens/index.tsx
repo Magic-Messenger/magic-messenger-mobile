@@ -7,11 +7,9 @@ import { useCreateGroup } from "../hooks";
 export default function CreateGroupChatScreen() {
   const {
     t,
-    theme,
     styles,
     control,
     errors,
-    isSubmitting,
     participants,
     handleSubmit,
     goToAddParticipants,
@@ -27,6 +25,7 @@ export default function CreateGroupChatScreen() {
         <Button
           type="primary"
           label={t("groups.create")}
+          disabled={participants?.length === 0}
           onPress={handleSubmit}
         />
       }
@@ -61,8 +60,12 @@ export default function CreateGroupChatScreen() {
             contentContainerStyle={styles.participantContainer}
             renderItem={({ item }) => (
               <View style={styles.participantItem}>
-                <ThemedText>{item}</ThemedText>
-                <TouchableOpacity onPress={() => removeParticipant(item)}>
+                <ThemedText>{item?.contactUsername}</ThemedText>
+                <TouchableOpacity
+                  onPress={() =>
+                    removeParticipant(item?.contactUsername as string)
+                  }
+                >
                   <Icon name="close" />
                 </TouchableOpacity>
               </View>

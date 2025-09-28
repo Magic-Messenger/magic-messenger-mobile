@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import React from "react";
+import React, { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { ContactItem, ThemedText } from "@/components";
@@ -24,35 +24,57 @@ export function ChatItem({
   isGroupChat,
   lastMessageTime,
   unreadMessagesCount,
+  ...props
 }: ChatItemProps) {
   const styles = useThemedStyles(createStyle);
 
+  const chatTitle = useMemo(() => {
+    return isGroupChat ? (groupName ?? "") : (contactUsername ?? "");
+  }, [isGroupChat, groupName, contactUsername]);
+
+  const handleGoToChat = () => {
+    if (isGroupChat) {
+      router.push({
+        pathname: "/groupChatDetail/screens",
+        params: {
+          chatId: chatId,
+          publicKey: publicKey,
+          userName: chatTitle,
+          isGroupChat: (isGroupChat as never) ?? false,
+        },
+      });
+    } else {
+      router.push({
+        pathname: "/chatDetail/screens",
+        params: {
+          chatId: chatId,
+          publicKey: publicKey,
+          userName: chatTitle,
+          isGroupChat: (isGroupChat as never) ?? false,
+        },
+      });
+    }
+  };
+
   return (
     <ContactItem
-      nickname={isGroupChat ? (groupName ?? "") : (contactUsername ?? "")}
+      nickname={chatTitle}
       contactUsername={
         lastMessageTime ? chatDateFormatter(lastMessageTime ?? "") : "-"
       }
       customAction={
-        unreadMessagesCount &&
-        unreadMessagesCount > 0 && (
+        unreadMessagesCount && unreadMessagesCount > 0 ? (
           <View style={styles.chatItem}>
             <ThemedText weight="semiBold" size={11}>
-              {unreadMessagesCount}
+              {unreadMessagesCount?.toString() ?? ""}
             </ThemedText>
           </View>
+        ) : (
+          <></>
         )
       }
       onAction={{
-        onPress: () =>
-          router.push({
-            pathname: "/chatDetail/screens",
-            params: {
-              chatId: chatId,
-              publicKey: publicKey,
-              userName: contactUsername,
-            },
-          }),
+        onPress: handleGoToChat,
       }}
     />
   );

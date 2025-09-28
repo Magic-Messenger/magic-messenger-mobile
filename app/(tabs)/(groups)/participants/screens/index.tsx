@@ -13,6 +13,7 @@ import {
   Icon,
   Input,
 } from "@/components";
+import { useGroupChatCreateStore } from "@/store";
 import { useColor, useThemedStyles } from "@/theme";
 import { spacingPixel } from "@/utils";
 
@@ -23,7 +24,8 @@ export default function ParticipantsScreen() {
   const colors = useColor();
   const navigation = useNavigation();
 
-  const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
+  const { participants, setParticipants, removeParticipant } =
+    useGroupChatCreateStore();
 
   const { data: contactData, isLoading, refetch } = useGetApiContactsList();
 
@@ -43,7 +45,7 @@ export default function ParticipantsScreen() {
         backgroundColor: undefined,
       },
     });
-  }, [navigation, selectedContacts]);
+  }, [navigation, participants]);
 
   const filteredData = useMemo(() => {
     return contactData?.data?.filter((x) =>
@@ -51,29 +53,32 @@ export default function ParticipantsScreen() {
     );
   }, [searchText, contactData?.data]);
 
+  const handleSelectContact = (contact: ContactDto) => {
+    if (
+      participants?.find((x) => x?.contactUsername === contact?.contactUsername)
+    ) {
+      removeParticipant(contact?.contactUsername as string);
+    } else {
+      setParticipants(contact);
+    }
+  };
+
   const renderContactItem = ({ item }: { item: ContactDto }) => {
     return (
       <ContactItem
         nickname={item.nickname as string}
         contactUsername={item.contactUsername as string}
         onAction={{
-          onPress: () => {
-            if (selectedContacts.includes(item.contactUsername as string)) {
-              setSelectedContacts((prev) =>
-                prev.filter((x) => x !== item.contactUsername),
-              );
-            } else {
-              setSelectedContacts((prev) => [
-                ...prev,
-                item.contactUsername as string,
-              ]);
-            }
-          },
+          onPress: () => handleSelectContact(item),
         }}
         customAction={
-          selectedContacts.includes(item.contactUsername as string) ? (
+          participants?.find(
+            (x) => x.contactUsername === item.contactUsername,
+          ) ? (
             <Icon type="ant" name="checkcircle" color={colors.colors.white} />
-          ) : null
+          ) : (
+            <></>
+          )
         }
       />
     );
@@ -81,12 +86,6 @@ export default function ParticipantsScreen() {
 
   const handleSelectParticipants = () => {
     router.back();
-
-    setTimeout(() => {
-      router.setParams({
-        participants: selectedContacts,
-      });
-    }, 400);
   };
 
   useFocusEffect(
@@ -104,7 +103,7 @@ export default function ParticipantsScreen() {
         <Button
           type="primary"
           label={t("groups.selectParticipants")}
-          disabled={selectedContacts?.length === 0}
+          disabled={participants?.length === 0}
           onPress={handleSelectParticipants}
         />
       }
