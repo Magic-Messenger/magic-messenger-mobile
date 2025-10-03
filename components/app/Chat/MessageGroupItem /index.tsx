@@ -16,6 +16,8 @@ import { useSignalRStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
 import { dateFormatter, spacingPixel, trackEvent } from "@/utils";
 
+import { ReplyMessageItem } from "../ReplyMessageItem";
+
 interface MessageItemProps {
   identifier: string;
   message?: MessageDto;
@@ -33,9 +35,8 @@ export function MessageGroupItem({
   const styles = useThemedStyles(createStyle);
   const magicHubClient = useSignalRStore((s) => s.magicHubClient);
 
-  const { decryptedContent, isSentByCurrentUser } = useGroupChatHelper(
-    message as MessageDto,
-  );
+  const { decryptedContent, isSentByCurrentUser, decryptedReplyMessage } =
+    useGroupChatHelper(message as MessageDto);
 
   const { loadAndPlay, pause, isPlaying } = useAudioPlayer();
 
@@ -159,6 +160,10 @@ export function MessageGroupItem({
               </ThemedText>
             </View>
           )}
+
+          {message?.repliedToMessage && (
+            <ReplyMessageItem message={decryptedReplyMessage as string} />
+          )}
           <ThemedText>{decryptedContent}</ThemedText>
           <View
             style={[
@@ -184,6 +189,16 @@ export function MessageGroupItem({
     } else if (message?.messageType === MessageType.Audio) {
       return (
         <View>
+          {!isSentByCurrentUser && (
+            <View>
+              <ThemedText size={11} numberOfLines={1} weight="semiBold">
+                {message?.nickname}
+              </ThemedText>
+            </View>
+          )}
+          {message?.repliedToMessage && (
+            <ReplyMessageItem message={decryptedReplyMessage as string} />
+          )}
           <View style={[styles.flex, styles.flexRow]}>
             <TouchableOpacity
               onPress={() => {
@@ -225,6 +240,16 @@ export function MessageGroupItem({
     } else if (message?.messageType === MessageType.Image) {
       return (
         <View style={styles.gap2}>
+          {!isSentByCurrentUser && (
+            <View>
+              <ThemedText size={11} numberOfLines={1} weight="semiBold">
+                {message?.nickname}
+              </ThemedText>
+            </View>
+          )}
+          {message?.repliedToMessage && (
+            <ReplyMessageItem message={decryptedReplyMessage as string} />
+          )}
           <AppImage
             source={{ uri: decryptedContent as string }}
             style={{
@@ -251,6 +276,17 @@ export function MessageGroupItem({
     } else if (message?.messageType === MessageType.Video) {
       return (
         <>
+          {!isSentByCurrentUser && (
+            <View>
+              <ThemedText size={11} numberOfLines={1} weight="semiBold">
+                {message?.nickname}
+              </ThemedText>
+            </View>
+          )}
+          {message?.repliedToMessage && (
+            <ReplyMessageItem message={decryptedReplyMessage as string} />
+          )}
+
           <VideoPreview source={decryptedContent as string} />
 
           <View style={[styles.flex, styles.flexRow, styles.alignItemsCenter]}>
