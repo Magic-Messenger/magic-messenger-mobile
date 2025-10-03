@@ -243,6 +243,23 @@
     "selectParticipants": "Select participants"
   },
 
+  "notes": {
+    "empty": "No notes available. Click the + button to add a new note.",
+    "lastUpdate": "Last update: {{date}}",
+    "newNote": "New Note",
+    "editNote": "Edit Note",
+    "noteTitle": "Note Title",
+    "noteContent": "Note Content",
+    "delete": "Delete Note",
+    "save": "Save Note",
+    "deleteMessageTitle": "Are you sure?",
+    "deleteMessageMessage": "Once a note is deleted, it cannot be recovered.",
+    "successAddNote": "Note added successfully",
+    "successUpdateNote": "Note updated successfully",
+    "successDeleteNote": "Note deleted successfully",
+    "listNotes": "List of Notes"
+  },
+
   "chatDetail": {
     "writeMessage": "Write a message...",
     "replyingTo": "Replying to"

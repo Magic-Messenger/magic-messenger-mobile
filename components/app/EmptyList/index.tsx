@@ -1,4 +1,4 @@
-import { View, ViewStyle } from "react-native";
+import { TextStyle, View, ViewStyle } from "react-native";
 
 import { useThemedStyles } from "@/theme";
 
@@ -10,6 +10,7 @@ interface Props {
   iconType?: IconLibrary;
   icon?: string;
   style?: ViewStyle;
+  textStyle?: TextStyle;
 }
 
 export const EmptyList = ({
@@ -17,13 +18,16 @@ export const EmptyList = ({
   icon,
   iconType = "feather",
   style,
+  textStyle,
 }: Props) => {
   const styles = useThemedStyles();
 
   return (
     <View style={[styles.alignItemsCenter, styles.gap2, style]}>
       {icon && <Icon name={icon} type={iconType} />}
-      <ThemedText type="default">{label ?? ""}</ThemedText>
+      <ThemedText type="default" style={textStyle ?? undefined}>
+        {label ?? ""}
+      </ThemedText>
     </View>
   );
 };

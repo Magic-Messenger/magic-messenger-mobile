@@ -18,10 +18,28 @@ export default function NotesStack() {
         },
         headerTitleAlign: "center",
       }}
-      initialRouteName="index"
+      initialRouteName="home/index"
     >
       <Stack.Screen
-        name="index"
+        name="home/index"
+        options={{
+          ...headerImage(),
+          headerShown: true,
+          title: t("settings.title"),
+        }}
+      />
+
+      <Stack.Screen
+        name="create/index"
+        options={{
+          ...headerImage(),
+          headerShown: true,
+          title: t("settings.title"),
+        }}
+      />
+
+      <Stack.Screen
+        name="edit/index"
         options={{
           ...headerImage(),
           headerShown: true,

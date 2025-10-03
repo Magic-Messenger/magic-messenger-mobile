@@ -16,6 +16,7 @@ export * from "./Contact/ContactScanQr";
 export * from "./EmptyList";
 export * from "./ExternalLink";
 export * from "./HapticTab";
+export * from "./Note/NoteItem";
 export * from "./PasswordInput";
 export * from "./ProductItem";
 export * from "./SectionHeader";
