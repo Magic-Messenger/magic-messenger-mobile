@@ -53,7 +53,25 @@ export function useChatHelper(message: MessageDto, receiverPublicKey: string) {
     }
   }, [message, currentUserName, isSentByCurrentUser, receiverPublicKey]);
 
-  return { decryptedContent, isSentByCurrentUser };
+  const decryptedReplyMessage = useMemo(() => {
+    const senderKey = isSentByCurrentUser ? receiverPublicKey : userPublicKey();
+    const receiverKey = isSentByCurrentUser ? userPublicKey() : receiverPublicKey; //prettier-ignore
+
+    if (
+      message?.repliedToMessage &&
+      message?.repliedToMessage?.content?.cipherText &&
+      message?.repliedToMessage?.content?.nonce
+    ) {
+      return decrypt(
+        message?.repliedToMessage?.content?.cipherText as string,
+        message?.repliedToMessage?.content?.nonce as string,
+        senderKey as string,
+        receiverKey as string,
+      );
+    }
+  }, [message]);
+
+  return { decryptedContent, isSentByCurrentUser, decryptedReplyMessage };
 }
 
 export function useGroupChatHelper(message: MessageDto) {

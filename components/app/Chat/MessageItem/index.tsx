@@ -16,6 +16,8 @@ import { useSignalRStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
 import { dateFormatter, spacingPixel, trackEvent } from "@/utils";
 
+import { ReplyMessageItem } from "../ReplyMessageItem";
+
 interface MessageItemProps {
   identifier: string;
   message?: MessageDto;
@@ -35,10 +37,8 @@ export function MessageItem({
   const styles = useThemedStyles(createStyle);
   const magicHubClient = useSignalRStore((s) => s.magicHubClient);
 
-  const { decryptedContent, isSentByCurrentUser } = useChatHelper(
-    message as MessageDto,
-    receiverPublicKey,
-  );
+  const { decryptedContent, isSentByCurrentUser, decryptedReplyMessage } =
+    useChatHelper(message as MessageDto, receiverPublicKey);
 
   const { loadAndPlay, pause, isPlaying } = useAudioPlayer();
 
@@ -155,6 +155,10 @@ export function MessageItem({
     if (message?.messageType === MessageType.Text) {
       return (
         <>
+          {message?.repliedToMessage && (
+            <ReplyMessageItem message={decryptedReplyMessage as string} />
+          )}
+
           <ThemedText>{decryptedContent}</ThemedText>
           <View
             style={[
@@ -180,6 +184,10 @@ export function MessageItem({
     } else if (message?.messageType === MessageType.Audio) {
       return (
         <View>
+          {message?.repliedToMessage && (
+            <ReplyMessageItem message={decryptedReplyMessage as string} />
+          )}
+
           <View style={[styles.flex, styles.flexRow]}>
             <TouchableOpacity
               onPress={() => {
@@ -221,6 +229,10 @@ export function MessageItem({
     } else if (message?.messageType === MessageType.Image) {
       return (
         <View style={styles.gap2}>
+          {message?.repliedToMessage && (
+            <ReplyMessageItem message={decryptedReplyMessage as string} />
+          )}
+
           <AppImage
             source={{ uri: decryptedContent as string }}
             style={{
@@ -247,6 +259,10 @@ export function MessageItem({
     } else if (message?.messageType === MessageType.Video) {
       return (
         <>
+          {message?.repliedToMessage && (
+            <ReplyMessageItem message={decryptedReplyMessage as string} />
+          )}
+
           <VideoPreview source={decryptedContent as string} />
 
           <View style={[styles.flex, styles.flexRow, styles.alignItemsCenter]}>

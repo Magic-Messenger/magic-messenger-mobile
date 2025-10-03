@@ -21,7 +21,7 @@ import {
   userPublicKey,
 } from "@/utils";
 
-const INITIAL_PAGE_SIZE = 3;
+const INITIAL_PAGE_SIZE = 20;
 const SCROLL_THRESHOLD = 100;
 
 export const useDetail = () => {
