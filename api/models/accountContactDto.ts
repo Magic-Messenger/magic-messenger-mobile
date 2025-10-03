@@ -13,5 +13,7 @@ export interface AccountContactDto {
   /** @nullable */
   readonly profileQrCodeLink?: string | null;
   /** @nullable */
+  photoUrl?: string | null;
+  /** @nullable */
   publicKey?: string | null;
 }

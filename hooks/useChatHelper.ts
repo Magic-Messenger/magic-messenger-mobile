@@ -1,8 +1,15 @@
+import { useLocalSearchParams } from "expo-router";
 import { useMemo } from "react";
 
 import { MessageDto, MessageType } from "@/api/models";
 import { useUserStore } from "@/store";
-import { decrypt, userPublicKey } from "@/utils";
+import {
+  decrypt,
+  decryptForGroup,
+  decryptGroupKeyForUser,
+  userPrivateKey,
+  userPublicKey,
+} from "@/utils";
 
 export function useChatHelper(message: MessageDto, receiverPublicKey: string) {
   const { userName: currentUserName } = useUserStore();
@@ -45,6 +52,54 @@ export function useChatHelper(message: MessageDto, receiverPublicKey: string) {
       }
     }
   }, [message, currentUserName, isSentByCurrentUser, receiverPublicKey]);
+
+  return { decryptedContent, isSentByCurrentUser };
+}
+
+export function useGroupChatHelper(message: MessageDto) {
+  const { groupKey, groupNonce, groupAdminAccount } = useLocalSearchParams();
+  const { userName: currentUserName } = useUserStore();
+  const isSentByCurrentUser = message?.senderUsername === currentUserName;
+
+  const decryptedGroupKey = decryptGroupKeyForUser(
+    groupKey as string,
+    groupNonce as string,
+    userPrivateKey() as string,
+    groupAdminAccount as string,
+  );
+
+  const decryptedContent = useMemo(() => {
+    if (
+      message?.messageType === MessageType.Audio ||
+      message?.messageType === MessageType.Image ||
+      message?.messageType === MessageType.Video
+    ) {
+      if (
+        message?.file &&
+        message?.file?.filePath?.cipherText &&
+        message?.file?.filePath?.nonce &&
+        decryptedGroupKey
+      ) {
+        return decryptForGroup(
+          message?.file.filePath?.cipherText as string,
+          message?.file.filePath?.nonce as string,
+          decryptedGroupKey as string,
+        );
+      }
+    } else if (message?.messageType === MessageType.Text) {
+      if (
+        message?.content?.cipherText &&
+        message?.content?.nonce &&
+        decryptedGroupKey
+      ) {
+        return decryptForGroup(
+          message?.content?.cipherText as string,
+          message?.content?.nonce as string,
+          decryptedGroupKey as string,
+        );
+      }
+    }
+  }, [message, currentUserName, isSentByCurrentUser]);
 
   return { decryptedContent, isSentByCurrentUser };
 }

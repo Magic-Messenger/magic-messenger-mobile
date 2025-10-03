@@ -4,8 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
-  getApiChatsMessages,
-  usePostApiChatsCreate,
+  getApiChatsGroupMessages,
   usePostApiChatsSendMessage,
 } from "@/api/endpoints/magicMessenger";
 import { MessageDto, MessageType } from "@/api/models";
@@ -14,8 +13,10 @@ import { useSignalRStore, useUserStore } from "@/store";
 import {
   convertMessageStatus,
   convertMessageType,
-  encrypt,
+  decryptGroupKeyForUser,
+  encryptForGroup,
   trackEvent,
+  userPrivateKey,
   userPublicKey,
 } from "@/utils";
 
@@ -24,33 +25,42 @@ export const useDetail = () => {
   const router = useRouter();
   const listRef = useRef<FlashListRef<MessageDto>>(null);
   const [replyMessage, setReplyMessage] = useState<MessageDto | null>(null);
-  const { userName: currentUserName } = useUserStore();
-  const { chatId: contactChatId, userName, publicKey } = useLocalSearchParams();
+  const { userName: currentUserName, credentials } = useUserStore();
+  const {
+    chatId,
+    userName,
+    publicKey,
+    groupKey,
+    groupNonce,
+    groupAccountCount,
+    groupAdminAccount,
+  } = useLocalSearchParams();
+
+  const decryptedGroupKey = decryptGroupKeyForUser(
+    groupKey as string,
+    groupNonce as string,
+    userPrivateKey() as string,
+    groupAdminAccount as string,
+  );
 
   const magicHubClient = useSignalRStore((s) => s.magicHubClient);
 
-  const [chatId, setChatId] = useState<string | null>(
-    (contactChatId as string) ?? null,
-  );
   const [messages, setMessages] = useState<MessageDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [typingUsername, setTypingUsername] = useState<string | null>(null);
-  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
 
   const { mutateAsync: sendApiMessage } = usePostApiChatsSendMessage();
-  const { mutateAsync: createApiChat } = usePostApiChatsCreate();
 
   const loadMessages = async () => {
     if (loading) return;
     setLoading(true);
-    const { data, success } = await getApiChatsMessages({
-      chatId: contactChatId as string,
+    const { data, success } = await getApiChatsGroupMessages({
+      chatId: chatId as string,
     });
 
     if (success && data?.messages?.data) {
       setLoading(false);
       setMessages(data?.messages?.data as never[]);
-      if (!chatId) setChatId(contactChatId as string);
       if (listRef.current) {
         listRef.current.scrollToEnd({ animated: true });
       }
@@ -59,10 +69,10 @@ export const useDetail = () => {
   };
 
   useEffect(() => {
-    if (contactChatId || chatId) {
+    if (chatId) {
       loadMessages();
     }
-  }, [contactChatId, listRef, chatId, listRef]);
+  }, [listRef, chatId, listRef]);
 
   const usersPublicKey = useMemo(() => {
     return {
@@ -72,20 +82,8 @@ export const useDetail = () => {
   }, [publicKey, userPublicKey]);
 
   const handleChatControl = async (message: string | UploadFileResultDto) => {
-    if (contactChatId) {
+    if (chatId) {
       await handleSendMessage(message);
-    } else {
-      const response = await createApiChat({
-        data: {
-          usernames: [userName as string],
-        },
-      });
-      if (response?.success && response?.data) {
-        setChatId(response?.data as string);
-        /* setTimeout(() => {
-          loadMessages();
-        }, 500); */
-      }
     }
   };
 
@@ -100,32 +98,30 @@ export const useDetail = () => {
   const handleSendMessage = async (message: string | UploadFileResultDto) => {
     const isFileMessage =
       typeof message === "object" && message?.fileUrl !== undefined;
-
     const response = await sendApiMessage({
       data: {
         chatId: chatId as string,
         messageType: isFileMessage ? message?.messageType : MessageType.Text,
         ...(!isFileMessage && {
-          content: encrypt(
+          content: encryptForGroup(
             message as string,
-            usersPublicKey.receiverPublicKey,
-            usersPublicKey.senderPrivateKey,
+            decryptedGroupKey as string,
           ),
         }),
         ...(isFileMessage && {
           file: {
             size: message.contentLength,
             contentType: message.contentType,
-            filePath: encrypt(
+            filePath: encryptForGroup(
               message.fileUrl as string,
-              usersPublicKey.receiverPublicKey,
-              usersPublicKey.senderPrivateKey,
+              decryptedGroupKey as string,
             ),
           },
         }),
         ...(replyMessage && { repliedToMessage: replyMessage?.messageId }),
       },
     });
+
     if (response?.success) {
       onClearReply();
     }
@@ -134,10 +130,6 @@ export const useDetail = () => {
   useEffect(() => {
     if (magicHubClient) {
       magicHubClient.joinChat(chatId as string);
-      magicHubClient.on("user_online", (data) => {
-        setOnlineUsers((prev) => [...prev, data.username]);
-      });
-
       magicHubClient.on(
         "typing",
         (data) =>
@@ -147,8 +139,8 @@ export const useDetail = () => {
         "stop_typing",
         (data) => currentUserName !== data.username && setTypingUsername(""),
       );
-      magicHubClient.on("message_received", (message) => {
-        trackEvent("message_received", { message });
+      magicHubClient.on("group_message_received", (message) => {
+        trackEvent("group_message_received", { message });
         setMessages((prev) => [
           ...prev,
           {
@@ -167,7 +159,7 @@ export const useDetail = () => {
         magicHubClient.leaveChat(chatId as string);
         magicHubClient.off("typing");
         magicHubClient.off("stop_typing");
-        magicHubClient.off("message_received");
+        magicHubClient.off("group_message_received");
         magicHubClient.off("user_offline");
       }
     };
@@ -178,10 +170,10 @@ export const useDetail = () => {
     router,
     listRef,
     loading,
-    chatId,
+    chatId: chatId as string,
     messages,
     userName,
-    onlineUsers,
+    groupAccountCount,
     typingUsername,
     currentUserName,
     usersPublicKey,

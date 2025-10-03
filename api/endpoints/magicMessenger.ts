@@ -22,6 +22,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { AxiosInstance } from "../../services/axios/AxiosBase";
 import type {
+  AcceptGroupInvitationCommandRequest,
   AccountContactDtoIDataResult,
   AccountDetailDtoIDataResult,
   AccountDtoIDataResult,
@@ -32,6 +33,7 @@ import type {
   AddTransactionToLicenseCommandRequest,
   AdminLoginCommandRequest,
   AdminLoginCommandResultIDataResult,
+  ArchiveChatCommandRequest,
   BlockAccountCommandRequest,
   BuyLicenseCommandRequest,
   BuyLicenseCommandResultIDataResult,
@@ -61,12 +63,14 @@ import type {
   DeleteApiTicketsDeleteParams,
   FaqDtoListPaginatedResult,
   FaqIDataResult,
+  GenerateMagicLinkCommandRequest,
   GetApiAccountGetAccountForContactParams,
   GetApiAccountGetParams,
   GetApiAccountListParams,
   GetApiChatsGroupMessagesParams,
   GetApiChatsListParams,
   GetApiChatsMessagesParams,
+  GetApiChatsValidateMagicLinkParams,
   GetApiFaqsGetParams,
   GetApiFaqsListParams,
   GetApiInvoicesGetParams,
@@ -85,6 +89,7 @@ import type {
   GetApiTicketsListParams,
   GetGroupMessagesQueryResultIDataResult,
   GetMessagesQueryResultIDataResult,
+  InviteToGroupCommandRequest,
   InvoiceDetailDtoIDataResult,
   InvoiceDtoListPaginatedResult,
   InvoiceIDataResult,
@@ -95,8 +100,11 @@ import type {
   LogDto,
   LoginCommandRequest,
   LoginCommandResultIDataResult,
+  MessageDeliveredCommandRequest,
   MessageDtoIDataResult,
+  MessageSeenCommandRequest,
   ObjectId,
+  PostApiAccountUploadProfilePictureBody,
   PostApiChatsClearParams,
   PostApiChatsUploadBody,
   RecoverPasswordCommandRequest,
@@ -105,6 +113,7 @@ import type {
   RegisterCommandRequest,
   RegisterCommandResultIDataResult,
   RegisterDeviceTokenCommandRequest,
+  RejectGroupInvitationCommandRequest,
   ResetPasswordCommandRequest,
   ResetPhrasesCommandRequest,
   ResetTwoFactorCommandRequest,
@@ -122,11 +131,14 @@ import type {
   TicketDetailDtoIDataResult,
   TicketDtoListPaginatedResult,
   Translate,
+  UnarchiveChatCommandRequest,
   UnblockAccountCommandRequest,
   UpdateChatCommandRequest,
   UpdateContactCommandRequest,
+  UpdateDeviceInformationCommandRequest,
   UpdateFaqCommandRequest,
   UpdateLanguageCommand,
+  UpdatePublicKeyCommandRequest,
   UpdateSubscriptionCommandRequest,
   UpdateTranslateCommand,
   UploadFileCommandResultIDataResult,
@@ -1600,6 +1612,200 @@ export const usePostApiAccountRegisterDeviceToken = <
 };
 
 /**
+ * @summary Update public key operation
+ */
+export const postApiAccountUpdatePublicKey = (
+  updatePublicKeyCommandRequest: UpdatePublicKeyCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/account/update-public-key`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: updatePublicKeyCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiAccountUpdatePublicKeyMutationOptions = <
+  TError = ResultMessage[] | null | null,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiAccountUpdatePublicKey>>,
+    TError,
+    { data: UpdatePublicKeyCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiAccountUpdatePublicKey>>,
+  TError,
+  { data: UpdatePublicKeyCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiAccountUpdatePublicKey"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiAccountUpdatePublicKey>>,
+    { data: UpdatePublicKeyCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiAccountUpdatePublicKey(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiAccountUpdatePublicKeyMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiAccountUpdatePublicKey>>
+>;
+export type PostApiAccountUpdatePublicKeyMutationBody =
+  UpdatePublicKeyCommandRequest;
+export type PostApiAccountUpdatePublicKeyMutationError =
+  | ResultMessage[]
+  | null
+  | null;
+
+/**
+ * @summary Update public key operation
+ */
+export const usePostApiAccountUpdatePublicKey = <
+  TError = ResultMessage[] | null | null,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiAccountUpdatePublicKey>>,
+      TError,
+      { data: UpdatePublicKeyCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiAccountUpdatePublicKey>>,
+  TError,
+  { data: UpdatePublicKeyCommandRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiAccountUpdatePublicKeyMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Update device information operation
+ */
+export const postApiAccountUpdateDeviceInformation = (
+  updateDeviceInformationCommandRequest: UpdateDeviceInformationCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/account/update-device-information`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: updateDeviceInformationCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiAccountUpdateDeviceInformationMutationOptions = <
+  TError = ResultMessage[] | null | null,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiAccountUpdateDeviceInformation>>,
+    TError,
+    { data: UpdateDeviceInformationCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiAccountUpdateDeviceInformation>>,
+  TError,
+  { data: UpdateDeviceInformationCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiAccountUpdateDeviceInformation"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiAccountUpdateDeviceInformation>>,
+    { data: UpdateDeviceInformationCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiAccountUpdateDeviceInformation(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiAccountUpdateDeviceInformationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiAccountUpdateDeviceInformation>>
+>;
+export type PostApiAccountUpdateDeviceInformationMutationBody =
+  UpdateDeviceInformationCommandRequest;
+export type PostApiAccountUpdateDeviceInformationMutationError =
+  | ResultMessage[]
+  | null
+  | null;
+
+/**
+ * @summary Update device information operation
+ */
+export const usePostApiAccountUpdateDeviceInformation = <
+  TError = ResultMessage[] | null | null,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiAccountUpdateDeviceInformation>>,
+      TError,
+      { data: UpdateDeviceInformationCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiAccountUpdateDeviceInformation>>,
+  TError,
+  { data: UpdateDeviceInformationCommandRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiAccountUpdateDeviceInformationMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
  * @summary Block account operation
  */
 export const postApiAccountBlockAccount = (
@@ -2802,6 +3008,108 @@ export const useDeleteApiAccountDeleteProfile = <
 };
 
 /**
+ * @summary Upload profile picture
+ */
+export const postApiAccountUploadProfilePicture = (
+  postApiAccountUploadProfilePictureBody: PostApiAccountUploadProfilePictureBody,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  const formData = new FormData();
+  if (postApiAccountUploadProfilePictureBody.file !== undefined) {
+    formData.append(`file`, postApiAccountUploadProfilePictureBody.file);
+  }
+
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/account/upload-profile-picture`,
+      method: "POST",
+      headers: { "Content-Type": "multipart/form-data" },
+      data: formData,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiAccountUploadProfilePictureMutationOptions = <
+  TError = ResultMessage[] | null | null,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiAccountUploadProfilePicture>>,
+    TError,
+    { data: PostApiAccountUploadProfilePictureBody },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiAccountUploadProfilePicture>>,
+  TError,
+  { data: PostApiAccountUploadProfilePictureBody },
+  TContext
+> => {
+  const mutationKey = ["postApiAccountUploadProfilePicture"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiAccountUploadProfilePicture>>,
+    { data: PostApiAccountUploadProfilePictureBody }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiAccountUploadProfilePicture(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiAccountUploadProfilePictureMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiAccountUploadProfilePicture>>
+>;
+export type PostApiAccountUploadProfilePictureMutationBody =
+  PostApiAccountUploadProfilePictureBody;
+export type PostApiAccountUploadProfilePictureMutationError =
+  | ResultMessage[]
+  | null
+  | null;
+
+/**
+ * @summary Upload profile picture
+ */
+export const usePostApiAccountUploadProfilePicture = <
+  TError = ResultMessage[] | null | null,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiAccountUploadProfilePicture>>,
+      TError,
+      { data: PostApiAccountUploadProfilePictureBody },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiAccountUploadProfilePicture>>,
+  TError,
+  { data: PostApiAccountUploadProfilePictureBody },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiAccountUploadProfilePictureMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
  * @summary Create a chat
  */
 export const postApiChatsCreate = (
@@ -3157,7 +3465,7 @@ export const useDeleteApiChatsDelete = <
 };
 
 /**
- * @summary Send message to chat
+ * @summary Send a message to chat
  */
 export const postApiChatsSendMessage = (
   sendMessageCommandRequest: SendMessageCommandRequest,
@@ -3224,7 +3532,7 @@ export type PostApiChatsSendMessageMutationError =
   | null;
 
 /**
- * @summary Send message to chat
+ * @summary Send a message to chat
  */
 export const usePostApiChatsSendMessage = <
   TError = ResultMessage[] | null | null,
@@ -3760,6 +4068,949 @@ export function useGetApiChatsGroupMessages<
 
   return query;
 }
+
+/**
+ * @summary Message delivered
+ */
+export const postApiChatsMessageDelivered = (
+  messageDeliveredCommandRequest: MessageDeliveredCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/chats/message-delivered`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: messageDeliveredCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiChatsMessageDeliveredMutationOptions = <
+  TError = ResultMessage[] | null | null,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiChatsMessageDelivered>>,
+    TError,
+    { data: MessageDeliveredCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiChatsMessageDelivered>>,
+  TError,
+  { data: MessageDeliveredCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiChatsMessageDelivered"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiChatsMessageDelivered>>,
+    { data: MessageDeliveredCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiChatsMessageDelivered(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiChatsMessageDeliveredMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiChatsMessageDelivered>>
+>;
+export type PostApiChatsMessageDeliveredMutationBody =
+  MessageDeliveredCommandRequest;
+export type PostApiChatsMessageDeliveredMutationError =
+  | ResultMessage[]
+  | null
+  | null;
+
+/**
+ * @summary Message delivered
+ */
+export const usePostApiChatsMessageDelivered = <
+  TError = ResultMessage[] | null | null,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiChatsMessageDelivered>>,
+      TError,
+      { data: MessageDeliveredCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiChatsMessageDelivered>>,
+  TError,
+  { data: MessageDeliveredCommandRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiChatsMessageDeliveredMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Message read
+ */
+export const postApiChatsMessageRead = (
+  messageSeenCommandRequest: MessageSeenCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/chats/message-read`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: messageSeenCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiChatsMessageReadMutationOptions = <
+  TError = ResultMessage[] | null | null,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiChatsMessageRead>>,
+    TError,
+    { data: MessageSeenCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiChatsMessageRead>>,
+  TError,
+  { data: MessageSeenCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiChatsMessageRead"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiChatsMessageRead>>,
+    { data: MessageSeenCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiChatsMessageRead(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiChatsMessageReadMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiChatsMessageRead>>
+>;
+export type PostApiChatsMessageReadMutationBody = MessageSeenCommandRequest;
+export type PostApiChatsMessageReadMutationError =
+  | ResultMessage[]
+  | null
+  | null;
+
+/**
+ * @summary Message read
+ */
+export const usePostApiChatsMessageRead = <
+  TError = ResultMessage[] | null | null,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiChatsMessageRead>>,
+      TError,
+      { data: MessageSeenCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiChatsMessageRead>>,
+  TError,
+  { data: MessageSeenCommandRequest },
+  TContext
+> => {
+  const mutationOptions = getPostApiChatsMessageReadMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Generate Magic Link for invite
+ */
+export const postApiChatsGenerateMagicLink = (
+  generateMagicLinkCommandRequest: GenerateMagicLinkCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/chats/generate-magic-link`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: generateMagicLinkCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiChatsGenerateMagicLinkMutationOptions = <
+  TError = ResultMessage[] | null | null,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiChatsGenerateMagicLink>>,
+    TError,
+    { data: GenerateMagicLinkCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiChatsGenerateMagicLink>>,
+  TError,
+  { data: GenerateMagicLinkCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiChatsGenerateMagicLink"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiChatsGenerateMagicLink>>,
+    { data: GenerateMagicLinkCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiChatsGenerateMagicLink(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiChatsGenerateMagicLinkMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiChatsGenerateMagicLink>>
+>;
+export type PostApiChatsGenerateMagicLinkMutationBody =
+  GenerateMagicLinkCommandRequest;
+export type PostApiChatsGenerateMagicLinkMutationError =
+  | ResultMessage[]
+  | null
+  | null;
+
+/**
+ * @summary Generate Magic Link for invite
+ */
+export const usePostApiChatsGenerateMagicLink = <
+  TError = ResultMessage[] | null | null,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiChatsGenerateMagicLink>>,
+      TError,
+      { data: GenerateMagicLinkCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiChatsGenerateMagicLink>>,
+  TError,
+  { data: GenerateMagicLinkCommandRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiChatsGenerateMagicLinkMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Get group messages in chat
+ */
+export const getApiChatsValidateMagicLink = (
+  params?: GetApiChatsValidateMagicLinkParams,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<GetGroupMessagesQueryResultIDataResult>(
+    { url: `/api/chats/validate-magic-link`, method: "GET", params, signal },
+    options,
+  );
+};
+
+export const getGetApiChatsValidateMagicLinkQueryKey = (
+  params?: GetApiChatsValidateMagicLinkParams,
+) => {
+  return [
+    `/api/chats/validate-magic-link`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetApiChatsValidateMagicLinkQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiChatsValidateMagicLink>>,
+  TError = ResultMessage[] | null | null,
+>(
+  params?: GetApiChatsValidateMagicLinkParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiChatsValidateMagicLink>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetApiChatsValidateMagicLinkQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiChatsValidateMagicLink>>
+  > = ({ signal }) =>
+    getApiChatsValidateMagicLink(params, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    staleTime: 10000,
+    refetchOnWindowFocus: false,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiChatsValidateMagicLink>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiChatsValidateMagicLinkQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiChatsValidateMagicLink>>
+>;
+export type GetApiChatsValidateMagicLinkQueryError =
+  | ResultMessage[]
+  | null
+  | null;
+
+export function useGetApiChatsValidateMagicLink<
+  TData = Awaited<ReturnType<typeof getApiChatsValidateMagicLink>>,
+  TError = ResultMessage[] | null | null,
+>(
+  params: undefined | GetApiChatsValidateMagicLinkParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiChatsValidateMagicLink>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiChatsValidateMagicLink>>,
+          TError,
+          Awaited<ReturnType<typeof getApiChatsValidateMagicLink>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiChatsValidateMagicLink<
+  TData = Awaited<ReturnType<typeof getApiChatsValidateMagicLink>>,
+  TError = ResultMessage[] | null | null,
+>(
+  params?: GetApiChatsValidateMagicLinkParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiChatsValidateMagicLink>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiChatsValidateMagicLink>>,
+          TError,
+          Awaited<ReturnType<typeof getApiChatsValidateMagicLink>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiChatsValidateMagicLink<
+  TData = Awaited<ReturnType<typeof getApiChatsValidateMagicLink>>,
+  TError = ResultMessage[] | null | null,
+>(
+  params?: GetApiChatsValidateMagicLinkParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiChatsValidateMagicLink>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get group messages in chat
+ */
+
+export function useGetApiChatsValidateMagicLink<
+  TData = Awaited<ReturnType<typeof getApiChatsValidateMagicLink>>,
+  TError = ResultMessage[] | null | null,
+>(
+  params?: GetApiChatsValidateMagicLinkParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiChatsValidateMagicLink>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiChatsValidateMagicLinkQueryOptions(
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Invite accounts to a chat group
+ */
+export const postApiChatsInviteToGroup = (
+  inviteToGroupCommandRequest: InviteToGroupCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/chats/invite-to-group`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: inviteToGroupCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiChatsInviteToGroupMutationOptions = <
+  TError = ResultMessage[] | null | null,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiChatsInviteToGroup>>,
+    TError,
+    { data: InviteToGroupCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiChatsInviteToGroup>>,
+  TError,
+  { data: InviteToGroupCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiChatsInviteToGroup"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiChatsInviteToGroup>>,
+    { data: InviteToGroupCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiChatsInviteToGroup(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiChatsInviteToGroupMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiChatsInviteToGroup>>
+>;
+export type PostApiChatsInviteToGroupMutationBody = InviteToGroupCommandRequest;
+export type PostApiChatsInviteToGroupMutationError =
+  | ResultMessage[]
+  | null
+  | null;
+
+/**
+ * @summary Invite accounts to a chat group
+ */
+export const usePostApiChatsInviteToGroup = <
+  TError = ResultMessage[] | null | null,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiChatsInviteToGroup>>,
+      TError,
+      { data: InviteToGroupCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiChatsInviteToGroup>>,
+  TError,
+  { data: InviteToGroupCommandRequest },
+  TContext
+> => {
+  const mutationOptions = getPostApiChatsInviteToGroupMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Accept group invitation
+ */
+export const postApiChatsAcceptGroupInvitation = (
+  acceptGroupInvitationCommandRequest: AcceptGroupInvitationCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/chats/accept-group-invitation`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: acceptGroupInvitationCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiChatsAcceptGroupInvitationMutationOptions = <
+  TError = ResultMessage[] | null | null,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiChatsAcceptGroupInvitation>>,
+    TError,
+    { data: AcceptGroupInvitationCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiChatsAcceptGroupInvitation>>,
+  TError,
+  { data: AcceptGroupInvitationCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiChatsAcceptGroupInvitation"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiChatsAcceptGroupInvitation>>,
+    { data: AcceptGroupInvitationCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiChatsAcceptGroupInvitation(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiChatsAcceptGroupInvitationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiChatsAcceptGroupInvitation>>
+>;
+export type PostApiChatsAcceptGroupInvitationMutationBody =
+  AcceptGroupInvitationCommandRequest;
+export type PostApiChatsAcceptGroupInvitationMutationError =
+  | ResultMessage[]
+  | null
+  | null;
+
+/**
+ * @summary Accept group invitation
+ */
+export const usePostApiChatsAcceptGroupInvitation = <
+  TError = ResultMessage[] | null | null,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiChatsAcceptGroupInvitation>>,
+      TError,
+      { data: AcceptGroupInvitationCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiChatsAcceptGroupInvitation>>,
+  TError,
+  { data: AcceptGroupInvitationCommandRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiChatsAcceptGroupInvitationMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Reject group invitation
+ */
+export const postApiChatsRejectGroupInvitation = (
+  rejectGroupInvitationCommandRequest: RejectGroupInvitationCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/chats/reject-group-invitation`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: rejectGroupInvitationCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiChatsRejectGroupInvitationMutationOptions = <
+  TError = ResultMessage[] | null | null,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiChatsRejectGroupInvitation>>,
+    TError,
+    { data: RejectGroupInvitationCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiChatsRejectGroupInvitation>>,
+  TError,
+  { data: RejectGroupInvitationCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiChatsRejectGroupInvitation"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiChatsRejectGroupInvitation>>,
+    { data: RejectGroupInvitationCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiChatsRejectGroupInvitation(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiChatsRejectGroupInvitationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiChatsRejectGroupInvitation>>
+>;
+export type PostApiChatsRejectGroupInvitationMutationBody =
+  RejectGroupInvitationCommandRequest;
+export type PostApiChatsRejectGroupInvitationMutationError =
+  | ResultMessage[]
+  | null
+  | null;
+
+/**
+ * @summary Reject group invitation
+ */
+export const usePostApiChatsRejectGroupInvitation = <
+  TError = ResultMessage[] | null | null,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiChatsRejectGroupInvitation>>,
+      TError,
+      { data: RejectGroupInvitationCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiChatsRejectGroupInvitation>>,
+  TError,
+  { data: RejectGroupInvitationCommandRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiChatsRejectGroupInvitationMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Archive a chat
+ */
+export const postApiChatsArchive = (
+  archiveChatCommandRequest: ArchiveChatCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/chats/archive`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: archiveChatCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiChatsArchiveMutationOptions = <
+  TError = ResultMessage[] | null | null,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiChatsArchive>>,
+    TError,
+    { data: ArchiveChatCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiChatsArchive>>,
+  TError,
+  { data: ArchiveChatCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiChatsArchive"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiChatsArchive>>,
+    { data: ArchiveChatCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiChatsArchive(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiChatsArchiveMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiChatsArchive>>
+>;
+export type PostApiChatsArchiveMutationBody = ArchiveChatCommandRequest;
+export type PostApiChatsArchiveMutationError = ResultMessage[] | null | null;
+
+/**
+ * @summary Archive a chat
+ */
+export const usePostApiChatsArchive = <
+  TError = ResultMessage[] | null | null,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiChatsArchive>>,
+      TError,
+      { data: ArchiveChatCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiChatsArchive>>,
+  TError,
+  { data: ArchiveChatCommandRequest },
+  TContext
+> => {
+  const mutationOptions = getPostApiChatsArchiveMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Unarchive a chat
+ */
+export const postApiChatsUnarchive = (
+  unarchiveChatCommandRequest: UnarchiveChatCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/chats/unarchive`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: unarchiveChatCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiChatsUnarchiveMutationOptions = <
+  TError = ResultMessage[] | null | null,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiChatsUnarchive>>,
+    TError,
+    { data: UnarchiveChatCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiChatsUnarchive>>,
+  TError,
+  { data: UnarchiveChatCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiChatsUnarchive"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiChatsUnarchive>>,
+    { data: UnarchiveChatCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiChatsUnarchive(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiChatsUnarchiveMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiChatsUnarchive>>
+>;
+export type PostApiChatsUnarchiveMutationBody = UnarchiveChatCommandRequest;
+export type PostApiChatsUnarchiveMutationError = ResultMessage[] | null | null;
+
+/**
+ * @summary Unarchive a chat
+ */
+export const usePostApiChatsUnarchive = <
+  TError = ResultMessage[] | null | null,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiChatsUnarchive>>,
+      TError,
+      { data: UnarchiveChatCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiChatsUnarchive>>,
+  TError,
+  { data: UnarchiveChatCommandRequest },
+  TContext
+> => {
+  const mutationOptions = getPostApiChatsUnarchiveMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
 
 /**
  * @summary Upload file for chat
@@ -9556,7 +10807,7 @@ export const getApiTranslatesLanguagesLanguage = (
   options?: SecondParameter<typeof AxiosInstance>,
   signal?: AbortSignal,
 ) => {
-  return AxiosInstance<string>(
+  return AxiosInstance<Translate[]>(
     { url: `/api/translates/languages/${language}`, method: "GET", signal },
     options,
   );
@@ -9570,7 +10821,7 @@ export const getGetApiTranslatesLanguagesLanguageQueryKey = (
 
 export const getGetApiTranslatesLanguagesLanguageQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiTranslatesLanguagesLanguage>>,
-  TError = ResultMessage[],
+  TError = ResultMessage[] | null | null,
 >(
   language: string,
   options?: {
@@ -9612,11 +10863,14 @@ export const getGetApiTranslatesLanguagesLanguageQueryOptions = <
 export type GetApiTranslatesLanguagesLanguageQueryResult = NonNullable<
   Awaited<ReturnType<typeof getApiTranslatesLanguagesLanguage>>
 >;
-export type GetApiTranslatesLanguagesLanguageQueryError = ResultMessage[];
+export type GetApiTranslatesLanguagesLanguageQueryError =
+  | ResultMessage[]
+  | null
+  | null;
 
 export function useGetApiTranslatesLanguagesLanguage<
   TData = Awaited<ReturnType<typeof getApiTranslatesLanguagesLanguage>>,
-  TError = ResultMessage[],
+  TError = ResultMessage[] | null | null,
 >(
   language: string,
   options: {
@@ -9643,7 +10897,7 @@ export function useGetApiTranslatesLanguagesLanguage<
 };
 export function useGetApiTranslatesLanguagesLanguage<
   TData = Awaited<ReturnType<typeof getApiTranslatesLanguagesLanguage>>,
-  TError = ResultMessage[],
+  TError = ResultMessage[] | null | null,
 >(
   language: string,
   options?: {
@@ -9670,7 +10924,7 @@ export function useGetApiTranslatesLanguagesLanguage<
 };
 export function useGetApiTranslatesLanguagesLanguage<
   TData = Awaited<ReturnType<typeof getApiTranslatesLanguagesLanguage>>,
-  TError = ResultMessage[],
+  TError = ResultMessage[] | null | null,
 >(
   language: string,
   options?: {
@@ -9693,7 +10947,7 @@ export function useGetApiTranslatesLanguagesLanguage<
 
 export function useGetApiTranslatesLanguagesLanguage<
   TData = Awaited<ReturnType<typeof getApiTranslatesLanguagesLanguage>>,
-  TError = ResultMessage[],
+  TError = ResultMessage[] | null | null,
 >(
   language: string,
   options?: {

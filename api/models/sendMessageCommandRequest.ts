@@ -18,4 +18,10 @@ export interface SendMessageCommandRequest {
   file?: SendMessageCommandRequestFile;
   /** @nullable */
   repliedToMessage?: string | null;
+  /** @nullable */
+  isEphemeral?: boolean | null;
+  /** @nullable */
+  expireAfterReadSeconds?: number | null;
+  /** @nullable */
+  expireAt?: string | null;
 }

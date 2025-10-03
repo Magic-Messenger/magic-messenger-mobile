@@ -22,15 +22,23 @@ export interface MessageDto {
   /** @nullable */
   senderUsername?: string | null;
   /** @nullable */
+  senderPublicKey?: string | null;
+  /** @nullable */
   content?: MessageDtoContent;
   /** @nullable */
   file?: MessageDtoFile;
   /** @nullable */
   repliedToMessage?: MessageDtoRepliedToMessage;
+  isStarred?: boolean;
   /** @nullable */
   receivers?: string[] | null;
   /** @nullable */
   deliveredTo?: MessageActionTime[] | null;
   /** @nullable */
   readBy?: MessageActionTime[] | null;
+  isEphemeral?: boolean;
+  /** @nullable */
+  expireAfterReadSeconds?: number | null;
+  /** @nullable */
+  expireAt?: string | null;
 }

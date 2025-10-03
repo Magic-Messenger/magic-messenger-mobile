@@ -4,9 +4,10 @@
  * MagicMessenger
  * OpenAPI spec version: v1
  */
+import type { AccountDetailDtoCurrentSubscription } from "./accountDetailDtoCurrentSubscription";
+import type { AccountDetailDtoDeviceInformation } from "./accountDetailDtoDeviceInformation";
 import type { AccountStatus } from "./accountStatus";
 import type { AccountType } from "./accountType";
-import type { AccountDetailDtoCurrentSubscription } from "./accountDetailDtoCurrentSubscription";
 import type { LicenseDto } from "./licenseDto";
 
 export interface AccountDetailDto {
@@ -35,6 +36,10 @@ export interface AccountDetailDto {
   /** @nullable */
   last2FAVerifiedAt?: string | null;
   createdAt?: string;
+  /** @nullable */
+  photoUrl?: string | null;
+  /** @nullable */
+  deviceInformation?: AccountDetailDtoDeviceInformation;
   /** @nullable */
   currentSubscription?: AccountDetailDtoCurrentSubscription;
   /** @nullable */

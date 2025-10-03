@@ -11,11 +11,15 @@ interface ChatHeaderProps {
   userName?: string;
   typingUsername?: string;
   onlineUsers?: string[];
+  isGroupChat?: boolean;
+  groupAccountCount?: string;
 }
 export function ChatHeader({
   userName,
   onlineUsers,
   typingUsername,
+  isGroupChat = false,
+  groupAccountCount,
 }: ChatHeaderProps) {
   const styles = useThemedStyles(createStyle);
   const { t } = useTranslation();
@@ -47,13 +51,19 @@ export function ChatHeader({
           <ThemedText type="title" size={16} numberOfLines={1}>
             {userName}
           </ThemedText>
-          <ThemedText type="subtitle">
-            {typingUsername
-              ? t("chat.typing")
-              : checkIsOnline
-                ? t("chat.online")
-                : t("chat.offline")}
-          </ThemedText>
+          {isGroupChat ? (
+            <ThemedText type="subtitle">
+              {typingUsername
+                ? t("chat.typing")
+                : checkIsOnline
+                  ? t("chat.online")
+                  : t("chat.offline")}
+            </ThemedText>
+          ) : (
+            <ThemedText type="subtitle">
+              {typingUsername ? t("chat.typing") : (groupAccountCount ?? "-")}
+            </ThemedText>
+          )}
         </View>
       </View>
 

@@ -85,15 +85,13 @@ export const userPublicKey = () => {
   return publicKey;
 };
 
-/**
- * Generates a random group key for encryption.
- * @returns A base64 encoded string representing the group key.
- * @throws Will log an error if key generation fails.
- * This key can be used to encrypt messages for a group.
- * */
-export const generateGroupKey = () => {
-  const key = nacl.randomBytes(nacl.secretbox.keyLength);
-  return encodeBase64(key);
+export const userPrivateKey = () => {
+  const { privateKey } = useUserStore.getState().credentials;
+  if (!privateKey) {
+    console.error("❌ Missing user public key");
+    return null;
+  }
+  return privateKey;
 };
 
 /**
@@ -204,6 +202,17 @@ export const decryptForGroup = (
 };
 
 /**
+ * Generates a random group key for encryption.
+ * @returns A base64 encoded string representing the group key.
+ * @throws Will log an error if key generation fails.
+ * This key can be used to encrypt messages for a group.
+ * */
+export const generateGroupKey = () => {
+  const key = nacl.randomBytes(nacl.secretbox.keyLength);
+  return encodeBase64(key); // Base64 string
+};
+
+/**
  * Encrypts a group key for a specific user using their public key and the sender's private key.
  * @param groupKey - The group key to encrypt, in base64 format.
  * @param userPublicKey - The user's public key to encrypt the group key for, in
@@ -216,9 +225,8 @@ export const encryptGroupKeyForUser = (
   userPublicKey: string,
   senderPrivateKey: string,
 ) => {
-  if (!groupKey || !userPublicKey || !senderPrivateKey) return;
-
   const nonce = nacl.randomBytes(nacl.box.nonceLength);
+
   const cipher = nacl.box(
     decodeBase64(groupKey),
     nonce,
@@ -247,14 +255,6 @@ export const decryptGroupKeyForUser = (
   receiverPrivateKey: string,
   senderPublicKey: string,
 ) => {
-  if (
-    !encryptedGroupKey ||
-    !encryptedGroupKeyNonce ||
-    !receiverPrivateKey ||
-    !senderPublicKey
-  )
-    return;
-
   const decrypted = nacl.box.open(
     decodeBase64(encryptedGroupKey),
     decodeBase64(encryptedGroupKeyNonce),
@@ -267,5 +267,5 @@ export const decryptGroupKeyForUser = (
     return;
   }
 
-  return encodeUTF8(decrypted);
+  return encodeBase64(decrypted); // Base64 string olarak geri dön
 };

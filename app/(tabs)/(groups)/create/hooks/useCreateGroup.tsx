@@ -5,12 +5,13 @@ import { useTranslation } from "react-i18next";
 import { StyleSheet } from "react-native";
 
 import { usePostApiChatsCreate } from "@/api/endpoints/magicMessenger";
-import { useGroupChatCreateStore } from "@/store";
+import { useGroupChatCreateStore, useUserStore } from "@/store";
 import { ColorDto, useColor, useThemedStyles } from "@/theme";
 import {
   encryptGroupKeyForUser,
   generateGroupKey,
   spacingPixel,
+  userPrivateKey,
   userPublicKey,
 } from "@/utils";
 
@@ -40,13 +41,14 @@ const createStyles = (colors: ColorDto) =>
 export const useCreateGroup = () => {
   const { t } = useTranslation();
   const theme = useColor();
+  const { userName } = useUserStore();
   const styles = useThemedStyles(createStyles);
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<CreateGroupFormData>();
-
+  const { credentials } = useUserStore();
   const { mutateAsync: createGroup } = usePostApiChatsCreate();
 
   const { participants, removeParticipant, clearParticipants } =
@@ -56,20 +58,22 @@ export const useCreateGroup = () => {
     if (data && participants.length > 0) {
       const groupKey = generateGroupKey();
 
-      const encryptedUserNames = participants.map(
-        ({ contactUsername, publicKey }) => {
-          const encryptedData = encryptGroupKeyForUser(
-            groupKey,
-            publicKey as never,
-            userPublicKey() as string,
-          );
-          return {
-            username: contactUsername as string,
-            groupKey: encryptedData?.cipherText,
-            none: encryptedData?.nonce,
-          };
-        },
-      );
+      const encryptedUserNames = [
+        ...participants,
+        { contactUsername: userName, publicKey: userPublicKey() },
+      ].map(({ contactUsername, publicKey }) => {
+        const encryptedData = encryptGroupKeyForUser(
+          groupKey,
+          publicKey as never,
+          userPrivateKey() as string,
+        );
+
+        return {
+          username: contactUsername as string,
+          groupKey: encryptedData?.cipherText,
+          nonce: encryptedData?.nonce,
+        };
+      });
 
       const { success, data: responseData } = await createGroup({
         data: {

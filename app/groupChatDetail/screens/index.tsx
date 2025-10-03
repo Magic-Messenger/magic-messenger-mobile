@@ -8,7 +8,7 @@ import {
   ChatLayout,
   ChatTyping,
   LoadingProvider,
-  MessageItem,
+  MessageGroupItem,
 } from "@/components";
 import { ColorDto, useThemedStyles } from "@/theme";
 import { spacingPixel } from "@/utils";
@@ -24,9 +24,8 @@ export default function ChatScreen() {
     messages,
     userName,
     listRef,
-    onlineUsers,
     typingUsername,
-    usersPublicKey,
+    groupAccountCount,
     replyMessage,
     handleChatControl,
     handleReply,
@@ -37,7 +36,7 @@ export default function ChatScreen() {
     <ChatLayout
       header={
         <ChatHeader
-          onlineUsers={onlineUsers}
+          groupAccountCount={groupAccountCount as string}
           typingUsername={typingUsername as string}
           userName={userName as string}
         />
@@ -57,10 +56,9 @@ export default function ChatScreen() {
           data={messages}
           contentContainerStyle={styles.contentContainerStyle}
           renderItem={({ item }) => (
-            <MessageItem
+            <MessageGroupItem
               identifier={chatId!}
               message={item as never}
-              receiverPublicKey={usersPublicKey.receiverPublicKey}
               onReply={handleReply}
             />
           )}

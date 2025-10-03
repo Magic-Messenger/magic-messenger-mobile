@@ -17,6 +17,12 @@ export interface ChatDto {
   /** @nullable */
   lastMessageTime?: string | null;
   /** @nullable */
+  groupKey?: string | null;
+  /** @nullable */
+  groupNonce?: string | null;
+  /** @nullable */
+  readonly groupAccountCount?: string | null;
+  /** @nullable */
   contact?: ChatDtoContact;
   unreadMessagesCount?: number;
 }

@@ -7,6 +7,7 @@
 
 export type GetApiChatsListParams = {
   isGroupChat?: boolean;
+  isArchivedChat?: boolean;
   pageNumber?: number;
   pageSize?: number;
 };

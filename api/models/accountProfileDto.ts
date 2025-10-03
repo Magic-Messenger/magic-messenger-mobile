@@ -24,5 +24,7 @@ export interface AccountProfileDto {
   enablePrivateNotes?: boolean;
   deleteButton?: boolean;
   /** @nullable */
+  photoUrl?: string | null;
+  /** @nullable */
   license?: AccountProfileDtoLicense;
 }

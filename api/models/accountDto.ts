@@ -4,8 +4,9 @@
  * MagicMessenger
  * OpenAPI spec version: v1
  */
-import type { AccountType } from "./accountType";
+import type { AccountDtoDeviceInformation } from "./accountDtoDeviceInformation";
 import type { AccountStatus } from "./accountStatus";
+import type { AccountType } from "./accountType";
 
 export interface AccountDto {
   /** @nullable */
@@ -26,6 +27,9 @@ export interface AccountDto {
   enableOnlineStatus?: boolean;
   enablePrivateNotes?: boolean;
   deleteButton?: boolean;
-  isLoggedIn?: boolean;
+  /** @nullable */
+  photoUrl?: string | null;
+  /** @nullable */
+  deviceInformation?: AccountDtoDeviceInformation;
   createdAt?: string;
 }

@@ -14,6 +14,10 @@ interface ChatItemProps extends React.ComponentProps<typeof ContactItem> {
   isGroupChat?: boolean;
   lastMessageTime?: string | null;
   unreadMessagesCount?: number;
+  groupKey?: string;
+  groupNonce?: string;
+  groupAccountCount?: string;
+  groupAdminAccount?: string;
 }
 
 export function ChatItem({
@@ -24,6 +28,10 @@ export function ChatItem({
   isGroupChat,
   lastMessageTime,
   unreadMessagesCount,
+  groupKey,
+  groupNonce,
+  groupAccountCount,
+  groupAdminAccount,
   ...props
 }: ChatItemProps) {
   const styles = useThemedStyles(createStyle);
@@ -38,8 +46,11 @@ export function ChatItem({
         pathname: "/groupChatDetail/screens",
         params: {
           chatId: chatId,
-          publicKey: publicKey,
+          groupKey,
+          groupNonce,
           userName: chatTitle,
+          groupAccountCount,
+          groupAdminAccount,
           isGroupChat: (isGroupChat as never) ?? false,
         },
       });

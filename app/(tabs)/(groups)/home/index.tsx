@@ -114,6 +114,10 @@ export default function ChatScreen() {
                   lastMessageTime={item?.item?.lastMessageTime ?? ""}
                   contactUsername={item?.item?.contact?.contactUsername ?? ""}
                   unreadMessagesCount={item?.item?.unreadMessagesCount ?? 0}
+                  groupKey={item?.item?.groupKey}
+                  groupNonce={item?.item?.groupNonce}
+                  groupAccountCount={item?.item?.groupAccountCount}
+                  groupAdminAccount={item?.item?.groupAdminAccount}
                 />
               </View>
             )}

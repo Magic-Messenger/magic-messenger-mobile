@@ -7,6 +7,7 @@ export * from "./Chat/ChatHeader";
 export * from "./Chat/ChatItem";
 export * from "./Chat/ChatLayout";
 export * from "./Chat/ChatTyping";
+export * from "./Chat/MessageGroupItem ";
 export * from "./Chat/MessageItem";
 export * from "./Collapsible";
 export * from "./Contact/ContactHeader";
