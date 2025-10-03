@@ -30,12 +30,14 @@ export default function ChatScreen() {
     handleChatControl,
     handleReply,
     onClearReply,
+    handleScroll,
   } = useDetail();
 
   return (
     <ChatLayout
       header={
         <ChatHeader
+          isGroupChat={true}
           groupAccountCount={groupAccountCount as string}
           typingUsername={typingUsername as string}
           userName={userName as string}
@@ -54,6 +56,8 @@ export default function ChatScreen() {
         <FlashList
           ref={listRef}
           data={messages}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
           contentContainerStyle={styles.contentContainerStyle}
           renderItem={({ item }) => (
             <MessageGroupItem

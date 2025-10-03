@@ -53,15 +53,15 @@ export function ChatHeader({
           </ThemedText>
           {isGroupChat ? (
             <ThemedText type="subtitle">
+              {typingUsername ? t("chat.typing") : (groupAccountCount ?? "-")}
+            </ThemedText>
+          ) : (
+            <ThemedText type="subtitle">
               {typingUsername
                 ? t("chat.typing")
                 : checkIsOnline
                   ? t("chat.online")
                   : t("chat.offline")}
-            </ThemedText>
-          ) : (
-            <ThemedText type="subtitle">
-              {typingUsername ? t("chat.typing") : (groupAccountCount ?? "-")}
             </ThemedText>
           )}
         </View>

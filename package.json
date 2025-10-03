@@ -22,8 +22,8 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
-    "@react-native-picker/picker": "2.11.1",
     "@microsoft/signalr": "^9.0.6",
+    "@react-native-picker/picker": "2.11.1",
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/elements": "^2.3.8",
     "@react-navigation/native": "^7.1.6",
@@ -59,6 +59,8 @@
     "expo-video": "~2.2.2",
     "expo-web-browser": "~14.2.0",
     "i18next": "^25.2.1",
+    "lodash": "^4.17.21",
+    "lottie-react-native": "7.2.2",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-hook-form": "^7.60.0",
@@ -76,12 +78,12 @@
     "react-native-webview": "13.13.5",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
-    "zustand": "^5.0.5",
-    "lottie-react-native": "7.2.2"
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@tanstack/eslint-plugin-query": "^5.81.2",
+    "@types/lodash": "^4.17.20",
     "@types/react": "~19.0.10",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~9.2.0",
