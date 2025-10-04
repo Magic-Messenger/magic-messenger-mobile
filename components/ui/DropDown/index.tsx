@@ -218,44 +218,60 @@ const DropdownComponent: React.FC<
         visible={visible}
         transparent
         animationType="slide"
+        renderToHardwareTextureAndroid
+        statusBarTranslucent
+        navigationBarTranslucent
+        hardwareAccelerated
+        shouldRasterizeIOS
         onRequestClose={handleCancel}
+        supportedOrientations={["portrait", "landscape"]}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Picker
-              selectedValue={tempValue}
-              onValueChange={(val) => setTempValue(val)}
-              enabled={enabled}
-              style={styles.picker}
-              itemStyle={styles.itemStyle}
-              dropdownIconColor={Colors.white}
-            >
-              {options.map((opt) => (
-                <Picker.Item
-                  key={opt.value.toString()}
-                  label={opt.label}
-                  value={opt.value}
-                />
-              ))}
-            </Picker>
-            <View style={styles.buttonRow}>
-              <View style={styles.cancelButton}>
-                <Button
-                  type="danger"
-                  label={t("common.cancel")}
-                  onPress={handleCancel}
-                />
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={handleCancel}
+        >
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <View style={styles.modalContent}>
+              <View style={styles.pickerWrapper}>
+                <Picker
+                  selectedValue={tempValue}
+                  onValueChange={(val) => setTempValue(val)}
+                  style={styles.picker}
+                  itemStyle={styles.itemStyle}
+                >
+                  {options.map((opt) => (
+                    <Picker.Item
+                      key={opt.value.toString()}
+                      label={opt.label}
+                      value={opt.value}
+                      color={Colors.white}
+                    />
+                  ))}
+                </Picker>
               </View>
-              <View style={styles.confirmButton}>
-                <Button
-                  type="primary"
-                  label={t("common.confirm")}
-                  onPress={handleConfirm}
-                />
+              <View style={styles.buttonRow}>
+                <View style={styles.cancelButton}>
+                  <Button
+                    type="danger"
+                    label={t("common.cancel")}
+                    onPress={handleCancel}
+                  />
+                </View>
+                <View style={styles.confirmButton}>
+                  <Button
+                    type="primary"
+                    label={t("common.confirm")}
+                    onPress={handleConfirm}
+                  />
+                </View>
               </View>
             </View>
-          </View>
-        </View>
+          </TouchableOpacity>
+        </TouchableOpacity>
       </Modal>
     </View>
   );
@@ -387,11 +403,19 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     paddingBottom: spacingPixel(16),
+    minHeight: 250,
+  },
+  pickerWrapper: {
+    height: 180,
+    justifyContent: "center",
   },
   picker: {
-    color: Colors.white,
+    width: "100%",
+    height: 180,
   },
   itemStyle: {
+    fontSize: fontPixel(18),
+    height: 180,
     color: Colors.white,
   },
   buttonRow: {

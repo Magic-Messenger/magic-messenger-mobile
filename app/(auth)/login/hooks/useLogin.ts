@@ -11,7 +11,7 @@ import {
 } from "@/api/endpoints/magicMessenger";
 import { flexBox, spacing } from "@/constants";
 import { useUserStore } from "@/store";
-import { ColorDto, useThemedStyles } from "@/theme";
+import { useThemedStyles } from "@/theme";
 import {
   fontPixel,
   getInstallationId,
@@ -134,7 +134,7 @@ export const useLogin = () => {
   };
 };
 
-const createStyle = (colors: ColorDto) =>
+const createStyle = () =>
   StyleSheet.create({
     formContainer: {
       ...spacing({

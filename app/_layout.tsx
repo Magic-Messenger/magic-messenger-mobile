@@ -1,15 +1,13 @@
 import "react-native-reanimated";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BlurView } from "expo-blur";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as ScreenCapture from "expo-screen-capture";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { AppState, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Toast from "react-native-toast-message";
 
@@ -36,8 +34,6 @@ export default function RootLayout() {
 
   const { t } = useTranslation();
 
-  const [showOverlay, setShowOverlay] = useState(false);
-
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
@@ -45,20 +41,7 @@ export default function RootLayout() {
   }, [loaded]);
 
   useEffect(() => {
-    const subscription = AppState.addEventListener(
-      "change",
-      async (nextAppState) => {
-        if (nextAppState === "background" || nextAppState === "inactive") {
-          setShowOverlay(true);
-          await ScreenCapture.preventScreenCaptureAsync();
-        } else {
-          setShowOverlay(false);
-          await ScreenCapture.allowScreenCaptureAsync();
-        }
-      },
-    );
-
-    return () => subscription.remove();
+    ScreenCapture.enableAppSwitcherProtectionAsync();
   }, []);
 
   if (!loaded || !rehydrated) {
@@ -93,10 +76,6 @@ export default function RootLayout() {
           <StatusBar style="light" />
         </SignalRProvider>
       </QueryClientProvider>
-
-      {showOverlay && (
-        <BlurView intensity={90} style={StyleSheet.absoluteFill} tint="dark" />
-      )}
     </GestureHandlerRootView>
   );
 }

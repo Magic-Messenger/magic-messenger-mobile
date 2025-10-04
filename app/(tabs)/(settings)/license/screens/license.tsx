@@ -2,10 +2,9 @@ import dayjs from "dayjs";
 import React from "react";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 
-import { useInAppPurchase } from "@/app/(tabs)/(settings)/license/hooks/useInAppPurchase";
 import { AppLayout, Icon, ProductItem, ThemedText } from "@/components";
 
-import { useLicense } from "../hooks";
+import { useInAppPurchase, useLicense } from "../hooks";
 
 export default function LicenseScreen() {
   const { t, styles, profile, handleCopy } = useLicense();

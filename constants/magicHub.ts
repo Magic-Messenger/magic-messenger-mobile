@@ -23,6 +23,8 @@ export const createMagicHubClient = (
   stopTyping: (chatId) => connection.invoke("StopTyping", chatId),
   sendMessage: (request: SendMessageCommandRequest) =>
     connection.invoke("SendMessage", request),
+  deliveredMessage: (chatId, messageId) =>
+    connection.invoke("DeliveredMessage", chatId, messageId),
   viewedMessage: (chatId, messageId) =>
     connection.invoke("ViewedMessage", chatId, messageId),
   blockUser: (blockedUsername) =>
@@ -77,13 +79,24 @@ export interface UnblockedEvent {
   unblockedBy: string;
 }
 
+export interface MessageDeliveredEvent {
+  message: MessageDto;
+  deliveredTo: string;
+}
+
+export interface MessageSeenEvent {
+  message: MessageDto;
+  readBy: string;
+}
+
 export interface MagicHubEvents {
   typing: TypingEvent;
   stop_typing: StopTypingEvent;
   you_blocked: YouBlockedEvent;
   message_received: MessageDto;
   group_message_received: MessageDto;
-  message_seen: MessageDto;
+  message_delivered: MessageDeliveredEvent;
+  message_seen: MessageSeenEvent;
   user_online: UserOnlineEvent;
   user_offline: UserOfflineEvent;
   unread_count: UnreadCountEvent;
@@ -118,7 +131,9 @@ export interface MagicHubClient {
 
   sendMessage(request: SendMessageCommandRequest): Promise<void>;
 
-  viewedMessage(chatId: string, messageId: string): Promise<void>;
+  deliveredMessage(chatId: string, messageId?: string): Promise<void>;
+
+  viewedMessage(chatId: string, messageId?: string): Promise<void>;
 
   blockUser(blockedUsername: string): Promise<void>;
 

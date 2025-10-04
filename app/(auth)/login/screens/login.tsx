@@ -85,6 +85,7 @@ export default function LoginScreen() {
               control={control}
               name="username"
               label={t("userName")}
+              autoFocus
               autoCapitalize="none"
               autoCorrect={false}
               autoComplete="off"
@@ -105,7 +106,6 @@ export default function LoginScreen() {
           )}
 
           <PasswordInput
-            autoFocus={!!userName}
             control={control}
             errors={errors.password?.message}
             placeholder="login.password"
