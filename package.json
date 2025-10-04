@@ -18,6 +18,9 @@
     "create-component": "node scripts/create-component.js",
     "generate-api": "orval --config orval.config.ts",
     "generate-api:watch": "orval --config orval.config.ts --watch",
+    "build:ios": "eas build -p ios --profile production && eas submit -p ios --profile production",
+    "build:android": "eas build -p android --profile production && eas submit -p android --profile production",
+    "prepare-hooks": "husky install",
     "prepare": "husky"
   },
   "dependencies": {
