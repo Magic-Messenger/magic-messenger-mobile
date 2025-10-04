@@ -7,11 +7,18 @@ import { Alert, StyleSheet } from "react-native";
 import {
   useGetApiAccountGetProfile,
   usePostApiAccountLogin,
+  usePostApiAccountUpdatePublicKey,
 } from "@/api/endpoints/magicMessenger";
 import { flexBox, spacing } from "@/constants";
 import { useUserStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { fontPixel, getInstallationId, heightPixel, widthPixel } from "@/utils";
+import {
+  fontPixel,
+  getInstallationId,
+  heightPixel,
+  userPublicKey,
+  widthPixel,
+} from "@/utils";
 
 interface RegisterFormData {
   username: string;
@@ -25,6 +32,8 @@ export const useLogin = () => {
   const { data: profileResponse, refetch } = useGetApiAccountGetProfile({
     query: { enabled: isLogin },
   });
+  const { mutateAsync: updatePublicKeyApi } =
+    usePostApiAccountUpdatePublicKey();
 
   const styles = useThemedStyles(createStyle);
 
@@ -70,6 +79,7 @@ export const useLogin = () => {
     setUsername(undefined);
     reset({ username: undefined, password: undefined });
   };
+
   const handleChangeAccount = () => {
     Alert.alert(
       t("login.changeAccountAlertTitle"),
@@ -88,8 +98,23 @@ export const useLogin = () => {
     );
   };
 
+  const handleProfileUpdate = async () => {
+    if (profileResponse?.data) {
+      setProfile(profileResponse?.data);
+
+      const { success: updateSuccess } = await updatePublicKeyApi({
+        data: {
+          publicKey: userPublicKey(),
+        },
+      });
+      if (!updateSuccess) {
+        Alert.alert(t("login.publicKeyUpdateError"));
+      }
+    }
+  };
+
   useEffect(() => {
-    if (profileResponse?.data) setProfile(profileResponse?.data);
+    handleProfileUpdate();
   }, [profileResponse?.data]);
 
   useEffect(() => {

@@ -25,7 +25,7 @@ interface AppLayoutProps {
   loading?: boolean;
   title?: string | React.ReactNode;
   showBadge?: boolean;
-  keyboardAvoiding?: boolean; // ✅ yeni prop
+  keyboardAvoiding?: boolean;
 }
 
 function AppLayout({
@@ -37,7 +37,7 @@ function AppLayout({
   title,
   showBadge = true,
   footer,
-  keyboardAvoiding = false, // ✅ default false
+  keyboardAvoiding = false,
 }: AppLayoutProps) {
   const styles = useThemedStyles(createStyle);
 
@@ -65,73 +65,65 @@ function AppLayout({
           safeAreaPadding ? { ...spacing({ mt: 45 }) } : undefined,
         ]}
       >
-        {loading ? (
-          <View
-            style={[
-              styles.flex,
-              styles.alignItemsCenter,
-              styles.justifyContentCenter,
-            ]}
-          >
-            <ActivityIndicator size="large" />
-          </View>
-        ) : (
-          <>
-            <Container
-              {...(keyboardAvoiding
-                ? {
-                    enableOnAndroid: true,
-                    enableAutomaticScroll: true,
-                    keyboardShouldPersistTaps: "handled",
-                    contentContainerStyle: styles.content,
-                    showsVerticalScrollIndicator: false,
-                    showsHorizontalScrollIndicator: false,
-                  }
-                : scrollable
-                  ? {
-                      contentContainerStyle: styles.content,
-                      keyboardShouldPersistTaps: "handled",
-                      showsVerticalScrollIndicator: false,
-                      showsHorizontalScrollIndicator: false,
-                    }
-                  : { style: styles.content })}
+        <Container
+          {...(keyboardAvoiding
+            ? {
+                enableOnAndroid: true,
+                enableAutomaticScroll: true,
+                keyboardShouldPersistTaps: "handled",
+                contentContainerStyle: styles.content,
+                showsVerticalScrollIndicator: false,
+                showsHorizontalScrollIndicator: false,
+              }
+            : scrollable
+              ? {
+                  contentContainerStyle: styles.content,
+                  keyboardShouldPersistTaps: "handled",
+                  showsVerticalScrollIndicator: false,
+                  showsHorizontalScrollIndicator: false,
+                }
+              : { style: styles.content })}
+        >
+          {showBadge && (
+            <View
+              style={[
+                styles.flexRow,
+                styles.alignItemsCenter,
+                styles.mt2,
+                styles.mb5,
+                !container ? styles.container : undefined,
+              ]}
             >
-              {showBadge && (
-                <View
-                  style={[
-                    styles.flexRow,
-                    styles.alignItemsCenter,
-                    styles.mt2,
-                    styles.mb5,
-                    !container ? styles.container : undefined,
-                  ]}
-                >
-                  {typeof title === "string" ? (
-                    <ThemedText type="title" weight="semiBold">
-                      {title}
-                    </ThemedText>
-                  ) : (
-                    title
-                  )}
-
-                  <View
-                    style={[
-                      styles.flex,
-                      styles.justifyContentEnd,
-                      styles.alignItemsEnd,
-                    ]}
-                  >
-                    <TorBadge />
-                  </View>
-                </View>
+              {typeof title === "string" ? (
+                <ThemedText type="title" weight="semiBold">
+                  {title}
+                </ThemedText>
+              ) : (
+                title
               )}
 
-              {children}
-            </Container>
-          </>
-        )}
+              <View
+                style={[
+                  styles.flex,
+                  styles.justifyContentEnd,
+                  styles.alignItemsEnd,
+                ]}
+              >
+                <TorBadge />
+              </View>
+            </View>
+          )}
+
+          {children}
+        </Container>
 
         {footer && <>{footer}</>}
+
+        {loading && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="large" />
+          </View>
+        )}
       </SafeAreaView>
     </LinearGradient>
   );
@@ -165,29 +157,16 @@ const createStyle = (colors: ColorDto) =>
         pr: 20,
       }),
     },
-    flex: {
-      flex: 1,
-    },
-    flexRow: {
-      flexDirection: "row",
-    },
-    alignItemsCenter: {
-      alignItems: "center",
-    },
-    justifyContentCenter: {
+    loadingOverlay: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: "rgba(0, 0, 0, 0.3)",
       justifyContent: "center",
-    },
-    justifyContentEnd: {
-      justifyContent: "flex-end",
-    },
-    alignItemsEnd: {
-      alignItems: "flex-end",
-    },
-    mt2: {
-      marginTop: 8,
-    },
-    mb5: {
-      marginBottom: 20,
+      alignItems: "center",
+      zIndex: 9999,
     },
   });
 

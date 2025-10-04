@@ -33,7 +33,8 @@
     "button": "Login",
     "changeAccount": "Change Account",
     "changeAccountAlertTitle": "Change Account",
-    "changeAccountAlertMessage": "Do you want to login with another username? This will clear your current session."
+    "changeAccountAlertMessage": "Do you want to login with another username? This will clear your current session.",
+    "publicKeyUpdateError": "Failed to update public key. Please try again."
   },
   "register": {
     "title": "Register",
