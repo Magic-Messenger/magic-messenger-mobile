@@ -4326,10 +4326,10 @@ expo-haptics@~14.1.4:
   resolved "https://registry.npmjs.org/expo-haptics/-/expo-haptics-14.1.4.tgz"
   integrity sha512-QZdE3NMX74rTuIl82I+n12XGwpDWKb8zfs5EpwsnGi/D/n7O2Jd4tO5ivH+muEG/OCJOMq5aeaVDqqaQOhTkcA==
 
-expo-iap@^2.8.7:
-  version "2.9.7"
-  resolved "https://registry.npmjs.org/expo-iap/-/expo-iap-2.9.7.tgz"
-  integrity sha512-t5+FexrclRYfITqPAKxX7ePH59KLXFqbVq8ZYesxkIUBmllX50h3kOkBfj7sNtdnDPvFCG/BkDb5G94AYXvv3Q==
+expo-iap@^3.1.9:
+  version "3.1.9"
+  resolved "https://registry.yarnpkg.com/expo-iap/-/expo-iap-3.1.9.tgz#9e26869f059caa11189453af11f215930e3b4e3a"
+  integrity sha512-P6Sx++NgntxDuAqNGX78qi6g0jsPUP+0jjFOIbl3WP5DJYBJ1VDOtCdI6RyYMMqE4rnQ/pt/s87oR4XmpIIyhw==
 
 expo-image-loader@~5.1.0:
   version "5.1.0"

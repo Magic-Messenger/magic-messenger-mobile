@@ -1,9 +1,7 @@
-import { useQueryClient } from "@tanstack/react-query";
 import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
-  getGetApiAccountGetProfileQueryKey,
   useGetApiAccountGetProfile,
   usePostApiAccountChangeAccountSettings,
 } from "@/api/endpoints/magicMessenger";
@@ -19,7 +17,6 @@ export const useSettings = () => {
   const profile = useUserStore((state) => state.profile);
   const setProfile = useUserStore((state) => state.setProfile);
 
-  const queryClient = useQueryClient();
   const { data, isLoading } = useGetApiAccountGetProfile();
   const { mutateAsync: changeAccountSettings } =
     usePostApiAccountChangeAccountSettings();
@@ -50,10 +47,7 @@ export const useSettings = () => {
           [key]: value,
         },
       });
-
-      const queryKey = getGetApiAccountGetProfileQueryKey();
-      await queryClient.invalidateQueries(queryKey as never);
-    }, 500);
+    }, 50);
   };
 
   const settingsItems = [

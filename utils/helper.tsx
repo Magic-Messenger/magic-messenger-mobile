@@ -53,6 +53,8 @@ export const getInstallationId = async () => {
   }
 };
 
+export const getApplicationId = () => Application.applicationId;
+
 export const headerImage = () => {
   return {
     headerTitle: () => (

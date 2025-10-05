@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    ...spacing({ gap: 20, pl: 15, pr: 15 }),
+    ...spacing({ gap: 20 }),
   },
   camera: {
     flex: 1,
