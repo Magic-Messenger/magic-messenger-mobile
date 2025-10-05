@@ -24,7 +24,8 @@
     "hoursAgo": "{{count}} hour ago",
     "daysAgo": "{{count}} day ago",
     "unread": "Unread",
-    "read": "Read"
+    "read": "Read",
+    "someThingWentWrong": "Something went wrong."
   },
   "login": {
     "title": "Login",

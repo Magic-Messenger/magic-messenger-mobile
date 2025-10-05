@@ -1,7 +1,8 @@
 import { Audio, AVPlaybackStatus } from "expo-av";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
-import { trackEvent } from "@/utils";
+import { showToast, trackEvent } from "@/utils";
 
 function formatTime(ms: number) {
   const totalSeconds = Math.floor(ms / 1000);
@@ -11,6 +12,7 @@ function formatTime(ms: number) {
 }
 
 export function useAudioPlayer() {
+  const { t } = useTranslation();
   const soundRef = useRef<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [position, setPosition] = useState(0);
@@ -29,6 +31,14 @@ export function useAudioPlayer() {
       if (soundRef.current) {
         await soundRef.current.unloadAsync();
         soundRef.current = null;
+      }
+
+      if (!uri) {
+        showToast({
+          type: "error",
+          text1: t("common.someThingWentWrong"),
+        });
+        return;
       }
 
       const { sound } = await Audio.Sound.createAsync(
