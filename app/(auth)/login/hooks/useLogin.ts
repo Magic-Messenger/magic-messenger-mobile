@@ -7,9 +7,11 @@ import { Alert, StyleSheet } from "react-native";
 import {
   useGetApiAccountGetProfile,
   usePostApiAccountLogin,
+  usePostApiAccountRegisterDeviceToken,
   usePostApiAccountUpdatePublicKey,
 } from "@/api/endpoints/magicMessenger";
 import { flexBox, spacing } from "@/constants";
+import { registerForPushNotificationsAsync } from "@/services";
 import { useUserStore } from "@/store";
 import { useThemedStyles } from "@/theme";
 import {
@@ -34,6 +36,8 @@ export const useLogin = () => {
   });
   const { mutateAsync: updatePublicKeyApi } =
     usePostApiAccountUpdatePublicKey();
+  const { mutateAsync: registerDeviceToken } =
+    usePostApiAccountRegisterDeviceToken();
 
   const styles = useThemedStyles(createStyle);
 
@@ -72,6 +76,9 @@ export const useLogin = () => {
         data?.account?.username as string,
       );
       router.push("/home");
+
+      const token = await registerForPushNotificationsAsync();
+      await registerDeviceToken({ data: { deviceToken: token } });
     }
   };
 

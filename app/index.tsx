@@ -8,6 +8,7 @@ import { StyleSheet, View } from "react-native";
 import { useGetApiAccountGetProfile } from "@/api/endpoints/magicMessenger";
 import { AppLayout, ThemedText } from "@/components";
 import { Images } from "@/constants";
+import { registerForPushNotificationsAsync } from "@/services";
 import { useUserStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
 import {
@@ -80,6 +81,10 @@ export default function IndexPage() {
   useEffect(() => {
     if (isLogin) refetch();
   }, [isLogin]);
+
+  useEffect(() => {
+    registerForPushNotificationsAsync();
+  }, []);
 
   useEffect(() => {
     const userPublicKeyCheck = checkUserCredentials();

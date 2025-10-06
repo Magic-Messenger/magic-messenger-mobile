@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "558547691038",
+    "firebase_url": "https://magic-messenger-2024-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "magic-messenger-2024",
+    "storage_bucket": "magic-messenger-2024.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:558547691038:android:35e7d25251cd4dce06b00f",
+        "android_client_info": {
+          "package_name": "com.example.magicchatapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBw_y341Ef-43ztiiUIK_-yLTP_ZWu1DKQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:558547691038:android:d969b58823d78d6106b00f",
+        "android_client_info": {
+          "package_name": "com.magicmessenger.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBw_y341Ef-43ztiiUIK_-yLTP_ZWu1DKQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
