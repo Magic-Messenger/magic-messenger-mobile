@@ -6127,7 +6127,7 @@ export const postApiInAppPurchaseValidateGoogleReceipt = (
 };
 
 export const getPostApiInAppPurchaseValidateGoogleReceiptMutationOptions = <
-  TError = ResultMessage[] | null | null,
+  TError = ResultMessage[],
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -6171,15 +6171,13 @@ export type PostApiInAppPurchaseValidateGoogleReceiptMutationResult =
 export type PostApiInAppPurchaseValidateGoogleReceiptMutationBody =
   ValidateGoogleReceiptCommandRequest;
 export type PostApiInAppPurchaseValidateGoogleReceiptMutationError =
-  | ResultMessage[]
-  | null
-  | null;
+  ResultMessage[];
 
 /**
  * @summary Validate Google In App Purchase Receipt
  */
 export const usePostApiInAppPurchaseValidateGoogleReceipt = <
-  TError = ResultMessage[] | null | null,
+  TError = ResultMessage[],
   TContext = unknown,
 >(
   options?: {
@@ -6225,7 +6223,7 @@ export const postApiInAppPurchaseValidateAppleReceipt = (
 };
 
 export const getPostApiInAppPurchaseValidateAppleReceiptMutationOptions = <
-  TError = ResultMessage[] | null | null,
+  TError = ResultMessage[],
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -6269,15 +6267,13 @@ export type PostApiInAppPurchaseValidateAppleReceiptMutationResult =
 export type PostApiInAppPurchaseValidateAppleReceiptMutationBody =
   ValidateAppleReceiptCommandRequest;
 export type PostApiInAppPurchaseValidateAppleReceiptMutationError =
-  | ResultMessage[]
-  | null
-  | null;
+  ResultMessage[];
 
 /**
  * @summary Validate Apple In App Purchase Receipt
  */
 export const usePostApiInAppPurchaseValidateAppleReceipt = <
-  TError = ResultMessage[] | null | null,
+  TError = ResultMessage[],
   TContext = unknown,
 >(
   options?: {

@@ -13,7 +13,7 @@ export interface ChatDto {
   /** @nullable */
   groupName?: string | null;
   /** @nullable */
-  readonly groupAdminAccount?: string | null;
+  groupAdminAccount?: string | null;
   /** @nullable */
   lastMessageTime?: string | null;
   /** @nullable */

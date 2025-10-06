@@ -44,16 +44,16 @@ export const useLogin = () => {
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>({
     defaultValues: {
-      username: userName ?? (__DEV__ ? "test-user-11" : undefined),
-      password: __DEV__ ? "Kadir123*+" : undefined,
+      username: userName ?? (__DEV__ ? "omer-test-user" : undefined),
+      password: __DEV__ ? "Omer123*+" : undefined,
     },
   });
 
   useEffect(() => {
     if (__DEV__) {
       reset({
-        username: userName ?? (__DEV__ ? "test-user-11" : undefined),
-        password: __DEV__ ? "Kadir123*+" : undefined,
+        username: userName ?? (__DEV__ ? "omer-test-user" : undefined),
+        password: __DEV__ ? "Omer123*+" : undefined,
       });
     }
   }, [__DEV__]);

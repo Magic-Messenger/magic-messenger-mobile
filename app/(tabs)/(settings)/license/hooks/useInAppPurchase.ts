@@ -1,6 +1,6 @@
-import { PurchaseResult, useIAP } from "expo-iap";
+import { Purchase, useIAP } from "expo-iap";
 import { router } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Platform } from "react-native";
 
@@ -10,7 +10,12 @@ import {
   usePostApiInAppPurchaseValidateGoogleReceipt,
 } from "@/api/endpoints/magicMessenger";
 import { useUserStore } from "@/store";
-import { getInstallationId, showToast, trackEvent } from "@/utils";
+import {
+  getApplicationId,
+  getInstallationId,
+  showToast,
+  trackEvent,
+} from "@/utils";
 
 const productIds = [
   "one_month",
@@ -28,21 +33,70 @@ export const useInAppPurchase = () => {
   const setProfile = useUserStore((state) => state.setProfile);
   const isLogin = useUserStore((state) => state.isLogin);
 
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const {
     connected,
     products,
     requestPurchase,
-    currentPurchase,
     finishTransaction,
     fetchProducts,
-  } = useIAP();
+  } = useIAP({
+    onPurchaseSuccess: completePurchase,
+  });
 
-  const { refetch: getProfile, isLoading: isProfileLoading } =
-    useGetApiAccountGetProfile({ query: { enabled: false } });
+  const { refetch: getProfile } = useGetApiAccountGetProfile({
+    query: { enabled: false },
+  });
   const { mutateAsync: validateApple } =
     usePostApiInAppPurchaseValidateAppleReceipt();
   const { mutateAsync: validateGoogle } =
     usePostApiInAppPurchaseValidateGoogleReceipt();
+
+  async function completePurchase(currentPurchase: Purchase) {
+    try {
+      setIsLoading(true);
+
+      trackEvent("current_purchase", currentPurchase);
+
+      await finishTransaction({
+        purchase: currentPurchase,
+        isConsumable: true,
+      });
+
+      let validateResponse = false;
+      if (Platform.OS === "ios") {
+        const appleValidateResponse = await validateApple({
+          data: {
+            username: userName,
+            deviceId: await getInstallationId(),
+            receiptData: currentPurchase.purchaseToken,
+          },
+        });
+        validateResponse = appleValidateResponse.success ?? false;
+      } else {
+        const googleValidateResponse = await validateGoogle({
+          data: {
+            username: userName,
+            deviceId: await getInstallationId(),
+            purchaseToken: currentPurchase.purchaseToken,
+            productId: currentPurchase.productId,
+            packageName: getApplicationId(),
+          },
+        });
+        validateResponse = googleValidateResponse.success ?? false;
+      }
+
+      if (validateResponse) await refreshAfterCompletePurchase();
+
+      trackEvent("purchase_completed", { productId: currentPurchase.id });
+
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Failed to complete purchase:", error);
+      setIsLoading(false);
+    }
+  }
 
   const refreshAfterCompletePurchase = async () => {
     showToast({
@@ -58,49 +112,11 @@ export const useInAppPurchase = () => {
     }
   };
 
-  const completePurchase = async () => {
-    try {
-      if (currentPurchase) {
-        trackEvent("purchase_completed", { productId: currentPurchase.id });
-        const transactionResponse = await finishTransaction({
-          purchase: currentPurchase,
-          isConsumable: true,
-        });
-        const purchaseResult = transactionResponse as PurchaseResult;
-        let validateResponse = false;
-        if (Platform.OS === "ios") {
-          const appleValidateResponse = await validateApple({
-            data: {
-              username: userName,
-              deviceId: await getInstallationId(),
-              receiptData: purchaseResult.purchaseToken,
-            },
-          });
-          validateResponse = appleValidateResponse.success ?? false;
-        } else {
-          const googleValidateResponse = await validateGoogle({
-            data: {
-              username: userName,
-              deviceId: await getInstallationId(),
-              purchaseToken: purchaseResult.purchaseToken,
-              productId: currentPurchase.productId,
-              packageName: "com.magicmessenger.app",
-            },
-          });
-          validateResponse = googleValidateResponse.success ?? false;
-        }
-
-        trackEvent("purchase_completed", { productId: currentPurchase.id });
-        if (validateResponse) await refreshAfterCompletePurchase();
-      }
-    } catch (error) {
-      console.error("Failed to complete purchase:", error);
-    }
-  };
-
   const handlePurchase = async (productId: string) => {
     try {
+      trackEvent("handlePurchase: " + productId);
       await requestPurchase({
+        type: "in-app",
         request: {
           ios: {
             sku: productId,
@@ -116,15 +132,9 @@ export const useInAppPurchase = () => {
   };
 
   useEffect(() => {
-    if (currentPurchase) {
-      completePurchase();
-    }
-  }, [currentPurchase]);
-
-  useEffect(() => {
     if (connected) {
       // Fetch your products
-      fetchProducts({ skus: productIds, type: "inapp" })
+      fetchProducts({ skus: productIds, type: "in-app" })
         .then()
         .catch(console.error);
     }
@@ -136,6 +146,6 @@ export const useInAppPurchase = () => {
       (a, b) => productIds.indexOf(a.id) - productIds.indexOf(b.id),
     ),
     handlePurchase,
-    isProfileLoading,
+    isLoading,
   };
 };

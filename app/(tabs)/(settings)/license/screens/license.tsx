@@ -8,14 +8,14 @@ import { useInAppPurchase, useLicense } from "../hooks";
 
 export default function LicenseScreen() {
   const { t, styles, profile, handleCopy } = useLicense();
-  const { products, handlePurchase, isProfileLoading } = useInAppPurchase();
+  const { products, handlePurchase, isLoading } = useInAppPurchase();
 
   return (
     <AppLayout
       container
       scrollable
       title={t("license.title")}
-      loading={isProfileLoading}
+      loading={isLoading}
     >
       <ThemedText type="title" weight="semiBold" size={20}>
         {t("license.yourLicense")}
