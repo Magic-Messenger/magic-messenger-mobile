@@ -3,6 +3,12 @@ import * as Notifications from "expo-notifications";
 import { NotificationBehavior } from "expo-notifications";
 import { Platform } from "react-native";
 
+import {
+  postApiChatsMessageDelivered,
+  postApiChatsMessageRead,
+} from "@/api/endpoints/magicMessenger";
+import { trackEvent } from "@/utils";
+
 if (Platform.OS === "android")
   Notifications.setNotificationHandler({
     handleNotification: async () =>
@@ -10,15 +16,59 @@ if (Platform.OS === "android")
         shouldShowBanner: true,
         shouldShowList: true,
         shouldPlaySound: true,
-        shouldSetBadge: false,
+        shouldSetBadge: true,
       }) as NotificationBehavior,
   });
+
+// --- Delivered listener (foreground + background) ---
+export const registerDeliveredListener = () => {
+  Notifications.addNotificationReceivedListener(async (notification) => {
+    try {
+      const messageData = notification.request.content.data;
+      if (!messageData) return;
+
+      trackEvent("📩 Message delivered:", messageData);
+
+      await postApiChatsMessageDelivered({
+        chatId: messageData?.chat as string,
+        messageId: messageData?.messageId as string,
+      });
+    } catch (err) {
+      trackEvent("Delivered handler failed:", { err });
+    }
+  });
+};
+
+// --- Opened listener (user tapped) ---
+export const registerOpenedListener = () => {
+  Notifications.addNotificationResponseReceivedListener(async (response) => {
+    try {
+      const messageData = response.notification.request.content.data;
+      if (!messageData) return;
+
+      trackEvent("👆 Message opened:", messageData);
+
+      await postApiChatsMessageRead({
+        chatId: messageData?.chat as string,
+        messageId: messageData?.messageId as string,
+      });
+    } catch (err) {
+      trackEvent("Opened handler failed:", { err });
+    }
+  });
+};
+
+// --- Initialization helper ---
+export const setupNotificationListeners = () => {
+  registerDeliveredListener();
+  registerOpenedListener();
+};
 
 export async function registerForPushNotificationsAsync(): Promise<
   string | null
 > {
   if (!Device.isDevice) {
-    console.log("Must use physical device for push notifications");
+    trackEvent("Must use physical device for push notifications");
     return null;
   }
 
@@ -31,11 +81,11 @@ export async function registerForPushNotificationsAsync(): Promise<
   }
 
   if (finalStatus !== "granted") {
-    console.log("Failed to get push token");
+    trackEvent("Failed to get push token");
     return null;
   }
 
   const tokenData = await Notifications.getExpoPushTokenAsync();
-  console.log("✅ Expo Push Token:", tokenData?.data);
+  trackEvent("✅ Expo Push Token:", { token: tokenData?.data });
   return tokenData?.data;
 }

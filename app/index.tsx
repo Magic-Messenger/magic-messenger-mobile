@@ -8,7 +8,10 @@ import { StyleSheet, View } from "react-native";
 import { useGetApiAccountGetProfile } from "@/api/endpoints/magicMessenger";
 import { AppLayout, ThemedText } from "@/components";
 import { Images } from "@/constants";
-import { registerForPushNotificationsAsync } from "@/services";
+import {
+  registerForPushNotificationsAsync,
+  setupNotificationListeners,
+} from "@/services";
 import { useUserStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
 import {
@@ -84,6 +87,10 @@ export default function IndexPage() {
 
   useEffect(() => {
     registerForPushNotificationsAsync();
+  }, []);
+
+  useEffect(() => {
+    setupNotificationListeners();
   }, []);
 
   useEffect(() => {
