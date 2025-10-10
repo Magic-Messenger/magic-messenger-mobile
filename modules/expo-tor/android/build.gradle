@@ -31,13 +31,34 @@ if (useManagedAndroidSdkVersions) {
   }
 }
 
+repositories {
+  maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/master" }
+}
+
+dependencies {
+  implementation 'info.guardianproject:jtorctl:0.4.5.7'
+  implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
+}
+
 android {
   namespace "expo.modules.tor"
   defaultConfig {
     versionCode 1
     versionName "0.7.6"
+    buildConfigField 'String', 'VERSION_NAME', "\"${versionName}\""
   }
+  
+  buildFeatures {
+    buildConfig = true
+  }
+  
   lintOptions {
     abortOnError false
+  }
+  
+  sourceSets {
+    main {
+      jniLibs.srcDirs = ['src/main/jniLibs']
+    }
   }
 }

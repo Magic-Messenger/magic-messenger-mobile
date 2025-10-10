@@ -1,48 +1,154 @@
 package expo.modules.tor
 
+import android.content.BroadcastReceiver
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.ServiceConnection
+import android.os.Build
+import android.os.IBinder
+import android.util.Log
+import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import java.net.URL
+import org.torproject.jni.TorService
 
 class ExpoTorModule : Module() {
-  // Each module class must implement the definition function. The definition consists of components
-  // that describes the module's functionality and behavior.
-  // See https://docs.expo.dev/modules/module-api for more details about available components.
+  private var torService: TorService? = null
+  private var isBound = false
+  private val TAG = "ExpoTorModule"
+
+  private val torServiceConnection =
+          object : ServiceConnection {
+            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+              val binder = service as? TorService.LocalBinder
+              torService = binder?.getService()
+              isBound = true
+              Log.d(TAG, "Tor Service Connected")
+
+              // Wait for Tor Control Connection
+              Thread {
+                        var attempts = 0
+                        while (torService?.getTorControlConnection() == null && attempts < 20) {
+                          try {
+                            Thread.sleep(500)
+                            attempts++
+                          } catch (e: InterruptedException) {
+                            e.printStackTrace()
+                          }
+                        }
+                        if (torService?.getTorControlConnection() != null) {
+                          sendEvent("onTorConnected", mapOf("connected" to true))
+                        }
+                      }
+                      .start()
+            }
+
+            override fun onServiceDisconnected(name: ComponentName?) {
+              torService = null
+              isBound = false
+              Log.d(TAG, "Tor Service Disconnected")
+              sendEvent("onTorDisconnected", mapOf("connected" to false))
+            }
+          }
+
+  private val statusReceiver =
+          object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+              val status = intent?.getStringExtra(TorService.EXTRA_STATUS)
+              Log.d(TAG, "Tor Status: $status")
+              sendEvent("onTorStatus", mapOf("status" to status))
+            }
+          }
+
   override fun definition() = ModuleDefinition {
-    // Sets the name of the module that JavaScript code will use to refer to the module. Takes a string as an argument.
-    // Can be inferred from module's class name, but it's recommended to set it explicitly for clarity.
-    // The module will be accessible from `requireNativeModule('ExpoTor')` in JavaScript.
     Name("ExpoTor")
 
-    // Defines constant property on the module.
-    Constant("PI") {
-      Math.PI
-    }
-
     // Defines event names that the module can send to JavaScript.
-    Events("onChange")
+    Events("onTorStatus", "onTorConnected", "onTorDisconnected", "onTorError")
 
-    // Defines a JavaScript synchronous function that runs the native code on the JavaScript thread.
-    Function("hello") {
-      "Hello world! 👋"
+    // Start Tor Service
+    AsyncFunction("startTor") { promise: Promise ->
+      try {
+        val context = appContext.reactContext ?: throw Exception("Context is null")
+
+        // Register status receiver
+        val filter = IntentFilter(TorService.ACTION_STATUS)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+          context.registerReceiver(statusReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+          context.registerReceiver(statusReceiver, filter)
+        }
+
+        // Start and bind to TorService
+        val intent = Intent(context, TorService::class.java)
+        context.bindService(intent, torServiceConnection, Context.BIND_AUTO_CREATE)
+
+        promise.resolve(mapOf("success" to true, "message" to "Tor service starting..."))
+      } catch (e: Exception) {
+        Log.e(TAG, "Error starting Tor", e)
+        promise.reject("TOR_START_ERROR", e.message, e)
+      }
     }
 
-    // Defines a JavaScript function that always returns a Promise and whose native code
-    // is by default dispatched on the different thread than the JavaScript runtime runs on.
-    AsyncFunction("setValueAsync") { value: String ->
-      // Send an event to JavaScript.
-      sendEvent("onChange", mapOf(
-        "value" to value
-      ))
+    // Stop Tor Service
+    AsyncFunction("stopTor") { promise: Promise ->
+      try {
+        val context = appContext.reactContext ?: throw Exception("Context is null")
+
+        if (isBound) {
+          context.unbindService(torServiceConnection)
+          isBound = false
+        }
+
+        try {
+          context.unregisterReceiver(statusReceiver)
+        } catch (e: Exception) {
+          Log.w(TAG, "Receiver not registered", e)
+        }
+
+        torService = null
+
+        promise.resolve(mapOf("success" to true, "message" to "Tor service stopped"))
+      } catch (e: Exception) {
+        Log.e(TAG, "Error stopping Tor", e)
+        promise.reject("TOR_STOP_ERROR", e.message, e)
+      }
     }
 
-    // Enables the module to be used as a native view. Definition components that are accepted as part of
-    // the view definition: Prop, Events.
+    // Get Tor Status
+    Function("getTorStatus") { TorService.currentStatus }
+
+    // Get SOCKS Port
+    Function("getSocksPort") { torService?.getSocksPort() ?: -1 }
+
+    // Get HTTP Tunnel Port
+    Function("getHttpTunnelPort") { torService?.getHttpTunnelPort() ?: -1 }
+
+    // Get Tor Info
+    AsyncFunction("getTorInfo") { key: String, promise: Promise ->
+      try {
+        val info = torService?.getInfo(key)
+        if (info != null) {
+          promise.resolve(info)
+        } else {
+          promise.reject("TOR_INFO_ERROR", "Could not get info for key: $key", null)
+        }
+      } catch (e: Exception) {
+        Log.e(TAG, "Error getting Tor info", e)
+        promise.reject("TOR_INFO_ERROR", e.message, e)
+      }
+    }
+
+    // Check if Tor is connected
+    Function("isTorConnected") { isBound && torService?.getTorControlConnection() != null }
+
+    // Enables the module to be used as a native view.
     View(ExpoTorView::class) {
       // Defines a setter for the `url` prop.
-      Prop("url") { view: ExpoTorView, url: URL ->
-        view.webView.loadUrl(url.toString())
-      }
+      Prop("url") { view: ExpoTorView, url: URL -> view.webView.loadUrl(url.toString()) }
       // Defines an event that the view can send to JavaScript.
       Events("onLoad")
     }

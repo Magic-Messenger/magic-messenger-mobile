@@ -1,0 +1,39 @@
+{
+  "name": "expo-tor",
+  "version": "1.0.0",
+  "description": "Tor network integration for Expo applications",
+  "main": "index.ts",
+  "types": "index.ts",
+  "scripts": {
+    "build": "expo-module build",
+    "clean": "expo-module clean",
+    "lint": "expo-module lint",
+    "test": "expo-module test"
+  },
+  "keywords": [
+    "expo",
+    "expo-module",
+    "tor",
+    "privacy",
+    "android",
+    "react-native"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/expo-tor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/expo-tor/issues"
+  },
+  "author": "Your Name",
+  "license": "MIT",
+  "homepage": "https://github.com/yourusername/expo-tor#readme",
+  "devDependencies": {
+    "expo-module-scripts": "^3.0.0"
+  },
+  "peerDependencies": {
+    "expo": "*",
+    "react": "*",
+    "react-native": "*"
+  }
+}

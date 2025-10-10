@@ -1,0 +1,24 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="expo.modules.tor" >
+4
+5    <uses-sdk android:minSdkVersion="24" />
+6
+7    <uses-permission android:name="android.permission.INTERNET" />
+7-->/Users/kadirbarcin/Desktop/Dev/ReactNative/magic-mobil-expo/modules/expo-tor/android/src/main/AndroidManifest.xml:2:3-64
+7-->/Users/kadirbarcin/Desktop/Dev/ReactNative/magic-mobil-expo/modules/expo-tor/android/src/main/AndroidManifest.xml:2:20-62
+8
+9    <application>
+9-->/Users/kadirbarcin/Desktop/Dev/ReactNative/magic-mobil-expo/modules/expo-tor/android/src/main/AndroidManifest.xml:4:3-10:17
+10        <service
+10-->/Users/kadirbarcin/Desktop/Dev/ReactNative/magic-mobil-expo/modules/expo-tor/android/src/main/AndroidManifest.xml:5:5-9:15
+11            android:name="org.torproject.jni.TorService"
+11-->/Users/kadirbarcin/Desktop/Dev/ReactNative/magic-mobil-expo/modules/expo-tor/android/src/main/AndroidManifest.xml:6:7-51
+12            android:enabled="true"
+12-->/Users/kadirbarcin/Desktop/Dev/ReactNative/magic-mobil-expo/modules/expo-tor/android/src/main/AndroidManifest.xml:7:7-29
+13            android:exported="false" >
+13-->/Users/kadirbarcin/Desktop/Dev/ReactNative/magic-mobil-expo/modules/expo-tor/android/src/main/AndroidManifest.xml:8:7-31
+14        </service>
+15    </application>
+16
+17</manifest>
