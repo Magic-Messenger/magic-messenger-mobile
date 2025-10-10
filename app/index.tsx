@@ -165,17 +165,6 @@ export default function IndexPage() {
             ]}
           >
             <View style={[styles.badgeStatus, styles.active]} />
-            <ThemedText type="default">VPN</ThemedText>
-          </View>
-          <View
-            style={[
-              styles.flexRow,
-              styles.justifyContentStart,
-              styles.alignItemsCenter,
-              styles.gap3,
-            ]}
-          >
-            <View style={[styles.badgeStatus, styles.active]} />
             <ThemedText type="default">Encryption</ThemedText>
           </View>
         </View>

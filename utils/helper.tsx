@@ -99,7 +99,6 @@ export const chatDateFormatter = (dateString: string) => {
   const diffInMinutes = now.diff(date, "minute");
   const diffInHours = now.diff(date, "hour");
   const diffInDays = now.diff(date, "day");
-  const diffInMonths = now.diff(date, "month");
 
   if (diffInMinutes < 60) {
     return i18n.t("common.minutesAgo", { count: diffInMinutes });

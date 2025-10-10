@@ -25,6 +25,7 @@ export function ChatItem({
   publicKey,
   groupName,
   contactUsername,
+  nickname,
   isGroupChat,
   lastMessageTime,
   unreadMessagesCount,
@@ -32,13 +33,14 @@ export function ChatItem({
   groupNonce,
   groupAccountCount,
   groupAdminAccount,
-  ...props
 }: ChatItemProps) {
   const styles = useThemedStyles(createStyle);
 
   const chatTitle = useMemo(() => {
-    return isGroupChat ? (groupName ?? "") : (contactUsername ?? "");
-  }, [isGroupChat, groupName, contactUsername]);
+    return isGroupChat
+      ? (groupName ?? "")
+      : (nickname ?? contactUsername ?? "");
+  }, [isGroupChat, groupName, nickname, contactUsername]);
 
   const handleGoToChat = () => {
     if (isGroupChat) {
@@ -71,13 +73,13 @@ export function ChatItem({
     <ContactItem
       nickname={chatTitle}
       contactUsername={
-        lastMessageTime ? chatDateFormatter(lastMessageTime ?? "") : "-"
+        lastMessageTime ? chatDateFormatter(lastMessageTime) : "-"
       }
       customAction={
         unreadMessagesCount && unreadMessagesCount > 0 ? (
           <View style={styles.chatItem}>
             <ThemedText weight="semiBold" size={11}>
-              {unreadMessagesCount?.toString() ?? ""}
+              {unreadMessagesCount}
             </ThemedText>
           </View>
         ) : (

@@ -1,7 +1,7 @@
+import { FlashList } from "@shopify/flash-list";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FlatList } from "react-native";
 
 import { useGetApiContactsList } from "@/api/endpoints/magicMessenger";
 import { ContactDto } from "@/api/models";
@@ -17,8 +17,14 @@ export default function CreateChatScreen() {
   const [searchText, setSearchText] = useState<string>("");
 
   const filteredData = useMemo(() => {
-    return contactData?.data?.filter((x) =>
-      x.nickname?.toLocaleLowerCase()?.includes(searchText?.toLowerCase()),
+    return contactData?.data?.filter(
+      (x) =>
+        x.contactUsername
+          ?.toLocaleLowerCase()
+          ?.includes(searchText?.toLocaleLowerCase()) ||
+        x.nickname
+          ?.toLocaleLowerCase()
+          ?.includes(searchText?.toLocaleLowerCase()),
     );
   }, [searchText, contactData?.data]);
 
@@ -52,7 +58,7 @@ export default function CreateChatScreen() {
 
   return (
     <AppLayout container title={t("chat.newChat")} loading={isLoading}>
-      <FlatList
+      <FlashList
         ListHeaderComponent={
           <ContactHeader setSearchText={(_text) => setSearchText(_text)} />
         }
