@@ -37,6 +37,20 @@ export type TorStopResponse = {
   message: string;
 };
 
+export type TorRequestOptions = {
+  method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "HEAD";
+  headers?: Record<string, string>;
+  body?: string;
+};
+
+export type TorRequestResponse = {
+  status: number;
+  statusText: string;
+  headers: Record<string, string>;
+  data: string;
+  url: string;
+};
+
 export type ExpoTorViewProps = {
   url: string;
   onLoad: (event: { nativeEvent: OnLoadEventPayload }) => void;

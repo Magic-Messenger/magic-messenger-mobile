@@ -2,6 +2,8 @@ import { NativeModule, requireNativeModule } from "expo";
 
 import {
   ExpoTorModuleEvents,
+  TorRequestOptions,
+  TorRequestResponse,
   TorStartResponse,
   TorStopResponse,
 } from "./ExpoTor.types";
@@ -49,6 +51,17 @@ declare class ExpoTorModule extends NativeModule<ExpoTorModuleEvents> {
    * @returns true if Tor is connected, false otherwise
    */
   isTorConnected(): boolean;
+
+  /**
+   * Make HTTP request through Tor network
+   * @param url - The URL to request
+   * @param options - Request options (method, headers, body)
+   * @returns Promise with response data
+   */
+  makeRequest(
+    url: string,
+    options?: TorRequestOptions,
+  ): Promise<TorRequestResponse>;
 }
 
 // This call loads the native module object from the JSI.
