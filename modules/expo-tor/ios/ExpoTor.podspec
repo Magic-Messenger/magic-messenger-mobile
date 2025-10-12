@@ -13,10 +13,14 @@ Pod::Spec.new do |s|
   s.static_framework = true
 
   s.dependency 'ExpoModulesCore'
-
+  
+  # Tor iOS Framework
+  s.dependency 'Tor', '~> 408.11'
+  
   # Swift/Objective-C compatibility
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
+    'SWIFT_VERSION' => '5.0'
   }
 
   s.source_files = "**/*.{h,m,mm,swift,hpp,cpp}"

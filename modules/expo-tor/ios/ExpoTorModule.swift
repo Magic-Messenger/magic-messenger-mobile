@@ -1,48 +1,121 @@
 import ExpoModulesCore
 
 public class ExpoTorModule: Module {
-  // Each module class must implement the definition function. The definition consists of components
-  // that describes the module's functionality and behavior.
-  // See https://docs.expo.dev/modules/module-api for more details about available components.
+  
+  private let torManager = TorManager.shared
+  
   public func definition() -> ModuleDefinition {
-    // Sets the name of the module that JavaScript code will use to refer to the module. Takes a string as an argument.
-    // Can be inferred from module's class name, but it's recommended to set it explicitly for clarity.
-    // The module will be accessible from `requireNativeModule('ExpoTor')` in JavaScript.
     Name("ExpoTor")
 
-    // Defines constant property on the module.
-    Constant("PI") {
-      Double.pi
+    // Event names
+    Events("onTorStatus", "onTorConnected", "onTorDisconnected", "onTorError")
+    
+    // Lifecycle
+    OnCreate {
+      self.setupTorCallbacks()
     }
 
-    // Defines event names that the module can send to JavaScript.
-    Events("onChange")
-
-    // Defines a JavaScript synchronous function that runs the native code on the JavaScript thread.
-    Function("hello") {
-      return "Hello world! 👋"
+    // Start Tor
+    AsyncFunction("startTor") { (promise: Promise) in
+      self.torManager.startTor { result in
+        switch result {
+        case .success:
+          promise.resolve([
+            "success": true,
+            "message": "Tor service starting..."
+          ])
+        case .failure(let error):
+          promise.reject("TOR_START_ERROR", error.localizedDescription)
+        }
+      }
     }
 
-    // Defines a JavaScript function that always returns a Promise and whose native code
-    // is by default dispatched on the different thread than the JavaScript runtime runs on.
-    AsyncFunction("setValueAsync") { (value: String) in
-      // Send an event to JavaScript.
-      self.sendEvent("onChange", [
-        "value": value
-      ])
+    // Stop Tor
+    AsyncFunction("stopTor") { (promise: Promise) in
+      self.torManager.stopTor {
+        promise.resolve([
+          "success": true,
+          "message": "Tor service stopped"
+        ])
+      }
     }
 
-    // Enables the module to be used as a native view. Definition components that are accepted as part of the
-    // view definition: Prop, Events.
+    // Get Tor Status
+    Function("getTorStatus") { () -> String in
+      if self.torManager.isConnected {
+        return "ON"
+      } else if self.torManager.isStarted {
+        return "STARTING"
+      } else {
+        return "OFF"
+      }
+    }
+
+    // Get SOCKS Port
+    Function("getSocksPort") { () -> Int in
+      return self.torManager.socksPort
+    }
+
+    // Get HTTP Tunnel Port (iOS doesn't have this, return -1)
+    Function("getHttpTunnelPort") { () -> Int in
+      return self.torManager.httpTunnelPort
+    }
+
+    // Get Tor Info (Simplified for iOS)
+    AsyncFunction("getTorInfo") { (key: String, promise: Promise) in
+      // iOS Tor.framework doesn't expose full GETINFO, return basic info
+      promise.resolve("Not available on iOS")
+    }
+
+    // Check if Tor is connected
+    Function("isTorConnected") { () -> Bool in
+      return self.torManager.isConnected
+    }
+
+    // Make HTTP request through Tor
+    AsyncFunction("makeRequest") { (url: String, options: [String: Any]?, promise: Promise) in
+      let method = options?["method"] as? String ?? "GET"
+      let headers = options?["headers"] as? [String: String]
+      let body = options?["body"] as? String
+      
+      TorHTTPClient.shared.makeRequest(
+        url: url,
+        method: method,
+        headers: headers,
+        body: body
+      ) { result in
+        switch result {
+        case .success(let response):
+          promise.resolve(response.toDictionary())
+        case .failure(let error):
+          promise.reject("HTTP_REQUEST_ERROR", error.localizedDescription)
+        }
+      }
+    }
+
+    // View support
     View(ExpoTorView.self) {
-      // Defines a setter for the `url` prop.
       Prop("url") { (view: ExpoTorView, url: URL) in
         if view.webView.url != url {
           view.webView.load(URLRequest(url: url))
         }
       }
-
       Events("onLoad")
+    }
+  }
+  
+  // Setup Tor callbacks
+  private func setupTorCallbacks() {
+    torManager.onStatusChanged = { [weak self] status in
+      self?.sendEvent("onTorStatus", ["status": status])
+    }
+    
+    torManager.onConnected = { [weak self] connected in
+      if connected {
+        self?.sendEvent("onTorConnected", ["connected": true])
+      } else {
+        self?.sendEvent("onTorDisconnected", ["connected": false])
+      }
     }
   }
 }
