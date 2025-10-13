@@ -1,12 +1,7 @@
+import { FlashList } from "@shopify/flash-list";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  FlatList,
-  StyleSheet,
-  Switch,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, Switch, TouchableOpacity, View } from "react-native";
 
 import { ThemedText } from "@/components";
 import { Colors, flexBox, Fonts, spacing } from "@/constants";
@@ -57,7 +52,7 @@ const SettingsItem = (props: SettingsItemType) => {
       </View>
       <View style={styles.rightContainer}>
         {options && options?.length > 0 ? (
-          <FlatList
+          <FlashList
             contentContainerStyle={styles.optionsContainer}
             data={options}
             horizontal

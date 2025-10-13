@@ -1,4 +1,4 @@
-import { FlatList } from "react-native";
+import { FlashList } from "@shopify/flash-list";
 
 import { AppLayout, ContactHeader, EmptyList } from "@/components";
 import { spacingPixel } from "@/utils";
@@ -19,7 +19,7 @@ export default function ContactsScreen() {
 
   return (
     <AppLayout container title={t("contacts.title")} loading={isLoading}>
-      <FlatList
+      <FlashList
         ListHeaderComponent={
           <ContactHeader
             setSearchText={(_text) => setSearchText(_text)}

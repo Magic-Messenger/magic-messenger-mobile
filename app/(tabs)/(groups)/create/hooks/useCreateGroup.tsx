@@ -43,16 +43,16 @@ export const useCreateGroup = () => {
   const theme = useColor();
   const { userName } = useUserStore();
   const styles = useThemedStyles(createStyles);
+
+  const { mutateAsync: createGroup } = usePostApiChatsCreate();
+  const { participants, removeParticipant, clearParticipants } =
+    useGroupChatCreateStore();
+
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<CreateGroupFormData>();
-  const { credentials } = useUserStore();
-  const { mutateAsync: createGroup } = usePostApiChatsCreate();
-
-  const { participants, removeParticipant, clearParticipants } =
-    useGroupChatCreateStore();
 
   const onSubmit = async (data: CreateGroupFormData) => {
     if (data && participants.length > 0) {
@@ -94,9 +94,7 @@ export const useCreateGroup = () => {
   };
 
   useEffect(() => {
-    return () => {
-      clearParticipants();
-    };
+    return () => clearParticipants();
   }, []);
 
   return {

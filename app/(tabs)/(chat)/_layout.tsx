@@ -25,7 +25,7 @@ export default function ChatStack() {
         options={{
           ...headerImage(),
           headerShown: true,
-          title: t("settings.title"),
+          title: t("chat.title"),
         }}
       />
       <Stack.Screen
@@ -33,7 +33,7 @@ export default function ChatStack() {
         options={{
           ...headerImage(),
           headerShown: true,
-          title: t("settings.title"),
+          title: t("chat.title"),
         }}
       />
     </Stack>

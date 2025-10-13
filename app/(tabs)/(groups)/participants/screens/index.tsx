@@ -1,7 +1,8 @@
+import { FlashList } from "@shopify/flash-list";
 import { router, useFocusEffect, useNavigation } from "expo-router";
 import { useCallback, useLayoutEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FlatList, TouchableOpacity } from "react-native";
+import { TouchableOpacity } from "react-native";
 
 import { useGetApiContactsList } from "@/api/endpoints/magicMessenger";
 import { ContactDto } from "@/api/models";
@@ -108,7 +109,7 @@ export default function ParticipantsScreen() {
         />
       }
     >
-      <FlatList
+      <FlashList
         ListHeaderComponent={
           <Input
             placeholder={t("common.search")}

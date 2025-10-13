@@ -1,4 +1,5 @@
-import { FlatList, TouchableOpacity, View } from "react-native";
+import { FlashList } from "@shopify/flash-list";
+import { TouchableOpacity, View } from "react-native";
 
 import { AppLayout, Button, Icon, Input, ThemedText } from "@/components";
 
@@ -55,7 +56,7 @@ export default function CreateGroupChatScreen() {
             {t("groups.searchContacts")}
           </ThemedText>
 
-          <FlatList
+          <FlashList
             data={participants}
             contentContainerStyle={styles.participantContainer}
             renderItem={({ item }) => (

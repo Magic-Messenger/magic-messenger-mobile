@@ -39,7 +39,7 @@ export default function ChatScreen() {
     const sections = [
       {
         title: t("common.unread"),
-        data: listData.filter((d) => (d.unreadMessagesCount as never) > 0),
+        data: listData.filter((d) => d.unreadMessagesCount! > 0),
       },
       {
         title: t("common.read"),

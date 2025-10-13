@@ -95,11 +95,11 @@ export const useDetail = () => {
 
           setPagination((prev) => ({
             ...prev,
-            currentPage: data.messages.pageNumber as number,
-            totalPages: data.messages.totalPages as number,
+            currentPage: data.messages?.pageNumber as number,
+            totalPages: data.messages?.totalPages as number,
             hasMore:
-              (data.messages.pageNumber as number) <
-              (data.messages.totalPages as number),
+              (data.messages?.pageNumber as number) <
+              (data.messages?.totalPages as number),
           }));
 
           if (isFirstLoad && listRef.current) {
@@ -207,32 +207,9 @@ export const useDetail = () => {
     [chatId, usersPublicKey, replyMessage, sendApiMessage, onClearReply],
   );
 
-  /* const handleChatControl = useCallback(
-    async (message: string | UploadFileResultDto) => {
-      if (chatId) {
-        await handleSendMessage(message);
-      } else {
-        try {
-          const response = await createApiChat({
-            data: {
-              usernames: [userName as string],
-            },
-          });
-
-          if (response?.success && response?.data) {
-            setChatId(response?.data as string);
-          }
-        } catch (error) {
-          console.error("Error creating chat:", error);
-        }
-      }
-    },
-    [chatId, userName, handleSendMessage, createApiChat]
-  ); */
-
   const handleChatControl = useCallback(
     async (message: string | UploadFileResultDto) => {
-      console.log("chatId: ", chatId);
+      trackEvent("chatId: ", { chatId });
 
       const isFileMessage =
         typeof message === "object" && message?.fileUrl !== undefined;
@@ -284,7 +261,7 @@ export const useDetail = () => {
             onClearReply();
           }
         } catch (error) {
-          console.error("Error creating chat:", error);
+          trackEvent("Error creating chat: ", { error });
         }
       }
     },
