@@ -12,6 +12,7 @@ import {
   registerForPushNotificationsAsync,
   setupNotificationListeners,
 } from "@/services";
+import { useTor } from "@/services/axios/tor";
 import { useUserStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
 import {
@@ -26,13 +27,18 @@ import {
 export default function IndexPage() {
   const isLogin = useUserStore((state) => state.isLogin);
   const rehydrated = useUserStore((state) => state.rehydrated);
+  const profile = useUserStore((state) => state.profile);
   const setProfile = useUserStore((state) => state.setProfile);
+
+  const { startTor, isConnected: isTorConnected } = useTor();
+
   const styles = useThemedStyles(createStyle);
 
   const { data: profileResponse, refetch } = useGetApiAccountGetProfile({
     query: { enabled: isLogin },
   });
 
+  const [appStarted, setAppStarted] = useState<boolean>(false);
   const [connected, setConnected] = useState<boolean>(false);
   const [dots, setDots] = useState<string>("");
 
@@ -49,18 +55,22 @@ export default function IndexPage() {
     }, 1000);
   };
 
-  useEffect(() => {
-    setupInterval();
+  const initializeTor = async () => {
+    try {
+      await startTor();
+    } catch (err) {
+      trackEvent("initializeTor error: ", { err });
+    }
 
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, []);
+    initializeAppStart();
+  };
 
-  useEffect(() => {
-    setTimeout(() => {
-      setConnected(true);
-    }, 2500);
+  const initializeAppStart = async (withTimeout?: boolean) => {
+    if (withTimeout) {
+      setTimeout(() => {
+        setConnected(true);
+      }, 2500);
+    } else setConnected(true);
 
     setTimeout(() => {
       if (isLogin) {
@@ -70,8 +80,29 @@ export default function IndexPage() {
       }
 
       clearTimeout(interval);
+
+      setAppStarted(true);
     }, 3000);
-  }, [interval, isLogin]);
+  };
+
+  useEffect(() => {
+    setupInterval();
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (profile?.enableTor) {
+      if (!isTorConnected) {
+        initializeTor();
+      } else initializeAppStart();
+    } else {
+      // When TOR is disabled, we simulate a connection delay
+      initializeAppStart(true);
+    }
+  }, [rehydrated, profile, appStarted, interval, isLogin, isTorConnected]);
 
   useEffect(() => {
     trackEvent("app_open", { isLogin, rehydrated });
@@ -153,7 +184,12 @@ export default function IndexPage() {
               styles.gap3,
             ]}
           >
-            <View style={[styles.badgeStatus, styles.active]} />
+            <View
+              style={[
+                styles.badgeStatus,
+                isTorConnected ? styles.active : styles.inActive,
+              ]}
+            />
             <ThemedText type="default">TOR</ThemedText>
           </View>
           <View

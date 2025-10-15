@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android", "web"],
+  "apple": {
+    "modules": ["ExpoTorModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.tor.ExpoTorModule"]
+  }
+}
