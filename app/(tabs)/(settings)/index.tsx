@@ -1,8 +1,7 @@
-import { FlashList } from "@shopify/flash-list";
 import { router } from "expo-router";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
 
 import {
   AppLayout,
@@ -117,7 +116,7 @@ export default function SettingsScreen() {
 
   return (
     <AppLayout container scrollable={false} title={t("settings.title")}>
-      <FlashList
+      <FlatList
         data={settingList}
         keyExtractor={(_, index) => index.toString()}
         renderItem={renderItem}

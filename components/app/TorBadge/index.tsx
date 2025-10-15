@@ -2,16 +2,15 @@ import { LinearGradient } from "expo-linear-gradient";
 import { StyleSheet, View } from "react-native";
 
 import { Colors } from "@/constants";
-import { useAppStore } from "@/store";
-import { ColorDto, useThemedStyles } from "@/theme";
+import { useTor } from "@/services/axios/tor";
+import { useThemedStyles } from "@/theme";
 import { heightPixel, spacingPixel, widthPixel } from "@/utils";
 
 import { ThemedText } from "../ThemedText";
 
 export const TorBadge = () => {
-  const { tor } = useAppStore();
+  const { isConnected } = useTor();
   const styles = useThemedStyles(createStyle);
-
   return (
     <LinearGradient
       colors={Colors.buttonPrimary as never}
@@ -27,7 +26,10 @@ export const TorBadge = () => {
       ]}
     >
       <View
-        style={[styles.badgeStatus, tor ? styles.active : styles.inActive]}
+        style={[
+          styles.badgeStatus,
+          isConnected ? styles.active : styles.inActive,
+        ]}
       />
       <ThemedText type="default" weight="semiBold">
         Tor
@@ -36,7 +38,7 @@ export const TorBadge = () => {
   );
 };
 
-const createStyle = (colors: ColorDto) =>
+const createStyle = () =>
   StyleSheet.create({
     bedge: {
       flexDirection: "row",
