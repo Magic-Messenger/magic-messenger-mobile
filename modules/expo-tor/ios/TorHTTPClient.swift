@@ -18,7 +18,7 @@ class TorHTTPClient {
         // Tor bağlı mı kontrol et
         guard TorManager.shared.isConnected else {
             print("❌ [TOR] Not connected - isConnected: \(TorManager.shared.isConnected), isStarted: \(TorManager.shared.isStarted)")
-            completion(.failure(TorError.notStarted))
+            completion(.failure(TorError.notReady))
             return
         }
         
