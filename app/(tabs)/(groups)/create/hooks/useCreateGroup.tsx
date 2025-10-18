@@ -65,7 +65,7 @@ export const useCreateGroup = () => {
         const encryptedData = encryptGroupKeyForUser(
           groupKey,
           publicKey as never,
-          userPrivateKey() as string,
+          userPrivateKey() as string
         );
 
         return {

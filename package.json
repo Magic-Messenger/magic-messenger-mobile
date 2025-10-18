@@ -86,7 +86,8 @@
     "react-native-webview": "13.13.5",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
-    "zustand": "^5.0.5"
+    "zustand": "^5.0.5",
+    "expo-tor": "file:./modules/expo-tor"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

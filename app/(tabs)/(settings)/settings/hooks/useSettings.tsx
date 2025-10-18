@@ -36,7 +36,7 @@ export const useSettings = () => {
 
   const handleSettingsChange = async (
     key: keyof AccountProfileDto,
-    value: boolean | number,
+    value: boolean | number
   ) => {
     setProfile({
       ...profile,

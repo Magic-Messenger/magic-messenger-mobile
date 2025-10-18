@@ -24,7 +24,7 @@ export default function CreateChatScreen() {
           ?.includes(searchText?.toLocaleLowerCase()) ||
         x.nickname
           ?.toLocaleLowerCase()
-          ?.includes(searchText?.toLocaleLowerCase()),
+          ?.includes(searchText?.toLocaleLowerCase())
     );
   }, [searchText, contactData?.data]);
 
@@ -53,7 +53,7 @@ export default function CreateChatScreen() {
   useFocusEffect(
     useCallback(() => {
       refetch();
-    }, []),
+    }, [])
   );
 
   return (

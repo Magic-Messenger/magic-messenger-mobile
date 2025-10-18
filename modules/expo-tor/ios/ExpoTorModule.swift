@@ -25,7 +25,8 @@ public class ExpoTorModule: Module {
             "message": "Tor service starting..."
           ])
         case .failure(let error):
-          promise.reject("TOR_START_ERROR", error.localizedDescription)
+          let errorCode = (error as? TorError)?.errorCode ?? "TOR_START_ERROR"
+          promise.reject(errorCode, error.localizedDescription)
         }
       }
     }
@@ -77,7 +78,6 @@ public class ExpoTorModule: Module {
       let method = options?["method"] as? String ?? "GET"
       let headers = options?["headers"] as? [String: String]
       let body = options?["body"] as? String
-      
       TorHTTPClient.shared.makeRequest(
         url: url,
         method: method,
@@ -88,7 +88,8 @@ public class ExpoTorModule: Module {
         case .success(let response):
           promise.resolve(response.toDictionary())
         case .failure(let error):
-          promise.reject("HTTP_REQUEST_ERROR", error.localizedDescription)
+          let errorCode = (error as? TorError)?.errorCode ?? "HTTP_REQUEST_ERROR"
+          promise.reject(errorCode, error.localizedDescription)
         }
       }
     }

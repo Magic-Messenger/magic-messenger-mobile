@@ -64,6 +64,6 @@ export const useAppStore = create<AppStore>()(
       onRehydrateStorage: () => () => {
         useAppStore.setState({ rehydrated: true });
       },
-    },
-  ),
+    }
+  )
 );

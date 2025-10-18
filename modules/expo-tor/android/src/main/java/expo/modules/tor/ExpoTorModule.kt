@@ -16,6 +16,12 @@ import java.net.InetSocketAddress
 import java.net.Proxy
 import java.net.URL
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -25,7 +31,11 @@ import org.torproject.jni.TorService
 class ExpoTorModule : Module() {
   private var torService: TorService? = null
   private var isBound = false
+  private var bindRequested = false  // Track if we requested a bind
+  private var isReceiverRegistered = false
   private val TAG = "ExpoTorModule"
+  private val moduleScope = CoroutineScope(Dispatchers.Main + Job())
+  private var connectionCheckJob: Job? = null
 
   private val torServiceConnection =
           object : ServiceConnection {
@@ -33,31 +43,36 @@ class ExpoTorModule : Module() {
               val binder = service as? TorService.LocalBinder
               torService = binder?.getService()
               isBound = true
-              Log.d(TAG, "Tor Service Connected")
+              Log.d(TAG, "✅ Tor Service Connected")
 
-              // Wait for Tor Control Connection
-              Thread {
-                        var attempts = 0
-                        while (torService?.getTorControlConnection() == null && attempts < 20) {
-                          try {
-                            Thread.sleep(500)
-                            attempts++
-                          } catch (e: InterruptedException) {
-                            e.printStackTrace()
-                          }
-                        }
-                        if (torService?.getTorControlConnection() != null) {
-                          sendEvent("onTorConnected", mapOf("connected" to true))
-                        }
-                      }
-                      .start()
+              // Wait for Tor Control Connection using coroutines
+              connectionCheckJob?.cancel() // Cancel any existing job
+              connectionCheckJob = moduleScope.launch(Dispatchers.IO) {
+                repeat(20) { attempt ->
+                  val connection = torService?.getTorControlConnection()
+                  Log.d(TAG, "🔍 Checking Tor control connection (attempt ${attempt + 1}/20): ${if (connection != null) "Connected" else "Not connected"}")
+                  if (connection != null) {
+                    withContext(Dispatchers.Main) {
+                      Log.d(TAG, "✅ Tor Control Connection established!")
+                      sendEvent("onTorConnected", mapOf("connected" to true))
+                    }
+                    return@launch
+                  }
+                  delay(500)
+                }
+                Log.w(TAG, "⚠️ Tor Control Connection not established after 10 seconds")
+              }
             }
 
             override fun onServiceDisconnected(name: ComponentName?) {
+              connectionCheckJob?.cancel()
+              connectionCheckJob = null
               torService = null
               isBound = false
-              Log.d(TAG, "Tor Service Disconnected")
+              bindRequested = false
+              Log.d(TAG, "🔴 Tor Service Disconnected")
               sendEvent("onTorDisconnected", mapOf("connected" to false))
+              sendEvent("onTorStatus", mapOf("status" to "OFF"))
             }
           }
 
@@ -65,7 +80,7 @@ class ExpoTorModule : Module() {
           object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
               val status = intent?.getStringExtra(TorService.EXTRA_STATUS)
-              Log.d(TAG, "Tor Status: $status")
+              Log.d(TAG, "📡 Tor Status Update: $status")
               sendEvent("onTorStatus", mapOf("status" to status))
             }
           }
@@ -76,22 +91,72 @@ class ExpoTorModule : Module() {
     // Defines event names that the module can send to JavaScript.
     Events("onTorStatus", "onTorConnected", "onTorDisconnected", "onTorError")
 
+    // Cleanup on module destroy
+    OnDestroy {
+      try {
+        // Cancel any pending coroutine jobs
+        connectionCheckJob?.cancel()
+        connectionCheckJob = null
+        Log.d(TAG, "Coroutine jobs cancelled")
+
+        val context = appContext.reactContext
+
+        if (context != null && isReceiverRegistered) {
+          try {
+            context.unregisterReceiver(statusReceiver)
+            isReceiverRegistered = false
+            Log.d(TAG, "BroadcastReceiver unregistered in OnDestroy")
+          } catch (e: Exception) {
+            Log.w(TAG, "Receiver cleanup in OnDestroy", e)
+          }
+        }
+
+        if (context != null && (isBound || bindRequested)) {
+          try {
+            context.unbindService(torServiceConnection)
+            isBound = false
+            bindRequested = false
+            Log.d(TAG, "Service unbound in OnDestroy")
+          } catch (e: Exception) {
+            Log.w(TAG, "Error unbinding in OnDestroy", e)
+          }
+        }
+
+        torService = null
+      } catch (e: Exception) {
+        Log.e(TAG, "Error in OnDestroy cleanup", e)
+      }
+    }
+
     // Start Tor Service
     AsyncFunction("startTor") { promise: Promise ->
       try {
         val context = appContext.reactContext ?: throw Exception("Context is null")
 
-        // Register status receiver
-        val filter = IntentFilter(TorService.ACTION_STATUS)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-          context.registerReceiver(statusReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
-        } else {
-          context.registerReceiver(statusReceiver, filter)
+        Log.d(TAG, "Starting Tor service...")
+
+        // Register status receiver (only if not already registered)
+        if (!isReceiverRegistered) {
+          val filter = IntentFilter(TorService.ACTION_STATUS)
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.registerReceiver(statusReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
+          } else {
+            context.registerReceiver(statusReceiver, filter)
+          }
+          isReceiverRegistered = true
+          Log.d(TAG, "BroadcastReceiver registered")
         }
 
-        // Start and bind to TorService
+        // Bind to TorService (BIND_AUTO_CREATE will start the service if needed)
         val intent = Intent(context, TorService::class.java)
-        context.bindService(intent, torServiceConnection, Context.BIND_AUTO_CREATE)
+        val bound = context.bindService(intent, torServiceConnection, Context.BIND_AUTO_CREATE)
+        bindRequested = bound
+        Log.d(TAG, "🚀 Service bind requested (auto-create), result: $bound")
+
+        if (!bound) {
+          promise.reject("TOR_START_ERROR", "Failed to bind to Tor service", null)
+          return@AsyncFunction
+        }
 
         promise.resolve(mapOf("success" to true, "message" to "Tor service starting..."))
       } catch (e: Exception) {
@@ -105,23 +170,49 @@ class ExpoTorModule : Module() {
       try {
         val context = appContext.reactContext ?: throw Exception("Context is null")
 
-        if (isBound) {
-          context.unbindService(torServiceConnection)
-          isBound = false
+        Log.d(TAG, "🛑 Stopping Tor service...")
+
+        // Cancel any pending connection check jobs
+        connectionCheckJob?.cancel()
+        connectionCheckJob = null
+        Log.d(TAG, "🛑 Connection check job cancelled")
+
+        // Unbind from service (if we requested a bind, we must unbind)
+        if (bindRequested || isBound) {
+          try {
+            Log.d(TAG, "🛑 Attempting to unbind service (bindRequested: $bindRequested, isBound: $isBound)")
+            context.unbindService(torServiceConnection)
+            isBound = false
+            bindRequested = false
+            Log.d(TAG, "🛑 Service unbound successfully")
+          } catch (e: Exception) {
+            Log.w(TAG, "⚠️ Error unbinding service", e)
+            // Reset flags even if unbind failed
+            isBound = false
+            bindRequested = false
+          }
+        } else {
+          Log.d(TAG, "⚠️ No service to unbind (bindRequested: $bindRequested, isBound: $isBound)")
         }
 
-        try {
-          context.unregisterReceiver(statusReceiver)
-        } catch (e: Exception) {
-          Log.w(TAG, "Receiver not registered", e)
+        // Unregister receiver
+        if (isReceiverRegistered) {
+          try {
+            context.unregisterReceiver(statusReceiver)
+            isReceiverRegistered = false
+            Log.d(TAG, "🛑 BroadcastReceiver unregistered")
+          } catch (e: Exception) {
+            Log.w(TAG, "⚠️ Receiver not registered", e)
+          }
         }
 
         torService = null
+        Log.d(TAG, "✅ Tor service stopped")
 
         promise.resolve(mapOf("success" to true, "message" to "Tor service stopped"))
       } catch (e: Exception) {
-        Log.e(TAG, "Error stopping Tor", e)
-        promise.reject("TOR_STOP_ERROR", e.message, e)
+        Log.e(TAG, "❌ Error stopping Tor", e)
+        promise.reject("TOR_STOP_ERROR", "Failed to stop Tor service", e)
       }
     }
 
@@ -141,11 +232,11 @@ class ExpoTorModule : Module() {
         if (info != null) {
           promise.resolve(info)
         } else {
-          promise.reject("TOR_INFO_ERROR", "Could not get info for key: $key", null)
+          promise.reject("TOR_NOT_READY", "Could not get info for key: $key. Tor may not be ready.", null)
         }
       } catch (e: Exception) {
         Log.e(TAG, "Error getting Tor info", e)
-        promise.reject("TOR_INFO_ERROR", e.message, e)
+        promise.reject("TOR_CONFIGURATION_ERROR", "Failed to retrieve Tor information", e)
       }
     }
 
@@ -194,33 +285,36 @@ class ExpoTorModule : Module() {
 
         val request = requestBuilder.build()
 
-        // Execute request in background
-        Thread {
-                  try {
-                    client.newCall(request).execute().use { response ->
-                      val responseBody = response.body?.string() ?: ""
-                      val responseHeaders = mutableMapOf<String, String>()
-                      response.headers.forEach { (name, value) -> responseHeaders[name] = value }
+        // Execute request in background using Coroutines
+        moduleScope.launch(Dispatchers.IO) {
+          try {
+            client.newCall(request).execute().use { response ->
+              val responseBody = response.body?.string() ?: ""
+              val responseHeaders = mutableMapOf<String, String>()
+              response.headers.forEach { (name, value) -> responseHeaders[name] = value }
 
-                      promise.resolve(
-                              mapOf(
-                                      "status" to response.code,
-                                      "statusText" to response.message,
-                                      "headers" to responseHeaders,
-                                      "data" to responseBody,
-                                      "url" to url
-                              )
-                      )
-                    }
-                  } catch (e: Exception) {
-                    Log.e(TAG, "HTTP request error", e)
-                    promise.reject("HTTP_REQUEST_ERROR", e.message, e)
-                  }
-                }
-                .start()
+              withContext(Dispatchers.Main) {
+                promise.resolve(
+                  mapOf(
+                    "status" to response.code,
+                    "statusText" to response.message,
+                    "headers" to responseHeaders,
+                    "data" to responseBody,
+                    "url" to url
+                  )
+                )
+              }
+            }
+          } catch (e: Exception) {
+            Log.e(TAG, "HTTP request error", e)
+            withContext(Dispatchers.Main) {
+              promise.reject("HTTP_REQUEST_ERROR", "HTTP request failed: ${e.message}", e)
+            }
+          }
+        }
       } catch (e: Exception) {
         Log.e(TAG, "Request setup error", e)
-        promise.reject("REQUEST_SETUP_ERROR", e.message, e)
+        promise.reject("REQUEST_SETUP_ERROR", "Failed to setup HTTP request: ${e.message}", e)
       }
     }
 

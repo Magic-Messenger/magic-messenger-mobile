@@ -74,7 +74,7 @@ await ExpoTor.startTor();
 
 // HTTP request
 const response = await ExpoTor.makeRequest(
-  "https://check.torproject.org/api/ip",
+  "https://check.torproject.org/api/ip"
 );
 console.log(JSON.parse(response.data));
 ```

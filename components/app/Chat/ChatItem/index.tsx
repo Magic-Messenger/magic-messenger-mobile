@@ -37,9 +37,7 @@ export function ChatItem({
   const styles = useThemedStyles(createStyle);
 
   const chatTitle = useMemo(() => {
-    return isGroupChat
-      ? (groupName ?? "")
-      : (nickname ?? contactUsername ?? "");
+    return isGroupChat ? groupName ?? "" : nickname ?? contactUsername ?? "";
   }, [isGroupChat, groupName, nickname, contactUsername]);
 
   const handleGoToChat = () => {

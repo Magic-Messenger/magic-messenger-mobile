@@ -58,7 +58,7 @@ export const useDetail = () => {
       receiverPublicKey: publicKey as string,
       senderPrivateKey: userPublicKey() as string,
     }),
-    [publicKey],
+    [publicKey]
   );
 
   useEffect(() => {
@@ -117,7 +117,7 @@ export const useDetail = () => {
         }
       }
     },
-    [chatId, pagination.pageSize, pagination.hasMore],
+    [chatId, pagination.pageSize, pagination.hasMore]
   );
 
   useEffect(() => {
@@ -148,9 +148,9 @@ export const useDetail = () => {
           }
         },
         1000,
-        { leading: true, trailing: false },
+        { leading: true, trailing: false }
       ),
-    [pagination.hasMore, pagination.currentPage, loadMessages],
+    [pagination.hasMore, pagination.currentPage, loadMessages]
   );
 
   const handleReply = useCallback((message: MessageDto) => {
@@ -177,7 +177,7 @@ export const useDetail = () => {
               content: encrypt(
                 message as string,
                 usersPublicKey.receiverPublicKey,
-                usersPublicKey.senderPrivateKey,
+                usersPublicKey.senderPrivateKey
               ),
             }),
             ...(isFileMessage && {
@@ -187,7 +187,7 @@ export const useDetail = () => {
                 filePath: encrypt(
                   message.fileUrl as string,
                   usersPublicKey.receiverPublicKey,
-                  usersPublicKey.senderPrivateKey,
+                  usersPublicKey.senderPrivateKey
                 ),
               },
             }),
@@ -204,7 +204,7 @@ export const useDetail = () => {
         console.error("Error sending message:", error);
       }
     },
-    [chatId, usersPublicKey, replyMessage, sendApiMessage, onClearReply],
+    [chatId, usersPublicKey, replyMessage, sendApiMessage, onClearReply]
   );
 
   const handleChatControl = useCallback(
@@ -238,7 +238,7 @@ export const useDetail = () => {
                   content: encrypt(
                     message as string,
                     usersPublicKey.receiverPublicKey,
-                    usersPublicKey.senderPrivateKey,
+                    usersPublicKey.senderPrivateKey
                   ),
                 }),
                 ...(isFileMessage && {
@@ -248,7 +248,7 @@ export const useDetail = () => {
                     filePath: encrypt(
                       message.fileUrl as string,
                       usersPublicKey.receiverPublicKey,
-                      usersPublicKey.senderPrivateKey,
+                      usersPublicKey.senderPrivateKey
                     ),
                   },
                 }),
@@ -274,7 +274,7 @@ export const useDetail = () => {
       usersPublicKey,
       replyMessage,
       onClearReply,
-    ],
+    ]
   );
 
   useEffect(() => {

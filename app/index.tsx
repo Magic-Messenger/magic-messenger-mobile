@@ -100,9 +100,7 @@ export default function IndexPage() {
   useEffect(() => {
     setupInterval();
 
-    return () => {
-      if (interval) clearInterval(interval);
-    };
+    initializeAppStart();
   }, []);
 
   useEffect(() => {

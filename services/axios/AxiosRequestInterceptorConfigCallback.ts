@@ -4,8 +4,9 @@ import { DEFAULT_LANGUAGE } from "@/constants";
 import { useAppStore, useUserStore } from "@/store";
 
 const AxiosRequestInterceptorConfigCallback = (
-  config: InternalAxiosRequestConfig,
+  config: InternalAxiosRequestConfig
 ) => {
+  // Headers yoksa oluştur
   if (!config.headers) {
     config.headers = {} as any;
   }

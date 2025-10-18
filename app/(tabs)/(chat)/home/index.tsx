@@ -39,7 +39,7 @@ export default function ChatScreen() {
       if (section.data.length > 0) {
         finalData.push({ type: "header", title: section.title });
         finalData.push(
-          ...section.data.map((i) => ({ type: "item" as never, item: i })),
+          ...section.data.map((i) => ({ type: "item" as never, item: i }))
         );
       }
     });
@@ -74,13 +74,13 @@ export default function ChatScreen() {
         )}
       </View>
     ),
-    [],
+    []
   );
 
   useFocusEffect(
     useCallback(() => {
       refetch();
-    }, []),
+    }, [])
   );
 
   return (
