@@ -1,6 +1,7 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
+import { DEFAULT_LANGUAGE } from "@/constants";
 import { useAppStore } from "@/store";
 
 import en from "./locales/en.json";
@@ -19,13 +20,11 @@ const initI18n = async () => {
   await waitForRehydrate();
 
   const currentLanguage =
-    useAppStore.getState()?.settings?.language ??
-    process?.env?.EXPO_PUBLIC_DEFAULT_LANGUAGE ??
-    "en";
+    useAppStore.getState()?.settings?.language ?? DEFAULT_LANGUAGE;
 
   i18n.use(initReactI18next).init({
     lng: currentLanguage,
-    fallbackLng: process?.env?.EXPO_PUBLIC_DEFAULT_LANGUAGE ?? "en",
+    fallbackLng: DEFAULT_LANGUAGE,
     resources: {
       en: {
         translation: en,
