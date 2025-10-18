@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -63,6 +64,8 @@ export const useUserStore = create<UserStore>()(
       },
       logout: () => {
         set({ isLogin: false, accessToken: null });
+        router.dismissAll();
+        router.replace("/(auth)/preLogin");
       },
       setProfile: (profile: AccountProfileDto) => {
         set({ profile });

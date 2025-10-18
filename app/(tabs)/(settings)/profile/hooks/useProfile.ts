@@ -1,4 +1,3 @@
-import { router } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet } from "react-native";
@@ -33,11 +32,7 @@ export const useProfile = () => {
             password: userPassword,
           },
         });
-        if (success) {
-          logout();
-          router.dismissAll();
-          router.replace("/(auth)/preLogin");
-        }
+        if (success) logout();
       } else {
         showToast({
           type: "error",

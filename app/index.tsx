@@ -2,7 +2,7 @@ import "@/i18n";
 
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { useGetApiAccountGetProfile } from "@/api/endpoints/magicMessenger";
@@ -69,20 +69,32 @@ export default function IndexPage() {
     if (withTimeout) {
       setTimeout(() => {
         setConnected(true);
-      }, 2500);
-    } else setConnected(true);
 
-    setTimeout(() => {
-      if (isLogin) {
-        router.dismissTo("/home");
-      } else {
-        router.dismissTo("/(auth)/preLogin");
-      }
+        clearTimeout(interval);
+        setAppStarted(true);
+
+        setTimeout(() => {
+          if (isLogin) {
+            router.replace("/home");
+          } else {
+            router.replace("/(auth)/preLogin");
+          }
+        }, 500);
+      }, 2500);
+    } else {
+      setConnected(true);
 
       clearTimeout(interval);
-
       setAppStarted(true);
-    }, 3000);
+
+      setTimeout(() => {
+        if (isLogin) {
+          router.replace("/home");
+        } else {
+          router.replace("/(auth)/preLogin");
+        }
+      }, 500);
+    }
   };
 
   useEffect(() => {
@@ -94,6 +106,8 @@ export default function IndexPage() {
   }, []);
 
   useEffect(() => {
+    if (!rehydrated) return;
+
     if (profile?.enableTor) {
       if (!isTorConnected) {
         initializeTor();
@@ -102,7 +116,7 @@ export default function IndexPage() {
       // When TOR is disabled, we simulate a connection delay
       initializeAppStart(true);
     }
-  }, [rehydrated, profile, appStarted, interval, isLogin, isTorConnected]);
+  }, [rehydrated, profile, isTorConnected]);
 
   useEffect(() => {
     trackEvent("app_open", { isLogin, rehydrated });
@@ -129,6 +143,13 @@ export default function IndexPage() {
     if (!userPublicKeyCheck) {
       generateKeyPairs();
     }
+  }, []);
+
+  useMemo(() => {
+    if (__DEV__) {
+      trackEvent("env_variables", { ...process.env });
+    }
+    return null;
   }, []);
 
   if (!rehydrated) {

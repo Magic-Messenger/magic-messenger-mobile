@@ -24,20 +24,19 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#24003D"
       },
+      "softwareKeyboardLayoutMode": "pan",
       "googleServicesFile": "./google-services.json",
       "edgeToEdgeEnabled": true,
       "package": "com.magicmessenger.app",
-      "namespace": "com.magicmessenger.app",
       "permissions": [
         "android.permission.INTERNET",
         "android.permission.ACCESS_NETWORK_STATE",
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS"
-      ],
-      "usesCleartextTraffic": true
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -45,7 +44,12 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router",
+      [
+        "expo-router",
+        {
+          "origin": false
+        }
+      ],
       [
         "expo-splash-screen",
         {
@@ -53,12 +57,12 @@
             "enableFullScreenImage_legacy": true,
             "image": "./assets/images/splash.png",
             "resizeMode": "cover",
-            "backgroundColor": "#ffffff"
+            "backgroundColor": "#24003D"
           },
           "android": {
             "image": "./assets/images/splash.png",
             "resizeMode": "cover",
-            "backgroundColor": "#ffffff",
+            "backgroundColor": "#24003D",
             "imageWidth": 180
           }
         }
@@ -66,8 +70,8 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
-          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "cameraPermission": "Allow the app accesses your photos to let you share securely.",
+          "microphonePermission": "Allow the app to access your microphone so you can send voice messages securely.",
           "recordAudioAndroid": true
         }
       ],
@@ -84,13 +88,13 @@
       [
         "expo-av",
         {
-          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
+          "microphonePermission": "Allow the app to access your microphone so you can send voice messages securely."
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "The app accesses your photos to let you share them with your friends."
+          "photosPermission": "Allow the app accesses your photos to let you share securely."
         }
       ],
       "expo-localization",

@@ -1,5 +1,5 @@
 import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
+import React, { memo, useMemo } from "react";
 import {
   ActivityIndicator,
   ImageBackground,
@@ -11,7 +11,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Colors, Images, spacing } from "@/constants";
-import { ColorDto, useThemedStyles } from "@/theme";
+import { useThemedStyles } from "@/theme";
 
 import { ThemedText } from "./ThemedText";
 import { TorBadge } from "./TorBadge";
@@ -41,96 +41,117 @@ function AppLayout({
 }: AppLayoutProps) {
   const styles = useThemedStyles(createStyle);
 
-  let Container: React.ElementType = View;
+  // Memoize container type to prevent unnecessary re-renders
+  const Container: React.ElementType = useMemo(() => {
+    if (keyboardAvoiding) return KeyboardAwareScrollView;
+    if (scrollable) return ScrollView;
+    return View;
+  }, [keyboardAvoiding, scrollable]);
 
-  if (keyboardAvoiding) {
-    Container = KeyboardAwareScrollView;
-  } else if (scrollable) {
-    Container = ScrollView;
-  }
+  // Memoize container props to prevent unnecessary re-renders
+  const containerProps = useMemo(() => {
+    const baseContentStyle = [
+      styles.content,
+      safeAreaPadding ? styles.contentPadding : undefined,
+    ];
+
+    if (keyboardAvoiding) {
+      return {
+        enableOnAndroid: true,
+        enableAutomaticScroll: true,
+        keyboardShouldPersistTaps: "handled" as const,
+        contentContainerStyle: baseContentStyle,
+        showsVerticalScrollIndicator: false,
+        showsHorizontalScrollIndicator: false,
+        bounces: false,
+        overScrollMode: "never" as const, // Android
+      };
+    }
+
+    if (scrollable) {
+      return {
+        contentContainerStyle: baseContentStyle,
+        keyboardShouldPersistTaps: "handled" as const,
+        showsVerticalScrollIndicator: false,
+        showsHorizontalScrollIndicator: false,
+        bounces: false,
+        overScrollMode: "never" as const, // Android
+      };
+    }
+
+    return { style: baseContentStyle };
+  }, [
+    keyboardAvoiding,
+    scrollable,
+    styles.content,
+    styles.contentPadding,
+    safeAreaPadding,
+  ]);
 
   return (
-    <LinearGradient
-      colors={Colors.backgroundColor as never}
-      style={[styles.gradient, container ? styles.container : undefined]}
-    >
-      <ImageBackground
-        source={Images.backgroundImage}
-        style={styles.imageBackground}
-        resizeMode="cover"
-      />
-      <SafeAreaView
-        style={[
-          styles.safeArea,
-          safeAreaPadding ? { ...spacing({ mt: 45 }) } : undefined,
-        ]}
+    <View style={styles.wrapper}>
+      <LinearGradient
+        colors={Colors.backgroundColor as never}
+        style={[styles.gradient, container ? styles.container : undefined]}
       >
-        <Container
-          {...(keyboardAvoiding
-            ? {
-                enableOnAndroid: true,
-                enableAutomaticScroll: true,
-                keyboardShouldPersistTaps: "handled",
-                contentContainerStyle: styles.content,
-                showsVerticalScrollIndicator: false,
-                showsHorizontalScrollIndicator: false,
-              }
-            : scrollable
-              ? {
-                  contentContainerStyle: styles.content,
-                  keyboardShouldPersistTaps: "handled",
-                  showsVerticalScrollIndicator: false,
-                  showsHorizontalScrollIndicator: false,
-                }
-              : { style: styles.content })}
-        >
-          {showBadge && (
-            <View
-              style={[
-                styles.flexRow,
-                styles.alignItemsCenter,
-                styles.mt2,
-                styles.mb5,
-                !container ? styles.container : undefined,
-              ]}
-            >
-              {typeof title === "string" ? (
-                <ThemedText type="title" weight="semiBold">
-                  {title}
-                </ThemedText>
-              ) : (
-                title
-              )}
-
+        <ImageBackground
+          source={Images.backgroundImage}
+          style={styles.imageBackground}
+          resizeMode="cover"
+        />
+        <SafeAreaView style={styles.safeArea}>
+          <Container {...containerProps}>
+            {showBadge && (
               <View
                 style={[
-                  styles.flex,
-                  styles.justifyContentEnd,
-                  styles.alignItemsEnd,
+                  styles.flexRow,
+                  styles.alignItemsCenter,
+                  styles.mt2,
+                  styles.mb5,
+                  !container ? styles.container : undefined,
                 ]}
               >
-                <TorBadge />
+                {typeof title === "string" ? (
+                  <ThemedText type="title" weight="semiBold">
+                    {title}
+                  </ThemedText>
+                ) : (
+                  title
+                )}
+
+                <View
+                  style={[
+                    styles.flex,
+                    styles.justifyContentEnd,
+                    styles.alignItemsEnd,
+                  ]}
+                >
+                  <TorBadge />
+                </View>
               </View>
-            </View>
-          )}
+            )}
 
-          {children}
-        </Container>
+            {children}
+          </Container>
 
-        {footer && <>{footer}</>}
+          {footer && <>{footer}</>}
+        </SafeAreaView>
+      </LinearGradient>
 
-        {loading && (
-          <View style={styles.loadingOverlay}>
-            <ActivityIndicator size="large" />
-          </View>
-        )}
-      </SafeAreaView>
-    </LinearGradient>
+      {loading && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" />
+        </View>
+      )}
+    </View>
   );
 }
 
-const createStyle = (colors: ColorDto) =>
+const createStyle = () =>
   StyleSheet.create({
+    wrapper: {
+      flex: 1,
+    },
     gradient: {
       flex: 1,
       position: "relative",
@@ -151,6 +172,11 @@ const createStyle = (colors: ColorDto) =>
       flexGrow: 1,
       position: "relative",
     },
+    contentPadding: {
+      ...spacing({
+        pt: 45,
+      }),
+    },
     container: {
       ...spacing({
         pl: 20,
@@ -170,4 +196,4 @@ const createStyle = (colors: ColorDto) =>
     },
   });
 
-export default AppLayout;
+export default memo(AppLayout);
