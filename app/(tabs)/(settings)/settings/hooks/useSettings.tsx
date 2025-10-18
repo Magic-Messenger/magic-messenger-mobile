@@ -7,6 +7,7 @@ import {
 } from "@/api/endpoints/magicMessenger";
 import { AccountProfileDto } from "@/api/models";
 import { SettingsItem } from "@/components";
+import { useTor } from "@/services/axios/tor";
 import { useUserStore } from "@/store";
 import { useThemedStyles } from "@/theme";
 
@@ -16,6 +17,8 @@ export const useSettings = () => {
 
   const profile = useUserStore((state) => state.profile);
   const setProfile = useUserStore((state) => state.setProfile);
+
+  const { startTor, stopTor } = useTor();
 
   const { data, isLoading } = useGetApiAccountGetProfile();
   const { mutateAsync: changeAccountSettings } =
@@ -33,7 +36,7 @@ export const useSettings = () => {
 
   const handleSettingsChange = async (
     key: keyof AccountProfileDto,
-    value: boolean | number,
+    value: boolean | number
   ) => {
     setProfile({
       ...profile,
@@ -99,8 +102,14 @@ export const useSettings = () => {
       title: "settings.torNetwork",
       description: "settings.torNetworkDescription",
       value: profile?.enableTor ?? false,
-      onSettingsChanged: (value: number | boolean) =>
-        handleSettingsChange("enableTor", value),
+      onSettingsChanged: (value: number | boolean) => {
+        handleSettingsChange("enableTor", value);
+        if (value) {
+          startTor();
+        } else {
+          stopTor();
+        }
+      },
     },
     {
       id: 6,

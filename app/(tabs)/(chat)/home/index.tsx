@@ -39,7 +39,7 @@ export default function ChatScreen() {
     const sections = [
       {
         title: t("common.unread"),
-        data: listData.filter((d) => (d.unreadMessagesCount as never) > 0),
+        data: listData.filter((d) => d.unreadMessagesCount! > 0),
       },
       {
         title: t("common.read"),
@@ -54,7 +54,7 @@ export default function ChatScreen() {
       if (section.data.length > 0) {
         finalData.push({ type: "header", title: section.title });
         finalData.push(
-          ...section.data.map((i) => ({ type: "item" as never, item: i })),
+          ...section.data.map((i) => ({ type: "item" as never, item: i }))
         );
       }
     });
@@ -65,7 +65,7 @@ export default function ChatScreen() {
   useFocusEffect(
     useCallback(() => {
       refetch();
-    }, []),
+    }, [])
   );
 
   return (

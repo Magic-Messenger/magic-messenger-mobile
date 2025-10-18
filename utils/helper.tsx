@@ -25,7 +25,7 @@ export const changeLanguage = (language: string) => {
 
 export const copyToClipboard = async (
   copyData: string,
-  successMessage?: string,
+  successMessage?: string
 ) => {
   await Clipboard.setStringAsync(copyData);
 
@@ -80,7 +80,7 @@ export function appSupportLanguages(): {
 }[] {
   if (process.env?.EXPO_PUBLIC_SUPPORT_LANGUAGES) {
     return process.env?.EXPO_PUBLIC_SUPPORT_LANGUAGES?.split(",")?.map(
-      (item) => ({ label: i18n.t(`languages.${item}`), value: item }),
+      (item) => ({ label: i18n.t(`languages.${item}`), value: item })
     );
   }
 
@@ -99,7 +99,6 @@ export const chatDateFormatter = (dateString: string) => {
   const diffInMinutes = now.diff(date, "minute");
   const diffInHours = now.diff(date, "hour");
   const diffInDays = now.diff(date, "day");
-  const diffInMonths = now.diff(date, "month");
 
   if (diffInMinutes < 60) {
     return i18n.t("common.minutesAgo", { count: diffInMinutes });

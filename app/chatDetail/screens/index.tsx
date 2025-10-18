@@ -10,7 +10,7 @@ import {
   LoadingProvider,
   MessageItem,
 } from "@/components";
-import { ColorDto, useThemedStyles } from "@/theme";
+import { useThemedStyles } from "@/theme";
 import { spacingPixel } from "@/utils";
 
 import { useDetail } from "../hooks";
@@ -75,7 +75,7 @@ export default function ChatScreen() {
   );
 }
 
-const createStyle = (colors: ColorDto) =>
+const createStyle = () =>
   StyleSheet.create({
     contentContainerStyle: {
       flexDirection: "column",

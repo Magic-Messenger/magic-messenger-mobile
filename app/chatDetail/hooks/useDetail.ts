@@ -58,7 +58,7 @@ export const useDetail = () => {
       receiverPublicKey: publicKey as string,
       senderPrivateKey: userPublicKey() as string,
     }),
-    [publicKey],
+    [publicKey]
   );
 
   useEffect(() => {
@@ -95,11 +95,11 @@ export const useDetail = () => {
 
           setPagination((prev) => ({
             ...prev,
-            currentPage: data.messages.pageNumber as number,
-            totalPages: data.messages.totalPages as number,
+            currentPage: data.messages?.pageNumber as number,
+            totalPages: data.messages?.totalPages as number,
             hasMore:
-              (data.messages.pageNumber as number) <
-              (data.messages.totalPages as number),
+              (data.messages?.pageNumber as number) <
+              (data.messages?.totalPages as number),
           }));
 
           if (isFirstLoad && listRef.current) {
@@ -117,7 +117,7 @@ export const useDetail = () => {
         }
       }
     },
-    [chatId, pagination.pageSize, pagination.hasMore],
+    [chatId, pagination.pageSize, pagination.hasMore]
   );
 
   useEffect(() => {
@@ -148,9 +148,9 @@ export const useDetail = () => {
           }
         },
         1000,
-        { leading: true, trailing: false },
+        { leading: true, trailing: false }
       ),
-    [pagination.hasMore, pagination.currentPage, loadMessages],
+    [pagination.hasMore, pagination.currentPage, loadMessages]
   );
 
   const handleReply = useCallback((message: MessageDto) => {
@@ -177,7 +177,7 @@ export const useDetail = () => {
               content: encrypt(
                 message as string,
                 usersPublicKey.receiverPublicKey,
-                usersPublicKey.senderPrivateKey,
+                usersPublicKey.senderPrivateKey
               ),
             }),
             ...(isFileMessage && {
@@ -187,7 +187,7 @@ export const useDetail = () => {
                 filePath: encrypt(
                   message.fileUrl as string,
                   usersPublicKey.receiverPublicKey,
-                  usersPublicKey.senderPrivateKey,
+                  usersPublicKey.senderPrivateKey
                 ),
               },
             }),
@@ -204,35 +204,12 @@ export const useDetail = () => {
         console.error("Error sending message:", error);
       }
     },
-    [chatId, usersPublicKey, replyMessage, sendApiMessage, onClearReply],
+    [chatId, usersPublicKey, replyMessage, sendApiMessage, onClearReply]
   );
-
-  /* const handleChatControl = useCallback(
-    async (message: string | UploadFileResultDto) => {
-      if (chatId) {
-        await handleSendMessage(message);
-      } else {
-        try {
-          const response = await createApiChat({
-            data: {
-              usernames: [userName as string],
-            },
-          });
-
-          if (response?.success && response?.data) {
-            setChatId(response?.data as string);
-          }
-        } catch (error) {
-          console.error("Error creating chat:", error);
-        }
-      }
-    },
-    [chatId, userName, handleSendMessage, createApiChat]
-  ); */
 
   const handleChatControl = useCallback(
     async (message: string | UploadFileResultDto) => {
-      console.log("chatId: ", chatId);
+      trackEvent("chatId: ", { chatId });
 
       const isFileMessage =
         typeof message === "object" && message?.fileUrl !== undefined;
@@ -261,7 +238,7 @@ export const useDetail = () => {
                   content: encrypt(
                     message as string,
                     usersPublicKey.receiverPublicKey,
-                    usersPublicKey.senderPrivateKey,
+                    usersPublicKey.senderPrivateKey
                   ),
                 }),
                 ...(isFileMessage && {
@@ -271,7 +248,7 @@ export const useDetail = () => {
                     filePath: encrypt(
                       message.fileUrl as string,
                       usersPublicKey.receiverPublicKey,
-                      usersPublicKey.senderPrivateKey,
+                      usersPublicKey.senderPrivateKey
                     ),
                   },
                 }),
@@ -284,7 +261,7 @@ export const useDetail = () => {
             onClearReply();
           }
         } catch (error) {
-          console.error("Error creating chat:", error);
+          trackEvent("Error creating chat: ", { error });
         }
       }
     },
@@ -297,7 +274,7 @@ export const useDetail = () => {
       usersPublicKey,
       replyMessage,
       onClearReply,
-    ],
+    ]
   );
 
   useEffect(() => {

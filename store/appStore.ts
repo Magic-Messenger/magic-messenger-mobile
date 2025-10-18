@@ -35,7 +35,6 @@ interface SettingDto {
 interface AppStore {
   settings: SettingDto;
   appVersion: string;
-  tor: boolean | null;
   rehydrated: boolean;
   changeLanguage: (language: string) => void;
 }
@@ -58,11 +57,6 @@ export const useAppStore = create<AppStore>()(
           },
         }));
       },
-      torStatus: (status: boolean) => {
-        set(() => ({
-          tor: status,
-        }));
-      },
     }),
     {
       name: "app-store",
@@ -70,6 +64,6 @@ export const useAppStore = create<AppStore>()(
       onRehydrateStorage: () => () => {
         useAppStore.setState({ rehydrated: true });
       },
-    },
-  ),
+    }
+  )
 );

@@ -86,10 +86,11 @@ export const useUserStore = create<UserStore>()(
       partialize: (state) => ({
         userName: state.userName,
         credentials: state.credentials,
+        profile: state.profile,
       }),
       onRehydrateStorage: () => () => {
         useUserStore.setState({ rehydrated: true });
       },
-    },
-  ),
+    }
+  )
 );

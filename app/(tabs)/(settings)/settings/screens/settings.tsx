@@ -1,6 +1,5 @@
-import { FlashList } from "@shopify/flash-list";
 import React from "react";
-import { View } from "react-native";
+import { FlatList, View } from "react-native";
 
 import { AppLayout } from "@/components";
 
@@ -17,7 +16,7 @@ const SettingsScreen = () => {
       loading={isLoading}
     >
       <View style={styles.flex}>
-        <FlashList
+        <FlatList
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
           data={settingsItems}

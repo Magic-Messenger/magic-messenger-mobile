@@ -21,8 +21,11 @@
     "video": "Video",
     "audio": "Audio",
     "minutesAgo": "{{count}} minute ago",
+    "minutesAgo_plural": "{{count}} minutes ago",
     "hoursAgo": "{{count}} hour ago",
+    "hoursAgo_plural": "{{count}} hours ago",
     "daysAgo": "{{count}} day ago",
+    "daysAgo_plural": "{{count}} days ago",
     "unread": "Unread",
     "read": "Read",
     "someThingWentWrong": "Something went wrong."
@@ -222,7 +225,6 @@
     "waiting": "Waiting",
     "closed": "Closed"
   },
-
   "chat": {
     "title": "Chat",
     "newChat": "New Chat",
@@ -233,7 +235,6 @@
     "offline": "offline",
     "typing": "is typing..."
   },
-
   "groups": {
     "title": "Groups",
     "newGroup": "New Group",
@@ -244,7 +245,6 @@
     "create": "Create",
     "selectParticipants": "Select participants"
   },
-
   "notes": {
     "empty": "No notes available. Click the + button to add a new note.",
     "lastUpdate": "Last update: {{date}}",
@@ -261,7 +261,6 @@
     "successDeleteNote": "Note deleted successfully",
     "listNotes": "List of Notes"
   },
-
   "chatDetail": {
     "writeMessage": "Write a message...",
     "replyingTo": "Replying to"

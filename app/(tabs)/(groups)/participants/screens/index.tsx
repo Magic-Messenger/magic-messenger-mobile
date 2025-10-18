@@ -1,7 +1,8 @@
+import { FlashList } from "@shopify/flash-list";
 import { router, useFocusEffect, useNavigation } from "expo-router";
 import { useCallback, useLayoutEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FlatList, TouchableOpacity } from "react-native";
+import { TouchableOpacity } from "react-native";
 
 import { useGetApiContactsList } from "@/api/endpoints/magicMessenger";
 import { ContactDto } from "@/api/models";
@@ -49,7 +50,7 @@ export default function ParticipantsScreen() {
 
   const filteredData = useMemo(() => {
     return contactData?.data?.filter((x) =>
-      x.nickname?.toLocaleLowerCase()?.includes(searchText?.toLowerCase()),
+      x.nickname?.toLocaleLowerCase()?.includes(searchText?.toLowerCase())
     );
   }, [searchText, contactData?.data]);
 
@@ -73,7 +74,7 @@ export default function ParticipantsScreen() {
         }}
         customAction={
           participants?.find(
-            (x) => x.contactUsername === item.contactUsername,
+            (x) => x.contactUsername === item.contactUsername
           ) ? (
             <Icon type="ant" name="checkcircle" color={colors.colors.white} />
           ) : (
@@ -91,7 +92,7 @@ export default function ParticipantsScreen() {
   useFocusEffect(
     useCallback(() => {
       refetch();
-    }, []),
+    }, [])
   );
 
   return (
@@ -108,7 +109,7 @@ export default function ParticipantsScreen() {
         />
       }
     >
-      <FlatList
+      <FlashList
         ListHeaderComponent={
           <Input
             placeholder={t("common.search")}
