@@ -9,6 +9,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "ios-device": "npx expo run:ios --device 'iPhone 12'",
+    "ios-device-release": "npx expo run:ios --device 'iPhone 12' --configuration Release",
     "web": "expo start --web",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
@@ -62,6 +63,7 @@
     "expo-status-bar": "~2.2.3",
     "expo-symbols": "~0.4.5",
     "expo-system-ui": "~5.0.9",
+    "expo-tor": "file:./modules/expo-tor",
     "expo-video": "~2.2.2",
     "expo-web-browser": "~14.2.0",
     "i18next": "^25.2.1",
@@ -84,8 +86,7 @@
     "react-native-webview": "13.13.5",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
-    "zustand": "^5.0.5",
-    "expo-tor": "file:./modules/expo-tor"
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

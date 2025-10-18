@@ -7,7 +7,7 @@ import { Platform } from "react-native";
 import Toast, { ToastShowParams } from "react-native-toast-message";
 
 import { MessageStatus, MessageType } from "@/api/models";
-import { Images } from "@/constants";
+import { Images, SUPPORT_LANGUAGES } from "@/constants";
 import i18n from "@/i18n";
 import { useAppStore } from "@/store";
 
@@ -78,13 +78,10 @@ export function appSupportLanguages(): {
   label: string;
   value: string | number;
 }[] {
-  if (process.env?.EXPO_PUBLIC_SUPPORT_LANGUAGES) {
-    return process.env?.EXPO_PUBLIC_SUPPORT_LANGUAGES?.split(",")?.map(
-      (item) => ({ label: i18n.t(`languages.${item}`), value: item }),
-    );
-  }
-
-  return [];
+  return SUPPORT_LANGUAGES.map((item) => ({
+    label: i18n.t(`languages.${item}`),
+    value: item,
+  }));
 }
 
 export const dateFormatter = (dateString: string, format: string) => {

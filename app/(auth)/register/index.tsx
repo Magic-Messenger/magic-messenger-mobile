@@ -14,7 +14,7 @@ import {
   PasswordInput,
   SectionHeader,
 } from "@/components";
-import { spacing } from "@/constants";
+import { DEFAULT_LANGUAGE, spacing } from "@/constants";
 import {
   appSupportLanguages,
   getInstallationId,
@@ -37,10 +37,6 @@ export default function RegisterScreen() {
     return appSupportLanguages();
   }, [appSupportLanguages]);
 
-  const defaultLocale = useMemo(() => {
-    return process?.env?.EXPO_PUBLIC_DEFAULT_LANGUAGE ?? "en";
-  }, [process?.env?.EXPO_PUBLIC_DEFAULT_LANGUAGE]);
-
   const {
     control,
     handleSubmit,
@@ -51,7 +47,7 @@ export default function RegisterScreen() {
       username: undefined,
       password: undefined,
       confirmPassword: undefined,
-      language: defaultLocale,
+      language: DEFAULT_LANGUAGE,
     },
   });
 
