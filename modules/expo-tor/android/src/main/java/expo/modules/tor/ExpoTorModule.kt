@@ -31,6 +31,7 @@ import org.torproject.jni.TorService
 class ExpoTorModule : Module() {
   private var torService: TorService? = null
   private var isBound = false
+  private var bindRequested = false  // Track if we requested a bind
   private var isReceiverRegistered = false
   private val TAG = "ExpoTorModule"
   private val moduleScope = CoroutineScope(Dispatchers.Main + Job())
@@ -42,21 +43,24 @@ class ExpoTorModule : Module() {
               val binder = service as? TorService.LocalBinder
               torService = binder?.getService()
               isBound = true
-              Log.d(TAG, "Tor Service Connected")
+              Log.d(TAG, "✅ Tor Service Connected")
 
               // Wait for Tor Control Connection using coroutines
               connectionCheckJob?.cancel() // Cancel any existing job
               connectionCheckJob = moduleScope.launch(Dispatchers.IO) {
                 repeat(20) { attempt ->
-                  if (torService?.getTorControlConnection() != null) {
+                  val connection = torService?.getTorControlConnection()
+                  Log.d(TAG, "🔍 Checking Tor control connection (attempt ${attempt + 1}/20): ${if (connection != null) "Connected" else "Not connected"}")
+                  if (connection != null) {
                     withContext(Dispatchers.Main) {
+                      Log.d(TAG, "✅ Tor Control Connection established!")
                       sendEvent("onTorConnected", mapOf("connected" to true))
                     }
                     return@launch
                   }
                   delay(500)
                 }
-                Log.w(TAG, "Tor Control Connection not established after 10 seconds")
+                Log.w(TAG, "⚠️ Tor Control Connection not established after 10 seconds")
               }
             }
 
@@ -65,8 +69,10 @@ class ExpoTorModule : Module() {
               connectionCheckJob = null
               torService = null
               isBound = false
-              Log.d(TAG, "Tor Service Disconnected")
+              bindRequested = false
+              Log.d(TAG, "🔴 Tor Service Disconnected")
               sendEvent("onTorDisconnected", mapOf("connected" to false))
+              sendEvent("onTorStatus", mapOf("status" to "OFF"))
             }
           }
 
@@ -74,7 +80,7 @@ class ExpoTorModule : Module() {
           object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
               val status = intent?.getStringExtra(TorService.EXTRA_STATUS)
-              Log.d(TAG, "Tor Status: $status")
+              Log.d(TAG, "📡 Tor Status Update: $status")
               sendEvent("onTorStatus", mapOf("status" to status))
             }
           }
@@ -105,10 +111,15 @@ class ExpoTorModule : Module() {
           }
         }
 
-        if (context != null && isBound) {
-          context.unbindService(torServiceConnection)
-          isBound = false
-          Log.d(TAG, "Service unbound in OnDestroy")
+        if (context != null && (isBound || bindRequested)) {
+          try {
+            context.unbindService(torServiceConnection)
+            isBound = false
+            bindRequested = false
+            Log.d(TAG, "Service unbound in OnDestroy")
+          } catch (e: Exception) {
+            Log.w(TAG, "Error unbinding in OnDestroy", e)
+          }
         }
 
         torService = null
@@ -122,6 +133,8 @@ class ExpoTorModule : Module() {
       try {
         val context = appContext.reactContext ?: throw Exception("Context is null")
 
+        Log.d(TAG, "Starting Tor service...")
+
         // Register status receiver (only if not already registered)
         if (!isReceiverRegistered) {
           val filter = IntentFilter(TorService.ACTION_STATUS)
@@ -134,9 +147,16 @@ class ExpoTorModule : Module() {
           Log.d(TAG, "BroadcastReceiver registered")
         }
 
-        // Start and bind to TorService
+        // Bind to TorService (BIND_AUTO_CREATE will start the service if needed)
         val intent = Intent(context, TorService::class.java)
-        context.bindService(intent, torServiceConnection, Context.BIND_AUTO_CREATE)
+        val bound = context.bindService(intent, torServiceConnection, Context.BIND_AUTO_CREATE)
+        bindRequested = bound
+        Log.d(TAG, "🚀 Service bind requested (auto-create), result: $bound")
+
+        if (!bound) {
+          promise.reject("TOR_START_ERROR", "Failed to bind to Tor service", null)
+          return@AsyncFunction
+        }
 
         promise.resolve(mapOf("success" to true, "message" to "Tor service starting..."))
       } catch (e: Exception) {
@@ -150,27 +170,48 @@ class ExpoTorModule : Module() {
       try {
         val context = appContext.reactContext ?: throw Exception("Context is null")
 
-        if (isBound) {
-          context.unbindService(torServiceConnection)
-          isBound = false
-          Log.d(TAG, "Service unbound")
+        Log.d(TAG, "🛑 Stopping Tor service...")
+
+        // Cancel any pending connection check jobs
+        connectionCheckJob?.cancel()
+        connectionCheckJob = null
+        Log.d(TAG, "🛑 Connection check job cancelled")
+
+        // Unbind from service (if we requested a bind, we must unbind)
+        if (bindRequested || isBound) {
+          try {
+            Log.d(TAG, "🛑 Attempting to unbind service (bindRequested: $bindRequested, isBound: $isBound)")
+            context.unbindService(torServiceConnection)
+            isBound = false
+            bindRequested = false
+            Log.d(TAG, "🛑 Service unbound successfully")
+          } catch (e: Exception) {
+            Log.w(TAG, "⚠️ Error unbinding service", e)
+            // Reset flags even if unbind failed
+            isBound = false
+            bindRequested = false
+          }
+        } else {
+          Log.d(TAG, "⚠️ No service to unbind (bindRequested: $bindRequested, isBound: $isBound)")
         }
 
+        // Unregister receiver
         if (isReceiverRegistered) {
           try {
             context.unregisterReceiver(statusReceiver)
             isReceiverRegistered = false
-            Log.d(TAG, "BroadcastReceiver unregistered")
+            Log.d(TAG, "🛑 BroadcastReceiver unregistered")
           } catch (e: Exception) {
-            Log.w(TAG, "Receiver not registered", e)
+            Log.w(TAG, "⚠️ Receiver not registered", e)
           }
         }
 
         torService = null
+        Log.d(TAG, "✅ Tor service stopped")
 
         promise.resolve(mapOf("success" to true, "message" to "Tor service stopped"))
       } catch (e: Exception) {
-        Log.e(TAG, "Error stopping Tor", e)
+        Log.e(TAG, "❌ Error stopping Tor", e)
         promise.reject("TOR_STOP_ERROR", "Failed to stop Tor service", e)
       }
     }

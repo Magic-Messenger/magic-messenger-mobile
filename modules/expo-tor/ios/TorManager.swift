@@ -111,21 +111,11 @@ class TorManager: NSObject {
                 self.torConfiguration = config
                 print("⚙️ [TOR] Configuration created")
 
-                // Tor thread başlat (sadece yoksa oluştur)
-                if self.torThread == nil {
-                    print("🧵 [TOR] Creating new Tor thread...")
-                    self.torThread = TorThread(configuration: config)
-                    self.torThread?.start()
-                    print("✅ [TOR] Tor thread started")
-                } else {
-                    // Zaten var, yeniden başlat
-                    if self.torThread?.isExecuting == false {
-                        print("🔄 [TOR] Restarting existing Tor thread...")
-                        self.torThread?.start()
-                    } else {
-                        print("⚠️ [TOR] Tor thread already executing")
-                    }
-                }
+                // Her zaman yeni Tor thread oluştur
+                print("🧵 [TOR] Creating new Tor thread...")
+                self.torThread = TorThread(configuration: config)
+                self.torThread?.start()
+                print("✅ [TOR] Tor thread started")
 
                 // Tor'un control port dosyasını oluşturmasını bekle
                 print("⏳ [TOR] Waiting for Tor to create control port file...")
@@ -359,6 +349,7 @@ class TorManager: NSObject {
         httpTunnelPort = 0
         torConfiguration = nil
         torController = nil
+        torThread = nil  // Thread'i nil yap - bir sonraki start'ta yeni thread oluşturulacak
 
         onStatusChanged?("OFF")
         onConnected?(false)

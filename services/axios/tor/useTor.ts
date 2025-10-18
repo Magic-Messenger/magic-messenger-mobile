@@ -15,6 +15,7 @@ export interface TorState {
  * Tor durumunu yöneten React Hook
  */
 export function useTor() {
+  const [loading, setLoading] = useState(false);
   const [torState, setTorState] = useState<TorState>({
     enabled: TorManager.getEnabled(),
     connected: false,
@@ -61,14 +62,17 @@ export function useTor() {
    */
   const startTor = async () => {
     try {
+      setLoading(true);
       setIsStarting(true);
       await ExpoTor.startTor();
       TorManager.setEnabled(true);
+
       return { success: true };
     } catch (error: any) {
       return { success: false, error: error.message };
     } finally {
       setIsStarting(false);
+      setLoading(false);
     }
   };
 
@@ -77,11 +81,14 @@ export function useTor() {
    */
   const stopTor = async () => {
     try {
+      setLoading(true);
       await ExpoTor.stopTor();
       TorManager.setEnabled(false);
       return { success: true };
     } catch (error: any) {
       return { success: false, error: error.message };
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -101,6 +108,7 @@ export function useTor() {
 
   return {
     // State
+    loading,
     torState,
     isStarting,
 

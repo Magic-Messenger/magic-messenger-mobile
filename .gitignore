@@ -40,3 +40,4 @@ app-example
 
 ios/*
 android/*
+modules/expo-tor/android/build/*
