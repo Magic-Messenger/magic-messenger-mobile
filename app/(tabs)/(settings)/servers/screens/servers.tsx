@@ -59,14 +59,14 @@ export default function ServersScreen() {
             />
           )}
 
-          {isConnected && (
+          {/*  {isConnected && (
             <Button
               type="primary"
               label={t("servers.restartConnection")}
               leftIcon={<Icon type="feather" name="refresh-cw" />}
               onPress={handleReconnect}
             />
-          )}
+          )} */}
         </>
       }
     >
