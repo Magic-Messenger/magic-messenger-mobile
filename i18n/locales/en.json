@@ -154,7 +154,8 @@
     "blockContactAlertTitle": "Are you sure to block contact?",
     "blockContactAlertMessage": "You will no longer receive messages from this contact.",
     "unblockContactAlertTitle": "Are you sure to unblock contact?",
-    "unblockContactAlertMessage": "You will start receiving messages from this contact."
+    "unblockContactAlertMessage": "You will start receiving messages from this contact.",
+    "blockThisContact": "Block this contact"
   },
   "scanQr": {
     "title": "Scan QR Code",

@@ -12,6 +12,7 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  Alert,
   NativeScrollEvent,
   NativeSyntheticEvent,
   TouchableOpacity,
@@ -314,22 +315,23 @@ export const useDetail = () => {
   }, [chatId, showToast, router]);
 
   const onAction = () => {
-    showActionSheetWithOptions(
-      {
-        options: [
-          t("chatDetail.delete.confirm"),
-          t("chatDetail.delete.cancel"),
-        ],
-        title: t("chatDetail.delete.title"),
-        message: t("chatDetail.delete.message"),
-        destructiveButtonIndex: 0,
-        cancelButtonIndex: 1,
-      },
-      (selectedIndex?: number) => {
-        if (selectedIndex === 0) {
-          handleDeleteChat();
-        }
-      },
+    Alert.alert(
+      t("chatDetail.delete.title"),
+      t("chatDetail.delete.message"),
+      [
+        {
+          text: t("chatDetail.delete.confirm"),
+          style: "destructive",
+          onPress: () => {
+            handleDeleteChat();
+          },
+        },
+        {
+          text: t("chatDetail.delete.cancel"),
+          style: "cancel",
+        },
+      ],
+      { cancelable: true },
     );
   };
 

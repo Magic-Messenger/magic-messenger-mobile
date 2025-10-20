@@ -1,4 +1,3 @@
-import { useActionSheet } from "@expo/react-native-action-sheet";
 import { FlashListRef } from "@shopify/flash-list";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { throttle } from "lodash";
@@ -12,6 +11,7 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  Alert,
   NativeScrollEvent,
   NativeSyntheticEvent,
   TouchableOpacity,
@@ -44,7 +44,6 @@ export const useDetail = () => {
   const router = useRouter();
   const navigation = useNavigation();
   const listRef = useRef<FlashListRef<MessageDto>>(null);
-  const { showActionSheetWithOptions } = useActionSheet();
 
   const [replyMessage, setReplyMessage] = useState<MessageDto | null>(null);
   const [messages, setMessages] = useState<MessageDto[]>([]);
@@ -368,22 +367,23 @@ export const useDetail = () => {
   }, [chatId, contactChatId, deleteChat, showToast, router]);
 
   const onAction = () => {
-    showActionSheetWithOptions(
-      {
-        options: [
-          t("chatDetail.delete.confirm"),
-          t("chatDetail.delete.cancel"),
-        ],
-        title: t("chatDetail.delete.title"),
-        message: t("chatDetail.delete.message"),
-        destructiveButtonIndex: 0,
-        cancelButtonIndex: 1,
-      },
-      (selectedIndex?: number) => {
-        if (selectedIndex === 0) {
-          handleDeleteChat();
-        }
-      },
+    Alert.alert(
+      t("chatDetail.delete.title"),
+      t("chatDetail.delete.message"),
+      [
+        {
+          text: t("chatDetail.delete.confirm"),
+          style: "destructive",
+          onPress: () => {
+            handleDeleteChat();
+          },
+        },
+        {
+          text: t("chatDetail.delete.cancel"),
+          style: "cancel",
+        },
+      ],
+      { cancelable: true },
     );
   };
 
