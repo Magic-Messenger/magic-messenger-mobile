@@ -12,11 +12,38 @@ class TorManager: NSObject {
     private var torConfiguration: TorConfiguration?
     private var torController: TorController?
     
-    // Status
-    private(set) var isStarted = false
-    private(set) var isConnected = false
-    private(set) var socksPort: Int = 0
-    private(set) var httpTunnelPort: Int = 0
+    // Thread-safe queue for property access
+    private let queue = DispatchQueue(label: "com.expotor.manager", attributes: .concurrent)
+
+    // Lock for concurrent startTor protection
+    private let startLock = NSLock()
+
+    // Status (private storage)
+    private var _isStarted = false
+    private var _isConnected = false
+    private var _socksPort: Int = 0
+    private var _httpTunnelPort: Int = 0
+
+    // Thread-safe public properties
+    private(set) var isStarted: Bool {
+        get { queue.sync { _isStarted } }
+        set { queue.async(flags: .barrier) { self._isStarted = newValue } }
+    }
+
+    private(set) var isConnected: Bool {
+        get { queue.sync { _isConnected } }
+        set { queue.async(flags: .barrier) { self._isConnected = newValue } }
+    }
+
+    private(set) var socksPort: Int {
+        get { queue.sync { _socksPort } }
+        set { queue.async(flags: .barrier) { self._socksPort = newValue } }
+    }
+
+    private(set) var httpTunnelPort: Int {
+        get { queue.sync { _httpTunnelPort } }
+        set { queue.async(flags: .barrier) { self._httpTunnelPort = newValue } }
+    }
     
     // Callbacks
     var onStatusChanged: ((String) -> Void)?
@@ -29,6 +56,15 @@ class TorManager: NSObject {
     
     /// Tor servisini başlat
     func startTor(completion: @escaping (Result<Void, Error>) -> Void) {
+        // Prevent concurrent startTor calls
+        guard startLock.try() else {
+            print("⚠️ [TOR] Start already in progress")
+            completion(.success(()))
+            return
+        }
+
+        defer { startLock.unlock() }
+
         guard !isStarted else {
             print("⚠️ [TOR] Already started")
             completion(.success(()))
@@ -75,21 +111,11 @@ class TorManager: NSObject {
                 self.torConfiguration = config
                 print("⚙️ [TOR] Configuration created")
 
-                // Tor thread başlat (sadece yoksa oluştur)
-                if self.torThread == nil {
-                    print("🧵 [TOR] Creating new Tor thread...")
-                    self.torThread = TorThread(configuration: config)
-                    self.torThread?.start()
-                    print("✅ [TOR] Tor thread started")
-                } else {
-                    // Zaten var, yeniden başlat
-                    if self.torThread?.isExecuting == false {
-                        print("🔄 [TOR] Restarting existing Tor thread...")
-                        self.torThread?.start()
-                    } else {
-                        print("⚠️ [TOR] Tor thread already executing")
-                    }
-                }
+                // Her zaman yeni Tor thread oluştur
+                print("🧵 [TOR] Creating new Tor thread...")
+                self.torThread = TorThread(configuration: config)
+                self.torThread?.start()
+                print("✅ [TOR] Tor thread started")
 
                 // Tor'un control port dosyasını oluşturmasını bekle
                 print("⏳ [TOR] Waiting for Tor to create control port file...")
@@ -323,6 +349,7 @@ class TorManager: NSObject {
         httpTunnelPort = 0
         torConfiguration = nil
         torController = nil
+        torThread = nil  // Thread'i nil yap - bir sonraki start'ta yeni thread oluşturulacak
 
         onStatusChanged?("OFF")
         onConnected?(false)
@@ -379,7 +406,30 @@ enum TorError: Error {
     case configurationError
     case notStarted
     case connectionFailed
-    
+    case startError
+    case stopError
+    case notReady
+    case requestSetupError
+
+    var errorCode: String {
+        switch self {
+        case .configurationError:
+            return "TOR_CONFIGURATION_ERROR"
+        case .notStarted:
+            return "TOR_NOT_STARTED"
+        case .connectionFailed:
+            return "TOR_CONNECTION_FAILED"
+        case .startError:
+            return "TOR_START_ERROR"
+        case .stopError:
+            return "TOR_STOP_ERROR"
+        case .notReady:
+            return "TOR_NOT_READY"
+        case .requestSetupError:
+            return "REQUEST_SETUP_ERROR"
+        }
+    }
+
     var localizedDescription: String {
         switch self {
         case .configurationError:
@@ -388,6 +438,14 @@ enum TorError: Error {
             return "Tor is not started"
         case .connectionFailed:
             return "Failed to connect to Tor"
+        case .startError:
+            return "Failed to start Tor service"
+        case .stopError:
+            return "Failed to stop Tor service"
+        case .notReady:
+            return "Tor is not connected yet"
+        case .requestSetupError:
+            return "Failed to setup HTTP request"
         }
     }
 }

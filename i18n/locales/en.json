@@ -195,7 +195,11 @@
     "trafficRoute": "Traffic Route",
     "disconnect": "Disconnect",
     "startConnection": "Start Connection",
-    "restartConnection": "Restart Connection"
+    "restartConnection": "Restart Connection",
+    "checkConnection": "Check Connection Status",
+    "torStatusTitle": "TOR Status",
+    "torWorking": "TOR is working properly.",
+    "torNotWorking": "TOR is not working. Please try reconnecting."
   },
   "support": {
     "title": "Support",
