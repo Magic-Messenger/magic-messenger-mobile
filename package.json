@@ -29,6 +29,8 @@
   "dependencies": {
     "@expo/react-native-action-sheet": "^4.1.1",
     "@expo/vector-icons": "^14.1.0",
+    "@gorhom/bottom-sheet": "^5",
+    "@gorhom/portal": "^1.0.14",
     "@microsoft/signalr": "^9.0.6",
     "@react-native-picker/picker": "2.11.1",
     "@react-navigation/bottom-tabs": "^7.3.10",

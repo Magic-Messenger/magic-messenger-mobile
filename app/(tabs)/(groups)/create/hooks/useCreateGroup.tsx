@@ -90,10 +90,6 @@ export const useCreateGroup = () => {
     }
   };
 
-  const goToAddParticipants = () => {
-    router.push("/(tabs)/(groups)/participants/screens");
-  };
-
   useEffect(() => {
     return () => clearParticipants();
   }, []);
@@ -108,7 +104,6 @@ export const useCreateGroup = () => {
     participants,
     isLoadingChatCreate,
     handleSubmit: handleSubmit(onSubmit),
-    goToAddParticipants,
     removeParticipant,
   };
 };

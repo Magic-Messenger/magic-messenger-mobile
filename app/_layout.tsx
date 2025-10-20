@@ -1,6 +1,7 @@
 import "react-native-reanimated";
 
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
+import { PortalProvider } from "@gorhom/portal";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
@@ -49,37 +50,42 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView>
-      <ActionSheetProvider>
-        <QueryClientProvider client={queryClient}>
-          <SignalRProvider>
-            <Stack
-              screenOptions={{
-                headerTransparent: true,
-                headerTintColor: Colors.white,
-                headerBackTitle: t("back"),
-                ...headerImage(),
-                contentStyle: {
-                  backgroundColor: "transparent",
-                },
-                headerTitleAlign: "center",
-              }}
-            >
-              <Stack.Screen name="index" options={{ headerShown: false }} />
-              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="chatDetail" options={{ headerShown: true }} />
-              <Stack.Screen
-                name="ticketDetail"
-                options={{ headerShown: true }}
-              />
-              <Stack.Screen name="+not-found" />
-            </Stack>
+      <PortalProvider>
+        <ActionSheetProvider>
+          <QueryClientProvider client={queryClient}>
+            <SignalRProvider>
+              <Stack
+                screenOptions={{
+                  headerTransparent: true,
+                  headerTintColor: Colors.white,
+                  headerBackTitle: t("back"),
+                  ...headerImage(),
+                  contentStyle: {
+                    backgroundColor: "transparent",
+                  },
+                  headerTitleAlign: "center",
+                }}
+              >
+                <Stack.Screen name="index" options={{ headerShown: false }} />
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="chatDetail"
+                  options={{ headerShown: true }}
+                />
+                <Stack.Screen
+                  name="ticketDetail"
+                  options={{ headerShown: true }}
+                />
+                <Stack.Screen name="+not-found" />
+              </Stack>
 
-            <Toast config={toastConfig as never} />
-            <StatusBar style="light" />
-          </SignalRProvider>
-        </QueryClientProvider>
-      </ActionSheetProvider>
+              <Toast config={toastConfig as never} />
+              <StatusBar style="light" />
+            </SignalRProvider>
+          </QueryClientProvider>
+        </ActionSheetProvider>
+      </PortalProvider>
     </GestureHandlerRootView>
   );
 }

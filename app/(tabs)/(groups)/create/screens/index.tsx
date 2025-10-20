@@ -1,8 +1,8 @@
-import { FlashList } from "@shopify/flash-list";
-import { TouchableOpacity, View } from "react-native";
+import { FlatList, TouchableOpacity, View } from "react-native";
 
 import { AppLayout, Button, Icon, Input, ThemedText } from "@/components";
 
+import ParticipantsScreen from "../../participants/screens";
 import { useCreateGroup } from "../hooks";
 
 export default function CreateGroupChatScreen() {
@@ -14,7 +14,6 @@ export default function CreateGroupChatScreen() {
     participants,
     isLoadingChatCreate,
     handleSubmit,
-    goToAddParticipants,
     removeParticipant,
   } = useCreateGroup();
 
@@ -58,11 +57,11 @@ export default function CreateGroupChatScreen() {
             {t("groups.searchContacts")}
           </ThemedText>
 
-          <FlashList
+          <FlatList
             data={participants}
             contentContainerStyle={styles.participantContainer}
             renderItem={({ item }) => (
-              <View style={styles.participantItem}>
+              <View style={[styles.participantItem]}>
                 <ThemedText>{item?.contactUsername}</ThemedText>
                 <TouchableOpacity
                   onPress={() =>
@@ -74,14 +73,10 @@ export default function CreateGroupChatScreen() {
               </View>
             )}
           />
-
-          <Button
-            type="primary"
-            label={t("groups.addParticipants")}
-            onPress={goToAddParticipants}
-          />
         </View>
       </View>
+
+      <ParticipantsScreen />
     </AppLayout>
   );
 }
