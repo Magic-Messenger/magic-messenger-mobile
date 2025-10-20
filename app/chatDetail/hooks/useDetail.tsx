@@ -19,6 +19,7 @@ import {
 
 import {
   getApiChatsMessages,
+  useDeleteApiChatsDelete,
   usePostApiChatsCreate,
   usePostApiChatsSendMessage,
 } from "@/api/endpoints/magicMessenger";
@@ -30,6 +31,7 @@ import {
   convertMessageStatus,
   convertMessageType,
   encrypt,
+  showToast,
   trackEvent,
   userPublicKey,
 } from "@/utils";
@@ -67,6 +69,7 @@ export const useDetail = () => {
 
   const { mutateAsync: sendApiMessage } = usePostApiChatsSendMessage();
   const { mutateAsync: createApiChat } = usePostApiChatsCreate();
+  const { mutateAsync: deleteChat } = useDeleteApiChatsDelete();
 
   const usersPublicKey = useMemo(
     () => ({
@@ -344,31 +347,41 @@ export const useDetail = () => {
     };
   }, [magicHubClient, chatId, currentUserName]);
 
-  const onAction = () => {
-    const options = ["Block", "Delete", "Cancel"];
-    const destructiveButtonIndex = 0;
-    const cancelButtonIndex = 2;
+  const handleDeleteChat = useCallback(async () => {
+    try {
+      const response = await deleteChat({
+        params: {
+          chatId: chatId || (contactChatId as string),
+        },
+      });
+      if (response?.success) {
+        trackEvent("chat_deleted", { chatId });
+        showToast({
+          type: "success",
+          text1: t("chatDetail.delete.success"),
+        });
+        router.back();
+      }
+    } catch (error) {
+      trackEvent("error_deleting_chat", { chatId, error });
+    }
+  }, [chatId, contactChatId, deleteChat, showToast, router]);
 
+  const onAction = () => {
     showActionSheetWithOptions(
       {
-        options,
-        cancelButtonIndex,
-        destructiveButtonIndex,
-        title: "Test",
-        message: "Action Sheet Example",
+        options: [
+          t("chatDetail.delete.confirm"),
+          t("chatDetail.delete.cancel"),
+        ],
+        title: t("chatDetail.delete.title"),
+        message: t("chatDetail.delete.message"),
+        destructiveButtonIndex: 0,
+        cancelButtonIndex: 1,
       },
-      (selectedIndex: number) => {
-        switch (selectedIndex) {
-          case 1:
-            // Save
-            break;
-
-          case destructiveButtonIndex:
-            // Delete
-            break;
-
-          case cancelButtonIndex:
-          // Canceled
+      (selectedIndex?: number) => {
+        if (selectedIndex === 0) {
+          handleDeleteChat();
         }
       },
     );
@@ -376,13 +389,14 @@ export const useDetail = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity onPress={onAction}>
-          <Icon type="feather" name="more-vertical" size={18} />
-        </TouchableOpacity>
-      ),
+      headerRight: () =>
+        chatId ? (
+          <TouchableOpacity onPress={onAction}>
+            <Icon type="feather" name="more-vertical" size={18} />
+          </TouchableOpacity>
+        ) : null,
     });
-  }, [navigation]);
+  }, [navigation, chatId]);
 
   return {
     t,

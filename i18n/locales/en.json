@@ -267,6 +267,13 @@
   },
   "chatDetail": {
     "writeMessage": "Write a message...",
-    "replyingTo": "Replying to"
+    "replyingTo": "Replying to",
+    "delete": {
+      "title": "Delete Chat",
+      "message": "Are you sure you want to delete this chat?",
+      "success": "Chat deleted successfully",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    }
   }
 }

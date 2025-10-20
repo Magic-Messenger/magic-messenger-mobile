@@ -1,15 +1,29 @@
+import { useActionSheet } from "@expo/react-native-action-sheet";
 import { FlashListRef } from "@shopify/flash-list";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { throttle } from "lodash";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useTranslation } from "react-i18next";
-import { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
+import {
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  TouchableOpacity,
+} from "react-native";
 
 import {
   getApiChatsGroupMessages,
+  useDeleteApiChatsDelete,
   usePostApiChatsSendMessage,
 } from "@/api/endpoints/magicMessenger";
 import { MessageDto, MessageType } from "@/api/models";
+import { Icon } from "@/components";
 import { UploadFileResultDto } from "@/constants";
 import { useSignalRStore, useUserStore } from "@/store";
 import {
@@ -17,6 +31,7 @@ import {
   convertMessageType,
   decryptGroupKeyForUser,
   encryptForGroup,
+  showToast,
   trackEvent,
   userPrivateKey,
   userPublicKey,
@@ -29,6 +44,8 @@ export const useDetail = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const listRef = useRef<FlashListRef<MessageDto>>(null);
+  const { showActionSheetWithOptions } = useActionSheet();
+  const navigation = useNavigation();
 
   const [replyMessage, setReplyMessage] = useState<MessageDto | null>(null);
   const [messages, setMessages] = useState<MessageDto[]>([]);
@@ -46,6 +63,8 @@ export const useDetail = () => {
 
   const { userName: currentUserName } = useUserStore();
   const magicHubClient = useSignalRStore((s) => s.magicHubClient);
+
+  const { mutateAsync: deleteChat } = useDeleteApiChatsDelete();
 
   const {
     chatId,
@@ -273,6 +292,57 @@ export const useDetail = () => {
     };
   }, [magicHubClient, chatId, currentUserName]);
   //#endregion
+
+  const handleDeleteChat = useCallback(async () => {
+    try {
+      const response = await deleteChat({
+        params: {
+          chatId: chatId || (contactChatId as string),
+        },
+      });
+      if (response?.success) {
+        trackEvent("chat_deleted", { chatId });
+        showToast({
+          type: "success",
+          text1: t("chatDetail.delete.success"),
+        });
+        router.back();
+      }
+    } catch (error) {
+      trackEvent("error_deleting_chat", { chatId, error });
+    }
+  }, [chatId, showToast, router]);
+
+  const onAction = () => {
+    showActionSheetWithOptions(
+      {
+        options: [
+          t("chatDetail.delete.confirm"),
+          t("chatDetail.delete.cancel"),
+        ],
+        title: t("chatDetail.delete.title"),
+        message: t("chatDetail.delete.message"),
+        destructiveButtonIndex: 0,
+        cancelButtonIndex: 1,
+      },
+      (selectedIndex?: number) => {
+        if (selectedIndex === 0) {
+          handleDeleteChat();
+        }
+      },
+    );
+  };
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () =>
+        chatId ? (
+          <TouchableOpacity onPress={onAction}>
+            <Icon type="feather" name="more-vertical" size={18} />
+          </TouchableOpacity>
+        ) : null,
+    });
+  }, [navigation, chatId]);
 
   return {
     t,
