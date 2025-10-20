@@ -1,9 +1,21 @@
+import { useActionSheet } from "@expo/react-native-action-sheet";
 import { FlashListRef } from "@shopify/flash-list";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { throttle } from "lodash";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useTranslation } from "react-i18next";
-import { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
+import {
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  TouchableOpacity,
+} from "react-native";
 
 import {
   getApiChatsMessages,
@@ -11,6 +23,7 @@ import {
   usePostApiChatsSendMessage,
 } from "@/api/endpoints/magicMessenger";
 import { MessageDto, MessageType } from "@/api/models";
+import { Icon } from "@/components";
 import { UploadFileResultDto } from "@/constants";
 import { useSignalRStore, useUserStore } from "@/store";
 import {
@@ -27,7 +40,9 @@ const SCROLL_THRESHOLD = 100;
 export const useDetail = () => {
   const { t } = useTranslation();
   const router = useRouter();
+  const navigation = useNavigation();
   const listRef = useRef<FlashListRef<MessageDto>>(null);
+  const { showActionSheetWithOptions } = useActionSheet();
 
   const [replyMessage, setReplyMessage] = useState<MessageDto | null>(null);
   const [messages, setMessages] = useState<MessageDto[]>([]);
@@ -58,7 +73,7 @@ export const useDetail = () => {
       receiverPublicKey: publicKey as string,
       senderPrivateKey: userPublicKey() as string,
     }),
-    [publicKey]
+    [publicKey],
   );
 
   useEffect(() => {
@@ -117,7 +132,7 @@ export const useDetail = () => {
         }
       }
     },
-    [chatId, pagination.pageSize, pagination.hasMore]
+    [chatId, pagination.pageSize, pagination.hasMore],
   );
 
   useEffect(() => {
@@ -148,9 +163,9 @@ export const useDetail = () => {
           }
         },
         1000,
-        { leading: true, trailing: false }
+        { leading: true, trailing: false },
       ),
-    [pagination.hasMore, pagination.currentPage, loadMessages]
+    [pagination.hasMore, pagination.currentPage, loadMessages],
   );
 
   const handleReply = useCallback((message: MessageDto) => {
@@ -177,7 +192,7 @@ export const useDetail = () => {
               content: encrypt(
                 message as string,
                 usersPublicKey.receiverPublicKey,
-                usersPublicKey.senderPrivateKey
+                usersPublicKey.senderPrivateKey,
               ),
             }),
             ...(isFileMessage && {
@@ -187,7 +202,7 @@ export const useDetail = () => {
                 filePath: encrypt(
                   message.fileUrl as string,
                   usersPublicKey.receiverPublicKey,
-                  usersPublicKey.senderPrivateKey
+                  usersPublicKey.senderPrivateKey,
                 ),
               },
             }),
@@ -204,7 +219,7 @@ export const useDetail = () => {
         console.error("Error sending message:", error);
       }
     },
-    [chatId, usersPublicKey, replyMessage, sendApiMessage, onClearReply]
+    [chatId, usersPublicKey, replyMessage, sendApiMessage, onClearReply],
   );
 
   const handleChatControl = useCallback(
@@ -238,7 +253,7 @@ export const useDetail = () => {
                   content: encrypt(
                     message as string,
                     usersPublicKey.receiverPublicKey,
-                    usersPublicKey.senderPrivateKey
+                    usersPublicKey.senderPrivateKey,
                   ),
                 }),
                 ...(isFileMessage && {
@@ -248,7 +263,7 @@ export const useDetail = () => {
                     filePath: encrypt(
                       message.fileUrl as string,
                       usersPublicKey.receiverPublicKey,
-                      usersPublicKey.senderPrivateKey
+                      usersPublicKey.senderPrivateKey,
                     ),
                   },
                 }),
@@ -274,7 +289,7 @@ export const useDetail = () => {
       usersPublicKey,
       replyMessage,
       onClearReply,
-    ]
+    ],
   );
 
   useEffect(() => {
@@ -328,6 +343,46 @@ export const useDetail = () => {
       magicHubClient.off("message_received");
     };
   }, [magicHubClient, chatId, currentUserName]);
+
+  const onAction = () => {
+    const options = ["Block", "Delete", "Cancel"];
+    const destructiveButtonIndex = 0;
+    const cancelButtonIndex = 2;
+
+    showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+        destructiveButtonIndex,
+        title: "Test",
+        message: "Action Sheet Example",
+      },
+      (selectedIndex: number) => {
+        switch (selectedIndex) {
+          case 1:
+            // Save
+            break;
+
+          case destructiveButtonIndex:
+            // Delete
+            break;
+
+          case cancelButtonIndex:
+          // Canceled
+        }
+      },
+    );
+  };
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={onAction}>
+          <Icon type="feather" name="more-vertical" size={18} />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
 
   return {
     t,

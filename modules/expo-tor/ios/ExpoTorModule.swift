@@ -78,6 +78,7 @@ public class ExpoTorModule: Module {
       let method = options?["method"] as? String ?? "GET"
       let headers = options?["headers"] as? [String: String]
       let body = options?["body"] as? String
+
       TorHTTPClient.shared.makeRequest(
         url: url,
         method: method,
