@@ -12,6 +12,7 @@ export default function CreateGroupChatScreen() {
     control,
     errors,
     participants,
+    isLoadingChatCreate,
     handleSubmit,
     goToAddParticipants,
     removeParticipant,
@@ -28,6 +29,7 @@ export default function CreateGroupChatScreen() {
           label={t("groups.create")}
           disabled={participants?.length === 0}
           onPress={handleSubmit}
+          loading={isLoadingChatCreate}
         />
       }
     >

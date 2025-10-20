@@ -44,7 +44,8 @@ export const useCreateGroup = () => {
   const { userName } = useUserStore();
   const styles = useThemedStyles(createStyles);
 
-  const { mutateAsync: createGroup } = usePostApiChatsCreate();
+  const { mutateAsync: createGroup, isPending: isLoadingChatCreate } =
+    usePostApiChatsCreate();
   const { participants, removeParticipant, clearParticipants } =
     useGroupChatCreateStore();
 
@@ -65,7 +66,7 @@ export const useCreateGroup = () => {
         const encryptedData = encryptGroupKeyForUser(
           groupKey,
           publicKey as never,
-          userPrivateKey() as string
+          userPrivateKey() as string,
         );
 
         return {
@@ -105,6 +106,7 @@ export const useCreateGroup = () => {
     errors,
     isSubmitting,
     participants,
+    isLoadingChatCreate,
     handleSubmit: handleSubmit(onSubmit),
     goToAddParticipants,
     removeParticipant,

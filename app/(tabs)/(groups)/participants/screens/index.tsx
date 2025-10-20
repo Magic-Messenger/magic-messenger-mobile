@@ -50,7 +50,7 @@ export default function ParticipantsScreen() {
 
   const filteredData = useMemo(() => {
     return contactData?.data?.filter((x) =>
-      x.nickname?.toLocaleLowerCase()?.includes(searchText?.toLowerCase())
+      x.nickname?.toLocaleLowerCase()?.includes(searchText?.toLowerCase()),
     );
   }, [searchText, contactData?.data]);
 
@@ -74,7 +74,7 @@ export default function ParticipantsScreen() {
         }}
         customAction={
           participants?.find(
-            (x) => x.contactUsername === item.contactUsername
+            (x) => x.contactUsername === item.contactUsername,
           ) ? (
             <Icon type="ant" name="checkcircle" color={colors.colors.white} />
           ) : (
@@ -92,7 +92,7 @@ export default function ParticipantsScreen() {
   useFocusEffect(
     useCallback(() => {
       refetch();
-    }, [])
+    }, []),
   );
 
   return (
@@ -113,7 +113,7 @@ export default function ParticipantsScreen() {
         ListHeaderComponent={
           <Input
             placeholder={t("common.search")}
-            style={[styles.mt5, styles.mb5]}
+            style={[styles.mb5]}
             onChangeText={(_text) => setSearchText(_text)}
             rightIcon={{
               type: "ant",
