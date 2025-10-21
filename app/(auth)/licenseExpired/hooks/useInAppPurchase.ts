@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import { Linking, Platform } from "react-native";
 
 import {
-  useGetApiAccountGetProfile,
   usePostApiInAppPurchaseValidateAppleReceipt,
   usePostApiInAppPurchaseValidateGoogleReceipt,
 } from "@/api/endpoints/magicMessenger";
@@ -31,8 +30,6 @@ export const useInAppPurchase = () => {
   const { t } = useTranslation();
 
   const userName = useUserStore((state) => state.userName);
-  const setProfile = useUserStore((state) => state.setProfile);
-  const isLogin = useUserStore((state) => state.isLogin);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -48,9 +45,6 @@ export const useInAppPurchase = () => {
     onPurchaseSuccess: completePurchase,
   });
 
-  const { refetch: getProfile } = useGetApiAccountGetProfile({
-    query: { enabled: false },
-  });
   const { mutateAsync: validateApple } =
     usePostApiInAppPurchaseValidateAppleReceipt();
   const { mutateAsync: validateGoogle } =
@@ -96,7 +90,7 @@ export const useInAppPurchase = () => {
 
       setIsLoading(false);
     } catch (error) {
-      console.error("Failed to complete purchase:", error);
+      trackEvent("Failed to complete purchase:", { error });
       setIsLoading(false);
     }
   }
@@ -106,18 +100,13 @@ export const useInAppPurchase = () => {
       text1: t("license.successUpgrade"),
       type: "success",
     });
-    if (isLogin) {
-      const profileDataResponse = await getProfile();
-      profileDataResponse.data?.data &&
-        setProfile(profileDataResponse.data?.data);
-    } else {
-      router.replace("/(auth)/login/screens/login");
-    }
+    router.canDismiss() && router.dismissAll();
+    router.replace("/(auth)/login/screens/login");
   };
 
   const handlePurchase = async (productId: string) => {
     try {
-      trackEvent("handlePurchase: " + productId);
+      trackEvent("handlePurchase: ", { productId });
       await requestPurchase({
         type: "in-app",
         request: {
@@ -130,7 +119,7 @@ export const useInAppPurchase = () => {
         },
       });
     } catch (error) {
-      console.error("Purchase failed:", error);
+      trackEvent("Purchase failed:", { error });
     }
   };
 

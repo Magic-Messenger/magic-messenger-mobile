@@ -2,6 +2,8 @@
   "welcome": "Welcome",
   "or": "or",
   "back": "Back",
+  "loading": "Loading",
+  "image_not_loading": "Image could not load",
   "common": {
     "successCopy": "Successfully Copied",
     "cancel": "Cancel",
@@ -55,6 +57,10 @@
     "yourAccountDeleted": "Your account has been deleted",
     "description": "Your Magic Messenger user account has been deleted successfully.",
     "createAccount": "Create account"
+  },
+  "licenseExpired": {
+    "yourLicenseExpired": "Your license has been expired",
+    "description": "Purchase a Magic license to continue using the application and its benefits."
   },
   "forgotAccount": {
     "title": "Forgot Your Password",
@@ -187,6 +193,7 @@
     "price": "PRICE",
     "oneTime": "ONE TIME",
     "buyNow": "BUY NOW",
+    "purchaseOnWeb": "Purchase on Web",
     "optionsForRenewal": "Options for Renewal",
     "copyLicenseCode": "Copy License Code",
     "activeLicenseText": "Active license code",

@@ -2,7 +2,7 @@ import * as Clipboard from "expo-clipboard";
 import { useTranslation } from "react-i18next";
 import { StyleSheet } from "react-native";
 
-import { Fonts, spacing } from "@/constants";
+import { Fonts, spacing, textStyle } from "@/constants";
 import { useUserStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
 import { fontPixel, heightPixel, showToast, widthPixel } from "@/utils";
@@ -65,15 +65,7 @@ const createStyle = (colors: ColorDto) =>
       fontSize: fontPixel(10),
       fontFamily: Fonts.SFProRegular,
     },
-
-    container: { padding: 20 },
-    status: { fontSize: 16, marginBottom: 20 },
-    product: {
-      padding: 15,
-      marginVertical: 5,
-      backgroundColor: "#f0f0f0",
-      borderRadius: 8,
+    title: {
+      ...textStyle(16, colors.white, "bold"),
     },
-    title: { fontSize: 16, fontWeight: "bold" },
-    price: { fontSize: 14, color: "#666", marginVertical: 5 },
   });

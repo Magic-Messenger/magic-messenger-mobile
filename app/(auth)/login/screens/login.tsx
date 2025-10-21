@@ -92,7 +92,11 @@ export default function LoginScreen() {
 
         {userName && (
           <View style={[styles.alignItemsCenter, styles.mb5]}>
-            <AppImage source={Images.logo} style={styles.logoImage} />
+            <AppImage
+              source={Images.logo}
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
             <ThemedText weight="semiBold" style={styles.pt2}>
               {t("login.userName", {
                 userName,

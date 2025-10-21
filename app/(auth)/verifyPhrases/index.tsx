@@ -68,7 +68,11 @@ export default function VerifyPhrasesScreen() {
     >
       <View style={[styles.mainContainer, styles.pt10]}>
         <View style={[styles.alignItemsCenter, styles.mb5]}>
-          <AppImage source={Images.logo} style={styles.logoImage} />
+          <AppImage
+            source={Images.logo}
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
           <ThemedText weight="semiBold" style={styles.pt2}>
             {t("forgotAccount.userResetPassword")}
           </ThemedText>

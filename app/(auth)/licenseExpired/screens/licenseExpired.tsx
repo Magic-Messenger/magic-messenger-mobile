@@ -1,13 +1,20 @@
-import dayjs from "dayjs";
 import React from "react";
-import { ActivityIndicator, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 
-import { AppLayout, Button, Icon, ProductItem, ThemedText } from "@/components";
+import {
+  AppImage,
+  AppLayout,
+  Button,
+  Icon,
+  ProductItem,
+  ThemedText,
+} from "@/components";
+import { Images } from "@/constants";
 
-import { useInAppPurchase, useLicense } from "../hooks";
+import { useInAppPurchase, useLicenseExpired } from "../hooks";
 
 export default function LicenseScreen() {
-  const { t, styles, profile, handleCopy } = useLicense();
+  const { t, styles } = useLicenseExpired();
   const { products, handlePurchase, handlePurchaseOnWeb, isLoading } =
     useInAppPurchase();
 
@@ -15,7 +22,7 @@ export default function LicenseScreen() {
     <AppLayout
       container
       scrollable
-      title={t("license.title")}
+      showBadge={false}
       loading={isLoading}
       footer={
         <Button
@@ -26,36 +33,24 @@ export default function LicenseScreen() {
         />
       }
     >
-      <ThemedText type="title" weight="semiBold" size={20}>
-        {t("license.yourLicense")}
-      </ThemedText>
+      <View style={[styles.alignItemsCenter, styles.mb5]}>
+        <AppImage
+          source={Images.logo}
+          style={styles.logoImage}
+          resizeMode="contain"
+        />
+      </View>
+
+      <View style={styles.container}>
+        <ThemedText type="title" style={styles.textCenter}>
+          {t("licenseExpired.yourLicenseExpired")}
+        </ThemedText>
+        <ThemedText type="subtitle" style={[styles.mt4, styles.textCenter]}>
+          {t("licenseExpired.description")}
+        </ThemedText>
+      </View>
 
       <View style={[styles.flex, styles.mt2]}>
-        <View style={styles.licenseContainer}>
-          <View>
-            <ThemedText style={styles.activeLicenseText}>
-              {t("license.activeLicenseText")}
-            </ThemedText>
-            <TouchableOpacity onPress={handleCopy}>
-              <ThemedText style={styles.licenseCodeText}>
-                <Icon type="feather" name="copy" size={14} />{" "}
-                {profile?.license?.licenseCode}
-              </ThemedText>
-            </TouchableOpacity>
-          </View>
-          <View>
-            <View style={styles.expireDateContainer}>
-              <ThemedText style={styles.expireLicenseDate}>
-                {t("license.expireLicenseDate", {
-                  expireDate: dayjs(profile?.license?.expirationDate).format(
-                    "DD.MM.YYYY",
-                  ),
-                })}
-              </ThemedText>
-            </View>
-          </View>
-        </View>
-
         <View style={styles.mt4}>
           {!products?.length ? (
             <View

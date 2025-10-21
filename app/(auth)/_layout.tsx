@@ -37,6 +37,13 @@ export default function AuthScreen() {
       />
 
       <Stack.Screen
+        name="licenseExpired/screens/licenseExpired"
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
         name="register/index"
         options={{
           headerShown: true,

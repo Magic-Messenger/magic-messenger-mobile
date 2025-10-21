@@ -28,7 +28,11 @@ export default function PreLoginScreen() {
           styles.justifyContentCenter,
         ]}
       >
-        <AppImage source={Images.logo} style={styles.logoImage} />
+        <AppImage
+          source={Images.logo}
+          style={styles.logoImage}
+          resizeMode="contain"
+        />
         <ThemedText weight="semiBold" style={styles.pt2}>
           {t("welcome")}
         </ThemedText>

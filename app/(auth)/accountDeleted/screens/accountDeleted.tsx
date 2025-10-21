@@ -29,7 +29,11 @@ export default function AccountDeletedScreen() {
         ]}
       >
         <View style={[styles.alignItemsCenter, styles.mb5]}>
-          <AppImage source={Images.logo} style={styles.logoImage} />
+          <AppImage
+            source={Images.logo}
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
         </View>
 
         <View style={styles.formContainer}>

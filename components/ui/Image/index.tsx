@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { JSX, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Image,
   ImageProps,
+  ImageStyle,
   StyleSheet,
   Text,
   TextStyle,
@@ -15,7 +17,7 @@ import { fontPixel, heightPixel, spacingPixel } from "@/utils";
 
 interface AppImageProps extends Omit<ImageProps, "onLoad" | "onError"> {
   source: ImageProps["source"];
-  style?: ViewStyle;
+  style?: ImageStyle;
   fallbackSource?: ImageProps["source"];
   placeholder?: string;
   errorText?: string;
@@ -29,9 +31,8 @@ interface AppImageProps extends Omit<ImageProps, "onLoad" | "onError"> {
 export const AppImage: React.FC<AppImageProps> = ({
   source,
   style,
-  fallbackSource,
-  placeholder = "Yükleniyor...",
-  errorText = "Resim yüklenemedi",
+  placeholder = "loading",
+  errorText = "image_not_load",
   onPress,
   onLoad,
   onError,
@@ -39,6 +40,7 @@ export const AppImage: React.FC<AppImageProps> = ({
   showLoading = true,
   ...props
 }) => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
 
@@ -81,8 +83,8 @@ export const AppImage: React.FC<AppImageProps> = ({
         />
         {loading && showLoading && (
           <View style={styles.loadingOverlay}>
-            <ActivityIndicator size="small" color="#666" />
-            <Text style={styles.loadingText}>{placeholder}</Text>
+            <ActivityIndicator size="small" />
+            <Text style={styles.loadingText}>{t(placeholder)}</Text>
           </View>
         )}
       </View>
@@ -101,7 +103,7 @@ export const AppImage: React.FC<AppImageProps> = ({
 };
 
 interface Styles {
-  image: ViewStyle;
+  image: ImageStyle;
   placeholder: ViewStyle;
   errorText: TextStyle;
   loadingOverlay: ViewStyle;
