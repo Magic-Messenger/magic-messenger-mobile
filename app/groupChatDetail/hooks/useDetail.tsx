@@ -1,4 +1,3 @@
-import { useActionSheet } from "@expo/react-native-action-sheet";
 import { FlashListRef } from "@shopify/flash-list";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { throttle } from "lodash";
@@ -45,7 +44,6 @@ export const useDetail = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const listRef = useRef<FlashListRef<MessageDto>>(null);
-  const { showActionSheetWithOptions } = useActionSheet();
   const navigation = useNavigation();
 
   const [replyMessage, setReplyMessage] = useState<MessageDto | null>(null);
@@ -152,9 +150,7 @@ export const useDetail = () => {
   );
 
   useEffect(() => {
-    if (chatId) {
-      loadMessages(1);
-    }
+    if (chatId) loadMessages(1);
   }, [chatId]);
 
   useEffect(() => {
@@ -299,7 +295,7 @@ export const useDetail = () => {
     try {
       const response = await deleteChat({
         params: {
-          chatId: chatId || (contactChatId as string),
+          chatId: chatId as string,
         },
       });
       if (response?.success) {
@@ -323,9 +319,7 @@ export const useDetail = () => {
         {
           text: t("chatDetail.delete.confirm"),
           style: "destructive",
-          onPress: () => {
-            handleDeleteChat();
-          },
+          onPress: handleDeleteChat,
         },
         {
           text: t("chatDetail.delete.cancel"),
@@ -341,7 +335,7 @@ export const useDetail = () => {
       headerRight: () =>
         chatId ? (
           <TouchableOpacity onPress={onAction}>
-            <Icon type="feather" name="more-vertical" size={18} />
+            <Icon type="feather" name="trash" />
           </TouchableOpacity>
         ) : null,
     });

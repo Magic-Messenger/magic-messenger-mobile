@@ -4,7 +4,7 @@ import { StyleSheet, View } from "react-native";
 
 import { AppImage, ThemedText, TorBadge } from "@/components";
 import { Images } from "@/constants";
-import { ColorDto, useThemedStyles } from "@/theme";
+import { useThemedStyles } from "@/theme";
 import { spacingPixel, widthPixel } from "@/utils";
 
 interface ChatHeaderProps {
@@ -76,7 +76,7 @@ export function ChatHeader({
   );
 }
 
-const createStyle = (colors: ColorDto) =>
+const createStyle = () =>
   StyleSheet.create({
     container: {
       paddingHorizontal: spacingPixel(15),

@@ -30,7 +30,7 @@ export default function ParticipantsScreen() {
   const { participants, setParticipants, removeParticipant } =
     useGroupChatCreateStore();
 
-  const { data: contactData, isLoading, refetch } = useGetApiContactsList();
+  const { data: contactData, refetch } = useGetApiContactsList();
 
   const [searchText, setSearchText] = useState<string>("");
 
@@ -40,42 +40,54 @@ export default function ParticipantsScreen() {
     );
   }, [searchText, contactData?.data]);
 
-  const handleSelectContact = (contact: ContactDto) => {
-    if (
-      participants?.find((x) => x?.contactUsername === contact?.contactUsername)
-    ) {
-      removeParticipant(contact?.contactUsername as string);
-    } else {
-      setParticipants(contact);
-    }
-  };
+  const handleSelectContact = useCallback(
+    (contact: ContactDto) => {
+      if (
+        participants?.find(
+          (x) => x?.contactUsername === contact?.contactUsername,
+        )
+      ) {
+        removeParticipant(contact?.contactUsername as string);
+      } else {
+        setParticipants(contact);
+      }
+    },
+    [participants],
+  );
 
-  const renderContactItem = ({ item }: { item: ContactDto }) => {
-    return (
-      <View style={styles.mb3}>
-        <ContactItem
-          nickname={item.nickname as string}
-          contactUsername={item.contactUsername as string}
-          onAction={{
-            onPress: () => handleSelectContact(item),
-          }}
-          customAction={
-            participants?.find(
-              (x) => x.contactUsername === item.contactUsername,
-            ) ? (
-              <Icon type="ant" name="checkcircle" color={colors.colors.white} />
-            ) : (
-              <></>
-            )
-          }
-        />
-      </View>
-    );
-  };
+  const renderContactItem = useCallback(
+    ({ item }: { item: ContactDto }) => {
+      return (
+        <View style={styles.mb3}>
+          <ContactItem
+            nickname={item.nickname as string}
+            contactUsername={item.contactUsername as string}
+            onAction={{
+              onPress: () => handleSelectContact(item),
+            }}
+            customAction={
+              participants?.find(
+                (x) => x.contactUsername === item.contactUsername,
+              ) ? (
+                <Icon
+                  type="ant"
+                  name="checkcircle"
+                  color={colors.colors.white}
+                />
+              ) : (
+                <></>
+              )
+            }
+          />
+        </View>
+      );
+    },
+    [handleSelectContact, participants],
+  );
 
-  const handleSelectParticipants = () => {
+  const handleSelectParticipants = useCallback(() => {
     modalRef.current?.close();
-  };
+  }, [modalRef]);
 
   useFocusEffect(
     useCallback(() => {
@@ -106,6 +118,7 @@ export default function ParticipantsScreen() {
           }}
           inputStyle={{
             backgroundColor: colors.colors.secondarySelected,
+            borderRadius: spacingPixel(10),
           }}
         />
         <FlashList

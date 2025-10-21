@@ -375,9 +375,7 @@ export const useDetail = () => {
         {
           text: t("chatDetail.delete.confirm"),
           style: "destructive",
-          onPress: () => {
-            handleDeleteChat();
-          },
+          onPress: handleDeleteChat,
         },
         {
           text: t("chatDetail.delete.cancel"),
@@ -393,7 +391,7 @@ export const useDetail = () => {
       headerRight: () =>
         chatId ? (
           <TouchableOpacity onPress={onAction}>
-            <Icon type="feather" name="more-vertical" size={18} />
+            <Icon type="feather" name="trash" />
           </TouchableOpacity>
         ) : null,
     });

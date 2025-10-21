@@ -63,6 +63,7 @@
     "inputPhrases": "Security Key",
     "userResetPassword": "Password Reset"
   },
+  "groupName": "Group Name",
   "userName": "Username",
   "password": "Password",
   "confirmPassword": "Confirm Password",

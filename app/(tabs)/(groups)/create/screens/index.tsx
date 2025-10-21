@@ -39,12 +39,12 @@ export default function CreateGroupChatScreen() {
           label={t("groups.groupName")}
           rules={{
             required: t("inputError.required", {
-              field: t("userName"),
+              field: t("groupName"),
             }),
             minLength: {
               value: 3,
               message: t("inputError.minLength", {
-                field: t("userName"),
+                field: t("groupName"),
                 count: 3,
               }),
             },
@@ -59,10 +59,13 @@ export default function CreateGroupChatScreen() {
 
           <FlatList
             data={participants}
+            scrollEnabled={false}
             contentContainerStyle={styles.participantContainer}
             renderItem={({ item }) => (
               <View style={[styles.participantItem]}>
-                <ThemedText>{item?.contactUsername}</ThemedText>
+                <ThemedText>
+                  {item?.nickname ?? item?.contactUsername}
+                </ThemedText>
                 <TouchableOpacity
                   onPress={() =>
                     removeParticipant(item?.contactUsername as string)
