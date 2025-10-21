@@ -34,7 +34,7 @@ export default function ContactEdit() {
     <AppLayout
       container
       scrollable
-      title={<ContactScanQr />}
+      title={<ContactScanQr showScanQr={false} />}
       footer={
         <>
           <Button

@@ -42,7 +42,11 @@ export default function SettingsScreen() {
       label: t("settings.scan-qr"),
       iconType: "ionicons",
       iconName: "qr-code-outline",
-      onPress: () => router.push("/(tabs)/(settings)/scanQr/screens/scanQr"),
+      onPress: () =>
+        router.push({
+          pathname: "/(tabs)/(settings)/scanQr/screens/scanQr",
+          params: { goToPage: "contact.add" },
+        }),
     },
     {
       label: t("settings.license"),

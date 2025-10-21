@@ -1,25 +1,26 @@
 import { BarcodeScanningResult } from "expo-camera";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { StyleSheet } from "react-native";
 
+import { useQrStore } from "@/store";
 import { useThemedStyles } from "@/theme";
 import { heightPixel, widthPixel } from "@/utils";
 
 export const useScanQr = () => {
   const { t } = useTranslation();
   const styles = useThemedStyles(createStyle);
+  const { setQrCode } = useQrStore();
+  const { goToPage } = useLocalSearchParams();
 
   const barcodeScanned = async (barcode: BarcodeScanningResult) => {
     if (barcode?.data) {
-      router.back();
-
-      setTimeout(() => {
-        router.push({
-          pathname: "/(tabs)/(settings)/contacts/screens/add",
-          params: { username: barcode?.data },
-        });
-      }, 250);
+      setQrCode(barcode.data);
+      if (goToPage === "contact.add") {
+        router.replace("/(tabs)/(settings)/contacts/screens/add");
+      } else {
+        router.back();
+      }
     }
   };
 

@@ -1,16 +1,17 @@
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 import { usePostApiContactsCreate } from "@/api/endpoints/magicMessenger";
 import { CreateContactCommandRequest } from "@/api/models";
+import { useQrStore } from "@/store";
 import { useThemedStyles } from "@/theme";
 import { showToast } from "@/utils";
 
 export const useAddContact = () => {
   const { t } = useTranslation();
-  const { username } = useLocalSearchParams();
+  const { qrCode: username, setQrCode } = useQrStore();
   const styles = useThemedStyles();
 
   const {
@@ -40,6 +41,10 @@ export const useAddContact = () => {
     if (username) {
       reset({ username: username as string, nickname: "" });
     }
+
+    return () => {
+      setQrCode("");
+    };
   }, [username, reset]);
 
   return {
