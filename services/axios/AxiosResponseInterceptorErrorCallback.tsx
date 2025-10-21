@@ -14,10 +14,7 @@ const AxiosResponseInterceptorErrorCallback = (error: AxiosError) => {
 
   if (response) {
     if (unauthorizedCode.includes(response.status)) {
-      useUserStore.setState({
-        isLogin: false,
-        accessToken: null,
-      });
+      useUserStore.getState().logout();
     } else {
       const messages =
         (response?.data as { messages: ResultMessage[] })?.messages ||
