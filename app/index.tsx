@@ -66,6 +66,8 @@ export default function IndexPage() {
   };
 
   const initializeAppStart = async (withTimeout?: boolean) => {
+    router.canDismiss() && router.dismissAll();
+
     if (withTimeout) {
       setTimeout(() => {
         setConnected(true);
@@ -93,18 +95,16 @@ export default function IndexPage() {
         } else {
           router.replace("/(auth)/preLogin");
         }
-      }, 500);
+      }, 1500);
     }
   };
 
   useEffect(() => {
     setupInterval();
-
-    initializeAppStart();
   }, []);
 
   useEffect(() => {
-    if (!rehydrated) return;
+    if (!rehydrated || appStarted) return;
 
     if (profile?.enableTor) {
       if (!isTorConnected) {
@@ -114,7 +114,7 @@ export default function IndexPage() {
       // When TOR is disabled, we simulate a connection delay
       initializeAppStart(true);
     }
-  }, [rehydrated, profile, isTorConnected]);
+  }, [rehydrated, appStarted, profile, isTorConnected]);
 
   useEffect(() => {
     trackEvent("app_open", { isLogin, rehydrated });

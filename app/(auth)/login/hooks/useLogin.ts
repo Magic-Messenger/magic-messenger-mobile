@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Alert, StyleSheet } from "react-native";
 
 import {
+  useDeleteApiAccountDeleteProfile,
   useGetApiAccountGetProfile,
   usePostApiAccountLogin,
   usePostApiAccountRegisterDeviceToken,
@@ -29,7 +30,8 @@ interface RegisterFormData {
 
 export const useLogin = () => {
   const { t } = useTranslation();
-  const { login, userName, isLogin, setProfile, setUsername } = useUserStore();
+  const { login, userName, isLogin, profile, setProfile, setUsername } =
+    useUserStore();
   const { mutateAsync: loginApi } = usePostApiAccountLogin();
   const { data: profileResponse, refetch } = useGetApiAccountGetProfile({
     query: { enabled: isLogin },
@@ -38,6 +40,8 @@ export const useLogin = () => {
     usePostApiAccountUpdatePublicKey();
   const { mutateAsync: registerDeviceToken } =
     usePostApiAccountRegisterDeviceToken();
+  const { mutateAsync: deleteAccount, isPending: isDeleteAccountLoading } =
+    useDeleteApiAccountDeleteProfile();
 
   const styles = useThemedStyles(createStyle);
 
@@ -45,6 +49,7 @@ export const useLogin = () => {
     control,
     handleSubmit,
     reset,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>({
     defaultValues: {
@@ -52,6 +57,8 @@ export const useLogin = () => {
       password: __DEV__ ? "Omer123*+" : undefined,
     },
   });
+
+  const password = watch("password");
 
   useEffect(() => {
     if (__DEV__) {
@@ -75,16 +82,43 @@ export const useLogin = () => {
         data?.accessToken?.token as string,
         data?.account?.username as string,
       );
-      router.push("/home");
+
+      router.canDismiss() && router.dismissAll();
+      router.replace("/home");
 
       const token = await registerForPushNotificationsAsync();
       await registerDeviceToken({ data: { deviceToken: token } });
+      await updatePublicKeyApi({
+        data: {
+          publicKey: userPublicKey(),
+        },
+      });
     }
   };
 
   const onChangeAccount = () => {
     setUsername(undefined);
     reset({ username: undefined, password: undefined });
+  };
+
+  const onDeleteAccount = async () => {
+    if (!password) {
+      Alert.alert(
+        t("login.deleteAccountAlertTitle"),
+        t("login.deleteAccountPasswordRequired"),
+      );
+      return;
+    }
+
+    const deleteAccountResponse = await deleteAccount({
+      params: { username: userName as string, password },
+    });
+    if (deleteAccountResponse?.success) {
+      setUsername(undefined);
+      reset({ username: undefined, password: undefined });
+      router.canDismiss() && router.dismissAll();
+      router.replace("/accountDeleted/screens/accountDeleted");
+    }
   };
 
   const handleChangeAccount = () => {
@@ -105,24 +139,27 @@ export const useLogin = () => {
     );
   };
 
-  const handleProfileUpdate = async () => {
-    if (profileResponse?.data) {
-      setProfile(profileResponse?.data);
-
-      const { success: updateSuccess } = await updatePublicKeyApi({
-        data: {
-          publicKey: userPublicKey(),
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      t("login.deleteAccountAlertTitle"),
+      t("login.deleteAccountAlertMessage"),
+      [
+        {
+          text: t("common.cancel"),
+          style: "cancel",
         },
-      });
-      if (!updateSuccess) {
-        Alert.alert(t("login.publicKeyUpdateError"));
-      }
-    }
+        {
+          text: t("login.deleteAccount"),
+          style: "destructive",
+          onPress: onDeleteAccount,
+        },
+      ],
+    );
   };
 
   useEffect(() => {
-    handleProfileUpdate();
-  }, [profileResponse?.data]);
+    if (isLogin && profileResponse?.data) setProfile(profileResponse?.data);
+  }, [isLogin, profileResponse?.data]);
 
   useEffect(() => {
     if (isLogin) refetch();
@@ -137,7 +174,11 @@ export const useLogin = () => {
     onSubmit,
     isSubmitting,
     userName,
+    password,
+    profile,
+    isDeleteAccountLoading,
     handleChangeAccount,
+    handleDeleteAccount,
   };
 };
 

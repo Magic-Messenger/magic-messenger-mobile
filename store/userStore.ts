@@ -64,7 +64,7 @@ export const useUserStore = create<UserStore>()(
       },
       logout: () => {
         set({ isLogin: false, accessToken: null });
-        router.dismissAll();
+        router.canDismiss() && router.dismissAll();
         router.replace("/(auth)/preLogin");
       },
       setProfile: (profile: AccountProfileDto) => {
@@ -90,10 +90,11 @@ export const useUserStore = create<UserStore>()(
         userName: state.userName,
         credentials: state.credentials,
         profile: state.profile,
+        isLogin: state.isLogin,
       }),
       onRehydrateStorage: () => () => {
         useUserStore.setState({ rehydrated: true });
       },
-    }
-  )
+    },
+  ),
 );

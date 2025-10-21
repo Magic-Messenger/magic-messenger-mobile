@@ -3,7 +3,7 @@ import type { AxiosError } from "axios";
 import { ResultMessage } from "@/api/models";
 import { TWO_FACTOR_NOT_SETUP, TWO_FACTOR_VERIFY_REQUIRED } from "@/constants";
 import { useUserStore } from "@/store";
-import { showToast } from "@/utils";
+import { showToast, trackEvent } from "@/utils";
 
 const unauthorizedCode = [401, 419, 440];
 
@@ -11,6 +11,7 @@ const notShowErrorMessages = [TWO_FACTOR_NOT_SETUP, TWO_FACTOR_VERIFY_REQUIRED];
 
 const AxiosResponseInterceptorErrorCallback = (error: AxiosError) => {
   const { response } = error;
+
   if (response) {
     if (unauthorizedCode.includes(response.status)) {
       useUserStore.setState({
@@ -22,7 +23,7 @@ const AxiosResponseInterceptorErrorCallback = (error: AxiosError) => {
         (response?.data as { messages: ResultMessage[] })?.messages ||
         (response?.data as ResultMessage[]) ||
         [];
-      console.warn("Magic Error Messages: ", messages);
+      trackEvent("Magic Error Messages: ", messages);
       if (messages?.length > 0) {
         if (
           !messages.some((message) =>

@@ -38,6 +38,10 @@
     "changeAccount": "Change Account",
     "changeAccountAlertTitle": "Change Account",
     "changeAccountAlertMessage": "Do you want to login with another username? This will clear your current session.",
+    "deleteAccount": "Delete Account",
+    "deleteAccountAlertTitle": "Delete Account",
+    "deleteAccountAlertMessage": "Do you want to delete your account? This process cannot be undone.",
+    "deleteAccountPasswordRequired": "Password is required to delete account",
     "publicKeyUpdateError": "Failed to update public key. Please try again."
   },
   "register": {
@@ -47,8 +51,13 @@
     "subtitle": "If you lose access to your chat space, you will need these 15 words in the correct sequence. To restore, you need the license key, your digit access, and these 15 words in the correct order.",
     "passwordNotMatch": "Passwords do not match"
   },
+  "accountDeleted": {
+    "yourAccountDeleted": "Your account has been deleted",
+    "description": "Your Magic Messenger user account has been deleted successfully.",
+    "createAccount": "Create account"
+  },
   "forgotAccount": {
-    "title": "Forgot Your Password?",
+    "title": "Forgot Your Password",
     "verifyPhrases": "Security Key Verification",
     "resetPassword": "Reset Password",
     "inputPhrases": "Security Key",

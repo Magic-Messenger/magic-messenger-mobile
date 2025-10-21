@@ -247,51 +247,52 @@ export const useDetail = () => {
   );
 
   //#region SignalR Effects
+  const handleTyping = (data: { username: string }) => {
+    if (currentUserName !== data.username) {
+      setTypingUsername(data.username);
+    }
+  };
+
+  const handleStopTyping = (data: { username: string }) => {
+    if (currentUserName !== data.username) {
+      setTypingUsername(null);
+    }
+  };
+
+  const handleGroupMessageReceived = (message: MessageDto) => {
+    trackEvent("group_message_received", { message });
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        ...message,
+        messageType: convertMessageType(message.messageType as never),
+        messageStatus: convertMessageStatus(message.messageStatus as never),
+      },
+    ]);
+
+    setTimeout(() => {
+      listRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+  };
+
   useEffect(() => {
-    if (!magicHubClient || !chatId) return;
-
-    magicHubClient.joinChat(chatId as string);
-
-    const handleTyping = (data: { username: string }) => {
-      if (currentUserName !== data.username) {
-        setTypingUsername(data.username);
-      }
-    };
-
-    const handleStopTyping = (data: { username: string }) => {
-      if (currentUserName !== data.username) {
-        setTypingUsername(null);
-      }
-    };
-
-    const handleGroupMessageReceived = (message: MessageDto) => {
-      trackEvent("group_message_received", { message });
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          ...message,
-          messageType: convertMessageType(message.messageType as never),
-          messageStatus: convertMessageStatus(message.messageStatus as never),
-        },
-      ]);
-
-      setTimeout(() => {
-        listRef.current?.scrollToEnd({ animated: true });
-      }, 100);
-    };
-
-    magicHubClient.on("typing", handleTyping);
-    magicHubClient.on("stop_typing", handleStopTyping);
-    magicHubClient.on("group_message_received", handleGroupMessageReceived);
+    if (magicHubClient && chatId) {
+      magicHubClient.joinChat(chatId as string);
+      magicHubClient.on("typing", handleTyping);
+      magicHubClient.on("stop_typing", handleStopTyping);
+      magicHubClient.on("group_message_received", handleGroupMessageReceived);
+    }
 
     return () => {
-      magicHubClient.leaveChat(chatId as string);
-      magicHubClient.off("typing");
-      magicHubClient.off("stop_typing");
-      magicHubClient.off("group_message_received");
+      if (magicHubClient && chatId) {
+        magicHubClient.leaveChat(chatId as string);
+        magicHubClient.off("typing");
+        magicHubClient.off("stop_typing");
+        magicHubClient.off("group_message_received");
+      }
     };
-  }, [magicHubClient, chatId, currentUserName]);
+  }, [magicHubClient, chatId]);
   //#endregion
 
   const handleDeleteChat = useCallback(async () => {

@@ -64,7 +64,12 @@ export const AxiosInstance = async <T>(
         baseURL: mergedConfig.baseURL || process.env.EXPO_PUBLIC_API_URL,
       });
 
-      console.log("✅ [AXIOS] Tor isteği başarılı:", mergedConfig.url);
+      if (torResponse.status >= 400) {
+        AxiosResponseInterceptorErrorCallback({
+          response: torResponse,
+        } as unknown as AxiosError);
+        Promise.reject({ response: torResponse } as unknown as AxiosError);
+      }
 
       // Response'u axios formatına çevir (interceptor'lar için)
       const axiosFormattedResponse: AxiosResponse = {
@@ -77,6 +82,11 @@ export const AxiosInstance = async <T>(
 
       // Response interceptor'ları çağır (şimdilik sadece başarılı response)
       // Error handling zaten catch bloğunda
+      if (
+        axiosFormattedResponse.status >= 200 &&
+        axiosFormattedResponse.status < 300
+      )
+        console.log("✅ [AXIOS] Tor isteği başarılı:", mergedConfig.url);
 
       // Sadece data'yı döndür (axios instance davranışı)
       return torResponse.data as T;

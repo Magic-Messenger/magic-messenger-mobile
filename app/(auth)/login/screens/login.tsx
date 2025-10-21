@@ -5,6 +5,7 @@ import {
   AppImage,
   AppLayout,
   Button,
+  Icon,
   Input,
   PasswordInput,
   SectionHeader,
@@ -24,7 +25,11 @@ export default function LoginScreen() {
     handleSubmit,
     onSubmit,
     userName,
+    password,
+    profile,
+    isDeleteAccountLoading,
     handleChangeAccount,
+    handleDeleteAccount,
   } = useLogin();
 
   return (
@@ -40,23 +45,40 @@ export default function LoginScreen() {
             onPress={handleSubmit(onSubmit)}
             loading={isSubmitting}
             disabled={isSubmitting}
+            leftIcon={<Icon type="feather" name="log-in" />}
           />
-
-          {userName && (
-            <Button
-              type="danger"
-              label={t("login.changeAccount")}
-              onPress={handleChangeAccount}
-              style={styles.mt2}
-            />
-          )}
 
           <Button
             type="secondary"
             label={t("forgotAccount.title")}
             onPress={() => router.push("/(auth)/verifyPhrases")}
             style={styles.mt2}
+            leftIcon={<Icon type="material" name="question-mark" />}
           />
+
+          {userName && (
+            <>
+              <Button
+                type="default"
+                label={t("login.changeAccount")}
+                onPress={handleChangeAccount}
+                style={styles.mt2}
+                leftIcon={<Icon type="feather" name="refresh-ccw" />}
+              />
+
+              {profile?.deleteButton && (
+                <Button
+                  type="danger"
+                  label={t("login.deleteAccount")}
+                  onPress={handleDeleteAccount}
+                  style={styles.mt2}
+                  loading={isDeleteAccountLoading}
+                  disabled={isDeleteAccountLoading}
+                  leftIcon={<Icon type="feather" name="trash" />}
+                />
+              )}
+            </>
+          )}
         </>
       }
     >

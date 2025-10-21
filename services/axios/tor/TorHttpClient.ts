@@ -96,7 +96,7 @@ class TorHttpClient {
         config,
       };
 
-      console.log(`✅ [TOR] ${response.status} ${fullUrl}`);
+      console.log(`✅ [TOR] ${response.status} ${fullUrl}`, result);
 
       return result;
     } catch (error: any) {

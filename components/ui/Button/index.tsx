@@ -9,7 +9,7 @@ import {
 } from "react-native";
 
 import { Colors, spacing } from "@/constants";
-import { ColorDto, useThemedStyles } from "@/theme";
+import { useThemedStyles } from "@/theme";
 import { heightPixel } from "@/utils";
 
 import { ThemedText, ThemedTextProps } from "../../app/ThemedText";
@@ -96,7 +96,7 @@ export function Button({
   );
 }
 
-const createStyle = (colors: ColorDto) =>
+const createStyle = () =>
   StyleSheet.create({
     button: {
       width: "100%",

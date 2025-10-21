@@ -294,57 +294,58 @@ export const useDetail = () => {
     ],
   );
 
+  const handleUserOnline = (data: { username: string }) => {
+    setOnlineUsers((prev) => [...prev, data.username]);
+  };
+
+  const handleTyping = (data: { username: string }) => {
+    if (currentUserName !== data.username) {
+      setTypingUsername(data.username);
+    }
+  };
+
+  const handleStopTyping = (data: { username: string }) => {
+    if (currentUserName !== data.username) {
+      setTypingUsername(null);
+    }
+  };
+
+  const handleMessageReceived = (message: MessageDto) => {
+    trackEvent("message_received", { message });
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        ...message,
+        messageType: convertMessageType(message.messageType as never),
+        messageStatus: convertMessageStatus(message.messageStatus as never),
+      },
+    ]);
+
+    setTimeout(() => {
+      listRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+  };
+
   useEffect(() => {
-    if (!magicHubClient || !chatId) return;
-
-    magicHubClient.joinChat(chatId as string);
-
-    const handleUserOnline = (data: { username: string }) => {
-      setOnlineUsers((prev) => [...prev, data.username]);
-    };
-
-    const handleTyping = (data: { username: string }) => {
-      if (currentUserName !== data.username) {
-        setTypingUsername(data.username);
-      }
-    };
-
-    const handleStopTyping = (data: { username: string }) => {
-      if (currentUserName !== data.username) {
-        setTypingUsername(null);
-      }
-    };
-
-    const handleMessageReceived = (message: MessageDto) => {
-      trackEvent("message_received", { message });
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          ...message,
-          messageType: convertMessageType(message.messageType as never),
-          messageStatus: convertMessageStatus(message.messageStatus as never),
-        },
-      ]);
-
-      setTimeout(() => {
-        listRef.current?.scrollToEnd({ animated: true });
-      }, 100);
-    };
-
-    magicHubClient.on("user_online", handleUserOnline);
-    magicHubClient.on("typing", handleTyping);
-    magicHubClient.on("stop_typing", handleStopTyping);
-    magicHubClient.on("message_received", handleMessageReceived);
+    if (magicHubClient && chatId) {
+      magicHubClient.joinChat(chatId as string);
+      magicHubClient.on("user_online", handleUserOnline);
+      magicHubClient.on("typing", handleTyping);
+      magicHubClient.on("stop_typing", handleStopTyping);
+      magicHubClient.on("message_received", handleMessageReceived);
+    }
 
     return () => {
-      magicHubClient.leaveChat(chatId as string);
-      magicHubClient.off("user_online");
-      magicHubClient.off("typing");
-      magicHubClient.off("stop_typing");
-      magicHubClient.off("message_received");
+      if (magicHubClient && chatId) {
+        magicHubClient.leaveChat(chatId as string);
+        magicHubClient.off("user_online");
+        magicHubClient.off("typing");
+        magicHubClient.off("stop_typing");
+        magicHubClient.off("message_received");
+      }
     };
-  }, [magicHubClient, chatId, currentUserName]);
+  }, [magicHubClient, chatId]);
 
   const handleDeleteChat = useCallback(async () => {
     try {

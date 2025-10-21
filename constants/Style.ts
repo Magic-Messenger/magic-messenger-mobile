@@ -116,7 +116,9 @@ export const commonStyle = StyleSheet.create({
   fullHeight: {
     height: "100%",
   },
-
+  textCenter: {
+    textAlign: "center",
+  },
   mt1: { ...spacing({ mt: 4 }) },
   mt2: { ...spacing({ mt: 8 }) },
   mt3: { ...spacing({ mt: 12 }) },

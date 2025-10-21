@@ -30,6 +30,13 @@ export default function AuthScreen() {
       />
 
       <Stack.Screen
+        name="accountDeleted/screens/accountDeleted"
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
         name="register/index"
         options={{
           headerShown: true,
