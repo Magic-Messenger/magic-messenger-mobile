@@ -1,5 +1,4 @@
 import React, { JSX, useState } from "react";
-import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Image,
@@ -31,7 +30,6 @@ interface AppImageProps extends Omit<ImageProps, "onLoad" | "onError"> {
 export const AppImage: React.FC<AppImageProps> = ({
   source,
   style,
-  placeholder = "loading",
   errorText = "image_not_load",
   onPress,
   onLoad,
@@ -40,7 +38,6 @@ export const AppImage: React.FC<AppImageProps> = ({
   showLoading = true,
   ...props
 }) => {
-  const { t } = useTranslation();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
 
@@ -81,12 +78,7 @@ export const AppImage: React.FC<AppImageProps> = ({
           resizeMode={resizeMode}
           {...props}
         />
-        {loading && showLoading && (
-          <View style={styles.loadingOverlay}>
-            <ActivityIndicator size="small" />
-            <Text style={styles.loadingText}>{t(placeholder)}</Text>
-          </View>
-        )}
+        {loading && showLoading && <ActivityIndicator size="small" />}
       </View>
     );
   };
@@ -106,7 +98,6 @@ interface Styles {
   image: ImageStyle;
   placeholder: ViewStyle;
   errorText: TextStyle;
-  loadingOverlay: ViewStyle;
   loadingText: TextStyle;
 }
 
@@ -126,16 +117,6 @@ const styles = StyleSheet.create<Styles>({
     color: "#666",
     fontSize: 16,
     textAlign: "center",
-  },
-  loadingOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
-    justifyContent: "center",
-    alignItems: "center",
   },
   loadingText: {
     color: "#666",
