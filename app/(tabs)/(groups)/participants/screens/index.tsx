@@ -3,7 +3,6 @@ import { FlashList } from "@shopify/flash-list";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { View } from "react-native";
 
 import { useGetApiContactsList } from "@/api/endpoints/magicMessenger";
 import { ContactDto } from "@/api/models";
@@ -56,32 +55,24 @@ export default function ParticipantsScreen() {
   );
 
   const renderContactItem = useCallback(
-    ({ item }: { item: ContactDto }) => {
-      return (
-        <View style={styles.mb3}>
-          <ContactItem
-            nickname={item.nickname as string}
-            contactUsername={item.contactUsername as string}
-            onAction={{
-              onPress: () => handleSelectContact(item),
-            }}
-            customAction={
-              participants?.find(
-                (x) => x.contactUsername === item.contactUsername,
-              ) ? (
-                <Icon
-                  type="ant"
-                  name="checkcircle"
-                  color={colors.colors.white}
-                />
-              ) : (
-                <></>
-              )
-            }
-          />
-        </View>
-      );
-    },
+    ({ item }: { item: ContactDto }) => (
+      <ContactItem
+        nickname={item.nickname as string}
+        contactUsername={item.contactUsername as string}
+        onAction={{
+          onPress: () => handleSelectContact(item),
+        }}
+        customAction={
+          participants?.find(
+            (x) => x.contactUsername === item.contactUsername,
+          ) ? (
+            <Icon type="ant" name="checkcircle" color={colors.colors.white} />
+          ) : (
+            <></>
+          )
+        }
+      />
+    ),
     [handleSelectContact, participants],
   );
 
