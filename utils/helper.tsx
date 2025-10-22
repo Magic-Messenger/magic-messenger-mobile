@@ -25,7 +25,7 @@ export const changeLanguage = (language: string) => {
 
 export const copyToClipboard = async (
   copyData: string,
-  successMessage?: string
+  successMessage?: string,
 ) => {
   await Clipboard.setStringAsync(copyData);
 
@@ -93,27 +93,27 @@ export const chatDateFormatter = (dateString: string) => {
 
   const date = dayjs(dateString);
   const now = dayjs();
+
+  const diffInSeconds = now.diff(date, "second");
   const diffInMinutes = now.diff(date, "minute");
   const diffInHours = now.diff(date, "hour");
   const diffInDays = now.diff(date, "day");
 
-  if (diffInMinutes < 60) {
+  if (diffInSeconds < 60) {
+    return i18n.t("common.secondsAgo", { count: diffInSeconds });
+  } else if (diffInMinutes < 60) {
     return i18n.t("common.minutesAgo", { count: diffInMinutes });
   } else if (diffInHours < 24) {
     return i18n.t("common.hoursAgo", { count: diffInHours });
   } else if (diffInDays < 30) {
     return i18n.t("common.daysAgo", { count: diffInDays });
   } else {
-    return date.format("MM/DD/YYYY");
+    return date.format("DD/MM/YYYY");
   }
 };
 
-export const trackEvent = (eventName: string, params?: object) => {
-  if (params) {
-    console.log(`Event: ${eventName}`, params);
-  } else {
-    console.log(`Event: ${eventName}`);
-  }
+export const trackEvent = (eventName: string, params?: any) => {
+  if (__DEV__) console.log(`Event: ${eventName}`, params);
 };
 
 export const convertMessageType = (messageType: number) => {

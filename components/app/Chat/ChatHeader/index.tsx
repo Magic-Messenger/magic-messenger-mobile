@@ -4,30 +4,38 @@ import { StyleSheet, View } from "react-native";
 
 import { AppImage, ThemedText, TorBadge } from "@/components";
 import { Images } from "@/constants";
+import { useSignalRStore } from "@/store";
 import { useThemedStyles } from "@/theme";
 import { spacingPixel, widthPixel } from "@/utils";
 
 interface ChatHeaderProps {
+  chatId: string;
   userName?: string;
-  typingUsername?: string;
-  onlineUsers?: string[];
   isGroupChat?: boolean;
   groupAccountCount?: string;
 }
+
 export function ChatHeader({
+  chatId,
   userName,
-  onlineUsers,
-  typingUsername,
   isGroupChat = false,
   groupAccountCount,
 }: ChatHeaderProps) {
   const styles = useThemedStyles(createStyle);
   const { t } = useTranslation();
 
+  const onlineUsers = useSignalRStore((s) => s.onlineUsers);
+  const typingUsers = useSignalRStore((s) => s.typingUsers);
+
   const checkIsOnline = useMemo(() => {
     if (!userName || !onlineUsers) return false;
     return onlineUsers.includes(userName);
   }, [onlineUsers, userName]);
+
+  const isTyping = useMemo(() => {
+    if (!userName || !typingUsers) return false;
+    return typingUsers.some((x) => x.chatId === chatId && userName);
+  }, [typingUsers, userName]);
 
   return (
     <View
@@ -53,11 +61,11 @@ export function ChatHeader({
           </ThemedText>
           {isGroupChat ? (
             <ThemedText type="subtitle">
-              {typingUsername ? t("chat.typing") : (groupAccountCount ?? "-")}
+              {isTyping ? t("chat.typing") : (groupAccountCount ?? "-")}
             </ThemedText>
           ) : (
             <ThemedText type="subtitle">
-              {typingUsername
+              {isTyping
                 ? t("chat.typing")
                 : checkIsOnline
                   ? t("chat.online")

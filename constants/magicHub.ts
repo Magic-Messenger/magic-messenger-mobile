@@ -41,10 +41,12 @@ export const createMagicHubClient = (
 /* Types */
 
 export interface TypingEvent {
+  chatId: string;
   username: string;
 }
 
 export interface StopTypingEvent {
+  chatId: string;
   username: string;
 }
 

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
@@ -12,7 +12,7 @@ import { ColorDto, useThemedStyles } from "@/theme";
 import { heightPixel, spacingPixel, trackEvent } from "@/utils";
 
 interface ChatFooterProps {
-  identifier: string;
+  chatId: string;
   replyMessage?: MessageDto | null;
   onClearReply?: () => void;
   onSend: (message: string | UploadFileResultDto) => void;
@@ -22,7 +22,7 @@ interface ChatFooterProps {
 }
 
 export function ChatFooter({
-  identifier,
+  chatId,
   onSend,
   replyMessage,
   onClearReply,
@@ -42,25 +42,28 @@ export function ChatFooter({
 
   const [message, setMessage] = useState("");
 
-  const handleSendMessage = () => {
+  const handleSendMessage = useCallback(() => {
     if (!message.trim()) return;
     onSend(message);
     setMessage("");
-    if (identifier) {
-      magicHubClient?.stopTyping(identifier as string);
+    if (chatId) {
+      magicHubClient?.stopTyping(chatId as string);
     }
-  };
+  }, [magicHubClient, chatId]);
 
-  const onChangeText = (text: string) => {
-    setMessage(text);
-    if (identifier) {
-      if (text.length > 0) {
-        magicHubClient?.typing(identifier as string);
-      } else {
-        magicHubClient?.stopTyping(identifier as string);
+  const onChangeText = useCallback(
+    (text: string) => {
+      setMessage(text);
+      if (chatId) {
+        if (text.length > 0) {
+          magicHubClient?.typing(chatId as string);
+        } else {
+          magicHubClient?.stopTyping(chatId as string);
+        }
       }
-    }
-  };
+    },
+    [magicHubClient, chatId],
+  );
 
   const handleSendRecording = async () => {
     try {
@@ -87,7 +90,7 @@ export function ChatFooter({
         }
       }
     } catch (error) {
-      trackEvent("send_audio_message_error", { error });
+      trackEvent("send_audio_message_error: ", error);
     }
   };
 
@@ -116,7 +119,7 @@ export function ChatFooter({
         }
       }
     } catch (error) {
-      trackEvent("send_image_message_error", { error });
+      trackEvent("send_image_message_error: ", error);
     }
   };
 

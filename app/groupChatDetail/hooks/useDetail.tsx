@@ -49,7 +49,6 @@ export const useDetail = () => {
   const [replyMessage, setReplyMessage] = useState<MessageDto | null>(null);
   const [messages, setMessages] = useState<MessageDto[]>([]);
   const [loading, setLoading] = useState(false);
-  const [typingUsername, setTypingUsername] = useState<string | null>(null);
   const [pagination, setPagination] = useState({
     currentPage: 0,
     pageSize: INITIAL_PAGE_SIZE,
@@ -243,18 +242,6 @@ export const useDetail = () => {
   );
 
   //#region SignalR Effects
-  const handleTyping = (data: { username: string }) => {
-    if (currentUserName !== data.username) {
-      setTypingUsername(data.username);
-    }
-  };
-
-  const handleStopTyping = (data: { username: string }) => {
-    if (currentUserName !== data.username) {
-      setTypingUsername(null);
-    }
-  };
-
   const handleGroupMessageReceived = (message: MessageDto) => {
     trackEvent("group_message_received", { message });
 
@@ -275,16 +262,12 @@ export const useDetail = () => {
   useEffect(() => {
     if (magicHubClient && chatId) {
       magicHubClient.joinChat(chatId as string);
-      magicHubClient.on("typing", handleTyping);
-      magicHubClient.on("stop_typing", handleStopTyping);
       magicHubClient.on("group_message_received", handleGroupMessageReceived);
     }
 
     return () => {
       if (magicHubClient && chatId) {
         magicHubClient.leaveChat(chatId as string);
-        magicHubClient.off("typing");
-        magicHubClient.off("stop_typing");
         magicHubClient.off("group_message_received");
       }
     };
@@ -350,7 +333,6 @@ export const useDetail = () => {
     messages,
     userName,
     groupAccountCount,
-    typingUsername,
     currentUserName,
     usersPublicKey,
     replyMessage,

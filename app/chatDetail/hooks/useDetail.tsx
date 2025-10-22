@@ -48,8 +48,6 @@ export const useDetail = () => {
   const [replyMessage, setReplyMessage] = useState<MessageDto | null>(null);
   const [messages, setMessages] = useState<MessageDto[]>([]);
   const [loading, setLoading] = useState(false);
-  const [typingUsername, setTypingUsername] = useState<string | null>(null);
-  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
   const [chatId, setChatId] = useState<string | null>(null);
   const [pagination, setPagination] = useState({
     currentPage: 0,
@@ -294,22 +292,6 @@ export const useDetail = () => {
     ],
   );
 
-  const handleUserOnline = (data: { username: string }) => {
-    setOnlineUsers((prev) => [...prev, data.username]);
-  };
-
-  const handleTyping = (data: { username: string }) => {
-    if (currentUserName !== data.username) {
-      setTypingUsername(data.username);
-    }
-  };
-
-  const handleStopTyping = (data: { username: string }) => {
-    if (currentUserName !== data.username) {
-      setTypingUsername(null);
-    }
-  };
-
   const handleMessageReceived = (message: MessageDto) => {
     trackEvent("message_received", { message });
 
@@ -330,18 +312,12 @@ export const useDetail = () => {
   useEffect(() => {
     if (magicHubClient && chatId) {
       magicHubClient.joinChat(chatId as string);
-      magicHubClient.on("user_online", handleUserOnline);
-      magicHubClient.on("typing", handleTyping);
-      magicHubClient.on("stop_typing", handleStopTyping);
       magicHubClient.on("message_received", handleMessageReceived);
     }
 
     return () => {
       if (magicHubClient && chatId) {
         magicHubClient.leaveChat(chatId as string);
-        magicHubClient.off("user_online");
-        magicHubClient.off("typing");
-        magicHubClient.off("stop_typing");
         magicHubClient.off("message_received");
       }
     };
@@ -402,11 +378,9 @@ export const useDetail = () => {
     router,
     listRef,
     loading,
-    chatId,
+    chatId: chatId as string,
     messages,
     userName,
-    onlineUsers,
-    typingUsername,
     currentUserName,
     usersPublicKey,
     replyMessage,

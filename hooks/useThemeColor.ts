@@ -5,6 +5,6 @@
 
 import { Colors } from "@/constants";
 
-export function useThemeColor(): keyof typeof Colors {
+export function useThemeColor(): typeof Colors {
   return Colors;
 }

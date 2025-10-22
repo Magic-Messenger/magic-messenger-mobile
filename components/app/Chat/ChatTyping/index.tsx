@@ -1,18 +1,30 @@
+import { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { LottiePlayer } from "@/components";
 import { Lottie } from "@/constants";
+import { useSignalRStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { spacingPixel, widthPixel } from "@/utils";
+import { spacingPixel, trackEvent, widthPixel } from "@/utils";
 
 interface Props {
-  typingUsername?: string | null;
+  chatId: string;
+  userName?: string;
 }
 
-export function ChatTyping({ typingUsername }: Props) {
+export function ChatTyping({ chatId, userName }: Props) {
   const styles = useThemedStyles(createStyle);
 
-  if (!typingUsername) return null;
+  const typingUsers = useSignalRStore((s) => s.typingUsers);
+
+  const isTyping = useMemo(() => {
+    if (!userName || !typingUsers) return false;
+    return typingUsers.some((x) => x.chatId === chatId && userName);
+  }, [typingUsers, userName]);
+
+  trackEvent("isTyping: ", { isTyping });
+
+  if (!isTyping) return null;
   return (
     <View style={styles.container}>
       <LottiePlayer source={Lottie.typingIndicator} style={styles.lottie} />

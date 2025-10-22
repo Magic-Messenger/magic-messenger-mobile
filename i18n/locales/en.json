@@ -4,6 +4,7 @@
   "back": "Back",
   "loading": "Loading",
   "image_not_loading": "Image could not load",
+  "recently": "Recently",
   "common": {
     "successCopy": "Successfully Copied",
     "cancel": "Cancel",
@@ -22,6 +23,8 @@
     "image": "Image",
     "video": "Video",
     "audio": "Audio",
+    "secondsAgo": "{{count}} second ago",
+    "secondsAgo_plural": "{{count}} seconds ago",
     "minutesAgo": "{{count}} minute ago",
     "minutesAgo_plural": "{{count}} minutes ago",
     "hoursAgo": "{{count}} hour ago",

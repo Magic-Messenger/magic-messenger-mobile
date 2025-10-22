@@ -1,5 +1,6 @@
 import { router } from "expo-router";
 import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
 
 import { ContactItem, ThemedText } from "@/components";
@@ -35,9 +36,12 @@ export function ChatItem({
   groupAdminAccount,
 }: ChatItemProps) {
   const styles = useThemedStyles(createStyle);
+  const { t } = useTranslation();
 
   const chatTitle = useMemo(() => {
-    return isGroupChat ? groupName ?? "" : nickname ?? contactUsername ?? "";
+    return isGroupChat
+      ? (groupName ?? "")
+      : (nickname ?? contactUsername ?? "");
   }, [isGroupChat, groupName, nickname, contactUsername]);
 
   const handleGoToChat = () => {
@@ -71,7 +75,7 @@ export function ChatItem({
     <ContactItem
       nickname={chatTitle}
       contactUsername={
-        lastMessageTime ? chatDateFormatter(lastMessageTime) : "-"
+        lastMessageTime ? chatDateFormatter(lastMessageTime) : t("recently")
       }
       customAction={
         unreadMessagesCount && unreadMessagesCount > 0 ? (

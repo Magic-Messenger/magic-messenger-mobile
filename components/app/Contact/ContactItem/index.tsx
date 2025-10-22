@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 import { Colors, Images } from "../../../../constants";
-import { ColorDto, useThemedStyles } from "../../../../theme";
+import { useThemedStyles } from "../../../../theme";
 import {
   copyToClipboard,
   heightPixel,
@@ -95,7 +95,7 @@ export const ContactItem = ({
   );
 };
 
-const createStyle = (colors: ColorDto) =>
+const createStyle = () =>
   StyleSheet.create({
     contactItem: {
       flexDirection: "row",
@@ -104,6 +104,7 @@ const createStyle = (colors: ColorDto) =>
       paddingHorizontal: spacingPixel(10),
       paddingVertical: spacingPixel(7),
       borderRadius: widthPixel(10),
+      marginBottom: spacingPixel(8),
     },
     iconImage: {
       width: widthPixel(35),

@@ -87,7 +87,8 @@ export const useLogin = () => {
       router.replace("/home");
 
       const token = await registerForPushNotificationsAsync();
-      await registerDeviceToken({ data: { deviceToken: token } });
+      token && (await registerDeviceToken({ data: { deviceToken: token } }));
+
       await updatePublicKeyApi({
         data: {
           publicKey: userPublicKey(),

@@ -2544,6 +2544,170 @@ export function useGetApiAccountGetProfile<
 }
 
 /**
+ * @summary Get online users
+ */
+export const getApiAccountGetOnlineUsers = (
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<StringListIDataResult>(
+    { url: `/api/account/get-online-users`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetApiAccountGetOnlineUsersQueryKey = () => {
+  return [`/api/account/get-online-users`] as const;
+};
+
+export const getGetApiAccountGetOnlineUsersQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiAccountGetOnlineUsers>>,
+  TError = ResultMessage[] | void | void,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiAccountGetOnlineUsers>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetApiAccountGetOnlineUsersQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiAccountGetOnlineUsers>>
+  > = ({ signal }) => getApiAccountGetOnlineUsers(requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    staleTime: 10000,
+    refetchOnWindowFocus: false,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiAccountGetOnlineUsers>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiAccountGetOnlineUsersQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiAccountGetOnlineUsers>>
+>;
+export type GetApiAccountGetOnlineUsersQueryError =
+  | ResultMessage[]
+  | void
+  | void;
+
+export function useGetApiAccountGetOnlineUsers<
+  TData = Awaited<ReturnType<typeof getApiAccountGetOnlineUsers>>,
+  TError = ResultMessage[] | void | void,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiAccountGetOnlineUsers>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiAccountGetOnlineUsers>>,
+          TError,
+          Awaited<ReturnType<typeof getApiAccountGetOnlineUsers>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiAccountGetOnlineUsers<
+  TData = Awaited<ReturnType<typeof getApiAccountGetOnlineUsers>>,
+  TError = ResultMessage[] | void | void,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiAccountGetOnlineUsers>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiAccountGetOnlineUsers>>,
+          TError,
+          Awaited<ReturnType<typeof getApiAccountGetOnlineUsers>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiAccountGetOnlineUsers<
+  TData = Awaited<ReturnType<typeof getApiAccountGetOnlineUsers>>,
+  TError = ResultMessage[] | void | void,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiAccountGetOnlineUsers>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get online users
+ */
+
+export function useGetApiAccountGetOnlineUsers<
+  TData = Awaited<ReturnType<typeof getApiAccountGetOnlineUsers>>,
+  TError = ResultMessage[] | void | void,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiAccountGetOnlineUsers>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiAccountGetOnlineUsersQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
  * @summary Change account settings operation
  */
 export const postApiAccountChangeAccountSettings = (

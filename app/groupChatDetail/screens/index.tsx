@@ -24,7 +24,6 @@ export default function ChatScreen() {
     messages,
     userName,
     listRef,
-    typingUsername,
     groupAccountCount,
     replyMessage,
     handleChatControl,
@@ -37,15 +36,15 @@ export default function ChatScreen() {
     <ChatLayout
       header={
         <ChatHeader
+          chatId={chatId}
           isGroupChat={true}
           groupAccountCount={groupAccountCount as string}
-          typingUsername={typingUsername as string}
           userName={userName as string}
         />
       }
       footer={
         <ChatFooter
-          identifier={chatId!}
+          chatId={chatId}
           replyMessage={replyMessage}
           onSend={handleChatControl}
           onClearReply={onClearReply}
@@ -61,12 +60,14 @@ export default function ChatScreen() {
           contentContainerStyle={styles.contentContainerStyle}
           renderItem={({ item }) => (
             <MessageGroupItem
-              identifier={chatId!}
+              identifier={chatId}
               message={item as never}
               onReply={handleReply}
             />
           )}
-          ListFooterComponent={<ChatTyping typingUsername={typingUsername} />}
+          ListFooterComponent={
+            <ChatTyping chatId={chatId} userName={userName as string} />
+          }
         />
       </LoadingProvider>
     </ChatLayout>
