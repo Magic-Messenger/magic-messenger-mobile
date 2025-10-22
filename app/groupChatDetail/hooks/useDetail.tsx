@@ -1,3 +1,4 @@
+import { useIsFocused } from "@react-navigation/core";
 import { FlashListRef } from "@shopify/flash-list";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { throttle } from "lodash";
@@ -20,6 +21,7 @@ import {
 import {
   getApiChatsGroupMessages,
   useDeleteApiChatsDelete,
+  useGetApiAccountGetOnlineUsers,
   usePostApiChatsSendMessage,
 } from "@/api/endpoints/magicMessenger";
 import { MessageDto, MessageType } from "@/api/models";
@@ -46,6 +48,8 @@ export const useDetail = () => {
   const listRef = useRef<FlashListRef<MessageDto>>(null);
   const navigation = useNavigation();
 
+  const isFocused = useIsFocused();
+
   const [replyMessage, setReplyMessage] = useState<MessageDto | null>(null);
   const [messages, setMessages] = useState<MessageDto[]>([]);
   const [loading, setLoading] = useState(false);
@@ -61,8 +65,22 @@ export const useDetail = () => {
 
   const { userName: currentUserName } = useUserStore();
   const magicHubClient = useSignalRStore((s) => s.magicHubClient);
+  const setOnlineUsers = useSignalRStore((s) => s.setOnlineUsers);
 
   const { mutateAsync: deleteChat } = useDeleteApiChatsDelete();
+
+  const { data: onlineUsersData } = useGetApiAccountGetOnlineUsers({
+    query: {
+      enabled: isFocused,
+      refetchInterval: isFocused ? 10000 : false,
+      staleTime: 10000,
+    },
+  });
+
+  useEffect(() => {
+    if (onlineUsersData?.data)
+      setOnlineUsers(onlineUsersData?.data as string[]);
+  }, [onlineUsersData]);
 
   const {
     chatId,

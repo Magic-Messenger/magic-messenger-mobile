@@ -1,29 +1,17 @@
 import { useEffect } from "react";
 
-import { useGetApiAccountGetOnlineUsers } from "@/api/endpoints/magicMessenger";
 import { useUserStore } from "@/store";
 import { useSignalRStore } from "@/store/signalRStore";
 import { trackEvent } from "@/utils";
 
 export const useSignalREvents = () => {
-  const isLogin = useUserStore((s) => s.isLogin);
   const magicHubClient = useSignalRStore((s) => s.magicHubClient);
-  const setOnlineUsers = useSignalRStore((s) => s.setOnlineUsers);
   const addOnlineUser = useSignalRStore((s) => s.addOnlineUser);
   const removeOnlineUser = useSignalRStore((s) => s.removeOnlineUser);
   const startTyping = useSignalRStore((s) => s.startTyping);
   const stopTyping = useSignalRStore((s) => s.stopTyping);
 
   const currentUserName = useUserStore((state) => state.userName);
-
-  const { data: onlineUsersData } = useGetApiAccountGetOnlineUsers({
-    query: {
-      enabled: isLogin,
-      refetchOnReconnect: isLogin,
-      refetchInterval: isLogin ? 10000 : false,
-      refetchIntervalInBackground: isLogin,
-    },
-  });
 
   const handleUserOnline = (data: { username: string }) => {
     trackEvent("user_online: ", data);
@@ -48,10 +36,6 @@ export const useSignalREvents = () => {
       stopTyping(data.chatId, data.username);
     }
   };
-
-  useEffect(() => {
-    if (onlineUsersData?.data) setOnlineUsers(onlineUsersData.data as string[]);
-  }, [onlineUsersData?.data]);
 
   useEffect(() => {
     if (magicHubClient) {

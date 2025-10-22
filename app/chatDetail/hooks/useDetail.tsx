@@ -1,3 +1,4 @@
+import { useIsFocused } from "@react-navigation/core";
 import { FlashListRef } from "@shopify/flash-list";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { throttle } from "lodash";
@@ -20,6 +21,7 @@ import {
 import {
   getApiChatsMessages,
   useDeleteApiChatsDelete,
+  useGetApiAccountGetOnlineUsers,
   usePostApiChatsCreate,
   usePostApiChatsSendMessage,
 } from "@/api/endpoints/magicMessenger";
@@ -45,6 +47,8 @@ export const useDetail = () => {
   const navigation = useNavigation();
   const listRef = useRef<FlashListRef<MessageDto>>(null);
 
+  const isFocused = useIsFocused();
+
   const [replyMessage, setReplyMessage] = useState<MessageDto | null>(null);
   const [messages, setMessages] = useState<MessageDto[]>([]);
   const [loading, setLoading] = useState(false);
@@ -61,12 +65,21 @@ export const useDetail = () => {
 
   const { userName: currentUserName } = useUserStore();
   const magicHubClient = useSignalRStore((s) => s.magicHubClient);
+  const setOnlineUsers = useSignalRStore((s) => s.setOnlineUsers);
 
   const { chatId: contactChatId, userName, publicKey } = useLocalSearchParams();
 
   const { mutateAsync: sendApiMessage } = usePostApiChatsSendMessage();
   const { mutateAsync: createApiChat } = usePostApiChatsCreate();
   const { mutateAsync: deleteChat } = useDeleteApiChatsDelete();
+
+  const { data: onlineUsersData } = useGetApiAccountGetOnlineUsers({
+    query: {
+      enabled: isFocused,
+      refetchInterval: isFocused ? 10000 : false,
+      staleTime: 10000,
+    },
+  });
 
   const usersPublicKey = useMemo(
     () => ({
@@ -75,6 +88,11 @@ export const useDetail = () => {
     }),
     [publicKey],
   );
+
+  useEffect(() => {
+    if (onlineUsersData?.data)
+      setOnlineUsers(onlineUsersData?.data as string[]);
+  }, [onlineUsersData]);
 
   useEffect(() => {
     if (contactChatId) {
