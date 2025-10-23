@@ -8,7 +8,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Colors, Images } from "@/constants";
-import { ColorDto, useThemedStyles } from "@/theme";
+import { useThemedStyles } from "@/theme";
 import { spacingPixel } from "@/utils";
 
 interface ChatLayoutProps {
@@ -41,7 +41,7 @@ export function ChatLayout({ header, footer, children }: ChatLayoutProps) {
   );
 }
 
-const createStyle = (colors: ColorDto) =>
+const createStyle = () =>
   StyleSheet.create({
     gradient: {
       flex: 1,

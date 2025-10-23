@@ -50,5 +50,7 @@ const createStyle = (colors: ColorDto) =>
       zIndex: 1,
       backgroundColor: colors.secondaryBackgroundAlpha,
       opacity: 0.9,
+      height: "100%",
+      width: "100%",
     },
   });

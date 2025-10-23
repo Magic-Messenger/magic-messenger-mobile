@@ -3,26 +3,26 @@ import { StyleSheet, View } from "react-native";
 
 import { LottiePlayer } from "@/components";
 import { Lottie } from "@/constants";
-import { useSignalRStore } from "@/store";
+import { useSignalRStore, useUserStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { spacingPixel, trackEvent, widthPixel } from "@/utils";
+import { spacingPixel, widthPixel } from "@/utils";
 
 interface Props {
   chatId: string;
-  userName?: string;
 }
 
-export function ChatTyping({ chatId, userName }: Props) {
+export function ChatTyping({ chatId }: Props) {
   const styles = useThemedStyles(createStyle);
 
   const typingUsers = useSignalRStore((s) => s.typingUsers);
+  const userName = useUserStore((s) => s.userName);
 
   const isTyping = useMemo(() => {
     if (!userName || !typingUsers) return false;
-    return typingUsers.some((x) => x.chatId === chatId && userName);
+    return typingUsers.some(
+      (x) => x.chatId === chatId && x.username !== userName,
+    );
   }, [typingUsers, userName]);
-
-  trackEvent("isTyping: ", { isTyping });
 
   if (!isTyping) return null;
   return (

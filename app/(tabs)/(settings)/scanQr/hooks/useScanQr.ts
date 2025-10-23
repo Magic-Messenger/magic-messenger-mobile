@@ -31,7 +31,6 @@ const createStyle = () =>
   StyleSheet.create({
     cameraContainer: {
       flex: 1,
-      position: "relative",
       justifyContent: "center",
       alignItems: "center",
     },

@@ -24,36 +24,39 @@ export default function CreateChatScreen() {
           ?.includes(searchText?.toLocaleLowerCase()) ||
         x.nickname
           ?.toLocaleLowerCase()
-          ?.includes(searchText?.toLocaleLowerCase())
+          ?.includes(searchText?.toLocaleLowerCase()),
     );
   }, [searchText, contactData?.data]);
 
-  const renderContactItem = ({ item }: { item: ContactDto }) => {
-    return (
+  const handleCreateChat = useCallback((item: ContactDto) => {
+    router.push({
+      pathname: "/chatDetail/screens",
+      params: {
+        chatId: item.chatId as string,
+        publicKey: item.publicKey as string,
+        nickname: item.nickname as string,
+        userName: item.contactUsername as string,
+      },
+    });
+  }, []);
+
+  const renderContactItem = useCallback(
+    ({ item }: { item: ContactDto }) => (
       <ContactItem
         nickname={item.nickname as string}
         contactUsername={item.contactUsername as string}
         onAction={{
-          onPress: () => {
-            router.push({
-              pathname: "/chatDetail/screens",
-              params: {
-                chatId: item.chatId as string,
-                publicKey: item.publicKey as string,
-                nickname: item.nickname as string,
-                userName: item.contactUsername as string,
-              },
-            });
-          },
+          onPress: () => handleCreateChat(item),
         }}
       />
-    );
-  };
+    ),
+    [],
+  );
 
   useFocusEffect(
     useCallback(() => {
       refetch();
-    }, [])
+    }, []),
   );
 
   return (

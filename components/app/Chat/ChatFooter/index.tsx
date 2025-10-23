@@ -49,7 +49,7 @@ export function ChatFooter({
     if (chatId) {
       magicHubClient?.stopTyping(chatId as string);
     }
-  }, [magicHubClient, chatId]);
+  }, [magicHubClient, chatId, message, onSend]);
 
   const onChangeText = useCallback(
     (text: string) => {

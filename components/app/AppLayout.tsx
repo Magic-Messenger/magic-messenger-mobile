@@ -99,7 +99,7 @@ function AppLayout({
           style={styles.imageBackground}
           resizeMode="cover"
         />
-        <SafeAreaView style={styles.safeArea}>
+        <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
           <Container {...containerProps}>
             {showBadge && (
               <View

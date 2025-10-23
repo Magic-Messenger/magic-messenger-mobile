@@ -24,8 +24,6 @@ export const useTicketDetail = () => {
   );
   const [messages, setMessages] = useState<TicketMessageDto[]>([]);
   const [loading, setLoading] = useState(false);
-  const [typingUsername, setTypingUsername] = useState<string | null>(null);
-  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
 
   const { mutateAsync: sendApiMessage } = usePostApiTicketsAddMessage();
 
@@ -77,22 +75,6 @@ export const useTicketDetail = () => {
   useEffect(() => {
     if (magicHubClient) {
       magicHubClient.joinTicket(ticketId as string);
-      magicHubClient.on("user_online", (data) => {
-        setOnlineUsers((prev) => [...prev, data.username]);
-      });
-      magicHubClient.on("user_offline", (data) => {
-        setOnlineUsers(onlineUsers.filter((x) => x !== data.username));
-      });
-
-      magicHubClient.on(
-        "typing",
-        (data) =>
-          currentUserName !== data.username && setTypingUsername(data.username),
-      );
-      magicHubClient.on(
-        "stop_typing",
-        (data) => currentUserName !== data.username && setTypingUsername(""),
-      );
       magicHubClient.on("get_ticket_message", (message) => {
         setMessages((prev) => [...prev, { ...message }]);
         if (listRef.current) {
@@ -103,11 +85,7 @@ export const useTicketDetail = () => {
     return () => {
       if (magicHubClient) {
         magicHubClient.leaveTicket(ticketId as string);
-        magicHubClient.off("typing");
-        magicHubClient.off("stop_typing");
         magicHubClient.off("get_ticket_message");
-        magicHubClient.off("user_online");
-        magicHubClient.off("user_offline");
       }
     };
   }, [magicHubClient]);
@@ -117,10 +95,9 @@ export const useTicketDetail = () => {
     router,
     listRef,
     loading,
+    ticketId,
     ticketDetail,
     messages,
-    onlineUsers,
-    typingUsername,
     currentUserName,
     handleChatControl,
   };

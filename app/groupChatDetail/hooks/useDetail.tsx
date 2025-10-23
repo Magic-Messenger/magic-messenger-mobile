@@ -208,6 +208,8 @@ export const useDetail = () => {
 
   const handleSendMessage = useCallback(
     async (message: string | UploadFileResultDto) => {
+      setLoading(true);
+
       const isFileMessage =
         typeof message === "object" && message?.fileUrl !== undefined;
 
@@ -246,6 +248,8 @@ export const useDetail = () => {
       } catch (error) {
         console.error("Error sending message:", error);
       }
+
+      setLoading(false);
     },
     [chatId, decryptedGroupKey, replyMessage, sendApiMessage, onClearReply],
   );

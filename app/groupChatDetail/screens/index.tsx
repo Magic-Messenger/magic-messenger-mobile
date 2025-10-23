@@ -65,9 +65,7 @@ export default function ChatScreen() {
               onReply={handleReply}
             />
           )}
-          ListFooterComponent={
-            <ChatTyping chatId={chatId} userName={userName as string} />
-          }
+          ListFooterComponent={<ChatTyping chatId={chatId} />}
         />
       </LoadingProvider>
     </ChatLayout>

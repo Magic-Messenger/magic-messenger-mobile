@@ -18,28 +18,21 @@ import { useTicketDetail } from "../hooks";
 export default function TicketDetailScreen() {
   const styles = useThemedStyles(createStyle);
 
-  const {
-    loading,
-    ticketDetail,
-    messages,
-    listRef,
-    onlineUsers,
-    typingUsername,
-    handleChatControl,
-  } = useTicketDetail();
+  const { loading, ticketId, messages, listRef, handleChatControl } =
+    useTicketDetail();
 
   return (
     <ChatLayout
       header={
         <ChatHeader
-          onlineUsers={onlineUsers}
-          typingUsername={typingUsername as string}
+          chatId={ticketId as string}
+          isGroupChat={false}
           userName="Magic Messenger"
         />
       }
       footer={
         <ChatFooter
-          identifier={ticketDetail?.ticketId!}
+          chatId={ticketId as string}
           onSend={(message) => handleChatControl(message as string)}
           displaySendMessageAlways
         />
@@ -51,7 +44,7 @@ export default function TicketDetailScreen() {
           data={messages}
           contentContainerStyle={styles.contentContainerStyle}
           renderItem={({ item }) => <TicketMessageItem {...item} />}
-          ListFooterComponent={<ChatTyping typingUsername={typingUsername} />}
+          ListFooterComponent={<ChatTyping chatId={ticketId as string} />}
         />
       </LoadingProvider>
     </ChatLayout>

@@ -76,8 +76,7 @@ export const useDetail = () => {
   const { data: onlineUsersData } = useGetApiAccountGetOnlineUsers({
     query: {
       enabled: isFocused,
-      refetchInterval: isFocused ? 10000 : false,
-      staleTime: 10000,
+      refetchOnWindowFocus: true,
     },
   });
 
@@ -196,13 +195,27 @@ export const useDetail = () => {
 
   const handleSendMessage = useCallback(
     async (message: string | UploadFileResultDto) => {
+      setLoading(true);
+
+      let messageChatId = chatId as string;
+      if (!messageChatId) {
+        const createChatResponse = await createApiChat({
+          data: {
+            usernames: [userName as string],
+          },
+        });
+        const newChatId = createChatResponse.data as string;
+        messageChatId = newChatId;
+        setChatId(newChatId);
+      }
+
       const isFileMessage =
         typeof message === "object" && message?.fileUrl !== undefined;
 
       try {
         const response = await sendApiMessage({
           data: {
-            chatId: chatId as string,
+            chatId: messageChatId,
             messageType: isFileMessage
               ? message?.messageType
               : MessageType.Text,
@@ -236,76 +249,15 @@ export const useDetail = () => {
       } catch (error) {
         console.error("Error sending message:", error);
       }
-    },
-    [chatId, usersPublicKey, replyMessage, sendApiMessage, onClearReply],
-  );
 
-  const handleChatControl = useCallback(
-    async (message: string | UploadFileResultDto) => {
-      trackEvent("chatId: ", { chatId });
-
-      const isFileMessage =
-        typeof message === "object" && message?.fileUrl !== undefined;
-
-      if (chatId) {
-        await handleSendMessage(message);
-      } else {
-        try {
-          const response = await createApiChat({
-            data: {
-              usernames: [userName as string],
-            },
-          });
-
-          if (response?.success && response?.data) {
-            const newChatId = response.data as string;
-            setChatId(newChatId);
-
-            await sendApiMessage({
-              data: {
-                chatId: newChatId,
-                messageType: isFileMessage
-                  ? message?.messageType
-                  : MessageType.Text,
-                ...(!isFileMessage && {
-                  content: encrypt(
-                    message as string,
-                    usersPublicKey.receiverPublicKey,
-                    usersPublicKey.senderPrivateKey,
-                  ),
-                }),
-                ...(isFileMessage && {
-                  file: {
-                    size: message.contentLength,
-                    contentType: message.contentType,
-                    filePath: encrypt(
-                      message.fileUrl as string,
-                      usersPublicKey.receiverPublicKey,
-                      usersPublicKey.senderPrivateKey,
-                    ),
-                  },
-                }),
-                ...(replyMessage && {
-                  repliedToMessage: replyMessage?.messageId,
-                }),
-              },
-            });
-
-            onClearReply();
-          }
-        } catch (error) {
-          trackEvent("Error creating chat: ", { error });
-        }
-      }
+      setLoading(false);
     },
     [
       chatId,
       userName,
-      handleSendMessage,
-      createApiChat,
-      sendApiMessage,
       usersPublicKey,
       replyMessage,
+      sendApiMessage,
       onClearReply,
     ],
   );
@@ -405,6 +357,6 @@ export const useDetail = () => {
     handleReply,
     onClearReply,
     handleScroll,
-    handleChatControl,
+    handleSendMessage,
   };
 };

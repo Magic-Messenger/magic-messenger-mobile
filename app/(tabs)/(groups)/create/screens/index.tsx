@@ -26,7 +26,7 @@ export default function CreateGroupChatScreen() {
         <Button
           type="primary"
           label={t("groups.create")}
-          disabled={participants?.length === 0}
+          disabled={isLoadingChatCreate || participants?.length === 0}
           onPress={handleSubmit}
           loading={isLoadingChatCreate}
         />
