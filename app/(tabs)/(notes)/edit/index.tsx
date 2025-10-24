@@ -1,11 +1,11 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { Alert, StyleSheet, View } from "react-native";
 
 import { AppLayout, Button, Input } from "@/components";
-import { useNoteStore } from "@/store/noteStore";
+import { NoteDto, useNoteStore } from "@/store/noteStore";
 import { ColorDto, useThemedStyles } from "@/theme";
 import {
   decrypt,
@@ -26,7 +26,7 @@ export default function EditScreen() {
   const router = useRouter();
   const { noteId } = useLocalSearchParams();
 
-  const [noteDetailData, setNoteDetailData] = React.useState<object>({});
+  const [noteDetailData, setNoteDetailData] = useState<NoteDto>();
 
   const [viewType, setViewType] = React.useState<"view" | "edit">("view");
 
@@ -78,6 +78,7 @@ export default function EditScreen() {
 
       updateNote(noteId as string, {
         id: noteId as string,
+        //@ts-ignore
         ...(encryptedBody as never),
       });
       showToast({ type: "success", text1: t("notes.successUpdateNote") });

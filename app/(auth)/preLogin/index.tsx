@@ -4,7 +4,7 @@ import { StyleSheet, View } from "react-native";
 
 import { AppImage, AppLayout, Button, ThemedText } from "@/components";
 import { Images, spacing } from "@/constants";
-import { ColorDto, useThemedStyles } from "@/theme";
+import { useThemedStyles } from "@/theme";
 import { heightPixel, widthPixel } from "@/utils";
 
 export default function PreLoginScreen() {
@@ -57,7 +57,7 @@ export default function PreLoginScreen() {
   );
 }
 
-const createStyle = (colors: ColorDto) =>
+const createStyle = () =>
   StyleSheet.create({
     mainContainer: {
       ...spacing({
