@@ -113,7 +113,7 @@ export const chatDateFormatter = (dateString: string) => {
 };
 
 export const trackEvent = (eventName: string, params?: any) => {
-  if (__DEV__) console.log(`Event: ${eventName}`, params);
+  if (__DEV__) console.log(`Event: ${eventName}`, params ?? "");
 };
 
 export const convertMessageType = (messageType: number) => {
