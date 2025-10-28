@@ -46,6 +46,7 @@ export default function CreateScreen() {
 
       addNote({
         id: body.id,
+        // @ts-ignore
         ...(encryptedBody as never),
       });
       showToast({ type: "success", text1: t("notes.successAddNote") });

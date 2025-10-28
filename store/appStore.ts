@@ -47,7 +47,6 @@ export const useAppStore = create<AppStore>()(
         timeZone: undefined,
       },
       appVersion: "",
-      tor: null,
       rehydrated: false,
       changeLanguage: (language: string) => {
         set((state) => ({
@@ -64,6 +63,6 @@ export const useAppStore = create<AppStore>()(
       onRehydrateStorage: () => () => {
         useAppStore.setState({ rehydrated: true });
       },
-    }
-  )
+    },
+  ),
 );

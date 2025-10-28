@@ -27,7 +27,7 @@ const SecureStoreStorage = {
   },
 };
 
-interface NoteDto {
+export interface NoteDto {
   id?: string;
   title: string;
   content: string;
@@ -38,6 +38,7 @@ interface NoteDto {
 interface NoteStore {
   notes: NoteDto[];
   sortType: "asc" | "desc";
+  setSortType: (type: "asc" | "desc") => void;
   getNoteById?: (id: string) => NoteDto | undefined;
   addNote: (note: NoteDto) => void;
   deleteNote: (id: string) => void;

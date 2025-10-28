@@ -1,7 +1,7 @@
 import { FlashList } from "@shopify/flash-list";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
@@ -13,7 +13,7 @@ import {
   NoteItem,
   ThemedText,
 } from "@/components";
-import { useNoteStore } from "@/store/noteStore";
+import { NoteDto, useNoteStore } from "@/store/noteStore";
 import { ColorDto, useThemedStyles } from "@/theme";
 import {
   decrypt,
@@ -60,6 +60,24 @@ export default function NoteScreen() {
     });
   }, [decryptNotes, sortType]);
 
+  const renderItem = useCallback(
+    ({ item }: { item: NoteDto }) => (
+      <NoteItem
+        title={item.title}
+        updatedAt={t("notes.lastUpdate", {
+          date: dayjs(item.updatedAt).format("DD MMMM, YYYY"),
+        })}
+        onPress={() =>
+          router.push({
+            pathname: "/(tabs)/(notes)/edit",
+            params: { noteId: item.id },
+          })
+        }
+      />
+    ),
+    [],
+  );
+
   return (
     <AppLayout
       container
@@ -105,22 +123,7 @@ export default function NoteScreen() {
             </TouchableOpacity>
           </View>
         }
-        renderItem={({ item }) => (
-          <View style={styles.mb4}>
-            <NoteItem
-              title={item.title}
-              updatedAt={t("notes.lastUpdate", {
-                date: dayjs(item.updatedAt).format("MMMM D, YYYY"),
-              })}
-              onPress={() =>
-                router.push({
-                  pathname: "/(tabs)/(notes)/edit",
-                  params: { noteId: item.id },
-                })
-              }
-            />
-          </View>
-        )}
+        renderItem={renderItem}
         ListEmptyComponent={
           <EmptyList
             icon="frown"

@@ -21,6 +21,7 @@ interface AppLayoutProps {
   scrollable?: boolean;
   container?: boolean;
   footer?: React.ReactNode;
+  safeAreaBottom?: boolean;
   safeAreaPadding?: boolean;
   loading?: boolean;
   title?: string | React.ReactNode;
@@ -33,6 +34,7 @@ function AppLayout({
   loading = false,
   container = false,
   scrollable = false,
+  safeAreaBottom = false,
   safeAreaPadding = true,
   title,
   showBadge = true,
@@ -99,7 +101,14 @@ function AppLayout({
           style={styles.imageBackground}
           resizeMode="cover"
         />
-        <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+        <SafeAreaView
+          style={styles.safeArea}
+          edges={
+            safeAreaBottom || !!footer
+              ? ["top", "left", "right", "bottom"]
+              : ["top", "left", "right"]
+          }
+        >
           <Container {...containerProps}>
             {showBadge && (
               <View
