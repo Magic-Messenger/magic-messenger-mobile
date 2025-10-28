@@ -10,6 +10,8 @@ import type { ReplyMessageDtoFile } from "./replyMessageDtoFile";
 export interface ReplyMessageDto {
   /** @nullable */
   readonly messageId?: string | null;
+  /** @nullable */
+  senderUsername?: string | null;
   createdAt?: string;
   /** @nullable */
   content?: ReplyMessageDtoContent;

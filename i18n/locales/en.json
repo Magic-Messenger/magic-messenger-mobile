@@ -258,7 +258,8 @@
     "delete": "Delete",
     "online": "online",
     "offline": "offline",
-    "typing": "is typing..."
+    "typing": "is typing...",
+    "repliedMessage": "Replied Message"
   },
   "groups": {
     "title": "Groups",

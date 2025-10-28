@@ -123,8 +123,10 @@ import type {
   SendNotificationCommandRequest,
   SetupTwoFactorCommandRequest,
   SetupTwoFactorCommandResultIDataResult,
+  StartTypingCommandRequest,
   StatisticsDecimalResultIDataResult,
   StatisticsResultIDataResult,
+  StopTypingCommandRequest,
   StringIDataResult,
   StringListIDataResult,
   SubscriptionDtoListIDataResult,
@@ -5268,6 +5270,193 @@ export const usePostApiChatsUpload = <
   TContext
 > => {
   const mutationOptions = getPostApiChatsUploadMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Start typing
+ */
+export const postApiChatsStartTyping = (
+  startTypingCommandRequest: StartTypingCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/chats/start-typing`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: startTypingCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiChatsStartTypingMutationOptions = <
+  TError = ResultMessage[] | void | void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiChatsStartTyping>>,
+    TError,
+    { data: StartTypingCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiChatsStartTyping>>,
+  TError,
+  { data: StartTypingCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiChatsStartTyping"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiChatsStartTyping>>,
+    { data: StartTypingCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiChatsStartTyping(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiChatsStartTypingMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiChatsStartTyping>>
+>;
+export type PostApiChatsStartTypingMutationBody = StartTypingCommandRequest;
+export type PostApiChatsStartTypingMutationError =
+  | ResultMessage[]
+  | void
+  | void;
+
+/**
+ * @summary Start typing
+ */
+export const usePostApiChatsStartTyping = <
+  TError = ResultMessage[] | void | void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiChatsStartTyping>>,
+      TError,
+      { data: StartTypingCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiChatsStartTyping>>,
+  TError,
+  { data: StartTypingCommandRequest },
+  TContext
+> => {
+  const mutationOptions = getPostApiChatsStartTypingMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Stop typing
+ */
+export const postApiChatsStopTyping = (
+  stopTypingCommandRequest: StopTypingCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/chats/stop-typing`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: stopTypingCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiChatsStopTypingMutationOptions = <
+  TError = ResultMessage[] | void | void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiChatsStopTyping>>,
+    TError,
+    { data: StopTypingCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiChatsStopTyping>>,
+  TError,
+  { data: StopTypingCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiChatsStopTyping"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiChatsStopTyping>>,
+    { data: StopTypingCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiChatsStopTyping(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiChatsStopTypingMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiChatsStopTyping>>
+>;
+export type PostApiChatsStopTypingMutationBody = StopTypingCommandRequest;
+export type PostApiChatsStopTypingMutationError = ResultMessage[] | void | void;
+
+/**
+ * @summary Stop typing
+ */
+export const usePostApiChatsStopTyping = <
+  TError = ResultMessage[] | void | void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiChatsStopTyping>>,
+      TError,
+      { data: StopTypingCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiChatsStopTyping>>,
+  TError,
+  { data: StopTypingCommandRequest },
+  TContext
+> => {
+  const mutationOptions = getPostApiChatsStopTypingMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };

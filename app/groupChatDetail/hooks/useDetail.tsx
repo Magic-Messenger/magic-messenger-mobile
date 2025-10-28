@@ -208,10 +208,46 @@ export const useDetail = () => {
 
   const handleSendMessage = useCallback(
     async (message: string | UploadFileResultDto) => {
-      setLoading(true);
-
       const isFileMessage =
         typeof message === "object" && message?.fileUrl !== undefined;
+
+      // Create optimistic message
+      const tempId = `temp-${Date.now()}-${Math.random()}`;
+      const optimisticMessage: MessageDto & {
+        isPending?: boolean;
+        tempId?: string;
+      } = {
+        messageId: tempId,
+        tempId,
+        isPending: true,
+        chatId: chatId as string,
+        senderUsername: currentUserName,
+        messageType: isFileMessage ? message.messageType : MessageType.Text,
+        createdAt: new Date().toISOString(),
+        content: !isFileMessage
+          ? encryptForGroup(message as string, decryptedGroupKey as string)
+          : null,
+        file: isFileMessage
+          ? {
+              size: message.contentLength,
+              contentType: message.contentType,
+              filePath: encryptForGroup(
+                message.fileUrl as string,
+                decryptedGroupKey as string,
+              ),
+            }
+          : null,
+        repliedToMessage: replyMessage || null,
+        messageStatus: 1, // Pending status
+      } as any;
+
+      // Add optimistic message to list
+      setMessages((prev) => [...prev, optimisticMessage]);
+
+      // Scroll to end
+      setTimeout(() => {
+        listRef.current?.scrollToEnd({ animated: true });
+      }, 100);
 
       try {
         const response = await sendApiMessage({
@@ -244,14 +280,30 @@ export const useDetail = () => {
 
         if (response?.success) {
           onClearReply();
+          // Remove optimistic message - the real one will come via SignalR
+          setMessages((prev) =>
+            prev.filter((m) => (m as any).tempId !== tempId),
+          );
+        } else {
+          // Remove failed message
+          setMessages((prev) =>
+            prev.filter((m) => (m as any).tempId !== tempId),
+          );
         }
       } catch (error) {
         console.error("Error sending message:", error);
+        // Remove failed message
+        setMessages((prev) => prev.filter((m) => (m as any).tempId !== tempId));
       }
-
-      setLoading(false);
     },
-    [chatId, decryptedGroupKey, replyMessage, sendApiMessage, onClearReply],
+    [
+      chatId,
+      currentUserName,
+      decryptedGroupKey,
+      replyMessage,
+      sendApiMessage,
+      onClearReply,
+    ],
   );
 
   const handleChatControl = useCallback(

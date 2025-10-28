@@ -18,7 +18,19 @@ export function useChatHelper(message: MessageDto, receiverPublicKey: string) {
   const decryptedContent = useMemo(() => {
     const senderKey = isSentByCurrentUser ? receiverPublicKey : userPublicKey();
     const receiverKey = isSentByCurrentUser ? userPublicKey() : receiverPublicKey; //prettier-ignore
-
+    if (
+      message?.file &&
+      message?.file?.filePath?.cipherText &&
+      message?.file?.filePath?.nonce &&
+      receiverPublicKey
+    ) {
+      return decrypt(
+        message.file.filePath.cipherText,
+        message.file.filePath.nonce,
+        senderKey as string,
+        receiverKey as string,
+      );
+    }
     if (
       message?.messageType === MessageType.Audio ||
       message?.messageType === MessageType.Image ||
@@ -54,8 +66,9 @@ export function useChatHelper(message: MessageDto, receiverPublicKey: string) {
   }, [message, currentUserName, isSentByCurrentUser, receiverPublicKey]);
 
   const decryptedReplyMessage = useMemo(() => {
-    const senderKey = isSentByCurrentUser ? receiverPublicKey : userPublicKey();
-    const receiverKey = isSentByCurrentUser ? userPublicKey() : receiverPublicKey; //prettier-ignore
+    const isReplySentByCurrentUser = message?.repliedToMessage?.senderUsername === currentUserName; //prettier-ignore
+    const senderKey = isReplySentByCurrentUser ? receiverPublicKey : userPublicKey(); //prettier-ignore
+    const receiverKey = isReplySentByCurrentUser ? userPublicKey() : receiverPublicKey; //prettier-ignore
 
     if (
       message?.repliedToMessage &&
@@ -68,8 +81,20 @@ export function useChatHelper(message: MessageDto, receiverPublicKey: string) {
         senderKey as string,
         receiverKey as string,
       );
+    } else if (
+      message?.repliedToMessage?.file &&
+      message?.repliedToMessage?.file?.filePath?.cipherText &&
+      message?.repliedToMessage?.file?.filePath?.nonce &&
+      receiverPublicKey
+    ) {
+      return decrypt(
+        message?.repliedToMessage?.file?.filePath?.cipherText as string,
+        message?.repliedToMessage?.file?.filePath?.nonce as string,
+        senderKey as string,
+        receiverKey as string,
+      );
     }
-  }, [message]);
+  }, [message, currentUserName, receiverPublicKey]);
 
   return { decryptedContent, isSentByCurrentUser, decryptedReplyMessage };
 }
@@ -119,6 +144,9 @@ export function useGroupChatHelper(message: MessageDto) {
     }
   }, [message, currentUserName, isSentByCurrentUser]);
 
+  /* 
+  şimdilik kalsın alttaki kod patlarsa bunu açarız.
+  
   const decryptedReplyMessage = useMemo(() => {
     if (
       message?.repliedToMessage &&
@@ -129,10 +157,35 @@ export function useGroupChatHelper(message: MessageDto) {
       return decryptForGroup(
         message?.repliedToMessage?.content?.cipherText as string,
         message?.repliedToMessage?.content?.nonce as string,
+        decryptedGroupKey as string
+      );
+    }
+  }, [message, decryptedGroupKey]); */
+
+  const decryptedReplyMessage = useMemo(() => {
+    if (
+      message?.repliedToMessage &&
+      message?.repliedToMessage?.content?.cipherText &&
+      message?.repliedToMessage?.content?.nonce
+    ) {
+      return decryptForGroup(
+        message?.repliedToMessage?.content?.cipherText as string,
+        message?.repliedToMessage?.content?.nonce as string,
+        decryptedGroupKey as string,
+      );
+    } else if (
+      message?.repliedToMessage?.file &&
+      message?.repliedToMessage?.file?.filePath?.cipherText &&
+      message?.repliedToMessage?.file?.filePath?.nonce &&
+      decryptedGroupKey
+    ) {
+      return decryptForGroup(
+        message?.repliedToMessage?.file?.filePath?.cipherText as string,
+        message?.repliedToMessage?.file?.filePath?.nonce as string,
         decryptedGroupKey as string,
       );
     }
-  }, [message, decryptedGroupKey]);
+  }, [message, currentUserName, decryptedGroupKey]);
 
   return { decryptedContent, isSentByCurrentUser, decryptedReplyMessage };
 }

@@ -13,9 +13,9 @@ if (Platform.OS === "android")
   Notifications.setNotificationHandler({
     handleNotification: async () =>
       ({
-        shouldShowBanner: true,
-        shouldShowList: true,
-        shouldPlaySound: true,
+        shouldShowBanner: false,
+        shouldShowList: false,
+        shouldPlaySound: false,
         shouldSetBadge: true,
       }) as NotificationBehavior,
   });
@@ -25,13 +25,14 @@ export const registerDeliveredListener = () => {
   Notifications.addNotificationReceivedListener(async (notification) => {
     try {
       const messageData = notification.request.content.data;
-      if (!messageData) return;
+      if (!messageData && !messageData?.ChatId && messageData?.MessageId)
+        return;
 
       trackEvent("📩 Message delivered:", messageData);
 
       await postApiChatsMessageDelivered({
-        chatId: messageData?.chat as string,
-        messageId: messageData?.messageId as string,
+        chatId: messageData?.ChatId as string,
+        messageId: messageData?.MessageId as string,
       });
     } catch (err) {
       trackEvent("Delivered handler failed:", { err });
@@ -44,13 +45,14 @@ export const registerOpenedListener = () => {
   Notifications.addNotificationResponseReceivedListener(async (response) => {
     try {
       const messageData = response.notification.request.content.data;
-      if (!messageData) return;
+      if (!messageData && !messageData?.ChatId && messageData?.MessageId)
+        return;
 
       trackEvent("👆 Message opened:", messageData);
 
       await postApiChatsMessageRead({
-        chatId: messageData?.chat as string,
-        messageId: messageData?.messageId as string,
+        chatId: messageData?.ChatId as string,
+        messageId: messageData?.MessageId as string,
       });
     } catch (err) {
       trackEvent("Opened handler failed:", { err });
