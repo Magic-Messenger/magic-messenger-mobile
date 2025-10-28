@@ -289,7 +289,7 @@
   },
   "chatDetail": {
     "writeMessage": "Write a message...",
-    "replyingTo": "Replying to",
+    "replyingTo": "Replying to: {{senderName}}",
     "delete": {
       "title": "Delete Chat",
       "message": "Are you sure you want to delete this chat?",

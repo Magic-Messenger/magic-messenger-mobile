@@ -197,28 +197,31 @@ export function ChatFooter({
         <TouchableOpacity style={styles.closeIcon} onPress={onClearReply}>
           <Icon name="close" size={18} />
         </TouchableOpacity>
-
-        <ThemedText weight="bold" type="link">
-          {t("chatDetail.replyingTo")}
+        <ThemedText weight="bold" type="link" size={13}>
+          {t("chatDetail.replyingTo", {
+            senderName,
+          })}
         </ThemedText>
-        <ThemedText type="defaultSemiBold">{senderName}</ThemedText>
 
         {replyMessage?.messageType === MessageType.Text && (
-          <ThemedText numberOfLines={1} ellipsizeMode="tail">
+          <ThemedText numberOfLines={1} ellipsizeMode="tail" size={13}>
             {replyMessage?.content as string}
           </ThemedText>
         )}
-
         {replyMessage?.messageType === MessageType.Image && (
-          <ThemedText type="link">{t("common.image")}</ThemedText>
+          <ThemedText type="link" size={13}>
+            {t("common.image")}
+          </ThemedText>
         )}
-
         {replyMessage?.messageType === MessageType.Audio && (
-          <ThemedText type="link">{t("common.audio")}</ThemedText>
+          <ThemedText type="link" size={13}>
+            {t("common.audio")}
+          </ThemedText>
         )}
-
         {replyMessage?.messageType === MessageType.Video && (
-          <ThemedText type="link">{t("common.video")}</ThemedText>
+          <ThemedText type="link" size={13}>
+            {t("common.video")}
+          </ThemedText>
         )}
       </View>
     );
