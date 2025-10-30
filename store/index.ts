@@ -3,3 +3,4 @@ export * from "./groupChatStore";
 export * from "./qrStore";
 export * from "./signalRStore";
 export * from "./userStore";
+export * from "./webRTCStore";

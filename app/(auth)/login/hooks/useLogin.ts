@@ -84,7 +84,8 @@ export const useLogin = () => {
       );
 
       router.canDismiss() && router.dismissAll();
-      router.replace("/home");
+      //router.replace("/home");
+      router.push("/(calling)/videoCalling/screens");
 
       const token = await registerForPushNotificationsAsync();
       token && (await registerDeviceToken({ data: { deviceToken: token } }));

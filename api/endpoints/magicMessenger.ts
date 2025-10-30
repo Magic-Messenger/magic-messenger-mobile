@@ -33,10 +33,12 @@ import type {
   AddTransactionToLicenseCommandRequest,
   AdminLoginCommandRequest,
   AdminLoginCommandResultIDataResult,
+  AnswerCallCommandRequest,
   ArchiveChatCommandRequest,
   BlockAccountCommandRequest,
   BuyLicenseCommandRequest,
   BuyLicenseCommandResultIDataResult,
+  CallUserCommandRequest,
   ChangeAccountStatusCommandRequest,
   ChangeInvoiceStatusCommandRequest,
   ChangeLicenseStatusCommandRequest,
@@ -90,6 +92,8 @@ import type {
   GetGroupMessagesQueryResultIDataResult,
   GetMessagesQueryResultIDataResult,
   GetNotificationCommandRequest,
+  IceCandidateCommandRequest,
+  IceServer,
   InviteToGroupCommandRequest,
   InvoiceDetailDtoIDataResult,
   InvoiceDtoListPaginatedResult,
@@ -3270,6 +3274,452 @@ export const usePostApiAccountUploadProfilePicture = <
 > => {
   const mutationOptions =
     getPostApiAccountUploadProfilePictureMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Get ice servers
+ */
+export const getApiCallingGetIceServers = (
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<IceServer[]>(
+    { url: `/api/calling/get-ice-servers`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetApiCallingGetIceServersQueryKey = () => {
+  return [`/api/calling/get-ice-servers`] as const;
+};
+
+export const getGetApiCallingGetIceServersQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiCallingGetIceServers>>,
+  TError = ResultMessage[] | void | void,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiCallingGetIceServers>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetApiCallingGetIceServersQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiCallingGetIceServers>>
+  > = ({ signal }) => getApiCallingGetIceServers(requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    staleTime: 10000,
+    refetchOnWindowFocus: false,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiCallingGetIceServers>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiCallingGetIceServersQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiCallingGetIceServers>>
+>;
+export type GetApiCallingGetIceServersQueryError =
+  | ResultMessage[]
+  | void
+  | void;
+
+export function useGetApiCallingGetIceServers<
+  TData = Awaited<ReturnType<typeof getApiCallingGetIceServers>>,
+  TError = ResultMessage[] | void | void,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiCallingGetIceServers>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiCallingGetIceServers>>,
+          TError,
+          Awaited<ReturnType<typeof getApiCallingGetIceServers>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiCallingGetIceServers<
+  TData = Awaited<ReturnType<typeof getApiCallingGetIceServers>>,
+  TError = ResultMessage[] | void | void,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiCallingGetIceServers>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiCallingGetIceServers>>,
+          TError,
+          Awaited<ReturnType<typeof getApiCallingGetIceServers>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiCallingGetIceServers<
+  TData = Awaited<ReturnType<typeof getApiCallingGetIceServers>>,
+  TError = ResultMessage[] | void | void,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiCallingGetIceServers>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get ice servers
+ */
+
+export function useGetApiCallingGetIceServers<
+  TData = Awaited<ReturnType<typeof getApiCallingGetIceServers>>,
+  TError = ResultMessage[] | void | void,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiCallingGetIceServers>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiCallingGetIceServersQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Call target user
+ */
+export const postApiCallingCallUser = (
+  callUserCommandRequest: CallUserCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/calling/call-user`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: callUserCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiCallingCallUserMutationOptions = <
+  TError = ResultMessage[] | void | void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiCallingCallUser>>,
+    TError,
+    { data: CallUserCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiCallingCallUser>>,
+  TError,
+  { data: CallUserCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiCallingCallUser"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiCallingCallUser>>,
+    { data: CallUserCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiCallingCallUser(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiCallingCallUserMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiCallingCallUser>>
+>;
+export type PostApiCallingCallUserMutationBody = CallUserCommandRequest;
+export type PostApiCallingCallUserMutationError = ResultMessage[] | void | void;
+
+/**
+ * @summary Call target user
+ */
+export const usePostApiCallingCallUser = <
+  TError = ResultMessage[] | void | void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiCallingCallUser>>,
+      TError,
+      { data: CallUserCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiCallingCallUser>>,
+  TError,
+  { data: CallUserCommandRequest },
+  TContext
+> => {
+  const mutationOptions = getPostApiCallingCallUserMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Answer call
+ */
+export const postApiCallingAnswerCall = (
+  answerCallCommandRequest: AnswerCallCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/calling/answer-call`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: answerCallCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiCallingAnswerCallMutationOptions = <
+  TError = ResultMessage[] | void | void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiCallingAnswerCall>>,
+    TError,
+    { data: AnswerCallCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiCallingAnswerCall>>,
+  TError,
+  { data: AnswerCallCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiCallingAnswerCall"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiCallingAnswerCall>>,
+    { data: AnswerCallCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiCallingAnswerCall(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiCallingAnswerCallMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiCallingAnswerCall>>
+>;
+export type PostApiCallingAnswerCallMutationBody = AnswerCallCommandRequest;
+export type PostApiCallingAnswerCallMutationError =
+  | ResultMessage[]
+  | void
+  | void;
+
+/**
+ * @summary Answer call
+ */
+export const usePostApiCallingAnswerCall = <
+  TError = ResultMessage[] | void | void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiCallingAnswerCall>>,
+      TError,
+      { data: AnswerCallCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiCallingAnswerCall>>,
+  TError,
+  { data: AnswerCallCommandRequest },
+  TContext
+> => {
+  const mutationOptions = getPostApiCallingAnswerCallMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Ice candidate
+ */
+export const postApiCallingIceCandidate = (
+  iceCandidateCommandRequest: IceCandidateCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/calling/ice-candidate`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: iceCandidateCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiCallingIceCandidateMutationOptions = <
+  TError = ResultMessage[] | void | void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiCallingIceCandidate>>,
+    TError,
+    { data: IceCandidateCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiCallingIceCandidate>>,
+  TError,
+  { data: IceCandidateCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiCallingIceCandidate"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiCallingIceCandidate>>,
+    { data: IceCandidateCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiCallingIceCandidate(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiCallingIceCandidateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiCallingIceCandidate>>
+>;
+export type PostApiCallingIceCandidateMutationBody = IceCandidateCommandRequest;
+export type PostApiCallingIceCandidateMutationError =
+  | ResultMessage[]
+  | void
+  | void;
+
+/**
+ * @summary Ice candidate
+ */
+export const usePostApiCallingIceCandidate = <
+  TError = ResultMessage[] | void | void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiCallingIceCandidate>>,
+      TError,
+      { data: IceCandidateCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiCallingIceCandidate>>,
+  TError,
+  { data: IceCandidateCommandRequest },
+  TContext
+> => {
+  const mutationOptions = getPostApiCallingIceCandidateMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };

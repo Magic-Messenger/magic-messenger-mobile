@@ -2,7 +2,10 @@ import * as signalR from "@microsoft/signalr";
 
 import {
   AddMessageToTicketCommandRequest,
+  AnswerCallCommandRequest,
+  CallUserCommandRequest,
   ChangeTicketStatusCommandRequest,
+  IceCandidateCommandRequest,
   MessageDto,
   SendMessageCommandRequest,
   TicketDto,
@@ -36,6 +39,9 @@ export const createMagicHubClient = (
   changeTicketStatus: (request: ChangeTicketStatusCommandRequest) =>
     connection.invoke("ChangeTicketStatus", request),
   onlineUsers: () => connection.invoke("OnlineUsers"),
+  callUser: (request) => connection.invoke("CallUser", request),
+  answerCall: (request) => connection.invoke("AnswerCall", request),
+  sendIceCandidate: (request) => connection.invoke("SendIceCandidate", request),
 });
 
 /* Types */
@@ -91,6 +97,21 @@ export interface MessageSeenEvent {
   readBy: string;
 }
 
+export interface IncomingCallEvent {
+  callerUsername: string;
+  offer: string;
+}
+
+export interface CallAnsweredEvent {
+  answerUsername: string;
+  answer: string;
+}
+
+export interface IceCandidateEvent {
+  callerUsername: string;
+  candidate: string;
+}
+
 export interface MagicHubEvents {
   typing: TypingEvent;
   stop_typing: StopTypingEvent;
@@ -107,6 +128,9 @@ export interface MagicHubEvents {
   unblocked: UnblockedEvent;
   get_ticket_message: TicketMessageDto;
   change_ticket_status: TicketDto;
+  incoming_call: IncomingCallEvent;
+  call_answered: CallAnsweredEvent;
+  ice_candidate: IceCandidateEvent;
 }
 
 export interface MagicHubClient {
@@ -146,4 +170,10 @@ export interface MagicHubClient {
   changeTicketStatus(request: ChangeTicketStatusCommandRequest): Promise<void>;
 
   onlineUsers(): Promise<number>;
+
+  callUser(request: CallUserCommandRequest): Promise<void>;
+
+  answerCall(request: AnswerCallCommandRequest): Promise<void>;
+
+  sendIceCandidate(request: IceCandidateCommandRequest): Promise<void>;
 }

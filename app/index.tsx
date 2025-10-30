@@ -77,7 +77,8 @@ export default function IndexPage() {
 
         setTimeout(() => {
           if (isLogin) {
-            router.replace("/home");
+            //router.replace("/home");
+            router.push("/(calling)/videoCalling/screens");
           } else {
             router.replace("/(auth)/preLogin");
           }
@@ -91,7 +92,8 @@ export default function IndexPage() {
 
       setTimeout(() => {
         if (isLogin) {
-          router.replace("/home");
+          //router.replace("/home");
+          router.push("/(calling)/videoCalling/screens");
         } else {
           router.replace("/(auth)/preLogin");
         }

@@ -1,6 +1,6 @@
 import { ReactNode, useEffect } from "react";
 
-import { useSignalREvents } from "@/hooks";
+import { useSignalREvents, useWebRTCEvents } from "@/hooks";
 import { useSignalRStore, useUserStore } from "@/store";
 
 type SignalRProviderProps = { children: ReactNode };
@@ -11,6 +11,7 @@ export function SignalRProvider({ children }: SignalRProviderProps) {
   const startConnection = useSignalRStore((state) => state.startConnection);
 
   useSignalREvents();
+  useWebRTCEvents();
 
   useEffect(() => {
     if (accessToken) startConnection(accessToken).then().catch(console.error);
