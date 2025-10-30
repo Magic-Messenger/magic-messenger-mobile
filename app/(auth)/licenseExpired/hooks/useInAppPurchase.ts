@@ -100,7 +100,6 @@ export const useInAppPurchase = () => {
       text1: t("license.successUpgrade"),
       type: "success",
     });
-    router.canDismiss() && router.dismissAll();
     router.replace("/(auth)/login/screens/login");
   };
 
