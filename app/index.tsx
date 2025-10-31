@@ -66,8 +66,6 @@ export default function IndexPage() {
   };
 
   const initializeAppStart = async (withTimeout?: boolean) => {
-    router.canDismiss() && router.dismissAll();
-
     if (withTimeout) {
       setTimeout(() => {
         setConnected(true);
@@ -123,8 +121,8 @@ export default function IndexPage() {
   }, [isLogin, rehydrated]);
 
   useEffect(() => {
-    if (profileResponse?.data) setProfile(profileResponse?.data);
-  }, [profileResponse?.data]);
+    if (isLogin && profileResponse?.data) setProfile(profileResponse?.data);
+  }, [isLogin, profileResponse?.data]);
 
   useEffect(() => {
     if (isLogin) refetch();

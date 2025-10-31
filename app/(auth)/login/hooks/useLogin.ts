@@ -83,7 +83,6 @@ export const useLogin = () => {
         data?.account?.username as string,
       );
 
-      router.canDismiss() && router.dismissAll();
       //router.replace("/home");
       router.push("/(calling)/videoCalling/screens");
 
@@ -118,7 +117,6 @@ export const useLogin = () => {
     if (deleteAccountResponse?.success) {
       setUsername(undefined);
       reset({ username: undefined, password: undefined });
-      router.canDismiss() && router.dismissAll();
       router.replace("/accountDeleted/screens/accountDeleted");
     }
   };
