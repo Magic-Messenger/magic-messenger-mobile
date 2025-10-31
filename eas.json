@@ -18,7 +18,8 @@
     },
     "production": {
       "autoIncrement": true,
-      "environment": "production"
+      "environment": "production",
+      "node": "24.5.0"
     },
     "ios-simulator": {
       "extends": "development",

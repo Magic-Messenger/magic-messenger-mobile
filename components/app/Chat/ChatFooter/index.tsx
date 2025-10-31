@@ -101,12 +101,15 @@ export function ChatFooter({
         const responseFetch = await fetch(uri);
         const imageData = await responseFetch.blob();
 
+        const extensionMatch = uri.match(/\.(\w+)(?:\?|$)/);
+        const extension = extensionMatch ? extensionMatch[1] : "jpg";
+
         const { data, success } = await requestUpload({
           data: {
             file: {
-              uri: uri,
-              name: `${Date.now()}-image.jpg`,
-              type: imageData.type,
+              uri,
+              name: `${Date.now()}.${extension}`,
+              type: imageData.type || `image/${extension}`,
             } as any,
           },
         });
