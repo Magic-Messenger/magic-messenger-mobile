@@ -9,6 +9,11 @@ import {
 } from "@/api/endpoints/magicMessenger";
 import { trackEvent } from "@/utils";
 
+type DeliveredMessageNotificationData = {
+  ChatId: string;
+  MessageId: string;
+};
+
 if (Platform.OS === "android")
   Notifications.setNotificationHandler({
     handleNotification: async () =>
@@ -25,15 +30,21 @@ export const registerDeliveredListener = () => {
   Notifications.addNotificationReceivedListener(async (notification) => {
     try {
       const messageData = notification.request.content.data;
-      if (!messageData && !messageData?.ChatId && messageData?.MessageId)
-        return;
+      if (!messageData) return;
 
-      trackEvent("📩 Message delivered:", messageData);
+      const deliveredMessageNotificationData =
+        messageData as DeliveredMessageNotificationData;
+      if (
+        deliveredMessageNotificationData.ChatId &&
+        deliveredMessageNotificationData.MessageId
+      ) {
+        trackEvent("📩 Message delivered:", messageData);
 
-      await postApiChatsMessageDelivered({
-        chatId: messageData?.ChatId as string,
-        messageId: messageData?.MessageId as string,
-      });
+        await postApiChatsMessageDelivered({
+          chatId: deliveredMessageNotificationData.ChatId,
+          messageId: deliveredMessageNotificationData.MessageId,
+        });
+      }
     } catch (err) {
       trackEvent("Delivered handler failed:", { err });
     }
@@ -45,15 +56,21 @@ export const registerOpenedListener = () => {
   Notifications.addNotificationResponseReceivedListener(async (response) => {
     try {
       const messageData = response.notification.request.content.data;
-      if (!messageData && !messageData?.ChatId && messageData?.MessageId)
-        return;
+      if (!messageData) return;
 
-      trackEvent("👆 Message opened:", messageData);
+      const deliveredMessageNotificationData =
+        messageData as DeliveredMessageNotificationData;
+      if (
+        deliveredMessageNotificationData.ChatId &&
+        deliveredMessageNotificationData.MessageId
+      ) {
+        trackEvent("👆 Message opened:", messageData);
 
-      await postApiChatsMessageRead({
-        chatId: messageData?.ChatId as string,
-        messageId: messageData?.MessageId as string,
-      });
+        await postApiChatsMessageRead({
+          chatId: deliveredMessageNotificationData.ChatId,
+          messageId: deliveredMessageNotificationData.MessageId,
+        });
+      }
     } catch (err) {
       trackEvent("Opened handler failed:", { err });
     }

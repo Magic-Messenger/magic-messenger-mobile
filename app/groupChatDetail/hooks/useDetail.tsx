@@ -26,7 +26,11 @@ import {
 } from "@/api/endpoints/magicMessenger";
 import { MessageDto, MessageType } from "@/api/models";
 import { Icon } from "@/components";
-import { UploadFileResultDto } from "@/constants";
+import {
+  MessageDeliveredEvent,
+  MessageSeenEvent,
+  UploadFileResultDto,
+} from "@/constants";
 import { useSignalRStore, useUserStore } from "@/store";
 import {
   convertMessageStatus,
@@ -241,7 +245,7 @@ export const useDetail = () => {
         messageStatus: 1, // Pending status
       } as any;
 
-      // Add optimistic message to list
+      // Add an optimistic message to the list
       setMessages((prev) => [...prev, optimisticMessage]);
 
       // Scroll to end
@@ -333,16 +337,52 @@ export const useDetail = () => {
     }, 100);
   };
 
+  const handleMessageDelivered = (
+    messageDeliveredEvent: MessageDeliveredEvent,
+  ) => {
+    trackEvent("message_delivered", { messageDeliveredEvent });
+
+    setMessages((prevMessages) =>
+      prevMessages.map((item) =>
+        item.messageId === messageDeliveredEvent.message?.messageId
+          ? {
+              ...item,
+              messageStatus: messageDeliveredEvent.message?.messageStatus,
+            }
+          : item,
+      ),
+    );
+  };
+
+  const handleMessageSeen = (messageSeenEvent: MessageSeenEvent) => {
+    trackEvent("message_seen", { messageSeenEvent });
+
+    setMessages((prevMessages) =>
+      prevMessages.map((item) =>
+        item.messageId === messageSeenEvent.message?.messageId
+          ? {
+              ...item,
+              messageStatus: messageSeenEvent.message?.messageStatus,
+            }
+          : item,
+      ),
+    );
+  };
+
   useEffect(() => {
     if (magicHubClient && chatId) {
       magicHubClient.joinChat(chatId as string);
       magicHubClient.on("group_message_received", handleGroupMessageReceived);
+      magicHubClient.on("message_delivered", handleMessageDelivered);
+      magicHubClient.on("message_seen", handleMessageSeen);
     }
 
     return () => {
       if (magicHubClient && chatId) {
         magicHubClient.leaveChat(chatId as string);
         magicHubClient.off("group_message_received");
+        magicHubClient.off("message_delivered");
+        magicHubClient.off("message_seen");
       }
     };
   }, [magicHubClient, chatId]);
