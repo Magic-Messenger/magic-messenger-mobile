@@ -3,6 +3,7 @@ import * as signalR from "@microsoft/signalr";
 import {
   AddMessageToTicketCommandRequest,
   AnswerCallCommandRequest,
+  CallingType,
   CallUserCommandRequest,
   ChangeTicketStatusCommandRequest,
   IceCandidateCommandRequest,
@@ -99,11 +100,13 @@ export interface MessageSeenEvent {
 
 export interface IncomingCallEvent {
   callerUsername: string;
+  callingType: CallingType;
   offer: string;
 }
 
 export interface CallAnsweredEvent {
   answerUsername: string;
+  answerType: CallingType;
   answer: string;
 }
 

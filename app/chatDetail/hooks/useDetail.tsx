@@ -28,7 +28,7 @@ import {
 import { MessageDto, MessageType } from "@/api/models";
 import { Icon } from "@/components";
 import { UploadFileResultDto } from "@/constants";
-import { useSignalRStore, useUserStore } from "@/store";
+import { useSignalRStore, useUserStore, useWebRTCStore } from "@/store";
 import {
   convertMessageStatus,
   convertMessageType,
@@ -64,6 +64,7 @@ export const useDetail = () => {
   const isMountedRef = useRef(true);
 
   const { userName: currentUserName } = useUserStore();
+  const startCall = useWebRTCStore((s) => s.startCall);
   const magicHubClient = useSignalRStore((s) => s.magicHubClient);
   const setOnlineUsers = useSignalRStore((s) => s.setOnlineUsers);
 
@@ -344,6 +345,25 @@ export const useDetail = () => {
     };
   }, [magicHubClient, chatId]);
 
+  const onAction = () => {
+    Alert.alert(
+      t("chatDetail.delete.title"),
+      t("chatDetail.delete.message"),
+      [
+        {
+          text: t("chatDetail.delete.confirm"),
+          style: "destructive",
+          onPress: handleDeleteChat,
+        },
+        {
+          text: t("chatDetail.delete.cancel"),
+          style: "cancel",
+        },
+      ],
+      { cancelable: true },
+    );
+  };
+
   const handleDeleteChat = useCallback(async () => {
     try {
       const response = await deleteChat({
@@ -364,24 +384,19 @@ export const useDetail = () => {
     }
   }, [chatId, contactChatId, deleteChat, showToast, router]);
 
-  const onAction = () => {
-    Alert.alert(
-      t("chatDetail.delete.title"),
-      t("chatDetail.delete.message"),
-      [
-        {
-          text: t("chatDetail.delete.confirm"),
-          style: "destructive",
-          onPress: handleDeleteChat,
-        },
-        {
-          text: t("chatDetail.delete.cancel"),
-          style: "cancel",
-        },
-      ],
-      { cancelable: true },
-    );
-  };
+  const handleStartCall = useCallback(async () => {
+    await startCall({
+      callingType: "Video",
+      targetUsername: userName as string,
+    });
+    router.push({
+      pathname: "/(calling)/videoCalling/screens",
+      params: {
+        callingType: "Video",
+        targetUsername: userName,
+      },
+    });
+  }, [userName, startCall]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -409,5 +424,6 @@ export const useDetail = () => {
     onClearReply,
     handleScroll,
     handleSendMessage,
+    handleStartCall,
   };
 };

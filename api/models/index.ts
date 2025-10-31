@@ -43,6 +43,7 @@ export * from "./buyLicenseCommandRequest";
 export * from "./buyLicenseCommandResult";
 export * from "./buyLicenseCommandResultIDataResult";
 export * from "./buyLicenseCommandResultIDataResultData";
+export * from "./callingType";
 export * from "./callUserCommandRequest";
 export * from "./changeAccountStatusCommandRequest";
 export * from "./changeInvoiceStatusCommandRequest";

@@ -8,6 +8,7 @@ import {
 
 import { getApiCallingGetIceServers } from "@/api/endpoints/magicMessenger";
 import { IceServer } from "@/api/models";
+import { trackEvent } from "@/utils";
 
 type ConnectionStateType =
   | "new"
@@ -36,6 +37,12 @@ type OnIceConnectionStateChangeCallback = (
 ) => void;
 type OnIceGatheringStateChangeCallback = (state: IceGatheringStateType) => void;
 
+type LocalMediaTrackConstraints = {
+  isFrontCamera?: boolean;
+  isAudioEnabled?: boolean;
+  isVideoEnabled?: boolean;
+};
+
 class WebRTCService {
   private peerConnection: RTCPeerConnection | null = null;
   private localStream: MediaStream | null = null;
@@ -48,7 +55,7 @@ class WebRTCService {
 
       const response = await getApiCallingGetIceServers();
       this.iceServers = response ?? [];
-      console.log("ICE Servers loaded:", this.iceServers);
+      trackEvent("ICE Servers loaded:", this.iceServers);
       return this.iceServers;
     } catch (error) {
       console.error("Error fetching ICE servers:", error);
@@ -58,25 +65,31 @@ class WebRTCService {
     }
   }
 
-  async getLocalStream(isFrontCamera: boolean = true): Promise<MediaStream> {
+  async getLocalStream({
+    isFrontCamera = true,
+    isAudioEnabled = true,
+    isVideoEnabled = true,
+  }: LocalMediaTrackConstraints): Promise<MediaStream> {
     if (this.localStream) return this.localStream;
 
     const constraints = {
-      audio: true,
-      video: {
-        mandatory: {
-          minWidth: 640,
-          minHeight: 480,
-          minFrameRate: 30,
-        },
-        facingMode: isFrontCamera ? "user" : "environment",
-      },
+      audio: isAudioEnabled,
+      video: isVideoEnabled
+        ? {
+            mandatory: {
+              minWidth: 640,
+              minHeight: 480,
+              minFrameRate: 30,
+            },
+            facingMode: isFrontCamera ? "user" : "environment",
+          }
+        : false,
     };
 
     try {
       const stream = await mediaDevices.getUserMedia(constraints);
       this.localStream = stream;
-      console.log("Local stream obtained successfully");
+      trackEvent("Local stream obtained successfully");
       return stream;
     } catch (error) {
       console.error("Error getting local stream:", error);
@@ -109,21 +122,13 @@ class WebRTCService {
 
     const configuration: any = {
       iceServers: formattedIceServers,
-      // iceServers: [
-      //   {
-      //     urls: [
-      //       "stun:stun.l.google.com:19302",
-      //       "stun:stun1.l.google.com:19302",
-      //     ],
-      //   },
-      // ],
       iceCandidatePoolSize: 10,
     };
 
-    console.log("WebRTC Configuration: ", configuration);
+    trackEvent("WebRTC Configuration: ", configuration);
 
     this.peerConnection = new RTCPeerConnection(configuration);
-    console.log("Peer connection created");
+    trackEvent("Peer connection created");
 
     // 🔹 Local tracks
     this.localStream.getTracks().forEach((track) => {
@@ -133,7 +138,7 @@ class WebRTCService {
     // 🔹 Remote stream events
     this.peerConnection.ontrack = (event: any) => {
       if (event.streams && event.streams[0]) {
-        console.log("Remote stream received");
+        trackEvent("Remote stream received");
         this.remoteStream = event.streams[0];
         onRemoteStream(event.streams[0]);
       }
@@ -142,7 +147,7 @@ class WebRTCService {
     // 🔹 ICE candidate event
     this.peerConnection.onicecandidate = (event: any) => {
       if (event.candidate) {
-        console.log("ICE candidate generated");
+        trackEvent("ICE candidate generated");
         onIceCandidate(event.candidate);
       }
     };
@@ -150,7 +155,7 @@ class WebRTCService {
     // 🔹 Connection state event
     this.peerConnection.onconnectionstatechange = () => {
       const state = this.peerConnection?.connectionState as ConnectionStateType;
-      console.log("Connection state:", state);
+      trackEvent("Connection state:", state);
       onConnectionStateChange?.(state);
 
       if (state === "failed" || state === "closed") {
@@ -162,7 +167,7 @@ class WebRTCService {
     this.peerConnection.oniceconnectionstatechange = () => {
       const state = this.peerConnection
         ?.iceConnectionState as IceConnectionStateType;
-      console.log("ICE connection state:", state);
+      trackEvent("ICE connection state:", state);
       onIceConnectionStateChange?.(state);
     };
 
@@ -170,7 +175,7 @@ class WebRTCService {
     this.peerConnection.onicegatheringstatechange = () => {
       const state = this.peerConnection
         ?.iceGatheringState as IceGatheringStateType;
-      console.log("ICE gathering state:", state);
+      trackEvent("ICE gathering state:", state);
       onIceGatheringStateChange?.(state);
     };
 
@@ -187,7 +192,7 @@ class WebRTCService {
     });
 
     await this.peerConnection.setLocalDescription(offer);
-    console.log("Offer created and set as local description");
+    trackEvent("Offer created and set as local description");
 
     return offer;
   }
@@ -198,7 +203,7 @@ class WebRTCService {
 
     const answer = await this.peerConnection.createAnswer();
     await this.peerConnection.setLocalDescription(answer);
-    console.log("Answer created and set as local description");
+    trackEvent("Answer created and set as local description");
 
     return answer;
   }
@@ -212,7 +217,7 @@ class WebRTCService {
     await this.peerConnection.setRemoteDescription(
       new RTCSessionDescription(description),
     );
-    console.log("Remote description set");
+    trackEvent("Remote description set");
   }
 
   async addIceCandidate(candidate: any): Promise<void> {
@@ -225,7 +230,7 @@ class WebRTCService {
         : new RTCIceCandidate({ candidate: candidate });
 
       await this.peerConnection.addIceCandidate(iceCandidate);
-      console.log("ICE candidate added");
+      trackEvent("ICE candidate added");
     } catch (error) {
       console.error("Error adding ICE candidate:", error);
     }
@@ -233,12 +238,12 @@ class WebRTCService {
 
   toggleAudio(enabled: boolean): void {
     this.localStream?.getAudioTracks().forEach((t) => (t.enabled = enabled));
-    console.log(`Audio ${enabled ? "enabled" : "disabled"}`);
+    trackEvent(`Audio ${enabled ? "enabled" : "disabled"}`);
   }
 
   toggleVideo(enabled: boolean): void {
     this.localStream?.getVideoTracks().forEach((t) => (t.enabled = enabled));
-    console.log(`Video ${enabled ? "enabled" : "disabled"}`);
+    trackEvent(`Video ${enabled ? "enabled" : "disabled"}`);
   }
 
   async switchCamera(): Promise<void> {
@@ -246,7 +251,7 @@ class WebRTCService {
       // @ts-ignore: react-native-webrtc internal
       track._switchCamera();
     });
-    console.log("Camera switched");
+    trackEvent("Camera switched");
   }
 
   async getStats(): Promise<any> {
@@ -279,7 +284,7 @@ class WebRTCService {
   }
 
   closeConnection(): void {
-    console.log("Closing WebRTC connection...");
+    trackEvent("Closing WebRTC connection...");
 
     this.peerConnection?.close();
     this.peerConnection = null;
@@ -289,7 +294,7 @@ class WebRTCService {
 
     this.remoteStream = null;
 
-    console.log("WebRTC connection closed and cleaned up");
+    trackEvent("WebRTC connection closed and cleaned up");
   }
 
   isConnected(): boolean {

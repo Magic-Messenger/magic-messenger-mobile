@@ -4,10 +4,12 @@
  * MagicMessenger
  * OpenAPI spec version: v1
  */
+import type { CallingType } from "./callingType";
 
 export interface AnswerCallCommandRequest {
   /** @nullable */
   callerUsername?: string | null;
+  answerType?: CallingType;
   /** @nullable */
   answer?: string | null;
 }
