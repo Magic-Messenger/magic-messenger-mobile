@@ -1,18 +1,19 @@
 import { router } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { Alert, StyleSheet } from "react-native";
 
 import {
+  getApiAccountGetProfile,
   useDeleteApiAccountDeleteProfile,
-  useGetApiAccountGetProfile,
   usePostApiAccountLogin,
   usePostApiAccountRegisterDeviceToken,
   usePostApiAccountUpdatePublicKey,
 } from "@/api/endpoints/magicMessenger";
 import { flexBox, spacing } from "@/constants";
 import { registerForPushNotificationsAsync } from "@/services";
+import { useTor } from "@/services/axios/tor";
 import { useUserStore } from "@/store";
 import { useThemedStyles } from "@/theme";
 import {
@@ -29,13 +30,11 @@ interface RegisterFormData {
 }
 
 export const useLogin = () => {
+  const styles = useThemedStyles(createStyle);
   const { t } = useTranslation();
-  const { login, userName, isLogin, profile, setProfile, setUsername } =
-    useUserStore();
+
+  const { login, userName, profile, setProfile, setUsername } = useUserStore();
   const { mutateAsync: loginApi } = usePostApiAccountLogin();
-  const { data: profileResponse, refetch } = useGetApiAccountGetProfile({
-    query: { enabled: isLogin },
-  });
   const { mutateAsync: updatePublicKeyApi } =
     usePostApiAccountUpdatePublicKey();
   const { mutateAsync: registerDeviceToken } =
@@ -43,14 +42,16 @@ export const useLogin = () => {
   const { mutateAsync: deleteAccount, isPending: isDeleteAccountLoading } =
     useDeleteApiAccountDeleteProfile();
 
-  const styles = useThemedStyles(createStyle);
+  const { startTor } = useTor();
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const {
     control,
     handleSubmit,
     reset,
     watch,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<RegisterFormData>({
     defaultValues: {
       username: userName ?? (__DEV__ ? "kadir-test-1" : undefined),
@@ -70,6 +71,8 @@ export const useLogin = () => {
   }, [__DEV__]);
 
   const onSubmit = async (formValues: RegisterFormData) => {
+    setIsLoading(true);
+
     const { success, data } = await loginApi({
       data: {
         username: formValues?.username,
@@ -77,23 +80,36 @@ export const useLogin = () => {
         deviceId: await getInstallationId(),
       },
     });
-    if (success && data?.accessToken) {
-      login(
-        data?.accessToken?.token as string,
-        data?.account?.username as string,
-      );
 
-      router.replace("/home");
-
-      const token = await registerForPushNotificationsAsync();
-      token && (await registerDeviceToken({ data: { deviceToken: token } }));
-
-      await updatePublicKeyApi({
-        data: {
-          publicKey: userPublicKey(),
-        },
-      });
+    if (!success) {
+      setIsLoading(false);
+      return;
     }
+
+    login(
+      data?.accessToken?.token as string,
+      data?.account?.username as string,
+    );
+
+    const profileResponse = await getApiAccountGetProfile();
+    if (profileResponse.success) {
+      setProfile(profileResponse.data!);
+
+      if (profileResponse.data?.enableTor) await startTor();
+    }
+
+    const token = await registerForPushNotificationsAsync();
+    token && (await registerDeviceToken({ data: { deviceToken: token } }));
+
+    await updatePublicKeyApi({
+      data: {
+        publicKey: userPublicKey(),
+      },
+    });
+
+    setIsLoading(false);
+
+    router.replace("/home");
   };
 
   const onChangeAccount = () => {
@@ -156,14 +172,6 @@ export const useLogin = () => {
     );
   };
 
-  useEffect(() => {
-    if (isLogin && profileResponse?.data) setProfile(profileResponse?.data);
-  }, [isLogin, profileResponse?.data]);
-
-  useEffect(() => {
-    if (isLogin) refetch();
-  }, [isLogin]);
-
   return {
     t,
     styles,
@@ -171,7 +179,7 @@ export const useLogin = () => {
     errors,
     handleSubmit,
     onSubmit,
-    isSubmitting,
+    isLoading,
     userName,
     password,
     profile,

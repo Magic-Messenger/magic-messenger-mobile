@@ -21,7 +21,7 @@ export default function LoginScreen() {
     control,
     errors,
     styles,
-    isSubmitting,
+    isLoading,
     handleSubmit,
     onSubmit,
     userName,
@@ -42,8 +42,8 @@ export default function LoginScreen() {
             type="primary"
             label={t("login.button")}
             onPress={handleSubmit(onSubmit)}
-            loading={isSubmitting}
-            disabled={isSubmitting}
+            loading={isLoading}
+            disabled={isLoading}
             leftIcon={<Icon type="feather" name="log-in" />}
           />
 
