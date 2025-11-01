@@ -35,7 +35,9 @@
     "daysAgo_plural": "{{count}} days ago",
     "unread": "Unread",
     "read": "Read",
-    "someThingWentWrong": "Something went wrong."
+    "someThingWentWrong": "Something went wrong.",
+    "newMessageReceived": "New Message Received",
+    "newMessageReceivedDesc": "You have received a new message in chat {{title}}."
   },
   "login": {
     "title": "Login",

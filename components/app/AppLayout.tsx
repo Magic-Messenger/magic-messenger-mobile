@@ -1,5 +1,7 @@
 import { LinearGradient } from "expo-linear-gradient";
-import React, { memo, useMemo } from "react";
+import { router, usePathname } from "expo-router";
+import React, { memo, useCallback, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   ImageBackground,
@@ -10,8 +12,11 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { ChatDto } from "@/api/models";
 import { Colors, Images, spacing } from "@/constants";
-import { useThemedStyles } from "@/theme";
+import { useSignalRStore, useUserStore } from "@/store";
+import { useColor, useThemedStyles } from "@/theme";
+import { showToast, trackEvent } from "@/utils";
 
 import { ThemedText } from "./ThemedText";
 import { TorBadge } from "./TorBadge";
@@ -41,7 +46,13 @@ function AppLayout({
   footer,
   keyboardAvoiding = false,
 }: AppLayoutProps) {
+  const { t } = useTranslation();
+  const colors = useColor();
   const styles = useThemedStyles(createStyle);
+  const { userName } = useUserStore();
+  const pathname = usePathname();
+
+  const magicHubClient = useSignalRStore((s) => s.magicHubClient);
 
   // Memoize container type to prevent unnecessary re-renders
   const Container: React.ElementType = useMemo(() => {
@@ -89,6 +100,74 @@ function AppLayout({
     styles.contentPadding,
     safeAreaPadding,
   ]);
+
+  const handleMessageReceived = useCallback(
+    ({ chat }: { chat: ChatDto }) => {
+      trackEvent("chat_message_received", chat);
+      if (chat?.chatId) {
+        showToast({
+          type: "success",
+          text1: t("common.newMessageReceived"),
+          text2: t("common.newMessageReceivedDesc", {
+            title: chat?.isGroupChat
+              ? chat?.groupName
+              : chat?.contact?.nickname,
+          }),
+          text2Style: {
+            color: colors.colors.text,
+          },
+          onPress: () => {
+            if (chat.isGroupChat) {
+              router.push({
+                pathname: "/groupChatDetail/screens",
+                params: {
+                  chatId: chat?.chatId,
+                  groupKey: chat?.groupKey,
+                  groupNonce: chat?.groupNonce,
+                  userName,
+                  groupAccountCount: chat?.groupAccountCount,
+                  groupAdminAccount: chat?.groupAdminAccount,
+                  isGroupChat: (chat?.isGroupChat as never) ?? false,
+                },
+              });
+            } else {
+              router.push({
+                pathname: "/chatDetail/screens",
+                params: {
+                  chatId: chat?.chatId,
+                  publicKey: chat?.contact?.publicKey,
+                  userName: chat?.contact?.contactUsername,
+                  isGroupChat: (chat?.isGroupChat as never) ?? false,
+                },
+              });
+            }
+          },
+        });
+      }
+    },
+    [t, router, showToast],
+  );
+
+  useEffect(() => {
+    if (
+      magicHubClient &&
+      pathname !== "/chatDetail/screens" &&
+      pathname !== "/groupChatDetail/screens"
+    ) {
+      magicHubClient.on("message_received", handleMessageReceived as never);
+      magicHubClient.on(
+        "group_message_received",
+        handleMessageReceived as never,
+      );
+    }
+
+    return () => {
+      if (magicHubClient) {
+        magicHubClient.off("message_received");
+        magicHubClient.off("group_message_received");
+      }
+    };
+  }, [magicHubClient, pathname]);
 
   return (
     <View style={styles.wrapper}>
