@@ -5628,103 +5628,6 @@ export const usePostApiChatsUnarchive = <
 };
 
 /**
- * @summary Upload file for chat
- */
-export const postApiChatsUpload = (
-  postApiChatsUploadBody: PostApiChatsUploadBody,
-  options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
-) => {
-  const formData = new FormData();
-  if (postApiChatsUploadBody.file !== undefined) {
-    formData.append(`file`, postApiChatsUploadBody.file);
-  }
-
-  return AxiosInstance<UploadFileCommandResultIDataResult>(
-    {
-      url: `/api/chats/upload`,
-      method: "POST",
-      headers: { "Content-Type": "multipart/form-data" },
-      data: formData,
-      signal,
-    },
-    options,
-  );
-};
-
-export const getPostApiChatsUploadMutationOptions = <
-  TError = ResultMessage[] | void | void,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postApiChatsUpload>>,
-    TError,
-    { data: PostApiChatsUploadBody },
-    TContext
-  >;
-  request?: SecondParameter<typeof AxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof postApiChatsUpload>>,
-  TError,
-  { data: PostApiChatsUploadBody },
-  TContext
-> => {
-  const mutationKey = ["postApiChatsUpload"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postApiChatsUpload>>,
-    { data: PostApiChatsUploadBody }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return postApiChatsUpload(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type PostApiChatsUploadMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postApiChatsUpload>>
->;
-export type PostApiChatsUploadMutationBody = PostApiChatsUploadBody;
-export type PostApiChatsUploadMutationError = ResultMessage[] | void | void;
-
-/**
- * @summary Upload file for chat
- */
-export const usePostApiChatsUpload = <
-  TError = ResultMessage[] | void | void,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postApiChatsUpload>>,
-      TError,
-      { data: PostApiChatsUploadBody },
-      TContext
-    >;
-    request?: SecondParameter<typeof AxiosInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof postApiChatsUpload>>,
-  TError,
-  { data: PostApiChatsUploadBody },
-  TContext
-> => {
-  const mutationOptions = getPostApiChatsUploadMutationOptions(options);
-
-  return useMutation(mutationOptions, queryClient);
-};
-
-/**
  * @summary Start typing
  */
 export const postApiChatsStartTyping = (
@@ -5907,6 +5810,103 @@ export const usePostApiChatsStopTyping = <
   TContext
 > => {
   const mutationOptions = getPostApiChatsStopTypingMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Upload file for chat
+ */
+export const postApiChatsUpload = (
+  postApiChatsUploadBody: PostApiChatsUploadBody,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  const formData = new FormData();
+  if (postApiChatsUploadBody.file !== undefined) {
+    formData.append(`file`, postApiChatsUploadBody.file);
+  }
+
+  return AxiosInstance<UploadFileCommandResultIDataResult>(
+    {
+      url: `/api/chats/upload`,
+      method: "POST",
+      headers: { "Content-Type": "multipart/form-data" },
+      data: formData,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiChatsUploadMutationOptions = <
+  TError = ResultMessage[] | void | void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiChatsUpload>>,
+    TError,
+    { data: PostApiChatsUploadBody },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiChatsUpload>>,
+  TError,
+  { data: PostApiChatsUploadBody },
+  TContext
+> => {
+  const mutationKey = ["postApiChatsUpload"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiChatsUpload>>,
+    { data: PostApiChatsUploadBody }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiChatsUpload(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiChatsUploadMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiChatsUpload>>
+>;
+export type PostApiChatsUploadMutationBody = PostApiChatsUploadBody;
+export type PostApiChatsUploadMutationError = ResultMessage[] | void | void;
+
+/**
+ * @summary Upload file for chat
+ */
+export const usePostApiChatsUpload = <
+  TError = ResultMessage[] | void | void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiChatsUpload>>,
+      TError,
+      { data: PostApiChatsUploadBody },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiChatsUpload>>,
+  TError,
+  { data: PostApiChatsUploadBody },
+  TContext
+> => {
+  const mutationOptions = getPostApiChatsUploadMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };

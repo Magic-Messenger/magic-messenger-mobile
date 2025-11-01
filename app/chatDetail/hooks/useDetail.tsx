@@ -33,6 +33,7 @@ import {
   INITIAL_PAGE_SIZE,
   MESSAGE_STATUS_PRIORITY,
   MessageDeliveredEvent,
+  MessageReceivedEvent,
   MessageSeenEvent,
   SCROLL_THRESHOLD,
   UploadFileResultDto,
@@ -324,7 +325,7 @@ export const useDetail = () => {
   );
 
   const handleMessageReceived = useCallback(
-    (message: MessageDto) => {
+    ({ message }: MessageReceivedEvent) => {
       trackEvent("message_received", message);
 
       setMessages((prev) => [

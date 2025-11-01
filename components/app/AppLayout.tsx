@@ -10,13 +10,16 @@ import {
   View,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 import { ChatDto } from "@/api/models";
 import { Colors, Images, spacing } from "@/constants";
 import { useSignalRStore, useUserStore } from "@/store";
 import { useColor, useThemedStyles } from "@/theme";
-import { showToast, trackEvent } from "@/utils";
+import { needsBottomSafeArea, showToast, trackEvent } from "@/utils";
 
 import { ThemedText } from "./ThemedText";
 import { TorBadge } from "./TorBadge";
@@ -39,7 +42,7 @@ function AppLayout({
   loading = false,
   container = false,
   scrollable = false,
-  safeAreaBottom = false,
+  safeAreaBottom,
   safeAreaPadding = true,
   title,
   showBadge = true,
@@ -47,12 +50,20 @@ function AppLayout({
   keyboardAvoiding = false,
 }: AppLayoutProps) {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const colors = useColor();
   const styles = useThemedStyles(createStyle);
-  const { userName } = useUserStore();
   const pathname = usePathname();
 
+  const userName = useUserStore((s) => s.userName);
   const magicHubClient = useSignalRStore((s) => s.magicHubClient);
+
+  const shouldApplyBottomSafeArea = useMemo(() => {
+    if (safeAreaBottom !== undefined) {
+      return safeAreaBottom;
+    }
+    return needsBottomSafeArea() || insets.bottom > 0;
+  }, [safeAreaBottom, insets.bottom]);
 
   // Memoize container type to prevent unnecessary re-renders
   const Container: React.ElementType = useMemo(() => {
@@ -66,6 +77,9 @@ function AppLayout({
     const baseContentStyle = [
       styles.content,
       safeAreaPadding ? styles.contentPadding : undefined,
+      shouldApplyBottomSafeArea && {
+        paddingBottom: Math.max(insets.bottom, 16),
+      },
     ];
 
     if (keyboardAvoiding) {
@@ -77,7 +91,7 @@ function AppLayout({
         showsVerticalScrollIndicator: false,
         showsHorizontalScrollIndicator: false,
         bounces: false,
-        overScrollMode: "never" as const, // Android
+        overScrollMode: "never" as const,
       };
     }
 
@@ -88,7 +102,7 @@ function AppLayout({
         showsVerticalScrollIndicator: false,
         showsHorizontalScrollIndicator: false,
         bounces: false,
-        overScrollMode: "never" as const, // Android
+        overScrollMode: "never" as const,
       };
     }
 
@@ -99,6 +113,8 @@ function AppLayout({
     styles.content,
     styles.contentPadding,
     safeAreaPadding,
+    shouldApplyBottomSafeArea,
+    insets.bottom,
   ]);
 
   const handleMessageReceived = useCallback(
@@ -154,11 +170,8 @@ function AppLayout({
       pathname !== "/chatDetail/screens" &&
       pathname !== "/groupChatDetail/screens"
     ) {
-      magicHubClient.on("message_received", handleMessageReceived as never);
-      magicHubClient.on(
-        "group_message_received",
-        handleMessageReceived as never,
-      );
+      magicHubClient.on("message_received", handleMessageReceived);
+      magicHubClient.on("group_message_received", handleMessageReceived);
     }
 
     return () => {
@@ -183,7 +196,7 @@ function AppLayout({
         <SafeAreaView
           style={styles.safeArea}
           edges={
-            safeAreaBottom || !!footer
+            shouldApplyBottomSafeArea || !!footer
               ? ["top", "left", "right", "bottom"]
               : ["top", "left", "right"]
           }
@@ -222,7 +235,18 @@ function AppLayout({
             {children}
           </Container>
 
-          {footer && <>{footer}</>}
+          {footer && (
+            <View
+              style={{
+                paddingTop: Math.max(insets.bottom, 16),
+                paddingBottom: shouldApplyBottomSafeArea
+                  ? 0
+                  : Math.max(insets.bottom, 16),
+              }}
+            >
+              {footer}
+            </View>
+          )}
         </SafeAreaView>
       </LinearGradient>
 

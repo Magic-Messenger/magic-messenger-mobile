@@ -1,6 +1,6 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
 
 import { Colors, spacing } from "../../../constants";
 import { ColorDto, useThemedStyles } from "../../../theme";
@@ -29,7 +29,7 @@ export const ProductItem = ({ productName, price, onPress }: Props) => {
         end={{ y: 1, x: 0 }}
         style={styles.productItem}
       >
-        <ThemedText weight="semiBold" size={18}>
+        <ThemedText weight="semiBold" size={Platform.OS === "ios" ? 18 : 12}>
           {productName ?? ""}
         </ThemedText>
 

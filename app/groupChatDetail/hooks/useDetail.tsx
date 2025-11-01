@@ -32,6 +32,7 @@ import {
   INITIAL_PAGE_SIZE,
   MESSAGE_STATUS_PRIORITY,
   MessageDeliveredEvent,
+  MessageReceivedEvent,
   MessageSeenEvent,
   SCROLL_THRESHOLD,
   UploadFileResultDto,
@@ -327,7 +328,7 @@ export const useDetail = () => {
 
   //#region SignalR Effects
   const handleGroupMessageReceived = useCallback(
-    (message: MessageDto) => {
+    ({ message }: MessageReceivedEvent) => {
       trackEvent("group_message_received", message);
 
       setMessages((prev) => [

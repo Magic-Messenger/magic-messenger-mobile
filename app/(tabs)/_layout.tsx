@@ -2,17 +2,21 @@ import { Tabs, usePathname } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Icon } from "@/components";
 import { Colors, spacing } from "@/constants";
-import { spacingPixel, widthPixel } from "@/utils";
+import { needsBottomSafeArea, spacingPixel, widthPixel } from "@/utils";
 
 export default function TabLayout() {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const pathname = usePathname();
   const [isTransitioning, setIsTransitioning] = useState(false);
   const previousPathname = useRef(pathname);
   const timeoutRef = useRef<NodeJS.Timeout | number | null>(null);
+
+  const isNeedBottomSafeArea = needsBottomSafeArea();
 
   useEffect(() => {
     // Clear any existing timeout
@@ -68,6 +72,9 @@ export default function TabLayout() {
             borderTopWidth: 0,
             backgroundColor: Colors.secondaryBackground,
             paddingTop: spacingPixel(5),
+            ...(isNeedBottomSafeArea && {
+              marginBottom: Math.max(insets.bottom, 16),
+            }),
           },
         }}
       >

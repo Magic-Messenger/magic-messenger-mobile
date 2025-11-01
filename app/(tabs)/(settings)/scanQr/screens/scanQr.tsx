@@ -10,7 +10,7 @@ export default function ScanQrScreen() {
   const { t, styles, barcodeScanned } = useScanQr();
 
   return (
-    <AppLayout container title={t("scanQr.title")}>
+    <AppLayout container safeAreaBottom={false} title={t("scanQr.title")}>
       <View style={styles.cameraContainer}>
         <Camera
           barcodeScannerSettings={{

@@ -3,6 +3,7 @@ import * as signalR from "@microsoft/signalr";
 import {
   AddMessageToTicketCommandRequest,
   ChangeTicketStatusCommandRequest,
+  ChatDto,
   MessageDto,
   SendMessageCommandRequest,
   TicketDto,
@@ -91,12 +92,17 @@ export interface MessageSeenEvent {
   readBy: string;
 }
 
+export interface MessageReceivedEvent {
+  message: MessageDto;
+  chat: ChatDto;
+}
+
 export interface MagicHubEvents {
   typing: TypingEvent;
   stop_typing: StopTypingEvent;
   you_blocked: YouBlockedEvent;
-  message_received: MessageDto;
-  group_message_received: MessageDto;
+  message_received: MessageReceivedEvent;
+  group_message_received: MessageReceivedEvent;
   message_delivered: MessageDeliveredEvent;
   message_seen: MessageSeenEvent;
   user_online: UserOnlineEvent;
