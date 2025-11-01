@@ -84,7 +84,6 @@
       "expo-localization",
       "expo-iap",
       "expo-secure-store",
-      "./plugins/clear-keychain-plugin",
       "./plugins/trust-local-certs.js",
       [
         "expo-av",

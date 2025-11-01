@@ -14,7 +14,7 @@ import { Images } from "@/constants";
 import { useAudioPlayer, useGroupChatHelper } from "@/hooks";
 import { useSignalRStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { dateFormatter, spacingPixel, trackEvent } from "@/utils";
+import { dateFormatter, spacingPixel } from "@/utils";
 
 import { ReplyMessageItem } from "../ReplyMessageItem";
 
@@ -101,7 +101,6 @@ export function MessageGroupItem({
       !isSentByCurrentUser &&
       message?.messageStatus !== MessageStatus.Seen
     ) {
-      trackEvent("message_seen", { messageId: message?.messageId });
       magicHubClient.viewedMessage(identifier, message?.messageId as string);
     }
   }, [

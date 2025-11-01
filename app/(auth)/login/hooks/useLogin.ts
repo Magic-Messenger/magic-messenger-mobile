@@ -54,8 +54,8 @@ export const useLogin = () => {
     formState: { errors },
   } = useForm<RegisterFormData>({
     defaultValues: {
-      username: userName ?? (__DEV__ ? "kadir-test-1" : undefined),
-      password: __DEV__ ? "Kadir123*+" : undefined,
+      username: userName ?? (__DEV__ ? "omer-test" : undefined),
+      password: __DEV__ ? "Omer123*+" : undefined,
     },
   });
 
@@ -64,52 +64,56 @@ export const useLogin = () => {
   useEffect(() => {
     if (__DEV__) {
       reset({
-        username: userName ?? (__DEV__ ? "kadir-test-1" : undefined),
-        password: __DEV__ ? "Kadir123*+" : undefined,
+        username: userName ?? (__DEV__ ? "omer-test" : undefined),
+        password: __DEV__ ? "Omer123*+" : undefined,
       });
     }
   }, [__DEV__]);
 
   const onSubmit = async (formValues: RegisterFormData) => {
-    setIsLoading(true);
+    try {
+      setIsLoading(true);
 
-    const { success, data } = await loginApi({
-      data: {
-        username: formValues?.username,
-        password: formValues?.password,
-        deviceId: await getInstallationId(),
-      },
-    });
+      const { success, data } = await loginApi({
+        data: {
+          username: formValues?.username,
+          password: formValues?.password,
+          deviceId: await getInstallationId(),
+        },
+      });
 
-    if (!success) {
+      if (!success) {
+        setIsLoading(false);
+        return;
+      }
+
+      login(
+        data?.accessToken?.token as string,
+        data?.account?.username as string,
+      );
+
+      const profileResponse = await getApiAccountGetProfile();
+      if (profileResponse.success) {
+        setProfile(profileResponse.data!);
+
+        if (profileResponse.data?.enableTor) await startTor();
+      }
+
+      const token = await registerForPushNotificationsAsync();
+      token && (await registerDeviceToken({ data: { deviceToken: token } }));
+
+      await updatePublicKeyApi({
+        data: {
+          publicKey: userPublicKey(),
+        },
+      });
+
       setIsLoading(false);
-      return;
+
+      router.replace("/home");
+    } catch {
+      setIsLoading(false);
     }
-
-    login(
-      data?.accessToken?.token as string,
-      data?.account?.username as string,
-    );
-
-    const profileResponse = await getApiAccountGetProfile();
-    if (profileResponse.success) {
-      setProfile(profileResponse.data!);
-
-      if (profileResponse.data?.enableTor) await startTor();
-    }
-
-    const token = await registerForPushNotificationsAsync();
-    token && (await registerDeviceToken({ data: { deviceToken: token } }));
-
-    await updatePublicKeyApi({
-      data: {
-        publicKey: userPublicKey(),
-      },
-    });
-
-    setIsLoading(false);
-
-    router.replace("/home");
   };
 
   const onChangeAccount = () => {

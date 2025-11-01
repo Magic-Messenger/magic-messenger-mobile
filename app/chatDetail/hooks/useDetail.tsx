@@ -27,11 +27,14 @@ import {
   usePostApiChatsCreate,
   usePostApiChatsSendMessage,
 } from "@/api/endpoints/magicMessenger";
-import { MessageDto, MessageType } from "@/api/models";
+import { MessageDto, MessageStatus, MessageType } from "@/api/models";
 import { Icon } from "@/components";
 import {
+  INITIAL_PAGE_SIZE,
+  MESSAGE_STATUS_PRIORITY,
   MessageDeliveredEvent,
   MessageSeenEvent,
+  SCROLL_THRESHOLD,
   UploadFileResultDto,
 } from "@/constants";
 import { useSignalRStore, useUserStore } from "@/store";
@@ -43,9 +46,6 @@ import {
   trackEvent,
   userPublicKey,
 } from "@/utils";
-
-const INITIAL_PAGE_SIZE = 20;
-const SCROLL_THRESHOLD = 100;
 
 export const useDetail = () => {
   const { t } = useTranslation();
@@ -65,6 +65,10 @@ export const useDetail = () => {
     totalPages: 1,
     hasMore: true,
   });
+
+  // Add these refs at the top of your component
+  const updateQueueRef = useRef<Map<string, any>>(new Map());
+  const batchTimeoutRef = useRef<NodeJS.Timeout | number | null>(null);
 
   const isLoadingRef = useRef(false);
   const isMountedRef = useRef(true);
@@ -216,7 +220,7 @@ export const useDetail = () => {
       const isFileMessage =
         typeof message === "object" && message?.fileUrl !== undefined;
 
-      // Create optimistic message
+      // Create an optimistic message
       const tempId = `temp-${Date.now()}-${Math.random()}`;
       const optimisticMessage: MessageDto & {
         isPending?: boolean;
@@ -248,10 +252,10 @@ export const useDetail = () => {
             }
           : null,
         repliedToMessage: replyMessage || null,
-        messageStatus: 1, // Pending status
+        messageStatus: MessageStatus.Sent, // Pending status
       } as any;
 
-      // Add optimistic message to list
+      // Add an optimistic message to the list
       setMessages((prev) => [...prev, optimisticMessage]);
 
       // Scroll to end
@@ -297,14 +301,14 @@ export const useDetail = () => {
             prev.filter((m) => (m as any).tempId !== tempId),
           );
         } else {
-          // Remove failed message
+          // Remove a failed message
           setMessages((prev) =>
             prev.filter((m) => (m as any).tempId !== tempId),
           );
         }
       } catch (error) {
         console.error("Error sending message:", error);
-        // Remove failed message
+        // Remove a failed message
         setMessages((prev) => prev.filter((m) => (m as any).tempId !== tempId));
       }
     },
@@ -319,54 +323,137 @@ export const useDetail = () => {
     ],
   );
 
-  const handleMessageReceived = (message: MessageDto) => {
-    trackEvent("message_received", { message });
+  const handleMessageReceived = useCallback(
+    (message: MessageDto) => {
+      trackEvent("message_received", message);
 
-    setMessages((prev) => [
-      ...prev,
-      {
-        ...message,
-        messageType: convertMessageType(message.messageType as never),
-        messageStatus: convertMessageStatus(message.messageStatus as never),
-      },
-    ]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          ...message,
+          messageType: convertMessageType(message.messageType as never),
+          messageStatus: convertMessageStatus(message.messageStatus as never),
+        },
+      ]);
 
-    setTimeout(() => {
-      listRef.current?.scrollToEnd({ animated: true });
-    }, 100);
-  };
+      setTimeout(() => {
+        listRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    },
+    [listRef],
+  );
 
-  const handleMessageDelivered = (
-    messageDeliveredEvent: MessageDeliveredEvent,
-  ) => {
-    trackEvent("message_delivered", { messageDeliveredEvent });
+  // Batch processor that applies all queued updates at once with priority checks
+  const processBatchUpdates = useCallback(() => {
+    if (updateQueueRef.current.size === 0) return;
 
-    setMessages((prevMessages) =>
-      prevMessages.map((item) =>
-        item.messageId === messageDeliveredEvent.message?.messageId
-          ? {
-              ...item,
-              messageStatus: messageDeliveredEvent.message?.messageStatus,
-            }
-          : item,
-      ),
-    );
-  };
-
-  const handleMessageSeen = (messageSeenEvent: MessageSeenEvent) => {
-    trackEvent("message_seen", { messageSeenEvent });
+    const updates = new Map(updateQueueRef.current);
+    updateQueueRef.current.clear();
 
     setMessages((prevMessages) =>
-      prevMessages.map((item) =>
-        item.messageId === messageSeenEvent.message?.messageId
-          ? {
-              ...item,
-              messageStatus: messageSeenEvent.message?.messageStatus,
-            }
-          : item,
-      ),
+      prevMessages.map((item) => {
+        const update = updates.get(item.messageId as string);
+        if (!update) return item;
+
+        const currentPriority =
+          MESSAGE_STATUS_PRIORITY[item.messageStatus as never];
+        const newPriority = MESSAGE_STATUS_PRIORITY[update.messageStatus];
+
+        const shouldUpdate =
+          newPriority > currentPriority ||
+          (item.messageStatus !== update.messageStatus &&
+            newPriority >= currentPriority);
+
+        if (shouldUpdate) {
+          return {
+            ...item,
+            messageStatus: update.messageStatus,
+          };
+        }
+        return item;
+      }),
     );
-  };
+  }, []);
+
+  // Schedule batch processing
+  const scheduleBatchUpdate = useCallback(() => {
+    if (batchTimeoutRef.current) {
+      clearTimeout(batchTimeoutRef.current);
+    }
+
+    batchTimeoutRef.current = setTimeout(() => {
+      processBatchUpdates();
+      batchTimeoutRef.current = null;
+    }, 250); // Batch updates within 250ms window
+  }, [processBatchUpdates]);
+
+  const handleMessageDelivered = useCallback(
+    (messageDeliveredEvent: MessageDeliveredEvent) => {
+      trackEvent("message_delivered", { messageDeliveredEvent });
+
+      const messageId = messageDeliveredEvent.message?.messageId;
+      const newStatus = Number(messageDeliveredEvent.message?.messageStatus);
+
+      if (!messageId || !newStatus) return;
+
+      // Check if this update should override the queued one
+      const existingUpdate = updateQueueRef.current.get(messageId);
+      if (existingUpdate) {
+        const existingPriority =
+          MESSAGE_STATUS_PRIORITY[existingUpdate.messageStatus as never];
+
+        /// Only update queue if new status has higher or equal priority
+        if (newStatus >= existingPriority) {
+          updateQueueRef.current.set(messageId, {
+            messageStatus: convertMessageStatus(newStatus),
+          });
+        }
+      } else {
+        // No existing update, add to queue
+        updateQueueRef.current.set(messageId, {
+          messageStatus: convertMessageStatus(newStatus),
+        });
+      }
+
+      scheduleBatchUpdate();
+    },
+    [scheduleBatchUpdate],
+  );
+
+  const handleMessageSeen = useCallback(
+    (messageSeenEvent: MessageSeenEvent) => {
+      trackEvent("message_seen", { messageSeenEvent });
+
+      const messageId = messageSeenEvent.message?.messageId;
+      const newStatus = Number(messageSeenEvent.message?.messageStatus);
+
+      if (!messageId || !newStatus) return;
+
+      // Check if this update should override the queued one
+      const existingUpdate = updateQueueRef.current.get(messageId);
+      trackEvent("message_seen existingUpdate", existingUpdate);
+
+      if (existingUpdate) {
+        const existingPriority =
+          MESSAGE_STATUS_PRIORITY[existingUpdate.messageStatus as never];
+
+        // Only update queue if new status has higher or equal priority
+        if (newStatus >= existingPriority) {
+          updateQueueRef.current.set(messageId, {
+            messageStatus: convertMessageStatus(newStatus),
+          });
+        }
+      } else {
+        // No existing update, add to queue
+        updateQueueRef.current.set(messageId, {
+          messageStatus: convertMessageStatus(newStatus),
+        });
+      }
+
+      scheduleBatchUpdate();
+    },
+    [scheduleBatchUpdate],
+  );
 
   useEffect(() => {
     if (magicHubClient && chatId) {
@@ -383,8 +470,21 @@ export const useDetail = () => {
         magicHubClient.off("message_delivered");
         magicHubClient.off("message_seen");
       }
+
+      // Clear any pending batch updates on unmounting
+      if (batchTimeoutRef.current) {
+        clearTimeout(batchTimeoutRef.current);
+        batchTimeoutRef.current = null;
+      }
+      updateQueueRef.current.clear();
     };
-  }, [magicHubClient, chatId]);
+  }, [
+    magicHubClient,
+    chatId,
+    handleMessageReceived,
+    handleMessageDelivered,
+    handleMessageSeen,
+  ]);
 
   const handleDeleteChat = useCallback(async () => {
     try {

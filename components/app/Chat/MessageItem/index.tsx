@@ -13,7 +13,7 @@ import { Icon } from "@/components";
 import { useChatHelper } from "@/hooks";
 import { useSignalRStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { spacingPixel, trackEvent } from "@/utils";
+import { spacingPixel } from "@/utils";
 
 import { AudioMessage } from "./AudioMessage";
 import { ImageMessage } from "./ImageMessage";
@@ -52,7 +52,6 @@ export function MessageItem({
       message?.messageStatus !== MessageStatus.Seen &&
       message?.messageId
     ) {
-      trackEvent("message_seen", { messageId: message.messageId });
       magicHubClient.viewedMessage(identifier, message.messageId);
     }
   }, [
