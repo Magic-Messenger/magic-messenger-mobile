@@ -144,24 +144,6 @@ export function useGroupChatHelper(message: MessageDto) {
     }
   }, [message, currentUserName, isSentByCurrentUser]);
 
-  /* 
-  şimdilik kalsın alttaki kod patlarsa bunu açarız.
-  
-  const decryptedReplyMessage = useMemo(() => {
-    if (
-      message?.repliedToMessage &&
-      message?.repliedToMessage?.content?.cipherText &&
-      message?.repliedToMessage?.content?.nonce &&
-      decryptedGroupKey
-    ) {
-      return decryptForGroup(
-        message?.repliedToMessage?.content?.cipherText as string,
-        message?.repliedToMessage?.content?.nonce as string,
-        decryptedGroupKey as string
-      );
-    }
-  }, [message, decryptedGroupKey]); */
-
   const decryptedReplyMessage = useMemo(() => {
     if (
       message?.repliedToMessage &&

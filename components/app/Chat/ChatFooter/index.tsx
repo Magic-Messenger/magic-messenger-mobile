@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
@@ -229,6 +229,12 @@ export function ChatFooter({
       </View>
     );
   }, [replyMessage]);
+
+  useEffect(() => {
+    return () => {
+      magicHubClient?.stopTyping(chatId as string);
+    };
+  }, []);
 
   return (
     <>
