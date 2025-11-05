@@ -1,7 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
+  Extrapolation,
+  interpolate,
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
@@ -29,6 +31,10 @@ interface MessageItemProps {
 
 const SWIPE_THRESHOLD = 60;
 const REPLY_ICON_WIDTH = 30;
+const SPRING_CONFIG = {
+  damping: 20,
+  stiffness: 300,
+};
 
 export function MessageItem({
   identifier,
@@ -43,8 +49,8 @@ export function MessageItem({
     useChatHelper(message as MessageDto, receiverPublicKey);
 
   const translateX = useSharedValue(0);
-  const opacity = useSharedValue(0);
 
+  // Mark message as seen
   useEffect(() => {
     if (
       magicHubClient &&
@@ -62,52 +68,72 @@ export function MessageItem({
     message?.messageStatus,
   ]);
 
-  const triggerReply = () => {
-    if (message && onReply) {
+  const triggerReply = useCallback(() => {
+    if (message && onReply && decryptedContent) {
       onReply({
         ...message,
         content: decryptedContent as string,
       } as MessageDto);
     }
-  };
+  }, [message, onReply, decryptedContent]);
 
-  const panGesture = Gesture.Pan()
-    .onUpdate((event) => {
-      "worklet";
-      if (event.translationX > 0) {
-        translateX.value = Math.min(event.translationX, SWIPE_THRESHOLD * 1.2);
-        const progress = Math.min(event.translationX / SWIPE_THRESHOLD, 1);
-        opacity.value = progress;
-      }
-    })
-    .onEnd((event) => {
-      "worklet";
-      if (event.translationX > SWIPE_THRESHOLD) {
-        runOnJS(triggerReply)();
-      }
+  const panGesture = useMemo(
+    () =>
+      Gesture.Pan()
+        .activeOffsetX(10) // Prevent accidental triggers
+        .failOffsetY([-10, 10]) // Allow vertical scrolling
+        .onUpdate((event) => {
+          "worklet";
+          if (event.translationX > 0) {
+            translateX.value = Math.min(
+              event.translationX,
+              SWIPE_THRESHOLD * 1.2,
+            );
+          }
+        })
+        .onEnd((event) => {
+          "worklet";
+          if (event.translationX > SWIPE_THRESHOLD) {
+            runOnJS(triggerReply)();
+          }
 
-      translateX.value = withSpring(0, {
-        damping: 20,
-        stiffness: 300,
-      });
-      opacity.value = withSpring(0);
-    });
+          translateX.value = withSpring(0, SPRING_CONFIG);
+        }),
+    [triggerReply],
+  );
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: translateX.value }],
   }));
 
-  const replyIconStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [
-      {
-        translateX:
-          translateX.value > 0 ? translateX.value - REPLY_ICON_WIDTH - 10 : 0,
-      },
-    ],
-  }));
+  const replyIconStyle = useAnimatedStyle(() => {
+    const opacity = interpolate(
+      translateX.value,
+      [0, SWIPE_THRESHOLD],
+      [0, 1],
+      Extrapolation.CLAMP,
+    );
 
-  const renderMessageContent = () => {
+    const scale = interpolate(
+      translateX.value,
+      [0, SWIPE_THRESHOLD * 0.5, SWIPE_THRESHOLD],
+      [0.5, 1, 1],
+      Extrapolation.CLAMP,
+    );
+
+    return {
+      opacity,
+      transform: [
+        {
+          translateX:
+            translateX.value > 0 ? translateX.value - REPLY_ICON_WIDTH - 10 : 0,
+        },
+        { scale },
+      ],
+    };
+  });
+
+  const renderMessageContent = useCallback(() => {
     if (!message || !decryptedContent) return null;
 
     const isLoading = (message as any)?.isPending === true;
@@ -133,7 +159,10 @@ export function MessageItem({
       default:
         return null;
     }
-  };
+  }, [message, decryptedContent, decryptedReplyMessage, isSentByCurrentUser]);
+
+  // Early return if no content
+  if (!decryptedContent || !message) return null;
 
   return (
     <View style={styles.messageWrapper}>
@@ -192,6 +221,8 @@ const createStyle = (colors: ColorDto) =>
       height: REPLY_ICON_WIDTH,
       backgroundColor: colors.secondary,
       borderRadius: REPLY_ICON_WIDTH / 2,
-      transform: [{ translateY: -REPLY_ICON_WIDTH / 2 }],
+      left: 0,
+      top: "50%",
+      marginTop: -REPLY_ICON_WIDTH / 2,
     },
   });

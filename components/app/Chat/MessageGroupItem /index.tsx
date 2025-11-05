@@ -1,7 +1,9 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
+  Extrapolation,
+  interpolate,
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
@@ -26,6 +28,10 @@ interface MessageItemProps {
 
 const SWIPE_THRESHOLD = 60;
 const REPLY_ICON_WIDTH = 30;
+const SPRING_CONFIG = {
+  damping: 20,
+  stiffness: 300,
+};
 
 export function MessageGroupItem({
   identifier,
@@ -41,67 +47,16 @@ export function MessageGroupItem({
   const { loadAndPlay, pause, isPlaying } = useAudioPlayer();
 
   const translateX = useSharedValue(0);
-  const opacity = useSharedValue(0);
 
-  const triggerReply = () => {
-    if (message && onReply) {
-      onReply({
-        ...message,
-        content: decryptedContent as string,
-      } as MessageDto);
-    }
-  };
-
-  const panGesture = Gesture.Pan()
-    .onUpdate((event) => {
-      "worklet";
-      if (event.translationX > 0) {
-        translateX.value = Math.min(event.translationX, SWIPE_THRESHOLD * 1.2);
-
-        const progress = Math.min(event.translationX / SWIPE_THRESHOLD, 1);
-        opacity.value = progress;
-      }
-    })
-    .onEnd((event) => {
-      "worklet";
-      if (event.translationX > SWIPE_THRESHOLD) {
-        runOnJS(triggerReply)();
-      }
-
-      translateX.value = withSpring(0, {
-        damping: 20,
-        stiffness: 300,
-      });
-      opacity.value = withSpring(0);
-    });
-
-  const animatedStyle = useAnimatedStyle(() => {
-    "worklet";
-    return {
-      transform: [{ translateX: translateX.value }],
-    };
-  });
-
-  const replyIconStyle = useAnimatedStyle(() => {
-    "worklet";
-    return {
-      opacity: opacity.value,
-      transform: [
-        {
-          translateX:
-            translateX.value > 0 ? translateX.value - REPLY_ICON_WIDTH - 10 : 0,
-        },
-      ],
-    };
-  });
-
-  useMemo(() => {
+  // Mark message as seen
+  useEffect(() => {
     if (
       magicHubClient &&
       !isSentByCurrentUser &&
-      message?.messageStatus !== MessageStatus.Seen
+      message?.messageStatus !== MessageStatus.Seen &&
+      message?.messageId
     ) {
-      magicHubClient.viewedMessage(identifier, message?.messageId as string);
+      magicHubClient.viewedMessage(identifier, message.messageId);
     }
   }, [
     identifier,
@@ -111,211 +66,263 @@ export function MessageGroupItem({
     message?.messageStatus,
   ]);
 
-  const renderMessageStatus = useMemo(() => {
-    if (isSentByCurrentUser) {
-      if (message?.messageStatus === MessageStatus.Sent) {
-        return (
-          <Icon
-            type="ionicons"
-            name="checkmark"
-            size={16}
-            color="white"
-            style={{ marginLeft: spacingPixel(5), opacity: 0.6 }}
-          />
-        );
-      } else if (message?.messageStatus === MessageStatus.Delivered) {
-        return (
-          <Icon
-            type="ionicons"
-            name="checkmark-done"
-            size={16}
-            color="white"
-            style={{ marginLeft: spacingPixel(5), opacity: 0.6 }}
-          />
-        );
-      } else if (message?.messageStatus === MessageStatus.Seen) {
-        return (
-          <Icon
-            type="ionicons"
-            name="checkmark-done"
-            size={16}
-            color="lightblue"
-            style={{ marginLeft: spacingPixel(5) }}
-          />
-        );
-      }
+  const triggerReply = useCallback(() => {
+    if (message && onReply && decryptedContent) {
+      onReply({
+        ...message,
+        content: decryptedContent as string,
+      } as MessageDto);
     }
-    return null;
+  }, [message, onReply, decryptedContent]);
+
+  const panGesture = useMemo(
+    () =>
+      Gesture.Pan()
+        .activeOffsetX(10)
+        .failOffsetY([-10, 10])
+        .onUpdate((event) => {
+          "worklet";
+          if (event.translationX > 0) {
+            translateX.value = Math.min(
+              event.translationX,
+              SWIPE_THRESHOLD * 1.2,
+            );
+          }
+        })
+        .onEnd((event) => {
+          "worklet";
+          if (event.translationX > SWIPE_THRESHOLD) {
+            runOnJS(triggerReply)();
+          }
+
+          translateX.value = withSpring(0, SPRING_CONFIG);
+        }),
+    [triggerReply],
+  );
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+  }));
+
+  const replyIconStyle = useAnimatedStyle(() => {
+    const opacity = interpolate(
+      translateX.value,
+      [0, SWIPE_THRESHOLD],
+      [0, 1],
+      Extrapolation.CLAMP,
+    );
+
+    const scale = interpolate(
+      translateX.value,
+      [0, SWIPE_THRESHOLD * 0.5, SWIPE_THRESHOLD],
+      [0.5, 1, 1],
+      Extrapolation.CLAMP,
+    );
+
+    return {
+      opacity,
+      transform: [
+        {
+          translateX:
+            translateX.value > 0 ? translateX.value - REPLY_ICON_WIDTH - 10 : 0,
+        },
+        { scale },
+      ],
+    };
+  });
+
+  const renderMessageStatus = useMemo(() => {
+    if (!isSentByCurrentUser) return null;
+
+    const statusConfig = {
+      [MessageStatus.Sent]: {
+        name: "checkmark",
+        color: "white",
+        opacity: 0.6,
+      },
+      [MessageStatus.Delivered]: {
+        name: "checkmark-done",
+        color: "white",
+        opacity: 0.6,
+      },
+      [MessageStatus.Seen]: {
+        name: "checkmark-done",
+        color: "lightblue",
+        opacity: 1,
+      },
+    };
+
+    const config = statusConfig[message?.messageStatus!];
+    if (!config) return null;
+
+    return (
+      <Icon
+        type="ionicons"
+        name={config.name as any}
+        size={16}
+        color={config.color}
+        style={{ marginLeft: spacingPixel(5), opacity: config.opacity }}
+      />
+    );
   }, [isSentByCurrentUser, message?.messageStatus]);
 
-  const renderMessageContent = useMemo(() => {
-    if (message?.messageType === MessageType.Text) {
-      return (
-        <>
-          {!isSentByCurrentUser && (
-            <View>
-              <ThemedText size={11} numberOfLines={1} weight="semiBold">
-                {message?.nickname}
-              </ThemedText>
-            </View>
-          )}
-
-          {message?.repliedToMessage && (
-            <ReplyMessageItem message={decryptedReplyMessage as string} />
-          )}
-          <ThemedText>{decryptedContent}</ThemedText>
-          <View
-            style={[
-              styles.flex,
-              styles.flexRow,
-              styles.alignItemsCenter,
-              styles.justifyContentEnd,
-            ]}
-          >
-            <ThemedText
-              style={
-                isSentByCurrentUser
-                  ? styles.messageDateSender
-                  : styles.messageDateReceiver
-              }
-            >
-              {dateFormatter(message?.createdAt!, "HH:mm")}
-            </ThemedText>
-            {renderMessageStatus}
-          </View>
-        </>
-      );
-    } else if (message?.messageType === MessageType.Audio) {
-      return (
-        <View>
-          {!isSentByCurrentUser && (
-            <View>
-              <ThemedText size={11} numberOfLines={1} weight="semiBold">
-                {message?.nickname}
-              </ThemedText>
-            </View>
-          )}
-          {message?.repliedToMessage && (
-            <ReplyMessageItem message={decryptedReplyMessage as string} />
-          )}
-          <View style={[styles.flex, styles.flexRow]}>
-            <TouchableOpacity
-              onPress={() => {
-                if (isPlaying) {
-                  pause();
-                } else {
-                  loadAndPlay(decryptedContent as string);
-                }
-              }}
-            >
-              <Icon
-                name={isPlaying ? "pause-circle" : "play-circle"}
-                size={30}
-              />
-            </TouchableOpacity>
-
-            <AppImage
-              source={Images.soundPreview}
-              resizeMode="contain"
-              width={100}
-              height={30}
-              style={isPlaying ? { opacity: 1 } : { opacity: 0.5 }}
-            />
-          </View>
-          <View style={[styles.flex, styles.flexRow, styles.alignItemsCenter]}>
-            <ThemedText
-              style={
-                isSentByCurrentUser
-                  ? styles.messageDateSender
-                  : styles.messageDateReceiver
-              }
-            >
-              {dateFormatter(message?.createdAt!, "HH:mm")}
-            </ThemedText>
-            {renderMessageStatus}
-          </View>
-        </View>
-      );
-    } else if (message?.messageType === MessageType.Image) {
-      return (
-        <View style={styles.gap2}>
-          {!isSentByCurrentUser && (
-            <View>
-              <ThemedText size={11} numberOfLines={1} weight="semiBold">
-                {message?.nickname}
-              </ThemedText>
-            </View>
-          )}
-          {message?.repliedToMessage && (
-            <ReplyMessageItem message={decryptedReplyMessage as string} />
-          )}
-          <AppImage
-            source={{ uri: decryptedContent as string }}
-            style={{
-              width: spacingPixel(200),
-              height: spacingPixel(200),
-              borderRadius: spacingPixel(8),
-            }}
-            resizeMode="cover"
-          />
-          <View style={[styles.flex, styles.flexRow, styles.alignItemsCenter]}>
-            <ThemedText
-              style={
-                isSentByCurrentUser
-                  ? styles.messageDateSender
-                  : styles.messageDateReceiver
-              }
-            >
-              {dateFormatter(message?.createdAt!, "HH:mm")}
-            </ThemedText>
-            {renderMessageStatus}
-          </View>
-        </View>
-      );
-    } else if (message?.messageType === MessageType.Video) {
-      return (
-        <>
-          {!isSentByCurrentUser && (
-            <View>
-              <ThemedText size={11} numberOfLines={1} weight="semiBold">
-                {message?.nickname}
-              </ThemedText>
-            </View>
-          )}
-          {message?.repliedToMessage && (
-            <ReplyMessageItem message={decryptedReplyMessage as string} />
-          )}
-
-          <VideoPreview source={decryptedContent as string} />
-
-          <View style={[styles.flex, styles.flexRow, styles.alignItemsCenter]}>
-            <ThemedText
-              style={
-                isSentByCurrentUser
-                  ? styles.messageDateSender
-                  : styles.messageDateReceiver
-              }
-            >
-              {dateFormatter(message?.createdAt!, "HH:mm")}
-            </ThemedText>
-            {renderMessageStatus}
-          </View>
-        </>
-      );
+  const handleAudioToggle = useCallback(() => {
+    if (isPlaying) {
+      pause();
+    } else {
+      loadAndPlay(decryptedContent as string);
     }
+  }, [isPlaying, pause, loadAndPlay, decryptedContent]);
 
-    return null;
+  const renderMessageFooter = useCallback(
+    () => (
+      <View
+        style={[
+          styles.flex,
+          styles.flexRow,
+          styles.alignItemsCenter,
+          styles.justifyContentEnd,
+        ]}
+      >
+        <ThemedText
+          style={
+            isSentByCurrentUser
+              ? styles.messageDateSender
+              : styles.messageDateReceiver
+          }
+        >
+          {dateFormatter(message?.createdAt!, "HH:mm")}
+        </ThemedText>
+        {renderMessageStatus}
+      </View>
+    ),
+    [styles, isSentByCurrentUser, message?.createdAt, renderMessageStatus],
+  );
+
+  const renderNickname = useCallback(() => {
+    if (isSentByCurrentUser || !message?.nickname) return null;
+
+    return (
+      <View>
+        <ThemedText size={11} numberOfLines={1} weight="semiBold">
+          {message.nickname}
+        </ThemedText>
+      </View>
+    );
+  }, [isSentByCurrentUser, message?.nickname]);
+
+  const renderReplyMessage = useCallback(() => {
+    if (!message?.repliedToMessage || !decryptedReplyMessage) return null;
+
+    return <ReplyMessageItem message={decryptedReplyMessage as string} />;
+  }, [message?.repliedToMessage, decryptedReplyMessage]);
+
+  const renderTextMessage = useCallback(
+    () => (
+      <>
+        {renderNickname()}
+        {renderReplyMessage()}
+        <ThemedText>{decryptedContent}</ThemedText>
+        {renderMessageFooter()}
+      </>
+    ),
+    [renderNickname, renderReplyMessage, decryptedContent, renderMessageFooter],
+  );
+
+  const renderAudioMessage = useCallback(
+    () => (
+      <View>
+        {renderNickname()}
+        {renderReplyMessage()}
+        <View style={[styles.flex, styles.flexRow]}>
+          <TouchableOpacity onPress={handleAudioToggle}>
+            <Icon name={isPlaying ? "pause-circle" : "play-circle"} size={30} />
+          </TouchableOpacity>
+
+          <AppImage
+            source={Images.soundPreview}
+            resizeMode="contain"
+            width={100}
+            height={30}
+            style={{ opacity: isPlaying ? 1 : 0.5 }}
+          />
+        </View>
+        {renderMessageFooter()}
+      </View>
+    ),
+    [
+      renderNickname,
+      renderReplyMessage,
+      handleAudioToggle,
+      isPlaying,
+      renderMessageFooter,
+      styles,
+    ],
+  );
+
+  const renderImageMessage = useCallback(
+    () => (
+      <View style={styles.gap2}>
+        {renderNickname()}
+        {renderReplyMessage()}
+        <AppImage
+          source={{ uri: decryptedContent as string }}
+          style={{
+            width: spacingPixel(200),
+            height: spacingPixel(200),
+            borderRadius: spacingPixel(8),
+          }}
+          resizeMode="cover"
+        />
+        {renderMessageFooter()}
+      </View>
+    ),
+    [
+      renderNickname,
+      renderReplyMessage,
+      decryptedContent,
+      renderMessageFooter,
+      styles,
+    ],
+  );
+
+  const renderVideoMessage = useCallback(
+    () => (
+      <>
+        {renderNickname()}
+        {renderReplyMessage()}
+        <VideoPreview source={decryptedContent as string} />
+        {renderMessageFooter()}
+      </>
+    ),
+    [renderNickname, renderReplyMessage, decryptedContent, renderMessageFooter],
+  );
+
+  const renderMessageContent = useMemo(() => {
+    if (!message || !decryptedContent) return null;
+
+    switch (message.messageType) {
+      case MessageType.Text:
+        return renderTextMessage();
+      case MessageType.Audio:
+        return renderAudioMessage();
+      case MessageType.Image:
+        return renderImageMessage();
+      case MessageType.Video:
+        return renderVideoMessage();
+      default:
+        return null;
+    }
   }, [
-    styles,
     message,
     decryptedContent,
-    isSentByCurrentUser,
-    styles.messageDateSender,
-    styles.messageDateReceiver,
-    isPlaying,
-    pause,
-    loadAndPlay,
+    renderTextMessage,
+    renderAudioMessage,
+    renderImageMessage,
+    renderVideoMessage,
   ]);
+
+  if (!decryptedContent || !message) return null;
 
   return (
     <View style={styles.messageWrapper}>
@@ -384,6 +391,23 @@ const createStyle = (colors: ColorDto) =>
       height: REPLY_ICON_WIDTH,
       backgroundColor: colors.secondary,
       borderRadius: REPLY_ICON_WIDTH / 2,
-      transform: [{ translateY: -REPLY_ICON_WIDTH / 2 }],
+      left: 0,
+      top: "50%",
+      marginTop: -REPLY_ICON_WIDTH / 2,
+    },
+    flex: {
+      flex: 1,
+    },
+    flexRow: {
+      flexDirection: "row",
+    },
+    alignItemsCenter: {
+      alignItems: "center",
+    },
+    justifyContentEnd: {
+      justifyContent: "flex-end",
+    },
+    gap2: {
+      gap: spacingPixel(2),
     },
   });
