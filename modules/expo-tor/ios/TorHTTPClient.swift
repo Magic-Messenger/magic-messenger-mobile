@@ -13,6 +13,7 @@ class TorHTTPClient {
         method: String = "GET",
         headers: [String: String]? = nil,
         body: String? = nil,
+        formData: [String: Any]? = nil,
         completion: @escaping (Result<HTTPResponse, Error>) -> Void
     ) {
         // Tor bağlı mı kontrol et
@@ -21,25 +22,37 @@ class TorHTTPClient {
             completion(.failure(TorError.notReady))
             return
         }
-        
+
         guard let requestURL = URL(string: url) else {
             completion(.failure(URLError(.badURL)))
             return
         }
-        
+
         // URLRequest oluştur
         var request = URLRequest(url: requestURL)
         request.httpMethod = method
-        
-        // Headers ekle
+
+        // Check if this is multipart/form-data
+        let isMultipart = headers?["Content-Type"]?.contains("multipart/form-data") == true
+
+        // Headers ekle (multipart için Content-Type'ı sonra ayarlayacağız)
         if let headers = headers {
             for (key, value) in headers {
-                request.setValue(value, forHTTPHeaderField: key)
+                if !isMultipart || key != "Content-Type" {
+                    request.setValue(value, forHTTPHeaderField: key)
+                }
             }
         }
-        
+
+        // FormData varsa multipart body oluştur
+        if let formData = formData, isMultipart {
+            print("📦 [TOR iOS] Processing formData: \(formData)")
+            let boundary = "Boundary-\(UUID().uuidString)"
+            request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+            request.httpBody = createMultipartBody(formData: formData, boundary: boundary)
+        }
         // Body ekle
-        if let body = body {
+        else if let body = body {
             request.httpBody = body.data(using: .utf8)
         }
         
@@ -90,6 +103,56 @@ class TorHTTPClient {
         }
         
         task.resume()
+    }
+
+    /// Multipart body oluştur
+    private func createMultipartBody(formData: [String: Any], boundary: String) -> Data {
+        var body = Data()
+
+        for (key, value) in formData {
+            // Dosya mı kontrol et
+            if let fileData = value as? [String: Any],
+               let uriString = fileData["uri"] as? String,
+               let fileName = fileData["name"] as? String,
+               let mimeType = fileData["type"] as? String {
+
+                print("📦 [TOR iOS] Processing file: \(fileName), uri: \(uriString)")
+
+                // URI'yi URL'e çevir
+                let cleanUri = uriString.replacingOccurrences(of: "file://", with: "")
+                guard let fileURL = URL(string: "file://\(cleanUri)") else {
+                    print("❌ [TOR iOS] Invalid file URL: \(cleanUri)")
+                    continue
+                }
+
+                // Dosyayı oku
+                guard let fileContent = try? Data(contentsOf: fileURL) else {
+                    print("❌ [TOR iOS] Cannot read file at: \(fileURL.path)")
+                    continue
+                }
+
+                print("✅ [TOR iOS] File loaded: \(fileName), size: \(fileContent.count) bytes")
+
+                // Multipart boundary
+                body.append("--\(boundary)\r\n".data(using: .utf8)!)
+                body.append("Content-Disposition: form-data; name=\"\(key)\"; filename=\"\(fileName)\"\r\n".data(using: .utf8)!)
+                body.append("Content-Type: \(mimeType)\r\n\r\n".data(using: .utf8)!)
+                body.append(fileContent)
+                body.append("\r\n".data(using: .utf8)!)
+
+            } else if let stringValue = value as? String {
+                // String değer
+                body.append("--\(boundary)\r\n".data(using: .utf8)!)
+                body.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
+                body.append("\(stringValue)\r\n".data(using: .utf8)!)
+            }
+        }
+
+        // Son boundary
+        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+
+        print("📦 [TOR iOS] Multipart body created, total size: \(body.count) bytes")
+        return body
     }
 }
 

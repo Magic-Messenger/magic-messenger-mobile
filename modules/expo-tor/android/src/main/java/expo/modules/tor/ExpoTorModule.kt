@@ -23,10 +23,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.torproject.jni.TorService
+import java.io.File
 
 class ExpoTorModule : Module() {
   private var torService: TorService? = null
@@ -268,17 +271,65 @@ class ExpoTorModule : Module() {
         val method = options?.get("method") as? String ?: "GET"
         val headers = options?.get("headers") as? Map<String, String> ?: emptyMap()
         val body = options?.get("body") as? String
+        val formData = options?.get("formData") as? Map<String, Any>
 
         // Build request
         val requestBuilder = Request.Builder().url(url)
 
-        // Add headers
-        headers.forEach { (key, value) -> requestBuilder.addHeader(key, value) }
+        // Add headers (but exclude Content-Type for multipart, OkHttp will set it with boundary)
+        val contentType = headers["Content-Type"]
+        val isMultipart = contentType?.contains("multipart/form-data") == true
+
+        headers.forEach { (key, value) ->
+          if (!isMultipart || key != "Content-Type") {
+            requestBuilder.addHeader(key, value)
+          }
+        }
 
         // Add body if present
-        if (body != null && (method == "POST" || method == "PUT" || method == "PATCH")) {
-          val contentType = headers["Content-Type"] ?: "application/json"
-          requestBuilder.method(method, body.toRequestBody(contentType.toMediaType()))
+        if (formData != null && isMultipart) {
+          // Handle multipart/form-data
+          Log.d(TAG, "📦 Processing formData: $formData")
+          val multipartBuilder = MultipartBody.Builder().setType(MultipartBody.FORM)
+
+          formData.forEach { (key, value) ->
+            Log.d(TAG, "📦 FormData key: $key, value type: ${value?.javaClass?.name}")
+            when (value) {
+              is Map<*, *> -> {
+                // Handle file upload
+                val fileMap = value as Map<String, Any>
+                val uri = fileMap["uri"] as? String
+                val name = fileMap["name"] as? String ?: "file"
+                val type = fileMap["type"] as? String ?: "application/octet-stream"
+
+                Log.d(TAG, "📦 File upload - uri: $uri, name: $name, type: $type")
+
+                if (uri != null) {
+                  val file = File(uri.replace("file://", ""))
+                  Log.d(TAG, "📦 File path: ${file.absolutePath}, exists: ${file.exists()}, size: ${if (file.exists()) file.length() else 0}")
+                  if (file.exists()) {
+                    val requestBody = file.asRequestBody(type.toMediaType())
+                    multipartBuilder.addFormDataPart(key, name, requestBody)
+                    Log.d(TAG, "✅ Added file part: $key = $name")
+                  } else {
+                    Log.e(TAG, "❌ File does not exist: ${file.absolutePath}")
+                  }
+                }
+              }
+              is String -> {
+                // Handle regular form field
+                multipartBuilder.addFormDataPart(key, value)
+                Log.d(TAG, "✅ Added text part: $key = $value")
+              }
+            }
+          }
+
+          val multipartBody = multipartBuilder.build()
+          Log.d(TAG, "📦 Multipart body created with ${multipartBody.size} parts")
+          requestBuilder.method(method, multipartBody)
+        } else if (body != null && (method == "POST" || method == "PUT" || method == "PATCH")) {
+          val bodyContentType = contentType ?: "application/json"
+          requestBuilder.method(method, body.toRequestBody(bodyContentType.toMediaType()))
         } else {
           requestBuilder.method(method, null)
         }
