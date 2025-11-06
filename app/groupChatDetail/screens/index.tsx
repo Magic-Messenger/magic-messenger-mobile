@@ -1,7 +1,8 @@
 import { FlashList } from "@shopify/flash-list";
-import React from "react";
+import React, { useCallback } from "react";
 import { StyleSheet } from "react-native";
 
+import { MessageDto } from "@/api/models";
 import {
   ChatFooter,
   ChatHeader,
@@ -10,7 +11,7 @@ import {
   LoadingProvider,
   MessageGroupItem,
 } from "@/components";
-import { ColorDto, useThemedStyles } from "@/theme";
+import { useThemedStyles } from "@/theme";
 import { spacingPixel } from "@/utils";
 
 import { useDetail } from "../hooks";
@@ -31,6 +32,35 @@ export default function ChatScreen() {
     onClearReply,
     handleScroll,
   } = useDetail();
+
+  // Memoized render function for better performance
+  const renderItem = useCallback(
+    ({ item }: { item: MessageDto }) => (
+      <MessageGroupItem
+        identifier={chatId}
+        message={item}
+        onReply={handleReply}
+      />
+    ),
+    [chatId, handleReply],
+  );
+
+  // Key extractor for optimal list performance
+  const keyExtractor = useCallback(
+    (item: MessageDto) => item.messageId || `temp-${item.createdAt}`,
+    [],
+  );
+
+  // Footer component
+  const renderFooter = useCallback(
+    () => <ChatTyping chatId={chatId} />,
+    [chatId],
+  );
+
+  // Optional: Item type for better recycling
+  const getItemType = useCallback((item: MessageDto) => {
+    return item.messageType; // "text", "image", "audio", "video"
+  }, []);
 
   return (
     <ChatLayout
@@ -55,27 +85,30 @@ export default function ChatScreen() {
         <FlashList
           ref={listRef}
           data={messages}
+          renderItem={renderItem}
+          keyExtractor={keyExtractor}
           onScroll={handleScroll}
           scrollEventThrottle={16}
           contentContainerStyle={styles.contentContainerStyle}
-          renderItem={({ item }) => (
-            <MessageGroupItem
-              identifier={chatId}
-              message={item as never}
-              onReply={handleReply}
-            />
-          )}
-          ListFooterComponent={<ChatTyping chatId={chatId} />}
+          ListFooterComponent={renderFooter}
+          getItemType={getItemType}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+          drawDistance={400}
+          removeClippedSubviews
+          maintainVisibleContentPosition={{
+            autoscrollToTopThreshold: 10,
+          }}
         />
       </LoadingProvider>
     </ChatLayout>
   );
 }
 
-const createStyle = (colors: ColorDto) =>
+const createStyle = () =>
   StyleSheet.create({
     contentContainerStyle: {
-      flexDirection: "column",
       paddingHorizontal: spacingPixel(15),
+      paddingTop: spacingPixel(10),
     },
   });

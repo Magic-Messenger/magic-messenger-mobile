@@ -1,7 +1,8 @@
 import { FlashList } from "@shopify/flash-list";
-import React from "react";
+import React, { useCallback } from "react";
 import { StyleSheet } from "react-native";
 
+import { MessageDto } from "@/api/models";
 import {
   ChatFooter,
   ChatHeader,
@@ -32,6 +33,35 @@ export default function ChatScreen() {
     onClearReply,
   } = useDetail();
 
+  // Memoized render function for better performance
+  const renderItem = useCallback(
+    ({ item }: { item: MessageDto }) => (
+      <MessageItem
+        identifier={chatId}
+        message={item}
+        receiverPublicKey={usersPublicKey.receiverPublicKey}
+        onReply={handleReply}
+      />
+    ),
+    [chatId, usersPublicKey.receiverPublicKey, handleReply],
+  );
+
+  // Key extractor for optimal list performance
+  const keyExtractor = useCallback(
+    (item: MessageDto) => item.messageId || `temp-${item.createdAt}`,
+    [],
+  );
+
+  const getItemType = useCallback((item: MessageDto) => {
+    return item.messageType; // "text", "image", "audio", "video"
+  }, []);
+
+  // Footer component
+  const renderFooter = useCallback(
+    () => <ChatTyping chatId={chatId} />,
+    [chatId],
+  );
+
   return (
     <ChatLayout
       header={
@@ -54,18 +84,20 @@ export default function ChatScreen() {
         <FlashList
           ref={listRef}
           data={messages}
+          renderItem={renderItem}
+          keyExtractor={keyExtractor}
           onScroll={handleScroll}
           scrollEventThrottle={16}
           contentContainerStyle={styles.contentContainerStyle}
-          renderItem={({ item }) => (
-            <MessageItem
-              identifier={chatId}
-              message={item as never}
-              receiverPublicKey={usersPublicKey.receiverPublicKey}
-              onReply={handleReply}
-            />
-          )}
-          ListFooterComponent={<ChatTyping chatId={chatId} />}
+          ListFooterComponent={renderFooter}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+          getItemType={getItemType}
+          drawDistance={400}
+          removeClippedSubviews
+          maintainVisibleContentPosition={{
+            autoscrollToTopThreshold: 10,
+          }}
         />
       </LoadingProvider>
     </ChatLayout>
@@ -75,7 +107,7 @@ export default function ChatScreen() {
 const createStyle = () =>
   StyleSheet.create({
     contentContainerStyle: {
-      flexDirection: "column",
       paddingHorizontal: spacingPixel(15),
+      paddingTop: spacingPixel(10),
     },
   });

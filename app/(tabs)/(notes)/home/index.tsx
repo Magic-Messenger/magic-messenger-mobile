@@ -14,7 +14,7 @@ import {
   ThemedText,
 } from "@/components";
 import { NoteDto, useNoteStore } from "@/store/noteStore";
-import { ColorDto, useThemedStyles } from "@/theme";
+import { useThemedStyles } from "@/theme";
 import {
   decrypt,
   heightPixel,
@@ -25,41 +25,42 @@ import {
 
 export default function NoteScreen() {
   const { t } = useTranslation();
-  const styles = useThemedStyles(createStyle);
   const router = useRouter();
+  const styles = useThemedStyles(createStyle);
 
   const { notes, sortType, setSortType } = useNoteStore();
 
+  /** Safely decrypt notes */
   const decryptNotes = useMemo(() => {
     return notes.map((note) => {
-      if ((note as any)?.cipherText && (note as any)?.nonce) {
-        return JSON.parse(
-          decrypt(
-            (note as any).cipherText as never,
-            (note as any).nonce as never,
+      try {
+        if (note?.cipherText && note?.nonce) {
+          const decrypted = decrypt(
+            note.cipherText,
+            note.nonce,
             userPublicKey()!,
             userPrivateKey()!,
-          ) as never,
-        );
+          );
+          return JSON.parse(decrypted as never);
+        }
+        return note;
+      } catch (error) {
+        console.warn("Failed to decrypt note:", note.id, error);
+        return note;
       }
-      return note;
     });
   }, [notes]);
 
+  /** Sort notes immutably */
   const sortedNotes = useMemo(() => {
-    return decryptNotes.sort((a, b) => {
-      if (sortType === "asc") {
-        return (
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-        );
-      } else {
-        return (
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-      }
+    return [...decryptNotes].sort((a, b) => {
+      const aTime = new Date(a.createdAt).getTime();
+      const bTime = new Date(b.createdAt).getTime();
+      return sortType === "asc" ? aTime - bTime : bTime - aTime;
     });
   }, [decryptNotes, sortType]);
 
+  /** Render each note */
   const renderItem = useCallback(
     ({ item }: { item: NoteDto }) => (
       <NoteItem
@@ -75,6 +76,41 @@ export default function NoteScreen() {
         }
       />
     ),
+    [router, t],
+  );
+
+  /** Toggle sorting */
+  const handleToggleSort = useCallback(() => {
+    setSortType(sortType === "asc" ? "desc" : "asc");
+  }, [sortType, setSortType]);
+
+  const NotesHeader = useCallback(
+    () => (
+      <View style={styles.headerRow}>
+        <ThemedText type="default" weight="semiBold" size={18}>
+          {t("notes.listNotes")}
+        </ThemedText>
+        <TouchableOpacity onPress={handleToggleSort} style={styles.sortButton}>
+          <Icon
+            type="fontawesome5"
+            size={18}
+            name={sortType === "asc" ? "sort-amount-up" : "sort-amount-down"}
+          />
+        </TouchableOpacity>
+      </View>
+    ),
+    [],
+  );
+
+  const NotesEmptyList = useCallback(
+    () => (
+      <EmptyList
+        icon="frown"
+        style={styles.emptyList}
+        textStyle={styles.textCenter}
+        label={t("notes.empty")}
+      />
+    ),
     [],
   );
 
@@ -82,14 +118,12 @@ export default function NoteScreen() {
     <AppLayout
       container
       title={
-        <View style={styles.newChatButton}>
+        <View style={styles.newNoteButton}>
           <Button
             type="primary"
             label={t("notes.newNote")}
             leftIcon={<Icon type="feather" name="plus" size={18} />}
-            textProps={{
-              size: 14,
-            }}
+            textProps={{ size: 14 }}
             onPress={() => router.push("/(tabs)/(notes)/create")}
           />
         </View>
@@ -97,53 +131,42 @@ export default function NoteScreen() {
     >
       <FlashList
         data={sortedNotes}
-        ListHeaderComponent={
-          <View
-            style={[
-              styles.flexRow,
-              styles.alignItemsCenter,
-              styles.justifyContentBetween,
-              styles.mb4,
-            ]}
-          >
-            <ThemedText type="default" weight="semiBold" size={18}>
-              {t("notes.listNotes")}
-            </ThemedText>
-
-            <TouchableOpacity
-              onPress={() => setSortType(sortType === "asc" ? "desc" : "asc")}
-            >
-              <Icon
-                type="fontawesome5"
-                size={18}
-                name={
-                  sortType === "asc" ? "sort-amount-up" : "sort-amount-down"
-                }
-              />
-            </TouchableOpacity>
-          </View>
-        }
+        keyExtractor={(item) => item.id!}
         renderItem={renderItem}
-        ListEmptyComponent={
-          <EmptyList
-            icon="frown"
-            style={[styles.mt10, styles.pl5, styles.pr5] as never}
-            textStyle={styles.textCenter}
-            label={t("notes.empty")}
-          />
-        }
+        ListHeaderComponent={NotesHeader}
+        ListEmptyComponent={NotesEmptyList}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+        drawDistance={400}
+        removeClippedSubviews
+        maintainVisibleContentPosition={{
+          autoscrollToTopThreshold: 10,
+        }}
       />
     </AppLayout>
   );
 }
 
-const createStyle = (colors: ColorDto) =>
+const createStyle = () =>
   StyleSheet.create({
+    newNoteButton: {
+      width: widthPixel(110),
+      height: heightPixel(30),
+    },
     textCenter: {
       textAlign: "center",
     },
-    newChatButton: {
-      width: widthPixel(110),
-      height: heightPixel(30),
+    headerRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: heightPixel(10),
+    },
+    sortButton: {
+      padding: widthPixel(6),
+    },
+    emptyList: {
+      marginTop: heightPixel(20),
+      paddingHorizontal: widthPixel(20),
     },
   });

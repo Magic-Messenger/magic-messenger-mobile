@@ -77,9 +77,6 @@ function AppLayout({
     const baseContentStyle = [
       styles.content,
       safeAreaPadding ? styles.contentPadding : undefined,
-      shouldApplyBottomSafeArea && {
-        paddingBottom: Math.max(insets.bottom, 16),
-      },
     ];
 
     if (keyboardAvoiding) {
@@ -239,9 +236,6 @@ function AppLayout({
             <View
               style={{
                 paddingTop: Math.max(insets.bottom, 16),
-                paddingBottom: shouldApplyBottomSafeArea
-                  ? 0
-                  : Math.max(insets.bottom, 16),
               }}
             >
               {footer}

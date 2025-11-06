@@ -33,6 +33,8 @@ export interface NoteDto {
   content: string;
   createdAt?: string;
   updatedAt?: string;
+  cipherText: string;
+  nonce: string;
 }
 
 interface NoteStore {
