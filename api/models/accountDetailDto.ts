@@ -20,6 +20,8 @@ export interface AccountDetailDto {
   /** @nullable */
   username?: string | null;
   /** @nullable */
+  language?: string | null;
+  /** @nullable */
   deviceToken?: string | null;
   voiceTransformer?: boolean;
   enableScreenShots?: boolean;

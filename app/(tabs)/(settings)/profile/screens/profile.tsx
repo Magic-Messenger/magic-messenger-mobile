@@ -9,12 +9,7 @@ import {
   Input,
   ThemedText,
 } from "@/components";
-import {
-  appSupportLanguages,
-  changeLanguage,
-  copyToClipboard,
-  fontPixel,
-} from "@/utils";
+import { appSupportLanguages, copyToClipboard } from "@/utils";
 
 import { useProfile } from "../hooks";
 
@@ -30,6 +25,7 @@ export default function ProfileScreen() {
     setUserPassword,
     isPending,
     deleteProfile,
+    handleChangeLanguage,
   } = useProfile();
 
   return (
@@ -86,12 +82,9 @@ export default function ProfileScreen() {
 
         <Dropdown
           label={t("profile.language")}
-          labelStyle={{
-            fontSize: fontPixel(16),
-          }}
           selectedValue={settings?.language ?? "en"}
           options={appSupportLanguages()}
-          onValueChange={(item) => changeLanguage(item as string)}
+          onValueChange={handleChangeLanguage}
           style={styles.mt7}
         />
       </View>

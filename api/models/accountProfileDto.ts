@@ -13,6 +13,8 @@ export interface AccountProfileDto {
   username?: string | null;
   /** @nullable */
   readonly profileQrCodeLink?: string | null;
+  /** @nullable */
+  language?: string | null;
   voiceTransformer?: boolean;
   enableScreenShots?: boolean;
   enableTor?: boolean;

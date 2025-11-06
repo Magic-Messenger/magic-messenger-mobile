@@ -17,6 +17,8 @@ export interface AccountDto {
   username?: string | null;
   /** @nullable */
   licenseCode?: string | null;
+  /** @nullable */
+  language?: string | null;
   voiceTransformer?: boolean;
   enableScreenShots?: boolean;
   enableTor?: boolean;

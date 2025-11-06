@@ -5,11 +5,12 @@ import { StyleSheet } from "react-native";
 import {
   useDeleteApiAccountDeleteProfile,
   useGetApiAccountGetProfile,
+  usePostApiAccountChangeLanguage,
 } from "@/api/endpoints/magicMessenger";
 import { Colors, flexBox, spacing } from "@/constants";
 import { useAppStore, useUserStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { showToast, widthPixel } from "@/utils";
+import { changeLanguage, showToast, widthPixel } from "@/utils";
 
 export const useProfile = () => {
   const { t } = useTranslation();
@@ -20,6 +21,8 @@ export const useProfile = () => {
   const { data, isLoading } = useGetApiAccountGetProfile();
   const { mutateAsync: deleteProfileRequest, isPending } =
     useDeleteApiAccountDeleteProfile();
+  const { mutateAsync: changeLanguageRequest } =
+    usePostApiAccountChangeLanguage();
 
   const [userPassword, setUserPassword] = useState<string | null>(null);
   const [deleteApprove, setDeleteApprove] = useState<boolean>(false);
@@ -44,6 +47,11 @@ export const useProfile = () => {
     }
   };
 
+  const handleChangeLanguage = async (value: string | number) => {
+    changeLanguage(value as string);
+    await changeLanguageRequest({ data: { language: value as string } });
+  };
+
   return {
     t,
     settings,
@@ -56,6 +64,7 @@ export const useProfile = () => {
     deleteApprove,
     setDeleteApprove,
     deleteProfile,
+    handleChangeLanguage,
   };
 };
 

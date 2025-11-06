@@ -41,6 +41,7 @@ import type {
   CallUserCommandRequest,
   ChangeAccountStatusCommandRequest,
   ChangeInvoiceStatusCommandRequest,
+  ChangeLanguageCommandRequest,
   ChangeLicenseStatusCommandRequest,
   ChangeTicketStatusCommandRequest,
   ChatDtoListPaginatedResultIDataResult,
@@ -1518,6 +1519,103 @@ export const usePostApiAccountChangeStatus = <
   TContext
 > => {
   const mutationOptions = getPostApiAccountChangeStatusMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Change language operation
+ */
+export const postApiAccountChangeLanguage = (
+  changeLanguageCommandRequest: ChangeLanguageCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/account/change-language`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: changeLanguageCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiAccountChangeLanguageMutationOptions = <
+  TError = ResultMessage[] | void | void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiAccountChangeLanguage>>,
+    TError,
+    { data: ChangeLanguageCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiAccountChangeLanguage>>,
+  TError,
+  { data: ChangeLanguageCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiAccountChangeLanguage"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiAccountChangeLanguage>>,
+    { data: ChangeLanguageCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiAccountChangeLanguage(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiAccountChangeLanguageMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiAccountChangeLanguage>>
+>;
+export type PostApiAccountChangeLanguageMutationBody =
+  ChangeLanguageCommandRequest;
+export type PostApiAccountChangeLanguageMutationError =
+  | ResultMessage[]
+  | void
+  | void;
+
+/**
+ * @summary Change language operation
+ */
+export const usePostApiAccountChangeLanguage = <
+  TError = ResultMessage[] | void | void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiAccountChangeLanguage>>,
+      TError,
+      { data: ChangeLanguageCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiAccountChangeLanguage>>,
+  TError,
+  { data: ChangeLanguageCommandRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiAccountChangeLanguageMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };

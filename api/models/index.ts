@@ -47,6 +47,7 @@ export * from "./callingType";
 export * from "./callUserCommandRequest";
 export * from "./changeAccountStatusCommandRequest";
 export * from "./changeInvoiceStatusCommandRequest";
+export * from "./changeLanguageCommandRequest";
 export * from "./changeLicenseStatusCommandRequest";
 export * from "./changeTicketStatusCommandRequest";
 export * from "./chatDto";
