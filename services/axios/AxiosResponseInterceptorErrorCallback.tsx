@@ -29,6 +29,7 @@ const AxiosResponseInterceptorErrorCallback = (error: AxiosError) => {
         (response?.data as { messages: ResultMessage[] })?.messages ||
         (response?.data as ResultMessage[]) ||
         [];
+      trackEvent("Magic Error Response: ", response);
       trackEvent("Magic Error Messages: ", messages);
       if (messages?.length > 0) {
         if (messages.some((message) => message.code === LICENSE_EXPIRED)) {

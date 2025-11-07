@@ -17,6 +17,7 @@ export default function LicenseScreen() {
       scrollable
       title={t("license.title")}
       loading={isLoading}
+      safeAreaBottom={false}
       footer={
         <Button
           type="secondary"

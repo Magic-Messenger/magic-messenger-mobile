@@ -12,13 +12,17 @@ export default function TicketsScreen() {
   // Empty list component
   const renderEmptyList = useCallback(
     () => (
-      <EmptyList
-        label={t("tickets.noTickets")}
-        icon="inbox"
-        style={styles.mt10}
-      />
+      <>
+        {!isLoading && (
+          <EmptyList
+            label={t("tickets.notFound")}
+            icon="inbox"
+            style={styles.mt10}
+          />
+        )}
+      </>
     ),
-    [t, styles.mt10],
+    [t, styles.mt10, isLoading],
   );
 
   return (

@@ -76,8 +76,8 @@ export const useLogin = () => {
 
       const { success, data } = await loginApi({
         data: {
-          username: formValues?.username,
-          password: formValues?.password,
+          username: formValues?.username?.trim(),
+          password: formValues?.password?.trim(),
           deviceId: await getInstallationId(),
         },
       });

@@ -64,13 +64,17 @@ export default function ChatScreen() {
   // Empty list component
   const renderEmptyList = useCallback(
     () => (
-      <EmptyList
-        label={t("chat.noChats")}
-        icon="message-square"
-        style={styles.mt10}
-      />
+      <>
+        {!isLoading && (
+          <EmptyList
+            label={t("chat.notFound")}
+            icon="message-square"
+            style={styles.mt10}
+          />
+        )}
+      </>
     ),
-    [t, styles.mt10],
+    [t, styles.mt10, isLoading],
   );
 
   // Header title with new chat button

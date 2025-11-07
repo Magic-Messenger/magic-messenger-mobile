@@ -163,7 +163,7 @@
     "scanQRCode": "Scan QR code",
     "scanSuccessfull": "Scan Successful",
     "successCopyUserName": "Username copied successfully",
-    "notFound": "Contact data not found",
+    "notFound": "You have no contact yet",
     "successAddedContact": "Contact added successfully",
     "successEditedContact": "Contact updated successfully",
     "deleteContact": "Delete Contact",
@@ -252,7 +252,8 @@
     "myTickets": "My Tickets",
     "open": "Open",
     "waiting": "Waiting",
-    "closed": "Closed"
+    "closed": "Closed",
+    "notFound": "You have no ticket yet"
   },
   "chat": {
     "title": "Chat",
@@ -263,7 +264,8 @@
     "online": "online",
     "offline": "offline",
     "typing": "is typing...",
-    "repliedMessage": "Replied Message"
+    "repliedMessage": "Replied Message",
+    "notFound": "You have no chat yet"
   },
   "groups": {
     "title": "Groups",
@@ -273,10 +275,11 @@
     "searchContacts": "Search from contact list to add in group",
     "inThisGroup": "In this group (max. 15 users)",
     "create": "Create",
-    "selectParticipants": "Select participants"
+    "selectParticipants": "Select participants",
+    "notFound": "You have no group chat yet"
   },
   "notes": {
-    "empty": "No notes available. Click the + button to add a new note.",
+    "empty": "You have no note yet, Click the + button to add a new note.",
     "lastUpdate": "Last update: {{date}}",
     "newNote": "New Note",
     "editNote": "Edit Note",

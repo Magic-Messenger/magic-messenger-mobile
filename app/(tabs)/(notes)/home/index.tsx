@@ -111,7 +111,7 @@ export default function NoteScreen() {
         label={t("notes.empty")}
       />
     ),
-    [],
+    [t, styles.emptyList, styles.textCenter],
   );
 
   return (

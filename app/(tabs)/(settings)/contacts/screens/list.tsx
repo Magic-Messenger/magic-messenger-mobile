@@ -53,13 +53,17 @@ export default function ContactsScreen() {
   // Empty list component
   const renderEmptyList = useCallback(
     () => (
-      <EmptyList
-        label={t("contacts.notFound")}
-        icon="frown"
-        style={styles.mt10}
-      />
+      <>
+        {!isLoading && (
+          <EmptyList
+            label={t("contacts.notFound")}
+            icon="frown"
+            style={styles.mt10}
+          />
+        )}
+      </>
     ),
-    [t, styles.mt10],
+    [t, styles.mt10, isLoading],
   );
 
   return (

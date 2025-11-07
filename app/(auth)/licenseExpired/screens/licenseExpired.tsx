@@ -23,6 +23,7 @@ export default function LicenseScreen() {
       container
       scrollable
       showBadge={false}
+      safeAreaBottom={false}
       loading={isLoading}
       footer={
         <Button

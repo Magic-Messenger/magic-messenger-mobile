@@ -29,7 +29,7 @@ export default function ParticipantsScreen() {
   const { participants, setParticipants, removeParticipant } =
     useGroupChatCreateStore();
 
-  const { data: contactData, refetch } = useGetApiContactsList();
+  const { data: contactData, refetch, isLoading } = useGetApiContactsList();
 
   const [searchText, setSearchText] = useState<string>("");
 
@@ -116,13 +116,17 @@ export default function ParticipantsScreen() {
   // Empty list component
   const renderEmptyList = useCallback(
     () => (
-      <EmptyList
-        label={t("contacts.notFound")}
-        icon="frown"
-        style={styles.mt10}
-      />
+      <>
+        {!isLoading && (
+          <EmptyList
+            label={t("contacts.notFound")}
+            icon="frown"
+            style={styles.mt10}
+          />
+        )}
+      </>
     ),
-    [t, styles.mt10],
+    [t, styles.mt10, isLoading],
   );
 
   return (

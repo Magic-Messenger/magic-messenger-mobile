@@ -72,13 +72,17 @@ export default function ChatScreen() {
   // Empty list component
   const renderEmptyList = useCallback(
     () => (
-      <EmptyList
-        label={t("groups.noGroups")}
-        icon="users"
-        style={styles.mt10}
-      />
+      <>
+        {!isLoading && (
+          <EmptyList
+            label={t("groups.notFound")}
+            icon="users"
+            style={styles.mt10}
+          />
+        )}
+      </>
     ),
-    [t, styles.mt10],
+    [t, styles.mt10, isLoading],
   );
 
   // Header title with new group button

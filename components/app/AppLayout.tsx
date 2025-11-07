@@ -19,7 +19,12 @@ import { ChatDto } from "@/api/models";
 import { Colors, Images, spacing } from "@/constants";
 import { useSignalRStore, useUserStore } from "@/store";
 import { useColor, useThemedStyles } from "@/theme";
-import { needsBottomSafeArea, showToast, trackEvent } from "@/utils";
+import {
+  needsBottomSafeArea,
+  showToast,
+  spacingPixel,
+  trackEvent,
+} from "@/utils";
 
 import { ThemedText } from "./ThemedText";
 import { TorBadge } from "./TorBadge";
@@ -235,7 +240,8 @@ function AppLayout({
           {footer && (
             <View
               style={{
-                paddingTop: Math.max(insets.bottom, 16),
+                paddingTop: spacingPixel(16),
+                paddingBottom: shouldApplyBottomSafeArea ? spacingPixel(16) : 0,
               }}
             >
               {footer}
