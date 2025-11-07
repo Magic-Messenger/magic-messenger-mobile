@@ -7,6 +7,8 @@
     "start:clean": "expo start --clear",
     "expo:clean": "npx expo prebuild --clean",
     "android": "expo run:android",
+    "release-aab": "cd android && ./gradlew bundleRelease && cd ..",
+    "release-apk": "cd android && ./gradlew assembleRelease  && cd ..",
     "ios": "expo run:ios",
     "ios-device": "npx expo run:ios --device 'iPhone 12'",
     "ios-device-release": "npx expo run:ios --device 'iPhone 12' --configuration Release",
