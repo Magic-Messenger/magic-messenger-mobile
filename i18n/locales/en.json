@@ -303,6 +303,7 @@
       "success": "Chat deleted successfully",
       "cancel": "Cancel",
       "confirm": "Delete"
-    }
+    },
+    "encryptionInfo": "This chat is end-to-end encrypted. Only the receiver and you can read this chat."
   }
 }
