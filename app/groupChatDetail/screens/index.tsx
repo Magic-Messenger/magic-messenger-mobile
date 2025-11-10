@@ -8,6 +8,7 @@ import {
   ChatHeader,
   ChatLayout,
   ChatTyping,
+  EncryptionInfo,
   LoadingProvider,
   MessageGroupItem,
 } from "@/components";
@@ -42,19 +43,19 @@ export default function ChatScreen() {
         onReply={handleReply}
       />
     ),
-    [chatId, handleReply],
+    [chatId, handleReply]
   );
 
   // Key extractor for optimal list performance
   const keyExtractor = useCallback(
     (item: MessageDto) => item.messageId || `temp-${item.createdAt}`,
-    [],
+    []
   );
 
   // Footer component
   const renderFooter = useCallback(
     () => <ChatTyping chatId={chatId} />,
-    [chatId],
+    [chatId]
   );
 
   // Optional: Item type for better recycling
@@ -99,6 +100,9 @@ export default function ChatScreen() {
           maintainVisibleContentPosition={{
             autoscrollToTopThreshold: 10,
           }}
+          ListHeaderComponent={
+            messages.length === 0 ? <EncryptionInfo /> : null
+          }
         />
       </LoadingProvider>
     </ChatLayout>
