@@ -79,6 +79,7 @@
     "react-hook-form": "^7.60.0",
     "react-i18next": "^15.5.3",
     "react-native": "0.79.6",
+    "react-native-capture-protection": "^2.3.3",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-get-random-values": "~1.11.0",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",

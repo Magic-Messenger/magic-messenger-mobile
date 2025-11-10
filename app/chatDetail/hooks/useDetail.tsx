@@ -19,6 +19,7 @@ import {
   Platform,
   TouchableOpacity,
 } from "react-native";
+import { CaptureProtection } from "react-native-capture-protection";
 
 import {
   getApiChatsMessages,
@@ -56,6 +57,8 @@ export const useDetail = () => {
 
   const isFocused = useIsFocused();
 
+  const [isScreenshotEnabled, setIsScreenshotEnabled] =
+    useState<boolean>(false);
   const [replyMessage, setReplyMessage] = useState<MessageDto | null>(null);
   const [messages, setMessages] = useState<MessageDto[]>([]);
   const [loading, setLoading] = useState(false);
@@ -87,6 +90,7 @@ export const useDetail = () => {
   const { data: onlineUsersData } = useGetApiAccountGetOnlineUsers({
     query: {
       enabled: isFocused,
+      refetchInterval: isFocused ? 10000 : false,
       refetchOnWindowFocus: true,
     },
   });
@@ -128,6 +132,9 @@ export const useDetail = () => {
 
         if (!isMountedRef.current) return;
 
+        if (success && data?.isScreenShotEnable !== undefined)
+          setIsScreenshotEnabled(data?.isScreenShotEnable);
+
         if (success && data?.messages?.data) {
           const newMessages = data.messages.data as MessageDto[];
           const isFirstLoad = pageNumber === 1;
@@ -162,6 +169,22 @@ export const useDetail = () => {
     },
     [chatId, pagination.pageSize, pagination.hasMore],
   );
+
+  const initializeScreenshot = useCallback(async () => {
+    if (isScreenshotEnabled) {
+      await CaptureProtection.allow();
+    } else {
+      await CaptureProtection.prevent({
+        appSwitcher: false,
+        screenshot: true,
+        record: true,
+      });
+    }
+  }, [isScreenshotEnabled]);
+
+  useEffect(() => {
+    initializeScreenshot();
+  }, [isScreenshotEnabled]);
 
   useEffect(() => {
     if (chatId) {

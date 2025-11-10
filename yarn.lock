@@ -7048,6 +7048,11 @@ react-is@^19.1.0:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-19.2.0.tgz#ddc3b4a4e0f3336c3847f18b806506388d7b9973"
   integrity sha512-x3Ax3kNSMIIkyVYhWPyO09bu0uttcAIoecO/um/rKGQ4EltYWVYtyiGkS/3xMynrbVQdS69Jhlv8FXUEZehlzA==
 
+react-native-capture-protection@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/react-native-capture-protection/-/react-native-capture-protection-2.3.3.tgz#743bb89b7ce72c9bf7940b3d26dae2a55563693e"
+  integrity sha512-PuQQEF1Ify+w63ruMxyf9Hkf60V0wMi/IdoFm3TBfM1TxaBkP6fwWu2GOcQGvyG7nIIYPOAnZrz1U4VK/p9tjQ==
+
 react-native-edge-to-edge@1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/react-native-edge-to-edge/-/react-native-edge-to-edge-1.6.0.tgz#2ba63b941704a7f713e298185c26cde4d9e4b973"
