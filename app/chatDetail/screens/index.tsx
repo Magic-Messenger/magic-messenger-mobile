@@ -2,18 +2,18 @@ import { FlashList } from "@shopify/flash-list";
 import React, { useCallback } from "react";
 import { StyleSheet } from "react-native";
 
-import { MessageDto } from "@/api/models";
 import {
   ChatFooter,
   ChatHeader,
   ChatLayout,
   ChatTyping,
+  DateSeparator,
   EncryptionInfo,
   LoadingProvider,
   MessageItem,
 } from "@/components";
 import { useThemedStyles } from "@/theme";
-import { spacingPixel } from "@/utils";
+import { isDateSeparator, MessageWithDate, spacingPixel } from "@/utils";
 
 import { useDetail } from "../hooks";
 
@@ -24,6 +24,7 @@ export default function ChatScreen() {
     loading,
     chatId,
     messages,
+    groupedMessages,
     userName,
     listRef,
     usersPublicKey,
@@ -36,24 +37,34 @@ export default function ChatScreen() {
 
   // Memoized render function for better performance
   const renderItem = useCallback(
-    ({ item }: { item: MessageDto }) => (
-      <MessageItem
-        identifier={chatId}
-        message={item}
-        receiverPublicKey={usersPublicKey.receiverPublicKey}
-        onReply={handleReply}
-      />
-    ),
+    ({ item }: { item: MessageWithDate }) => {
+      if (isDateSeparator(item)) {
+        return <DateSeparator date={item.date} />;
+      }
+      return (
+        <MessageItem
+          identifier={chatId}
+          message={item}
+          receiverPublicKey={usersPublicKey.receiverPublicKey}
+          onReply={handleReply}
+        />
+      );
+    },
     [chatId, usersPublicKey.receiverPublicKey, handleReply]
   );
 
   // Key extractor for optimal list performance
-  const keyExtractor = useCallback(
-    (item: MessageDto) => item.messageId || `temp-${item.createdAt}`,
-    []
-  );
+  const keyExtractor = useCallback((item: MessageWithDate, index: number) => {
+    if (isDateSeparator(item)) {
+      return `date-${item.date}-${index}`;
+    }
+    return item.messageId || `temp-${item.createdAt}`;
+  }, []);
 
-  const getItemType = useCallback((item: MessageDto) => {
+  const getItemType = useCallback((item: MessageWithDate) => {
+    if (isDateSeparator(item)) {
+      return "date";
+    }
     return item.messageType; // "text", "image", "audio", "video"
   }, []);
 
@@ -84,7 +95,7 @@ export default function ChatScreen() {
       <LoadingProvider loading={loading}>
         <FlashList
           ref={listRef}
-          data={messages}
+          data={groupedMessages}
           renderItem={renderItem}
           keyExtractor={keyExtractor}
           onScroll={handleScroll}

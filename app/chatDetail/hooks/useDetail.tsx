@@ -44,6 +44,8 @@ import {
   convertMessageStatus,
   convertMessageType,
   encrypt,
+  groupMessagesByDate,
+  MessageWithDate,
   showToast,
   trackEvent,
   userPublicKey,
@@ -53,7 +55,7 @@ export const useDetail = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const navigation = useNavigation();
-  const listRef = useRef<FlashListRef<MessageDto>>(null);
+  const listRef = useRef<FlashListRef<MessageWithDate>>(null);
 
   const isFocused = useIsFocused();
 
@@ -100,7 +102,7 @@ export const useDetail = () => {
       receiverPublicKey: publicKey as string,
       senderPrivateKey: userPublicKey() as string,
     }),
-    [publicKey],
+    [publicKey]
   );
 
   useEffect(() => {
@@ -167,7 +169,7 @@ export const useDetail = () => {
         }
       }
     },
-    [chatId, pagination.pageSize, pagination.hasMore],
+    [chatId, pagination.pageSize, pagination.hasMore]
   );
 
   const initializeScreenshot = useCallback(async () => {
@@ -214,9 +216,9 @@ export const useDetail = () => {
           }
         },
         1000,
-        { leading: true, trailing: false },
+        { leading: true, trailing: false }
       ),
-    [pagination.hasMore, pagination.currentPage, loadMessages],
+    [pagination.hasMore, pagination.currentPage, loadMessages]
   );
 
   const handleReply = useCallback((message: MessageDto) => {
@@ -261,7 +263,7 @@ export const useDetail = () => {
           ? encrypt(
               message as string,
               usersPublicKey.receiverPublicKey,
-              usersPublicKey.senderPrivateKey,
+              usersPublicKey.senderPrivateKey
             )
           : null,
         file: isFileMessage
@@ -271,7 +273,7 @@ export const useDetail = () => {
               filePath: encrypt(
                 message.fileUrl as string,
                 usersPublicKey.receiverPublicKey,
-                usersPublicKey.senderPrivateKey,
+                usersPublicKey.senderPrivateKey
               ),
             }
           : null,
@@ -298,7 +300,7 @@ export const useDetail = () => {
               content: encrypt(
                 message as string,
                 usersPublicKey.receiverPublicKey,
-                usersPublicKey.senderPrivateKey,
+                usersPublicKey.senderPrivateKey
               ),
             }),
             ...(isFileMessage && {
@@ -308,7 +310,7 @@ export const useDetail = () => {
                 filePath: encrypt(
                   message.fileUrl as string,
                   usersPublicKey.receiverPublicKey,
-                  usersPublicKey.senderPrivateKey,
+                  usersPublicKey.senderPrivateKey
                 ),
               },
             }),
@@ -322,12 +324,12 @@ export const useDetail = () => {
           onClearReply();
           // Remove optimistic message - the real one will come via SignalR
           setMessages((prev) =>
-            prev.filter((m) => (m as any).tempId !== tempId),
+            prev.filter((m) => (m as any).tempId !== tempId)
           );
         } else {
           // Remove a failed message
           setMessages((prev) =>
-            prev.filter((m) => (m as any).tempId !== tempId),
+            prev.filter((m) => (m as any).tempId !== tempId)
           );
         }
       } catch (error) {
@@ -344,7 +346,7 @@ export const useDetail = () => {
       replyMessage,
       sendApiMessage,
       onClearReply,
-    ],
+    ]
   );
 
   const handleMessageReceived = useCallback(
@@ -364,7 +366,7 @@ export const useDetail = () => {
         listRef.current?.scrollToEnd({ animated: true });
       }, 100);
     },
-    [listRef],
+    [listRef]
   );
 
   // Batch processor that applies all queued updates at once with priority checks
@@ -395,7 +397,7 @@ export const useDetail = () => {
           };
         }
         return item;
-      }),
+      })
     );
   }, []);
 
@@ -441,7 +443,7 @@ export const useDetail = () => {
 
       scheduleBatchUpdate();
     },
-    [scheduleBatchUpdate],
+    [scheduleBatchUpdate]
   );
 
   const handleMessageSeen = useCallback(
@@ -476,7 +478,7 @@ export const useDetail = () => {
 
       scheduleBatchUpdate();
     },
-    [scheduleBatchUpdate],
+    [scheduleBatchUpdate]
   );
 
   useEffect(() => {
@@ -545,7 +547,7 @@ export const useDetail = () => {
           style: "cancel",
         },
       ],
-      { cancelable: true },
+      { cancelable: true }
     );
   };
 
@@ -576,6 +578,11 @@ export const useDetail = () => {
     };
   }, [listRef]);
 
+  const groupedMessages = useMemo(
+    () => groupMessagesByDate(messages),
+    [messages]
+  );
+
   return {
     t,
     router,
@@ -583,6 +590,7 @@ export const useDetail = () => {
     loading,
     chatId: chatId as string,
     messages,
+    groupedMessages,
     userName,
     currentUserName,
     usersPublicKey,

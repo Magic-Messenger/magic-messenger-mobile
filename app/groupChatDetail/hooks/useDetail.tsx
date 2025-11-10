@@ -43,6 +43,8 @@ import {
   convertMessageType,
   decryptGroupKeyForUser,
   encryptForGroup,
+  groupMessagesByDate,
+  MessageWithDate,
   showToast,
   trackEvent,
   userPrivateKey,
@@ -52,7 +54,7 @@ import {
 export const useDetail = () => {
   const { t } = useTranslation();
   const router = useRouter();
-  const listRef = useRef<FlashListRef<MessageDto>>(null);
+  const listRef = useRef<FlashListRef<MessageWithDate>>(null);
   const navigation = useNavigation();
 
   const isFocused = useIsFocused();
@@ -109,9 +111,9 @@ export const useDetail = () => {
         groupKey as string,
         groupNonce as string,
         userPrivateKey() as string,
-        groupAdminAccount as string,
+        groupAdminAccount as string
       ),
-    [groupKey, groupNonce, groupAdminAccount],
+    [groupKey, groupNonce, groupAdminAccount]
   );
 
   const usersPublicKey = useMemo(
@@ -119,7 +121,7 @@ export const useDetail = () => {
       receiverPublicKey: publicKey as string,
       senderPrivateKey: userPublicKey() as string,
     }),
-    [publicKey],
+    [publicKey]
   );
 
   const loadMessages = useCallback(
@@ -174,7 +176,7 @@ export const useDetail = () => {
         }
       }
     },
-    [chatId, pagination.pageSize, pagination.hasMore],
+    [chatId, pagination.pageSize, pagination.hasMore]
   );
 
   useEffect(() => {
@@ -202,9 +204,9 @@ export const useDetail = () => {
           }
         },
         1000,
-        { leading: true, trailing: false },
+        { leading: true, trailing: false }
       ),
-    [pagination.hasMore, pagination.currentPage, loadMessages],
+    [pagination.hasMore, pagination.currentPage, loadMessages]
   );
 
   const handleReply = useCallback((message: MessageDto) => {
@@ -244,7 +246,7 @@ export const useDetail = () => {
               contentType: message.contentType,
               filePath: encryptForGroup(
                 message.fileUrl as string,
-                decryptedGroupKey as string,
+                decryptedGroupKey as string
               ),
             }
           : null,
@@ -270,7 +272,7 @@ export const useDetail = () => {
             ...(!isFileMessage && {
               content: encryptForGroup(
                 message as string,
-                decryptedGroupKey as string,
+                decryptedGroupKey as string
               ),
             }),
             ...(isFileMessage && {
@@ -279,7 +281,7 @@ export const useDetail = () => {
                 contentType: message.contentType,
                 filePath: encryptForGroup(
                   message.fileUrl as string,
-                  decryptedGroupKey as string,
+                  decryptedGroupKey as string
                 ),
               },
             }),
@@ -293,12 +295,12 @@ export const useDetail = () => {
           onClearReply();
           // Remove optimistic message - the real one will come via SignalR
           setMessages((prev) =>
-            prev.filter((m) => (m as any).tempId !== tempId),
+            prev.filter((m) => (m as any).tempId !== tempId)
           );
         } else {
           // Remove failed message
           setMessages((prev) =>
-            prev.filter((m) => (m as any).tempId !== tempId),
+            prev.filter((m) => (m as any).tempId !== tempId)
           );
         }
       } catch (error) {
@@ -314,7 +316,7 @@ export const useDetail = () => {
       replyMessage,
       sendApiMessage,
       onClearReply,
-    ],
+    ]
   );
 
   const handleChatControl = useCallback(
@@ -323,7 +325,7 @@ export const useDetail = () => {
         await handleSendMessage(message);
       }
     },
-    [chatId, handleSendMessage],
+    [chatId, handleSendMessage]
   );
 
   //#region SignalR Effects
@@ -344,7 +346,7 @@ export const useDetail = () => {
         listRef.current?.scrollToEnd({ animated: true });
       }, 100);
     },
-    [listRef],
+    [listRef]
   );
 
   // Batch processor that applies all queued updates at once with priority checks
@@ -375,7 +377,7 @@ export const useDetail = () => {
           };
         }
         return item;
-      }),
+      })
     );
   }, []);
 
@@ -421,7 +423,7 @@ export const useDetail = () => {
 
       scheduleBatchUpdate();
     },
-    [scheduleBatchUpdate],
+    [scheduleBatchUpdate]
   );
 
   const handleMessageSeen = useCallback(
@@ -456,7 +458,7 @@ export const useDetail = () => {
 
       scheduleBatchUpdate();
     },
-    [scheduleBatchUpdate],
+    [scheduleBatchUpdate]
   );
 
   useEffect(() => {
@@ -526,7 +528,7 @@ export const useDetail = () => {
           style: "cancel",
         },
       ],
-      { cancelable: true },
+      { cancelable: true }
     );
   };
 
@@ -557,6 +559,11 @@ export const useDetail = () => {
     };
   }, [listRef]);
 
+  const groupedMessages = useMemo(
+    () => groupMessagesByDate(messages),
+    [messages]
+  );
+
   return {
     t,
     router,
@@ -564,6 +571,7 @@ export const useDetail = () => {
     loading,
     chatId: chatId as string,
     messages,
+    groupedMessages,
     userName,
     groupAccountCount,
     currentUserName,
