@@ -1,7 +1,6 @@
 import { StyleSheet } from "react-native";
 
-import { fontPixel, spacingPixel } from "@/utils";
-
+import { fontPixel, spacingPixel } from "../utils/pixelHelper";
 import {
   AlignContent,
   AlignItems,

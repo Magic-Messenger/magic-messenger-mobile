@@ -1,55 +1,78 @@
 import { Text, View } from "react-native";
-import { BaseToast, ErrorToast } from "react-native-toast-message";
+import { ToastConfig } from "react-native-toast-message";
 
-import { Colors, Fonts } from "@/constants";
-
+import { Icon } from "../components/ui/Icon";
+import { Colors } from "../constants/Colors";
+import { Fonts } from "../constants/Fonts";
 import { heightPixel, spacingPixel } from "./pixelHelper";
 
 export const toastConfig = {
-  success: (props: any) => (
-    <BaseToast
-      {...props}
-      text1NumberOfLines={2}
-      style={{
-        borderLeftWidth: 0,
-        backgroundColor: Colors.toastBackground,
-        borderRadius: 20,
-        marginTop: spacingPixel(20),
-      }}
-      text1Style={{
-        fontSize: 16,
-        color: Colors.white,
-        fontFamily: Fonts.SFProSemiBold,
-      }}
-    />
-  ),
-  error: (props: any) => (
-    <ErrorToast
-      {...props}
-      text1NumberOfLines={2}
-      style={{
-        borderLeftWidth: 0,
-        backgroundColor: Colors.toastBackgroundDanger,
-        borderRadius: 20,
-        marginTop: spacingPixel(20),
-      }}
-      text1Style={{
-        fontSize: 16,
-        color: Colors.white,
-        fontFamily: Fonts.SFProSemiBold,
-      }}
-    />
-  ),
-  tomatoToast: ({ text1, props }: { text1: string; props: any }) => (
+  success: ({ text1 }: { text1: string }) => (
     <View
       style={{
-        height: heightPixel(60),
-        width: "100%",
-        backgroundColor: "tomato",
+        flexDirection: "row",
+        alignItems: "center",
+        width: "95%",
+        minHeight: heightPixel(60),
+        backgroundColor: Colors.toastBackground,
+        borderRadius: spacingPixel(20),
+        marginTop: spacingPixel(20),
+        paddingVertical: spacingPixel(12),
+        paddingHorizontal: spacingPixel(16),
       }}
     >
-      <Text style={{ color: "white" }}>{text1}</Text>
-      <Text style={{ color: "white" }}>{props.uuid}</Text>
+      <Icon
+        type="feather"
+        name="check-circle"
+        size={24}
+        color={Colors.white}
+        style={{ marginRight: spacingPixel(12) }}
+      />
+      <Text
+        style={{
+          flex: 1,
+          fontSize: 16,
+          color: Colors.white,
+          fontFamily: Fonts.SFProSemiBold,
+          flexWrap: "wrap",
+        }}
+      >
+        {text1}
+      </Text>
     </View>
   ),
-};
+  error: ({ text1 }: { text1: string }) => (
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        width: "95%",
+        minHeight: heightPixel(60),
+        backgroundColor: Colors.toastBackgroundDanger,
+        borderRadius: spacingPixel(20),
+        marginTop: spacingPixel(20),
+        paddingVertical: spacingPixel(12),
+        paddingHorizontal: spacingPixel(16),
+      }}
+    >
+      <Icon
+        type="feather"
+        name="alert-circle"
+        size={24}
+        color={Colors.white}
+        style={{ marginRight: spacingPixel(12) }}
+      />
+      <Text
+        style={{
+          flex: 1,
+          fontSize: 16,
+          color: Colors.white,
+          fontFamily: Fonts.SFProSemiBold,
+          flexWrap: "wrap",
+        }}
+      >
+        {text1}
+      </Text>
+    </View>
+  ),
+} as ToastConfig;

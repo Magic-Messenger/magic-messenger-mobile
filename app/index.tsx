@@ -25,7 +25,6 @@ import {
 
 export default function IndexPage() {
   const { t } = useTranslation();
-  const userName = useUserStore((state) => state.userName);
   const rehydrated = useUserStore((state) => state.rehydrated);
 
   const styles = useThemedStyles(createStyle);
@@ -33,10 +32,17 @@ export default function IndexPage() {
   const [connected, setConnected] = useState<boolean>(false);
   const [dots, setDots] = useState<string>("");
 
-  let interval: number = 0;
+  useEffect(() => {
+    if (!rehydrated) return; // 👈 wait for the store to be ready
 
-  const setupInterval = () => {
-    interval = setInterval(() => {
+    const userPublicKeyCheck = checkUserCredentials();
+    if (!userPublicKeyCheck) {
+      generateKeyPairs();
+    }
+    registerForPushNotificationsAsync();
+    setupNotificationListeners();
+
+    const interval = setInterval(() => {
       setDots((prev) => {
         if (prev.length >= 3) {
           return "";
@@ -44,33 +50,26 @@ export default function IndexPage() {
         return prev + ".";
       });
     }, 1000);
-  };
 
-  const initializeAppStart = async () => {
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       setConnected(true);
       clearTimeout(interval);
 
       setTimeout(() => {
-        if (userName) {
+        const currentUser = useUserStore.getState().userName;
+        if (currentUser) {
           router.replace("/(auth)/login/screens/login");
         } else {
           router.replace("/(auth)/preLogin");
         }
       }, 500);
     }, 3000);
-  };
 
-  useEffect(() => {
-    const userPublicKeyCheck = checkUserCredentials();
-    if (!userPublicKeyCheck) {
-      generateKeyPairs();
-    }
-    registerForPushNotificationsAsync();
-    setupNotificationListeners();
-    setupInterval();
-    initializeAppStart();
-  }, []);
+    return () => {
+      clearTimeout(interval);
+      clearTimeout(timeout);
+    };
+  }, [rehydrated]);
 
   useMemo(() => {
     if (__DEV__) {

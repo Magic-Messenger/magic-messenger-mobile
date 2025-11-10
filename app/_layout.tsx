@@ -80,7 +80,7 @@ export default function RootLayout() {
                 <Stack.Screen name="+not-found" />
               </Stack>
 
-              <Toast config={toastConfig as never} />
+              <Toast config={toastConfig} />
               <StatusBar style="light" />
             </SignalRProvider>
           </QueryClientProvider>
