@@ -25,11 +25,13 @@ import {
   getApiChatsMessages,
   useDeleteApiChatsDelete,
   useGetApiAccountGetOnlineUsers,
+  usePostApiAccountBlockAccount,
+  usePostApiChatsClear,
   usePostApiChatsCreate,
   usePostApiChatsSendMessage,
 } from "@/api/endpoints/magicMessenger";
 import { MessageDto, MessageStatus, MessageType } from "@/api/models";
-import { Icon } from "@/components";
+import { ActionSheetRef, Icon } from "@/components";
 import {
   INITIAL_PAGE_SIZE,
   MESSAGE_STATUS_PRIORITY,
@@ -56,6 +58,7 @@ export const useDetail = () => {
   const router = useRouter();
   const navigation = useNavigation();
   const listRef = useRef<FlashListRef<MessageWithDate>>(null);
+  const actionRef = useRef<ActionSheetRef | null>(null);
 
   const isFocused = useIsFocused();
 
@@ -88,6 +91,8 @@ export const useDetail = () => {
   const { mutateAsync: sendApiMessage } = usePostApiChatsSendMessage();
   const { mutateAsync: createApiChat } = usePostApiChatsCreate();
   const { mutateAsync: deleteChat } = useDeleteApiChatsDelete();
+  const { mutateAsync: clearChatRequest } = usePostApiChatsClear();
+  const { mutateAsync: blockContactRequest } = usePostApiAccountBlockAccount();
 
   const { data: onlineUsersData } = useGetApiAccountGetOnlineUsers({
     query: {
@@ -512,6 +517,84 @@ export const useDetail = () => {
     handleMessageSeen,
   ]);
 
+  const onDelete = () => {
+    Alert.alert(
+      t("chatDetail.delete.title"),
+      t("chatDetail.delete.message"),
+      [
+        {
+          text: t("chatDetail.delete.confirm"),
+          style: "destructive",
+          onPress: handleDeleteChat,
+        },
+        {
+          text: t("chatDetail.delete.cancel"),
+          style: "cancel",
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  const onChatClear = () => {
+    Alert.alert(
+      t("chatDetail.clear.title"),
+      t("chatDetail.clear.message"),
+      [
+        {
+          text: t("chatDetail.clear.confirm"),
+          style: "destructive",
+          onPress: handleClearChat,
+        },
+        {
+          text: t("chatDetail.clear.cancel"),
+          style: "cancel",
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  const onBlockContact = () => {
+    Alert.alert(
+      t("chatDetail.block.title"),
+      t("chatDetail.block.message"),
+      [
+        {
+          text: t("chatDetail.block.confirm"),
+          style: "destructive",
+          onPress: handleBlockContact,
+        },
+        {
+          text: t("chatDetail.block.cancel"),
+          style: "cancel",
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  const chatActionOptions = useMemo(
+    () => [
+      {
+        label: t("chatDetail.menu.clearMessages"),
+        icon: <Icon type="feather" name="delete" size={20} />,
+        onPress: onChatClear,
+      },
+      {
+        label: t("chatDetail.menu.deleteConversation"),
+        icon: <Icon type="feather" name="trash" size={20} />,
+        onPress: onDelete,
+      },
+      {
+        label: t("chatDetail.menu.blockContact"),
+        icon: <Icon type="feather" name="slash" size={20} />,
+        onPress: onBlockContact,
+      },
+    ],
+    [t, onDelete, onChatClear, onBlockContact]
+  );
+
   const handleDeleteChat = useCallback(async () => {
     try {
       const response = await deleteChat({
@@ -532,31 +615,52 @@ export const useDetail = () => {
     }
   }, [chatId, contactChatId, deleteChat, showToast, router]);
 
-  const onAction = () => {
-    Alert.alert(
-      t("chatDetail.delete.title"),
-      t("chatDetail.delete.message"),
-      [
-        {
-          text: t("chatDetail.delete.confirm"),
-          style: "destructive",
-          onPress: handleDeleteChat,
+  const handleClearChat = useCallback(async () => {
+    try {
+      const response = await clearChatRequest({
+        params: {
+          chatId: chatId || (contactChatId as string),
         },
-        {
-          text: t("chatDetail.delete.cancel"),
-          style: "cancel",
+      });
+      if (response?.success) {
+        trackEvent("chat_cleared", { chatId });
+        showToast({
+          type: "success",
+          text1: t("chatDetail.clear.success"),
+        });
+        router.back();
+      }
+    } catch (error) {
+      trackEvent("error_clearing_chat", { chatId, error });
+    }
+  }, [chatId, deleteChat, showToast]);
+
+  const handleBlockContact = useCallback(async () => {
+    try {
+      const response = await blockContactRequest({
+        data: {
+          blockedUsername: userName as string,
         },
-      ],
-      { cancelable: true }
-    );
-  };
+      });
+      if (response?.success) {
+        trackEvent("user_blocked", { chatId });
+        showToast({
+          type: "success",
+          text1: t("chatDetail.block.success"),
+        });
+        await handleDeleteChat();
+      }
+    } catch (error) {
+      console.log("error: ", error);
+    }
+  }, [chatId]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () =>
         chatId ? (
-          <TouchableOpacity onPress={onAction}>
-            <Icon type="feather" name="trash" />
+          <TouchableOpacity onPress={() => actionRef.current?.open()}>
+            <Icon type="feather" name="menu" />
           </TouchableOpacity>
         ) : null,
     });
@@ -588,9 +692,11 @@ export const useDetail = () => {
     router,
     listRef,
     loading,
+    actionRef,
     chatId: chatId as string,
     messages,
     groupedMessages,
+    chatActionOptions,
     userName,
     currentUserName,
     usersPublicKey,

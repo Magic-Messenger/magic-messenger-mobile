@@ -306,6 +306,25 @@
       "cancel": "Cancel",
       "confirm": "Delete"
     },
-    "encryptionInfo": "This chat is end-to-end encrypted. Only the receiver and you can read this chat."
+    "encryptionInfo": "This chat is end-to-end encrypted. Only the receiver and you can read this chat.",
+    "menu": {
+      "clearMessages": "Clear Messages",
+      "deleteConversation": "Delete Conversation",
+      "blockContact": "Block Contact"
+    },
+    "clear": {
+      "title": "Clear Chat",
+      "message": "Are you sure you want to clear this chat?",
+      "success": "Chat cleared successfully",
+      "cancel": "Cancel",
+      "confirm": "Clear"
+    },
+    "block": {
+      "title": "Block Contact and Delete Chat",
+      "message": "Are you sure you want to block this contact and chat will be deleted?",
+      "success": "Contact blocked and chat deleted successfully",
+      "cancel": "Cancel",
+      "confirm": "Block"
+    }
   }
 }

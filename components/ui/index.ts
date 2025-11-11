@@ -1,3 +1,4 @@
+export * from "./ActionSheet";
 export * from "./BottomSheet";
 export * from "./Button";
 export * from "./Camera";

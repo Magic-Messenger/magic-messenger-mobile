@@ -3,6 +3,7 @@ import React, { useCallback } from "react";
 import { StyleSheet } from "react-native";
 
 import {
+  ActionSheet,
   ChatFooter,
   ChatHeader,
   ChatLayout,
@@ -29,6 +30,8 @@ export default function ChatScreen() {
     listRef,
     usersPublicKey,
     replyMessage,
+    actionRef,
+    chatActionOptions,
     handleSendMessage,
     handleReply,
     handleScroll,
@@ -115,6 +118,7 @@ export default function ChatScreen() {
           }
         />
       </LoadingProvider>
+      <ActionSheet ref={actionRef} options={chatActionOptions} />
     </ChatLayout>
   );
 }
