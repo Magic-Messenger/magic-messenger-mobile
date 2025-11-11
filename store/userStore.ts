@@ -64,7 +64,7 @@ export const useUserStore = create<UserStore>()(
       },
       logout: () => {
         set({ isLogin: false, accessToken: null });
-        router.replace("/(auth)/preLogin");
+        router.replace("/(auth)/login/screens/login");
       },
       setProfile: (profile: AccountProfileDto) => {
         set({ profile });

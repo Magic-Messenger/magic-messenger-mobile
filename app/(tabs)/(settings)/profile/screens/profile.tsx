@@ -29,7 +29,11 @@ export default function ProfileScreen() {
   } = useProfile();
 
   return (
-    <AppLayout scrollable loading={isLoading} title={t("profile.yourProfile")}>
+    <AppLayout
+      keyboardAvoiding
+      loading={isLoading}
+      title={t("profile.yourProfile")}
+    >
       <View style={styles.mainContainer}>
         <View
           style={[

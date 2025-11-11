@@ -45,6 +45,10 @@ export const showToast = (toastConfig: ToastShowParams) => {
   });
 };
 
+export const hideToast = () => {
+  Toast.hide();
+};
+
 export const getInstallationId = async () => {
   if (Platform.OS === "ios") {
     return await Application.getIosIdForVendorAsync();

@@ -37,7 +37,9 @@
     "read": "Read",
     "someThingWentWrong": "Something went wrong.",
     "newMessageReceived": "New Message Received",
-    "newMessageReceivedDesc": "You have received a new message in chat {{title}}."
+    "newMessageReceivedDesc": "You have received a new message in chat {{title}}.",
+    "torIsStarted": "TOR is started successfully",
+    "torIsNotStarted": "TOR is not started, please try again later"
   },
   "login": {
     "title": "Login",

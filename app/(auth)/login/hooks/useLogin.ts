@@ -20,6 +20,7 @@ import {
   fontPixel,
   getInstallationId,
   heightPixel,
+  showToast,
   userPublicKey,
   widthPixel,
 } from "@/utils";
@@ -92,21 +93,41 @@ export const useLogin = () => {
         data?.account?.username as string,
       );
 
-      const profileResponse = await getApiAccountGetProfile();
-      if (profileResponse.success) {
-        setProfile(profileResponse.data!);
+      getApiAccountGetProfile().then((profileResponse) => {
+        if (profileResponse.success) {
+          setProfile(profileResponse.data!);
+          if (profileResponse.data?.enableTor) {
+            startTor()
+              .then(() => {
+                showToast({
+                  type: "success",
+                  text1: t("common.torIsStarted"),
+                });
+              })
+              .catch(() => {
+                showToast({
+                  type: "error",
+                  text1: t("common.torIsNotStarted"),
+                });
+              });
+          }
+        }
+      });
 
-        if (profileResponse.data?.enableTor) await startTor();
-      }
+      registerForPushNotificationsAsync().then(async (token) => {
+        token &&
+          registerDeviceToken({ data: { deviceToken: token } })
+            .then()
+            .catch();
+      });
 
-      const token = await registerForPushNotificationsAsync();
-      token && (await registerDeviceToken({ data: { deviceToken: token } }));
-
-      await updatePublicKeyApi({
+      updatePublicKeyApi({
         data: {
           publicKey: userPublicKey(),
         },
-      });
+      })
+        .then()
+        .catch();
 
       setIsLoading(false);
 
