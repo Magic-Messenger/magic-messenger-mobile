@@ -114,7 +114,7 @@ export default function ChatScreen() {
             autoscrollToTopThreshold: 10,
           }}
           ListHeaderComponent={
-            messages.length === 0 ? <EncryptionInfo /> : null
+            messages.length === 0 && !loading ? <EncryptionInfo /> : null
           }
         />
       </LoadingProvider>

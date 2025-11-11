@@ -1,4 +1,5 @@
 import BottomSheet, {
+  BottomSheetBackdrop,
   BottomSheetProps,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
@@ -29,7 +30,7 @@ export const BottomSheetComponent = forwardRef<any, BottomSheetComponentProps>(
       closeButton = false,
       ...props
     },
-    ref,
+    ref
   ) => {
     const styles = useThemedStyles(createStyles);
     const colors = useColor();
@@ -45,12 +46,22 @@ export const BottomSheetComponent = forwardRef<any, BottomSheetComponentProps>(
 
     const memoSnapPoints = useMemo(() => snapPoints, [snapPoints]);
 
+    const renderBackdrop = (props: any) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        pressBehavior="close"
+      />
+    );
+
     return (
       <Portal>
         <BottomSheet
           ref={bottomSheetRef}
           index={initialIndex}
           snapPoints={memoSnapPoints}
+          backdropComponent={renderBackdrop}
           backgroundStyle={{
             backgroundColor: colors.colors.secondaryBackground,
           }}
@@ -81,7 +92,7 @@ export const BottomSheetComponent = forwardRef<any, BottomSheetComponentProps>(
         </BottomSheet>
       </Portal>
     );
-  },
+  }
 );
 
 const createStyles = () =>

@@ -3,6 +3,7 @@ import React, { useCallback } from "react";
 import { StyleSheet } from "react-native";
 
 import {
+  ActionSheet,
   ChatFooter,
   ChatHeader,
   ChatLayout,
@@ -27,6 +28,8 @@ export default function ChatScreen() {
     groupedMessages,
     userName,
     listRef,
+    actionRef,
+    chatActionOptions,
     groupAccountCount,
     replyMessage,
     handleChatControl,
@@ -112,10 +115,15 @@ export default function ChatScreen() {
             autoscrollToTopThreshold: 10,
           }}
           ListHeaderComponent={
-            messages.length === 0 ? <EncryptionInfo /> : null
+            messages.length === 0 && !loading ? <EncryptionInfo /> : null
           }
         />
       </LoadingProvider>
+      <ActionSheet
+        ref={actionRef}
+        snapPoints={["15%"]}
+        options={chatActionOptions}
+      />
     </ChatLayout>
   );
 }

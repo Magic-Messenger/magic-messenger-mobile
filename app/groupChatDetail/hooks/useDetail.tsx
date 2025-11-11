@@ -27,7 +27,7 @@ import {
   usePostApiChatsSendMessage,
 } from "@/api/endpoints/magicMessenger";
 import { MessageDto, MessageStatus, MessageType } from "@/api/models";
-import { Icon } from "@/components";
+import { ActionSheetRef, Icon } from "@/components";
 import {
   INITIAL_PAGE_SIZE,
   MESSAGE_STATUS_PRIORITY,
@@ -55,6 +55,7 @@ export const useDetail = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const listRef = useRef<FlashListRef<MessageWithDate>>(null);
+  const actionRef = useRef<ActionSheetRef | null>(null);
   const navigation = useNavigation();
 
   const isFocused = useIsFocused();
@@ -513,7 +514,7 @@ export const useDetail = () => {
     }
   }, [chatId, showToast, router]);
 
-  const onAction = () => {
+  const onDelete = () => {
     Alert.alert(
       t("chatDetail.delete.title"),
       t("chatDetail.delete.message"),
@@ -532,12 +533,23 @@ export const useDetail = () => {
     );
   };
 
+  const chatActionOptions = useMemo(
+    () => [
+      {
+        label: t("chatDetail.menu.deleteConversation"),
+        icon: <Icon type="feather" name="trash" size={20} />,
+        onPress: onDelete,
+      },
+    ],
+    [t, onDelete]
+  );
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () =>
         chatId ? (
-          <TouchableOpacity onPress={onAction}>
-            <Icon type="feather" name="trash" />
+          <TouchableOpacity onPress={() => actionRef.current?.open()}>
+            <Icon type="feather" name="menu" />
           </TouchableOpacity>
         ) : null,
     });
@@ -569,9 +581,11 @@ export const useDetail = () => {
     router,
     listRef,
     loading,
+    actionRef,
     chatId: chatId as string,
     messages,
     groupedMessages,
+    chatActionOptions,
     userName,
     groupAccountCount,
     currentUserName,

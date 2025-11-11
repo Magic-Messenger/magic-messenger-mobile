@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { FlatList, StyleSheet, TouchableOpacity } from "react-native";
 
 import { ThemedText } from "@/components/app";
-import { ColorDto, useThemedStyles } from "@/theme";
+import { useThemedStyles } from "@/theme";
 import { spacingPixel } from "@/utils";
 
 import { BottomSheetComponent } from "../BottomSheet";
@@ -20,13 +20,14 @@ export interface ActionSheetProps {
     icon?: React.ReactNode;
     onPress: () => void;
   }[];
+  snapPoints?: string[];
 }
 
 export const ActionSheet = forwardRef<ActionSheetRef, ActionSheetProps>(
   (props, ref) => {
     const { t } = useTranslation();
     const styles = useThemedStyles(createStyles);
-    const { options = [] } = props;
+    const { options = [], snapPoints } = props;
 
     const modalRef = useRef<BottomSheet | null>(null);
 
@@ -72,7 +73,7 @@ export const ActionSheet = forwardRef<ActionSheetRef, ActionSheetProps>(
     return (
       <BottomSheetComponent
         ref={modalRef}
-        snapPoints={["30%"]}
+        snapPoints={snapPoints ?? ["30%"]}
         enablePanDownToClose
       >
         <FlatList
@@ -85,7 +86,7 @@ export const ActionSheet = forwardRef<ActionSheetRef, ActionSheetProps>(
   }
 );
 
-const createStyles = (colors: ColorDto) =>
+const createStyles = () =>
   StyleSheet.create({
     actionItem: {
       padding: spacingPixel(10),
