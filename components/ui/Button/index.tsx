@@ -10,8 +10,8 @@ import {
 
 import { Colors, spacing } from "@/constants";
 import { useThemedStyles } from "@/theme";
-import { heightPixel } from "@/utils";
 
+import { heightPixel } from "../../../utils/pixelHelper";
 import { ThemedText, ThemedTextProps } from "../../app/ThemedText";
 
 interface Props {

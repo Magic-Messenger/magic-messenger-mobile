@@ -19,13 +19,9 @@ import { ChatDto } from "@/api/models";
 import { Colors, Images, spacing } from "@/constants";
 import { useSignalRStore, useUserStore } from "@/store";
 import { useColor, useThemedStyles } from "@/theme";
-import {
-  needsBottomSafeArea,
-  showToast,
-  spacingPixel,
-  trackEvent,
-} from "@/utils";
 
+import { showToast, trackEvent } from "../../utils/helper";
+import { needsBottomSafeArea, spacingPixel } from "../../utils/pixelHelper";
 import { ThemedText } from "./ThemedText";
 import { TorBadge } from "./TorBadge";
 

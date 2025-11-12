@@ -5,7 +5,8 @@ import { LottiePlayer } from "@/components";
 import { Lottie } from "@/constants";
 import { useSignalRStore, useUserStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { spacingPixel, widthPixel } from "@/utils";
+
+import { spacingPixel, widthPixel } from "../../../../utils/pixelHelper";
 
 interface Props {
   chatId: string;

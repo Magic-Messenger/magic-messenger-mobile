@@ -11,8 +11,8 @@ import {
 import { ThemedText } from "@/components";
 import { Colors, flexBox, Fonts, spacing } from "@/constants";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { fontPixel, heightPixel, widthPixel } from "@/utils";
 
+import { fontPixel, heightPixel, widthPixel } from "../../../utils/pixelHelper";
 import { SettingsItemOption, SettingsItemType } from "./type";
 
 const SettingsItem = (props: SettingsItemType) => {

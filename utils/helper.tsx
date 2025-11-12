@@ -3,11 +3,13 @@ import * as Application from "expo-application";
 import * as Clipboard from "expo-clipboard";
 import { Image } from "expo-image";
 import { changeLanguage as i18nChangeLanguage } from "i18next";
+import React from "react";
 import { Platform } from "react-native";
 import Toast, { ToastShowParams } from "react-native-toast-message";
 
 import { MessageStatus, MessageType } from "@/api/models";
-import { Images, SUPPORT_LANGUAGES } from "@/constants";
+import { Icon } from "@/components";
+import { commonStyle, Images, SUPPORT_LANGUAGES } from "@/constants";
 import i18n from "@/i18n";
 import { useAppStore } from "@/store";
 
@@ -145,5 +147,47 @@ export const convertMessageStatus = (messageStatus: number) => {
       return MessageStatus.Seen;
     default:
       return MessageStatus.Sent;
+  }
+};
+
+export const renderMessageStatus = (
+  messageStatus: MessageStatus,
+  isSentByCurrentUser?: boolean,
+) => {
+  if (!isSentByCurrentUser) return null;
+
+  switch (messageStatus) {
+    case MessageStatus.Sent:
+      return (
+        <Icon
+          type="ionicons"
+          name="checkmark"
+          size={16}
+          color="white"
+          style={commonStyle.statusIcon}
+        />
+      );
+    case MessageStatus.Delivered:
+      return (
+        <Icon
+          type="ionicons"
+          name="checkmark-done"
+          size={16}
+          color="white"
+          style={commonStyle.statusIcon}
+        />
+      );
+    case MessageStatus.Seen:
+      return (
+        <Icon
+          type="ionicons"
+          name="checkmark-done"
+          size={16}
+          color="#90D5FF"
+          style={commonStyle.statusIconSeen}
+        />
+      );
+    default:
+      return null;
   }
 };

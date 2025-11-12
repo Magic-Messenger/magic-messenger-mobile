@@ -9,7 +9,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Colors, Images } from "@/constants";
 import { useThemedStyles } from "@/theme";
-import { spacingPixel } from "@/utils";
+
+import { spacingPixel } from "../../../../utils/pixelHelper";
 
 interface ChatLayoutProps {
   header: React.ReactNode;

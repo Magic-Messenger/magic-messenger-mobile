@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { memo, useCallback, useEffect, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
@@ -15,8 +15,8 @@ import { Icon } from "@/components";
 import { useChatHelper } from "@/hooks";
 import { useSignalRStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { spacingPixel } from "@/utils";
 
+import { spacingPixel } from "../../../../utils/pixelHelper";
 import { AudioMessage } from "./AudioMessage";
 import { ImageMessage } from "./ImageMessage";
 import { TextMessage } from "./TextMessage";
@@ -25,6 +25,7 @@ import { VideoMessage } from "./VideoMessage";
 interface MessageItemProps {
   identifier: string;
   message?: MessageDto;
+  messageStatus: MessageStatus;
   receiverPublicKey: string;
   onReply?: (message: MessageDto) => void;
 }
@@ -36,9 +37,10 @@ const SPRING_CONFIG = {
   stiffness: 300,
 };
 
-export function MessageItem({
+function MessageItem({
   identifier,
   message,
+  messageStatus,
   receiverPublicKey,
   onReply,
 }: MessageItemProps) {
@@ -55,7 +57,7 @@ export function MessageItem({
     if (
       magicHubClient &&
       !isSentByCurrentUser &&
-      message?.messageStatus !== MessageStatus.Seen &&
+      messageStatus !== MessageStatus.Seen &&
       message?.messageId
     ) {
       magicHubClient.viewedMessage(identifier, message.messageId);
@@ -65,7 +67,7 @@ export function MessageItem({
     isSentByCurrentUser,
     magicHubClient,
     message?.messageId,
-    message?.messageStatus,
+    messageStatus,
   ]);
 
   const triggerReply = useCallback(() => {
@@ -143,7 +145,7 @@ export function MessageItem({
       decryptedReplyMessage,
       isSentByCurrentUser,
       createdAt: message.createdAt!,
-      messageStatus: message.messageStatus,
+      messageStatus,
       isLoading,
     };
 
@@ -185,6 +187,13 @@ export function MessageItem({
     </View>
   );
 }
+
+export default memo(MessageItem, (prevProps, nextProps) => {
+  return (
+    prevProps.message?.messageId === nextProps.message?.messageId &&
+    prevProps.messageStatus === nextProps.messageStatus
+  );
+});
 
 const createStyle = (colors: ColorDto) =>
   StyleSheet.create({

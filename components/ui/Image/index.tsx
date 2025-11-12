@@ -12,7 +12,11 @@ import {
   ViewStyle,
 } from "react-native";
 
-import { fontPixel, heightPixel, spacingPixel } from "@/utils";
+import {
+  fontPixel,
+  heightPixel,
+  spacingPixel,
+} from "../../../utils/pixelHelper";
 
 interface AppImageProps extends Omit<ImageProps, "onLoad" | "onError"> {
   source: ImageProps["source"];

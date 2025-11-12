@@ -4,8 +4,12 @@ import { StyleSheet, View } from "react-native";
 import { Colors } from "@/constants";
 import { useTor } from "@/services/axios/tor";
 import { useThemedStyles } from "@/theme";
-import { heightPixel, spacingPixel, widthPixel } from "@/utils";
 
+import {
+  heightPixel,
+  spacingPixel,
+  widthPixel,
+} from "../../../utils/pixelHelper";
 import { ThemedText } from "../ThemedText";
 
 export const TorBadge = () => {

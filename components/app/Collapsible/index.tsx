@@ -15,7 +15,8 @@ import Animated, {
 import { Icon, ThemedText } from "@/components";
 import { Colors, Fonts, spacing } from "@/constants";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { fontPixel, spacingPixel } from "@/utils";
+
+import { fontPixel, spacingPixel } from "../../../utils/pixelHelper";
 
 type CollapsibleProps = {
   question: string;

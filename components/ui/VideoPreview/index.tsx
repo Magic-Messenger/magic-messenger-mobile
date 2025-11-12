@@ -2,8 +2,7 @@ import { useVideoPlayer, VideoView } from "expo-video";
 import { useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
-import { widthPixel } from "@/utils";
-
+import { heightPixel, widthPixel } from "../../../utils/pixelHelper";
 import { Icon } from "../Icon";
 
 export function VideoPreview({ source = "VideoPreview" }: { source: string }) {
@@ -39,7 +38,7 @@ export function VideoPreview({ source = "VideoPreview" }: { source: string }) {
 }
 
 const styles = StyleSheet.create({
-  container: { width: widthPixel(200), height: 200 },
+  container: { width: widthPixel(200), height: heightPixel(200) },
   video: { width: "100%", height: "100%" },
   overlay: {
     position: "absolute",
