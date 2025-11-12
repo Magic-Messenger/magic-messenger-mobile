@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
@@ -16,15 +16,13 @@ import { Images } from "@/constants";
 import { useAudioPlayer, useGroupChatHelper } from "@/hooks";
 import { useSignalRStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
+import { dateFormatter, spacingPixel } from "@/utils";
 
-import { dateFormatter, renderMessageStatus } from "../../../../utils/helper";
-import { spacingPixel } from "../../../../utils/pixelHelper";
 import { ReplyMessageItem } from "../ReplyMessageItem";
 
 interface MessageItemProps {
   identifier: string;
   message?: MessageDto;
-  messageStatus: MessageStatus;
   onReply?: (message: MessageDto) => void;
 }
 
@@ -35,10 +33,9 @@ const SPRING_CONFIG = {
   stiffness: 300,
 };
 
-function MessageGroupItem({
+export function MessageGroupItem({
   identifier,
   message,
-  messageStatus,
   onReply,
 }: MessageItemProps) {
   const styles = useThemedStyles(createStyle);
@@ -56,7 +53,7 @@ function MessageGroupItem({
     if (
       magicHubClient &&
       !isSentByCurrentUser &&
-      messageStatus !== MessageStatus.Seen &&
+      message?.messageStatus !== MessageStatus.Seen &&
       message?.messageId
     ) {
       magicHubClient.viewedMessage(identifier, message.messageId);
@@ -66,7 +63,7 @@ function MessageGroupItem({
     isSentByCurrentUser,
     magicHubClient,
     message?.messageId,
-    messageStatus,
+    message?.messageStatus,
   ]);
 
   const triggerReply = useCallback(() => {
@@ -134,6 +131,41 @@ function MessageGroupItem({
     };
   });
 
+  const renderMessageStatus = useMemo(() => {
+    if (!isSentByCurrentUser) return null;
+
+    const statusConfig = {
+      [MessageStatus.Sent]: {
+        name: "checkmark",
+        color: "white",
+        opacity: 0.6,
+      },
+      [MessageStatus.Delivered]: {
+        name: "checkmark-done",
+        color: "white",
+        opacity: 0.6,
+      },
+      [MessageStatus.Seen]: {
+        name: "checkmark-done",
+        color: "lightblue",
+        opacity: 1,
+      },
+    };
+
+    const config = statusConfig[message?.messageStatus!];
+    if (!config) return null;
+
+    return (
+      <Icon
+        type="ionicons"
+        name={config.name as any}
+        size={16}
+        color={config.color}
+        style={{ marginLeft: spacingPixel(5), opacity: config.opacity }}
+      />
+    );
+  }, [isSentByCurrentUser, message?.messageStatus]);
+
   const handleAudioToggle = useCallback(() => {
     if (isPlaying) {
       pause();
@@ -161,7 +193,7 @@ function MessageGroupItem({
         >
           {dateFormatter(message?.createdAt!, "HH:mm")}
         </ThemedText>
-        {renderMessageStatus(messageStatus, isSentByCurrentUser)}
+        {renderMessageStatus}
       </View>
     ),
     [styles, isSentByCurrentUser, message?.createdAt, renderMessageStatus],
@@ -313,13 +345,6 @@ function MessageGroupItem({
     </View>
   );
 }
-
-export default memo(MessageGroupItem, (prevProps, nextProps) => {
-  return (
-    prevProps.message?.messageId === nextProps.message?.messageId &&
-    prevProps.messageStatus === nextProps.messageStatus
-  );
-});
 
 const createStyle = (colors: ColorDto) =>
   StyleSheet.create({

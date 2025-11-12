@@ -5,9 +5,7 @@ import { StyleSheet, View } from "react-native";
 
 import { ContactItem, ThemedText } from "@/components";
 import { ColorDto, useThemedStyles } from "@/theme";
-
-import { chatDateFormatter } from "../../../../utils/helper";
-import { spacingPixel } from "../../../../utils/pixelHelper";
+import { chatDateFormatter, spacingPixel } from "@/utils";
 
 interface ChatItemProps extends React.ComponentProps<typeof ContactItem> {
   chatId?: string;
