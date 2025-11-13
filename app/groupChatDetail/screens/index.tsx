@@ -18,7 +18,7 @@ import { isDateSeparator, MessageWithDate, spacingPixel } from "@/utils";
 
 import { useDetail } from "../hooks";
 
-export default function ChatScreen() {
+export default function GroupChatScreen() {
   const styles = useThemedStyles(createStyle);
 
   const {
@@ -36,6 +36,7 @@ export default function ChatScreen() {
     handleReply,
     onClearReply,
     handleScroll,
+    getMessageStatus,
   } = useDetail();
 
   // Memoized render function for better performance
@@ -44,15 +45,17 @@ export default function ChatScreen() {
       if (isDateSeparator(item)) {
         return <DateSeparator date={item.date} />;
       }
+      const messageStatus = getMessageStatus(item.messageId!);
       return (
         <MessageGroupItem
           identifier={chatId}
           message={item}
+          messageStatus={messageStatus}
           onReply={handleReply}
         />
       );
     },
-    [chatId, handleReply]
+    [chatId, handleReply, getMessageStatus],
   );
 
   // Key extractor for optimal list performance
@@ -66,7 +69,7 @@ export default function ChatScreen() {
   // Footer component
   const renderFooter = useCallback(
     () => <ChatTyping chatId={chatId} />,
-    [chatId]
+    [chatId],
   );
 
   // Optional: Item type for better recycling

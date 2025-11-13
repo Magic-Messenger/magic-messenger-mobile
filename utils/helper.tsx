@@ -188,6 +188,14 @@ export const renderMessageStatus = (
         />
       );
     default:
-      return null;
+      return (
+        <Icon
+          type="feather"
+          name="clock"
+          size={16}
+          color="white"
+          style={commonStyle.statusIcon}
+        />
+      );
   }
 };

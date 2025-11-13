@@ -1,14 +1,15 @@
 import type { AxiosError } from "axios";
 import { router } from "expo-router";
 
-import { ResultMessage } from "@/api/models";
 import {
   LICENSE_EXPIRED,
   TWO_FACTOR_NOT_SETUP,
   TWO_FACTOR_VERIFY_REQUIRED,
 } from "@/constants";
-import { useUserStore } from "@/store";
-import { showToast, trackEvent } from "@/utils";
+
+import { ResultMessage } from "../../api/models";
+import { useUserStore } from "../../store/userStore";
+import { showToast, trackEvent } from "../../utils/helper";
 
 const unauthorizedCode = [401, 419, 440];
 

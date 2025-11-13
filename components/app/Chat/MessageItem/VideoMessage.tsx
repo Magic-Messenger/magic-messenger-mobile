@@ -2,8 +2,8 @@ import React from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 import { ThemedText, VideoPreview } from "@/components";
-import { spacingPixel } from "@/utils";
 
+import { spacingPixel } from "../../../../utils/pixelHelper";
 import { ReplyMessageItem } from "../ReplyMessageItem";
 import { MessageFooter } from "./MessageFooter";
 import { MessageContentProps } from "./types";

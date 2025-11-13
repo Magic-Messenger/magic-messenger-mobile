@@ -7,7 +7,8 @@ import {
   postApiChatsMessageDelivered,
   postApiChatsMessageRead,
 } from "@/api/endpoints/magicMessenger";
-import { trackEvent } from "@/utils";
+
+import { trackEvent } from "../../utils/helper";
 
 type DeliveredMessageNotificationData = {
   ChatId: string;

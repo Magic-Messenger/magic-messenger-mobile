@@ -4,8 +4,8 @@ import { StyleSheet, View } from "react-native";
 
 import { Colors } from "@/constants";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { spacingPixel } from "@/utils";
 
+import { spacingPixel } from "../../../../utils/pixelHelper";
 import { ThemedText } from "../../ThemedText";
 
 export function EncryptionInfo() {

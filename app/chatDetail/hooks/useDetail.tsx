@@ -66,6 +66,7 @@ export const useDetail = () => {
     useState<boolean>(false);
   const [replyMessage, setReplyMessage] = useState<MessageDto | null>(null);
   const [messages, setMessages] = useState<MessageDto[]>([]);
+  const [messageStatuses, setMessageStatuses] = useState(new Map());
   const [loading, setLoading] = useState(false);
   const [chatId, setChatId] = useState<string | null>(null);
   const [pagination, setPagination] = useState({
@@ -107,7 +108,7 @@ export const useDetail = () => {
       receiverPublicKey: publicKey as string,
       senderPrivateKey: userPublicKey() as string,
     }),
-    [publicKey]
+    [publicKey],
   );
 
   useEffect(() => {
@@ -146,8 +147,18 @@ export const useDetail = () => {
           const newMessages = data.messages.data as MessageDto[];
           const isFirstLoad = pageNumber === 1;
 
-          setMessages((prev) => {
-            return isFirstLoad ? newMessages : [...newMessages, ...prev];
+          const messagesData = isFirstLoad
+            ? newMessages
+            : [...newMessages, ...messages];
+          setMessages(messagesData);
+
+          // Initialize status for the new message
+          setMessageStatuses((prevStatuses) => {
+            const newStatuses = new Map(prevStatuses);
+            messagesData.forEach((messageData) => {
+              newStatuses.set(messageData.messageId, messageData.messageStatus);
+            });
+            return newStatuses;
           });
 
           setPagination((prev) => ({
@@ -174,7 +185,7 @@ export const useDetail = () => {
         }
       }
     },
-    [chatId, pagination.pageSize, pagination.hasMore]
+    [chatId, pagination.pageSize, pagination.hasMore],
   );
 
   const initializeScreenshot = useCallback(async () => {
@@ -221,9 +232,9 @@ export const useDetail = () => {
           }
         },
         1000,
-        { leading: true, trailing: false }
+        { leading: true, trailing: false },
       ),
-    [pagination.hasMore, pagination.currentPage, loadMessages]
+    [pagination.hasMore, pagination.currentPage, loadMessages],
   );
 
   const handleReply = useCallback((message: MessageDto) => {
@@ -268,7 +279,7 @@ export const useDetail = () => {
           ? encrypt(
               message as string,
               usersPublicKey.receiverPublicKey,
-              usersPublicKey.senderPrivateKey
+              usersPublicKey.senderPrivateKey,
             )
           : null,
         file: isFileMessage
@@ -278,13 +289,15 @@ export const useDetail = () => {
               filePath: encrypt(
                 message.fileUrl as string,
                 usersPublicKey.receiverPublicKey,
-                usersPublicKey.senderPrivateKey
+                usersPublicKey.senderPrivateKey,
               ),
             }
           : null,
         repliedToMessage: replyMessage || null,
         messageStatus: MessageStatus.Sent, // Pending status
       } as any;
+
+      trackEvent("sendMessage: ", optimisticMessage);
 
       // Add an optimistic message to the list
       setMessages((prev) => [...prev, optimisticMessage]);
@@ -305,7 +318,7 @@ export const useDetail = () => {
               content: encrypt(
                 message as string,
                 usersPublicKey.receiverPublicKey,
-                usersPublicKey.senderPrivateKey
+                usersPublicKey.senderPrivateKey,
               ),
             }),
             ...(isFileMessage && {
@@ -315,7 +328,7 @@ export const useDetail = () => {
                 filePath: encrypt(
                   message.fileUrl as string,
                   usersPublicKey.receiverPublicKey,
-                  usersPublicKey.senderPrivateKey
+                  usersPublicKey.senderPrivateKey,
                 ),
               },
             }),
@@ -329,12 +342,12 @@ export const useDetail = () => {
           onClearReply();
           // Remove optimistic message - the real one will come via SignalR
           setMessages((prev) =>
-            prev.filter((m) => (m as any).tempId !== tempId)
+            prev.filter((m) => (m as any).tempId !== tempId),
           );
         } else {
           // Remove a failed message
           setMessages((prev) =>
-            prev.filter((m) => (m as any).tempId !== tempId)
+            prev.filter((m) => (m as any).tempId !== tempId),
           );
         }
       } catch (error) {
@@ -351,59 +364,32 @@ export const useDetail = () => {
       replyMessage,
       sendApiMessage,
       onClearReply,
-    ]
+    ],
   );
 
-  const handleMessageReceived = useCallback(
-    ({ message }: MessageReceivedEvent) => {
-      trackEvent("message_received", message);
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          ...message,
-          messageType: convertMessageType(message.messageType as never),
-          messageStatus: convertMessageStatus(message.messageStatus as never),
-        },
-      ]);
-
-      setTimeout(() => {
-        listRef.current?.scrollToEnd({ animated: true });
-      }, 100);
-    },
-    [listRef]
-  );
-
-  // Batch processor that applies all queued updates at once with priority checks
+  // Batch processor that applies all queued status updates at once
   const processBatchUpdates = useCallback(() => {
     if (updateQueueRef.current.size === 0) return;
 
     const updates = new Map(updateQueueRef.current);
     updateQueueRef.current.clear();
 
-    setMessages((prevMessages) =>
-      prevMessages.map((item) => {
-        const update = updates.get(item.messageId as string);
-        if (!update) return item;
+    setMessageStatuses((prevStatuses) => {
+      const newStatuses = new Map(prevStatuses);
 
-        const currentPriority =
-          MESSAGE_STATUS_PRIORITY[item.messageStatus as never];
+      updates.forEach((update, messageId) => {
+        const currentStatus = prevStatuses.get(messageId);
+        const currentPriority = MESSAGE_STATUS_PRIORITY[currentStatus] || 0;
         const newPriority = MESSAGE_STATUS_PRIORITY[update.messageStatus];
 
-        const shouldUpdate =
-          newPriority > currentPriority ||
-          (item.messageStatus !== update.messageStatus &&
-            newPriority >= currentPriority);
-
-        if (shouldUpdate) {
-          return {
-            ...item,
-            messageStatus: update.messageStatus,
-          };
+        // Only update if new status has higher priority
+        if (newPriority > currentPriority) {
+          newStatuses.set(messageId, update.messageStatus);
         }
-        return item;
-      })
-    );
+      });
+
+      return newStatuses;
+    });
   }, []);
 
   // Schedule batch processing
@@ -415,7 +401,7 @@ export const useDetail = () => {
     batchTimeoutRef.current = setTimeout(() => {
       processBatchUpdates();
       batchTimeoutRef.current = null;
-    }, 250); // Batch updates within 250ms window
+    }, 500); // Batch updates within 500ms window
   }, [processBatchUpdates]);
 
   const handleMessageDelivered = useCallback(
@@ -429,11 +415,13 @@ export const useDetail = () => {
 
       // Check if this update should override the queued one
       const existingUpdate = updateQueueRef.current.get(messageId);
+      trackEvent("message_delivered existingUpdate", existingUpdate);
+
       if (existingUpdate) {
         const existingPriority =
           MESSAGE_STATUS_PRIORITY[existingUpdate.messageStatus as never];
 
-        /// Only update queue if new status has higher or equal priority
+        // Only update queue if new status has higher or equal priority
         if (newStatus >= existingPriority) {
           updateQueueRef.current.set(messageId, {
             messageStatus: convertMessageStatus(newStatus),
@@ -441,6 +429,10 @@ export const useDetail = () => {
         }
       } else {
         // No existing update, add to queue
+        trackEvent("message_delivered no existing update", {
+          messageId,
+          messageStatus: convertMessageStatus(newStatus),
+        });
         updateQueueRef.current.set(messageId, {
           messageStatus: convertMessageStatus(newStatus),
         });
@@ -448,7 +440,7 @@ export const useDetail = () => {
 
       scheduleBatchUpdate();
     },
-    [scheduleBatchUpdate]
+    [scheduleBatchUpdate],
   );
 
   const handleMessageSeen = useCallback(
@@ -476,6 +468,10 @@ export const useDetail = () => {
         }
       } else {
         // No existing update, add to queue
+        trackEvent("message_seen no existing update", {
+          messageId,
+          messageStatus: convertMessageStatus(newStatus),
+        });
         updateQueueRef.current.set(messageId, {
           messageStatus: convertMessageStatus(newStatus),
         });
@@ -483,7 +479,42 @@ export const useDetail = () => {
 
       scheduleBatchUpdate();
     },
-    [scheduleBatchUpdate]
+    [scheduleBatchUpdate],
+  );
+
+  const handleMessageReceived = useCallback(
+    (messageReceivedEvent: MessageReceivedEvent) => {
+      trackEvent("message_received", { messageReceivedEvent });
+
+      const newMessage = messageReceivedEvent.message;
+      if (!newMessage) return;
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          ...newMessage,
+          messageType: convertMessageType(newMessage.messageType as never),
+          messageStatus: convertMessageStatus(
+            newMessage.messageStatus as never,
+          ),
+        },
+      ]);
+
+      // Initialize status for the new message
+      setMessageStatuses((prevStatuses) => {
+        const newStatuses = new Map(prevStatuses);
+        newStatuses.set(
+          newMessage.messageId,
+          convertMessageStatus(newMessage.messageStatus as never),
+        );
+        return newStatuses;
+      });
+
+      setTimeout(() => {
+        listRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    },
+    [listRef],
   );
 
   useEffect(() => {
@@ -517,6 +548,10 @@ export const useDetail = () => {
     handleMessageSeen,
   ]);
 
+  // Helper function to get message status
+  const getMessageStatus = (messageId: string) =>
+    messageStatuses.get(messageId);
+
   const onDelete = () => {
     Alert.alert(
       t("chatDetail.delete.title"),
@@ -532,7 +567,7 @@ export const useDetail = () => {
           style: "cancel",
         },
       ],
-      { cancelable: true }
+      { cancelable: true },
     );
   };
 
@@ -551,7 +586,7 @@ export const useDetail = () => {
           style: "cancel",
         },
       ],
-      { cancelable: true }
+      { cancelable: true },
     );
   };
 
@@ -570,7 +605,7 @@ export const useDetail = () => {
           style: "cancel",
         },
       ],
-      { cancelable: true }
+      { cancelable: true },
     );
   };
 
@@ -592,7 +627,7 @@ export const useDetail = () => {
         onPress: onBlockContact,
       },
     ],
-    [t, onDelete, onChatClear, onBlockContact]
+    [t, onDelete, onChatClear, onBlockContact],
   );
 
   const handleDeleteChat = useCallback(async () => {
@@ -653,14 +688,14 @@ export const useDetail = () => {
     } catch (error) {
       console.log("error: ", error);
     }
-  }, [chatId]);
+  }, [userName, chatId]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () =>
         chatId ? (
           <TouchableOpacity onPress={() => actionRef.current?.open()}>
-            <Icon type="feather" name="menu" />
+            <Icon type="feather" name="more-vertical" />
           </TouchableOpacity>
         ) : null,
     });
@@ -684,7 +719,7 @@ export const useDetail = () => {
 
   const groupedMessages = useMemo(
     () => groupMessagesByDate(messages),
-    [messages]
+    [messages],
   );
 
   return {
@@ -705,5 +740,6 @@ export const useDetail = () => {
     onClearReply,
     handleScroll,
     handleSendMessage,
+    getMessageStatus,
   };
 };

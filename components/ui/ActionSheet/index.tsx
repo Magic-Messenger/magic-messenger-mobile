@@ -5,8 +5,8 @@ import { FlatList, StyleSheet, TouchableOpacity } from "react-native";
 
 import { ThemedText } from "@/components/app";
 import { useThemedStyles } from "@/theme";
-import { spacingPixel } from "@/utils";
 
+import { spacingPixel } from "../../../utils/pixelHelper";
 import { BottomSheetComponent } from "../BottomSheet";
 
 export interface ActionSheetRef {
@@ -83,7 +83,7 @@ export const ActionSheet = forwardRef<ActionSheetRef, ActionSheetProps>(
         />
       </BottomSheetComponent>
     );
-  }
+  },
 );
 
 const createStyles = () =>

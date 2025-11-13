@@ -62,6 +62,7 @@ export const useDetail = () => {
 
   const [replyMessage, setReplyMessage] = useState<MessageDto | null>(null);
   const [messages, setMessages] = useState<MessageDto[]>([]);
+  const [messageStatuses, setMessageStatuses] = useState(new Map());
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({
     currentPage: 0,
@@ -112,9 +113,9 @@ export const useDetail = () => {
         groupKey as string,
         groupNonce as string,
         userPrivateKey() as string,
-        groupAdminAccount as string
+        groupAdminAccount as string,
       ),
-    [groupKey, groupNonce, groupAdminAccount]
+    [groupKey, groupNonce, groupAdminAccount],
   );
 
   const usersPublicKey = useMemo(
@@ -122,7 +123,7 @@ export const useDetail = () => {
       receiverPublicKey: publicKey as string,
       senderPrivateKey: userPublicKey() as string,
     }),
-    [publicKey]
+    [publicKey],
   );
 
   const loadMessages = useCallback(
@@ -147,8 +148,18 @@ export const useDetail = () => {
           const newMessages = data.messages.data as MessageDto[];
           const isFirstLoad = pageNumber === 1;
 
-          setMessages((prev) => {
-            return isFirstLoad ? newMessages : [...newMessages, ...prev];
+          const messagesData = isFirstLoad
+            ? newMessages
+            : [...newMessages, ...messages];
+          setMessages(messagesData);
+
+          // Initialize status for the new message
+          setMessageStatuses((prevStatuses) => {
+            const newStatuses = new Map(prevStatuses);
+            messagesData.forEach((messageData) => {
+              newStatuses.set(messageData.messageId, messageData.messageStatus);
+            });
+            return newStatuses;
           });
 
           setPagination((prev) => ({
@@ -177,7 +188,7 @@ export const useDetail = () => {
         }
       }
     },
-    [chatId, pagination.pageSize, pagination.hasMore]
+    [chatId, pagination.pageSize, pagination.hasMore],
   );
 
   useEffect(() => {
@@ -205,9 +216,9 @@ export const useDetail = () => {
           }
         },
         1000,
-        { leading: true, trailing: false }
+        { leading: true, trailing: false },
       ),
-    [pagination.hasMore, pagination.currentPage, loadMessages]
+    [pagination.hasMore, pagination.currentPage, loadMessages],
   );
 
   const handleReply = useCallback((message: MessageDto) => {
@@ -247,7 +258,7 @@ export const useDetail = () => {
               contentType: message.contentType,
               filePath: encryptForGroup(
                 message.fileUrl as string,
-                decryptedGroupKey as string
+                decryptedGroupKey as string,
               ),
             }
           : null,
@@ -273,7 +284,7 @@ export const useDetail = () => {
             ...(!isFileMessage && {
               content: encryptForGroup(
                 message as string,
-                decryptedGroupKey as string
+                decryptedGroupKey as string,
               ),
             }),
             ...(isFileMessage && {
@@ -282,7 +293,7 @@ export const useDetail = () => {
                 contentType: message.contentType,
                 filePath: encryptForGroup(
                   message.fileUrl as string,
-                  decryptedGroupKey as string
+                  decryptedGroupKey as string,
                 ),
               },
             }),
@@ -296,17 +307,17 @@ export const useDetail = () => {
           onClearReply();
           // Remove optimistic message - the real one will come via SignalR
           setMessages((prev) =>
-            prev.filter((m) => (m as any).tempId !== tempId)
+            prev.filter((m) => (m as any).tempId !== tempId),
           );
         } else {
-          // Remove failed message
+          // Remove a failed message
           setMessages((prev) =>
-            prev.filter((m) => (m as any).tempId !== tempId)
+            prev.filter((m) => (m as any).tempId !== tempId),
           );
         }
       } catch (error) {
         console.error("Error sending message:", error);
-        // Remove failed message
+        // Remove a failed message
         setMessages((prev) => prev.filter((m) => (m as any).tempId !== tempId));
       }
     },
@@ -317,7 +328,7 @@ export const useDetail = () => {
       replyMessage,
       sendApiMessage,
       onClearReply,
-    ]
+    ],
   );
 
   const handleChatControl = useCallback(
@@ -326,60 +337,33 @@ export const useDetail = () => {
         await handleSendMessage(message);
       }
     },
-    [chatId, handleSendMessage]
+    [chatId, handleSendMessage],
   );
 
   //#region SignalR Effects
-  const handleGroupMessageReceived = useCallback(
-    ({ message }: MessageReceivedEvent) => {
-      trackEvent("group_message_received", message);
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          ...message,
-          messageType: convertMessageType(message.messageType as never),
-          messageStatus: convertMessageStatus(message.messageStatus as never),
-        },
-      ]);
-
-      setTimeout(() => {
-        listRef.current?.scrollToEnd({ animated: true });
-      }, 100);
-    },
-    [listRef]
-  );
-
-  // Batch processor that applies all queued updates at once with priority checks
+  // Batch processor that applies all queued status updates at once
   const processBatchUpdates = useCallback(() => {
     if (updateQueueRef.current.size === 0) return;
 
     const updates = new Map(updateQueueRef.current);
     updateQueueRef.current.clear();
 
-    setMessages((prevMessages) =>
-      prevMessages.map((item) => {
-        const update = updates.get(item.messageId as string);
-        if (!update) return item;
+    setMessageStatuses((prevStatuses) => {
+      const newStatuses = new Map(prevStatuses);
 
-        const currentPriority =
-          MESSAGE_STATUS_PRIORITY[item.messageStatus as never];
+      updates.forEach((update, messageId) => {
+        const currentStatus = prevStatuses.get(messageId);
+        const currentPriority = MESSAGE_STATUS_PRIORITY[currentStatus] || 0;
         const newPriority = MESSAGE_STATUS_PRIORITY[update.messageStatus];
 
-        const shouldUpdate =
-          newPriority > currentPriority ||
-          (item.messageStatus !== update.messageStatus &&
-            newPriority >= currentPriority);
-
-        if (shouldUpdate) {
-          return {
-            ...item,
-            messageStatus: update.messageStatus,
-          };
+        // Only update if new status has higher priority
+        if (newPriority > currentPriority) {
+          newStatuses.set(messageId, update.messageStatus);
         }
-        return item;
-      })
-    );
+      });
+
+      return newStatuses;
+    });
   }, []);
 
   // Schedule batch processing
@@ -391,7 +375,7 @@ export const useDetail = () => {
     batchTimeoutRef.current = setTimeout(() => {
       processBatchUpdates();
       batchTimeoutRef.current = null;
-    }, 250); // Batch updates within 250ms window
+    }, 500); // Batch updates within 500ms window
   }, [processBatchUpdates]);
 
   const handleMessageDelivered = useCallback(
@@ -405,11 +389,13 @@ export const useDetail = () => {
 
       // Check if this update should override the queued one
       const existingUpdate = updateQueueRef.current.get(messageId);
+      trackEvent("message_delivered existingUpdate", existingUpdate);
+
       if (existingUpdate) {
         const existingPriority =
           MESSAGE_STATUS_PRIORITY[existingUpdate.messageStatus as never];
 
-        /// Only update queue if new status has higher or equal priority
+        // Only update queue if new status has higher or equal priority
         if (newStatus >= existingPriority) {
           updateQueueRef.current.set(messageId, {
             messageStatus: convertMessageStatus(newStatus),
@@ -417,6 +403,10 @@ export const useDetail = () => {
         }
       } else {
         // No existing update, add to queue
+        trackEvent("message_delivered no existing update", {
+          messageId,
+          messageStatus: convertMessageStatus(newStatus),
+        });
         updateQueueRef.current.set(messageId, {
           messageStatus: convertMessageStatus(newStatus),
         });
@@ -424,7 +414,7 @@ export const useDetail = () => {
 
       scheduleBatchUpdate();
     },
-    [scheduleBatchUpdate]
+    [scheduleBatchUpdate],
   );
 
   const handleMessageSeen = useCallback(
@@ -452,6 +442,10 @@ export const useDetail = () => {
         }
       } else {
         // No existing update, add to queue
+        trackEvent("message_seen no existing update", {
+          messageId,
+          messageStatus: convertMessageStatus(newStatus),
+        });
         updateQueueRef.current.set(messageId, {
           messageStatus: convertMessageStatus(newStatus),
         });
@@ -459,13 +453,48 @@ export const useDetail = () => {
 
       scheduleBatchUpdate();
     },
-    [scheduleBatchUpdate]
+    [scheduleBatchUpdate],
+  );
+
+  const handleMessageReceived = useCallback(
+    (messageReceivedEvent: MessageReceivedEvent) => {
+      trackEvent("group_message_received", { messageReceivedEvent });
+
+      const newMessage = messageReceivedEvent.message;
+      if (!newMessage) return;
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          ...newMessage,
+          messageType: convertMessageType(newMessage.messageType as never),
+          messageStatus: convertMessageStatus(
+            newMessage.messageStatus as never,
+          ),
+        },
+      ]);
+
+      // Initialize status for the new message
+      setMessageStatuses((prevStatuses) => {
+        const newStatuses = new Map(prevStatuses);
+        newStatuses.set(
+          newMessage.messageId,
+          convertMessageStatus(newMessage.messageStatus as never),
+        );
+        return newStatuses;
+      });
+
+      setTimeout(() => {
+        listRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    },
+    [listRef],
   );
 
   useEffect(() => {
     if (magicHubClient && chatId) {
       magicHubClient.joinChat(chatId as string);
-      magicHubClient.on("group_message_received", handleGroupMessageReceived);
+      magicHubClient.on("group_message_received", handleMessageReceived);
       magicHubClient.on("message_delivered", handleMessageDelivered);
       magicHubClient.on("message_seen", handleMessageSeen);
     }
@@ -488,10 +517,19 @@ export const useDetail = () => {
   }, [
     magicHubClient,
     chatId,
-    handleGroupMessageReceived,
+    handleMessageReceived,
     handleMessageDelivered,
     handleMessageSeen,
   ]);
+
+  // Helper function to get message status
+  const getMessageStatus = useCallback(
+    (messageId: string) => {
+      return messageStatuses.get(messageId);
+    },
+    [messageStatuses],
+  );
+
   //#endregion
 
   const handleDeleteChat = useCallback(async () => {
@@ -529,7 +567,7 @@ export const useDetail = () => {
           style: "cancel",
         },
       ],
-      { cancelable: true }
+      { cancelable: true },
     );
   };
 
@@ -541,7 +579,7 @@ export const useDetail = () => {
         onPress: onDelete,
       },
     ],
-    [t, onDelete]
+    [t, onDelete],
   );
 
   useLayoutEffect(() => {
@@ -549,7 +587,7 @@ export const useDetail = () => {
       headerRight: () =>
         chatId ? (
           <TouchableOpacity onPress={() => actionRef.current?.open()}>
-            <Icon type="feather" name="menu" />
+            <Icon type="feather" name="more-vertical" />
           </TouchableOpacity>
         ) : null,
     });
@@ -573,7 +611,7 @@ export const useDetail = () => {
 
   const groupedMessages = useMemo(
     () => groupMessagesByDate(messages),
-    [messages]
+    [messages],
   );
 
   return {
@@ -595,5 +633,6 @@ export const useDetail = () => {
     onClearReply,
     handleScroll,
     handleChatControl,
+    getMessageStatus,
   };
 };

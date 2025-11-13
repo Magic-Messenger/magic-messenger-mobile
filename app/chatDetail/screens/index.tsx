@@ -36,6 +36,7 @@ export default function ChatScreen() {
     handleReply,
     handleScroll,
     onClearReply,
+    getMessageStatus,
   } = useDetail();
 
   // Memoized render function for better performance
@@ -44,16 +45,18 @@ export default function ChatScreen() {
       if (isDateSeparator(item)) {
         return <DateSeparator date={item.date} />;
       }
+      const messageStatus = getMessageStatus(item.messageId!);
       return (
         <MessageItem
           identifier={chatId}
           message={item}
+          messageStatus={messageStatus}
           receiverPublicKey={usersPublicKey.receiverPublicKey}
           onReply={handleReply}
         />
       );
     },
-    [chatId, usersPublicKey.receiverPublicKey, handleReply]
+    [chatId, usersPublicKey.receiverPublicKey, handleReply, getMessageStatus],
   );
 
   // Key extractor for optimal list performance
@@ -74,7 +77,7 @@ export default function ChatScreen() {
   // Footer component
   const renderFooter = useCallback(
     () => <ChatTyping chatId={chatId} />,
-    [chatId]
+    [chatId],
   );
 
   return (

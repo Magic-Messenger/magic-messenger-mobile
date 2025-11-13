@@ -3,7 +3,8 @@ import { StyleSheet, View } from "react-native";
 
 import { ThemedText } from "@/components";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { spacingPixel } from "@/utils";
+
+import { spacingPixel } from "../../../../utils/pixelHelper";
 
 type DateSeparatorProps = {
   date: string;

@@ -8,7 +8,9 @@ import Animated, {
 import { TicketMessageDto } from "@/api/models";
 import { ThemedText } from "@/components";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { dateFormatter, spacingPixel } from "@/utils";
+
+import { dateFormatter } from "../../../utils/helper";
+import { spacingPixel } from "../../../utils/pixelHelper";
 
 export function TicketMessageItem(props: TicketMessageDto) {
   const styles = useThemedStyles(createStyle);

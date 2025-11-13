@@ -3,8 +3,8 @@ import { StyleSheet, View } from "react-native";
 
 import { Icon } from "@/components/ui";
 import { ColorDto, useColor, useThemedStyles } from "@/theme";
-import { spacingPixel } from "@/utils";
 
+import { spacingPixel } from "../../../../utils/pixelHelper";
 import { ThemedText } from "../../ThemedText";
 
 interface ReplyMessageItemProps {

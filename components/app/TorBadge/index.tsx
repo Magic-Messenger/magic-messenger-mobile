@@ -13,7 +13,7 @@ import {
 import { ThemedText } from "../ThemedText";
 
 export const TorBadge = () => {
-  const { isConnected } = useTor();
+  const { isConnected, isStarting } = useTor();
   const styles = useThemedStyles(createStyle);
   return (
     <LinearGradient
@@ -32,7 +32,11 @@ export const TorBadge = () => {
       <View
         style={[
           styles.badgeStatus,
-          isConnected ? styles.active : styles.inActive,
+          isConnected
+            ? styles.active
+            : isStarting
+              ? styles.starting
+              : styles.inActive,
         ]}
       />
       <ThemedText type="default" weight="semiBold">
@@ -59,5 +63,8 @@ const createStyle = () =>
     },
     inActive: {
       backgroundColor: Colors.danger,
+    },
+    starting: {
+      backgroundColor: Colors.warning,
     },
   });

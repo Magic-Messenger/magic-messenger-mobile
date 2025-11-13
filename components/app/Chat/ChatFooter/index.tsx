@@ -9,7 +9,9 @@ import { UploadFileResultDto } from "@/constants";
 import { useAudioRecorder, usePicker } from "@/hooks";
 import { useSignalRStore, useUserStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { heightPixel, spacingPixel, trackEvent } from "@/utils";
+
+import { trackEvent } from "../../../../utils/helper";
+import { heightPixel, spacingPixel } from "../../../../utils/pixelHelper";
 
 interface ChatFooterProps {
   chatId: string;

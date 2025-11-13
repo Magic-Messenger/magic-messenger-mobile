@@ -3,8 +3,8 @@ import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 import { AppImage, ThemedText } from "@/components";
 import { useThemedStyles } from "@/theme";
-import { spacingPixel } from "@/utils";
 
+import { spacingPixel } from "../../../../utils/pixelHelper";
 import { ReplyMessageItem } from "../ReplyMessageItem";
 import { MessageFooter } from "./MessageFooter";
 import { MessageContentProps } from "./types";

@@ -9,8 +9,8 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 import { ThemedText } from "@/components/app";
 import { useColor, useThemedStyles } from "@/theme";
-import { spacingPixel } from "@/utils";
 
+import { spacingPixel } from "../../../utils/pixelHelper";
 import { Icon } from "../Icon";
 
 interface BottomSheetComponentProps extends BottomSheetProps {
@@ -30,7 +30,7 @@ export const BottomSheetComponent = forwardRef<any, BottomSheetComponentProps>(
       closeButton = false,
       ...props
     },
-    ref
+    ref,
   ) => {
     const styles = useThemedStyles(createStyles);
     const colors = useColor();
@@ -92,7 +92,7 @@ export const BottomSheetComponent = forwardRef<any, BottomSheetComponentProps>(
         </BottomSheet>
       </Portal>
     );
-  }
+  },
 );
 
 const createStyles = () =>

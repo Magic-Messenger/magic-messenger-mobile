@@ -161,7 +161,13 @@ function MessageItem({
       default:
         return null;
     }
-  }, [message, decryptedContent, decryptedReplyMessage, isSentByCurrentUser]);
+  }, [
+    message,
+    messageStatus,
+    decryptedContent,
+    decryptedReplyMessage,
+    isSentByCurrentUser,
+  ]);
 
   // Early return if no content
   if (!decryptedContent || !message) return null;
@@ -194,7 +200,6 @@ export default memo(MessageItem, (prevProps, nextProps) => {
     prevProps.messageStatus === nextProps.messageStatus
   );
 });
-
 const createStyle = (colors: ColorDto) =>
   StyleSheet.create({
     messageWrapper: {
