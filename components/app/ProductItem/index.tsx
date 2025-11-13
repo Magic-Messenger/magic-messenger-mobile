@@ -1,10 +1,10 @@
-import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
 import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
 
 import { Colors, spacing } from "../../../constants";
-import { ColorDto, useThemedStyles } from "../../../theme";
+import { useThemedStyles } from "../../../theme";
 import { heightPixel, spacingPixel, widthPixel } from "../../../utils";
+import { GradientBackground } from "../../ui/GradientBackground";
 import { ThemedText } from "../ThemedText";
 
 interface Props {
@@ -23,12 +23,7 @@ export const ProductItem = ({ productName, price, onPress }: Props) => {
       activeOpacity={0.5}
       onPress={onPress}
     >
-      <LinearGradient
-        colors={Colors.buttonPrimary as never}
-        start={{ y: 0, x: 1 }}
-        end={{ y: 1, x: 0 }}
-        style={styles.productItem}
-      >
+      <GradientBackground style={styles.productItem}>
         <ThemedText weight="semiBold" size={Platform.OS === "ios" ? 18 : 12}>
           {productName ?? ""}
         </ThemedText>
@@ -54,12 +49,12 @@ export const ProductItem = ({ productName, price, onPress }: Props) => {
             </ThemedText>
           </View>
         </View>
-      </LinearGradient>
+      </GradientBackground>
     </TouchableOpacity>
   );
 };
 
-const createStyle = (colors: ColorDto) =>
+const createStyle = () =>
   StyleSheet.create({
     container: {
       height: heightPixel(110),

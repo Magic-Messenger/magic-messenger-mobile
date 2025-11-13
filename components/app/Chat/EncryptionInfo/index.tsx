@@ -1,11 +1,10 @@
-import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
 
-import { Colors } from "@/constants";
-import { ColorDto, useThemedStyles } from "@/theme";
+import { useThemedStyles } from "@/theme";
 
 import { spacingPixel } from "../../../../utils/pixelHelper";
+import { GradientBackground } from "../../../ui/GradientBackground";
 import { ThemedText } from "../../ThemedText";
 
 export function EncryptionInfo() {
@@ -13,22 +12,17 @@ export function EncryptionInfo() {
   const styles = useThemedStyles(createStyle);
 
   return (
-    <LinearGradient
-      colors={Colors.buttonPrimary as never}
-      start={{ y: 0, x: 1 }}
-      end={{ y: 1, x: 0 }}
-      style={styles.container}
-    >
+    <GradientBackground style={styles.container}>
       <View style={styles.content}>
         <ThemedText size={13} center>
           {t("chatDetail.encryptionInfo")}
         </ThemedText>
       </View>
-    </LinearGradient>
+    </GradientBackground>
   );
 }
 
-const createStyle = (colors: ColorDto) =>
+const createStyle = () =>
   StyleSheet.create({
     container: {
       borderRadius: spacingPixel(10),

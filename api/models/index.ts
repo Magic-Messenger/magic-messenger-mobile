@@ -49,6 +49,7 @@ export * from "./changeAccountStatusCommandRequest";
 export * from "./changeInvoiceStatusCommandRequest";
 export * from "./changeLanguageCommandRequest";
 export * from "./changeLicenseStatusCommandRequest";
+export * from "./changePasswordCommandRequest";
 export * from "./changeTicketStatusCommandRequest";
 export * from "./chatDto";
 export * from "./chatDtoContact";

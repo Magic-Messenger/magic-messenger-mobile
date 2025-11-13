@@ -1,4 +1,3 @@
-import { LinearGradient } from "expo-linear-gradient";
 import { StyleSheet, View } from "react-native";
 
 import { Colors } from "@/constants";
@@ -10,18 +9,16 @@ import {
   spacingPixel,
   widthPixel,
 } from "../../../utils/pixelHelper";
+import { GradientBackground } from "../../ui/GradientBackground";
 import { ThemedText } from "../ThemedText";
 
 export const TorBadge = () => {
   const { isConnected, isStarting } = useTor();
   const styles = useThemedStyles(createStyle);
   return (
-    <LinearGradient
-      colors={Colors.buttonPrimary as never}
-      start={{ y: 0, x: 1 }}
-      end={{ y: 1, x: 0 }}
+    <GradientBackground
       style={[
-        styles.bedge,
+        styles.badge,
         styles.alignItemsCenter,
         styles.justifyContentCenter,
         styles.gap2,
@@ -42,13 +39,13 @@ export const TorBadge = () => {
       <ThemedText type="default" weight="semiBold">
         Tor
       </ThemedText>
-    </LinearGradient>
+    </GradientBackground>
   );
 };
 
 const createStyle = () =>
   StyleSheet.create({
-    bedge: {
+    badge: {
       flexDirection: "row",
       minWidth: widthPixel(60),
       height: heightPixel(30),

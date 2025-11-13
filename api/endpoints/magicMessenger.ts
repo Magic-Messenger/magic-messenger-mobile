@@ -43,6 +43,7 @@ import type {
   ChangeInvoiceStatusCommandRequest,
   ChangeLanguageCommandRequest,
   ChangeLicenseStatusCommandRequest,
+  ChangePasswordCommandRequest,
   ChangeTicketStatusCommandRequest,
   ChatDtoListPaginatedResultIDataResult,
   ContactDtoListIDataResult,
@@ -2290,6 +2291,103 @@ export const usePostApiAccountResetPassword = <
 > => {
   const mutationOptions =
     getPostApiAccountResetPasswordMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Change account password operation
+ */
+export const postApiAccountChangePassword = (
+  changePasswordCommandRequest: ChangePasswordCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/account/change-password`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: changePasswordCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiAccountChangePasswordMutationOptions = <
+  TError = ResultMessage[] | void | void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiAccountChangePassword>>,
+    TError,
+    { data: ChangePasswordCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiAccountChangePassword>>,
+  TError,
+  { data: ChangePasswordCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiAccountChangePassword"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiAccountChangePassword>>,
+    { data: ChangePasswordCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiAccountChangePassword(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiAccountChangePasswordMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiAccountChangePassword>>
+>;
+export type PostApiAccountChangePasswordMutationBody =
+  ChangePasswordCommandRequest;
+export type PostApiAccountChangePasswordMutationError =
+  | ResultMessage[]
+  | void
+  | void;
+
+/**
+ * @summary Change account password operation
+ */
+export const usePostApiAccountChangePassword = <
+  TError = ResultMessage[] | void | void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiAccountChangePassword>>,
+      TError,
+      { data: ChangePasswordCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiAccountChangePassword>>,
+  TError,
+  { data: ChangePasswordCommandRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiAccountChangePasswordMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };

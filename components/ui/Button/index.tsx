@@ -1,4 +1,3 @@
-import { LinearGradient } from "expo-linear-gradient";
 import {
   ActivityIndicator,
   StyleProp,
@@ -13,6 +12,7 @@ import { useThemedStyles } from "@/theme";
 
 import { heightPixel } from "../../../utils/pixelHelper";
 import { ThemedText, ThemedTextProps } from "../../app/ThemedText";
+import { GradientBackground } from "../../ui/GradientBackground";
 
 interface Props {
   type?: "default" | "primary" | "secondary" | "danger";
@@ -67,10 +67,8 @@ export function Button({
       activeOpacity={activeOpacity}
       style={[styles.button, style]}
     >
-      <LinearGradient
+      <GradientBackground
         colors={backgroundColor() as never}
-        start={{ y: 0, x: 1 }}
-        end={{ y: 1, x: 0 }}
         style={[
           styles.fullWidth,
           styles.fullHeight,
@@ -91,7 +89,7 @@ export function Button({
             {rightIcon && <View style={styles.rightIcon}>{rightIcon}</View>}
           </View>
         )}
-      </LinearGradient>
+      </GradientBackground>
     </TouchableOpacity>
   );
 }

@@ -2,7 +2,14 @@ import dayjs from "dayjs";
 import React from "react";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 
-import { AppLayout, Button, Icon, ProductItem, ThemedText } from "@/components";
+import {
+  AppLayout,
+  Button,
+  GradientBackground,
+  Icon,
+  ProductItem,
+  ThemedText,
+} from "@/components";
 
 import { useInAppPurchase, useLicense } from "../hooks";
 
@@ -45,7 +52,7 @@ export default function LicenseScreen() {
             </TouchableOpacity>
           </View>
           <View>
-            <View style={styles.expireDateContainer}>
+            <GradientBackground style={styles.expireDateContainer}>
               <ThemedText style={styles.expireLicenseDate}>
                 {t("license.expireLicenseDate", {
                   expireDate: dayjs(profile?.license?.expirationDate).format(
@@ -53,7 +60,7 @@ export default function LicenseScreen() {
                   ),
                 })}
               </ThemedText>
-            </View>
+            </GradientBackground>
           </View>
         </View>
 

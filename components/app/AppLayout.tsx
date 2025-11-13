@@ -1,4 +1,3 @@
-import { LinearGradient } from "expo-linear-gradient";
 import { router, usePathname } from "expo-router";
 import React, { memo, useCallback, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
@@ -22,6 +21,7 @@ import { useColor, useThemedStyles } from "@/theme";
 
 import { showToast, trackEvent } from "../../utils/helper";
 import { needsBottomSafeArea, spacingPixel } from "../../utils/pixelHelper";
+import { GradientBackground } from "../ui/GradientBackground";
 import { ThemedText } from "./ThemedText";
 import { TorBadge } from "./TorBadge";
 
@@ -182,7 +182,7 @@ function AppLayout({
 
   return (
     <View style={styles.wrapper}>
-      <LinearGradient
+      <GradientBackground
         colors={Colors.backgroundColor as never}
         style={[styles.gradient, container ? styles.container : undefined]}
       >
@@ -244,7 +244,7 @@ function AppLayout({
             </View>
           )}
         </SafeAreaView>
-      </LinearGradient>
+      </GradientBackground>
 
       {loading && (
         <View style={styles.loadingOverlay}>

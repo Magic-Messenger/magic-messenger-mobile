@@ -1,9 +1,8 @@
 import { Image } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
-import { Colors, Images } from "../../../../constants";
+import { Images } from "../../../../constants";
 import { useThemedStyles } from "../../../../theme";
 import {
   copyToClipboard,
@@ -12,6 +11,7 @@ import {
   widthPixel,
 } from "../../../../utils";
 import { Icon } from "../../../ui";
+import { GradientBackground } from "../../../ui/GradientBackground";
 import { ThemedText } from "../../ThemedText";
 
 export interface ContactItemProps {
@@ -48,12 +48,7 @@ export const ContactItem = ({
       onPress={onAction?.onPress}
       {...props}
     >
-      <LinearGradient
-        colors={Colors.buttonPrimary as never}
-        start={{ y: 0, x: 1 }}
-        end={{ y: 1, x: 0 }}
-        style={styles.contactItem}
-      >
+      <GradientBackground style={styles.contactItem}>
         <Image
           contentFit="contain"
           source={Images.icon}
@@ -90,7 +85,7 @@ export const ContactItem = ({
 
           {customAction && customAction}
         </View>
-      </LinearGradient>
+      </GradientBackground>
     </TouchableOpacity>
   );
 };
