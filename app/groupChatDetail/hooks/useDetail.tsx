@@ -78,9 +78,11 @@ export const useDetail = () => {
   const isLoadingRef = useRef(false);
   const isMountedRef = useRef(true);
 
-  const { userName: currentUserName } = useUserStore();
+  const currentUserName = useUserStore((s) => s.userName);
   const magicHubClient = useSignalRStore((s) => s.magicHubClient);
   const setOnlineUsers = useSignalRStore((s) => s.setOnlineUsers);
+  const receivedMessage = useSignalRStore((s) => s.receivedMessage);
+  const setReceivedMessage = useSignalRStore((s) => s.setReceivedMessage);
 
   const { mutateAsync: deleteChat } = useDeleteApiChatsDelete();
 
@@ -456,12 +458,16 @@ export const useDetail = () => {
     [scheduleBatchUpdate],
   );
 
-  const handleMessageReceived = useCallback(
+  const handleGroupMessageReceived = useCallback(
     (messageReceivedEvent: MessageReceivedEvent) => {
       trackEvent("group_message_received", { messageReceivedEvent });
 
       const newMessage = messageReceivedEvent.message;
-      if (!newMessage) return;
+      if (
+        !newMessage ||
+        (chatId as string) !== messageReceivedEvent?.chat?.chatId
+      )
+        return;
 
       setMessages((prev) => [
         ...prev,
@@ -484,17 +490,22 @@ export const useDetail = () => {
         return newStatuses;
       });
 
+      setReceivedMessage(undefined);
+
       setTimeout(() => {
         listRef.current?.scrollToEnd({ animated: true });
       }, 100);
     },
-    [listRef],
+    [listRef, chatId],
   );
+
+  useEffect(() => {
+    if (receivedMessage) handleGroupMessageReceived(receivedMessage);
+  }, [receivedMessage]);
 
   useEffect(() => {
     if (magicHubClient && chatId) {
       magicHubClient.joinChat(chatId as string);
-      magicHubClient.on("group_message_received", handleMessageReceived);
       magicHubClient.on("message_delivered", handleMessageDelivered);
       magicHubClient.on("message_seen", handleMessageSeen);
     }
@@ -502,7 +513,6 @@ export const useDetail = () => {
     return () => {
       if (magicHubClient && chatId) {
         magicHubClient.leaveChat(chatId as string);
-        magicHubClient.off("group_message_received");
         magicHubClient.off("message_delivered");
         magicHubClient.off("message_seen");
       }
@@ -517,7 +527,7 @@ export const useDetail = () => {
   }, [
     magicHubClient,
     chatId,
-    handleMessageReceived,
+    handleGroupMessageReceived,
     handleMessageDelivered,
     handleMessageSeen,
   ]);
