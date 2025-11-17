@@ -15,15 +15,23 @@ type DeliveredMessageNotificationData = {
   MessageId: string;
 };
 
+Notifications.setNotificationHandler({
+  handleNotification: async () =>
+    ({
+      shouldShowBanner: false,
+      shouldShowList: false,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+    }) as NotificationBehavior,
+});
+
 if (Platform.OS === "android")
-  Notifications.setNotificationHandler({
-    handleNotification: async () =>
-      ({
-        shouldShowBanner: false,
-        shouldShowList: false,
-        shouldPlaySound: false,
-        shouldSetBadge: true,
-      }) as NotificationBehavior,
+  Notifications.setNotificationChannelAsync("default", {
+    name: "Default",
+    importance: Notifications.AndroidImportance.MAX,
+    sound: "default",
+    vibrationPattern: [0, 250, 250, 250],
+    lightColor: "#FF231F7C",
   });
 
 // --- Delivered listener (foreground + background) ---
