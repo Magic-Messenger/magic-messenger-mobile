@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet } from "react-native";
@@ -52,6 +53,10 @@ export const useProfile = () => {
     await changeLanguageRequest({ data: { language: value as string } });
   };
 
+  const changePassword = () => {
+    router.push("/changePassword");
+  };
+
   return {
     t,
     settings,
@@ -65,6 +70,7 @@ export const useProfile = () => {
     setDeleteApprove,
     deleteProfile,
     handleChangeLanguage,
+    changePassword,
   };
 };
 

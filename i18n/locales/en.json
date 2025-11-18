@@ -149,7 +149,15 @@
     "deleteProfileNote": "NOTE: THIS ACTION IS IRREVERSIBLE AND CANNOT BE UNDONE",
     "successCopyUserId": "User Name successfully copied",
     "password": "Your Password",
-    "passwordError": "Password must be at least 8 characters"
+    "passwordError": "Password must be at least 8 characters",
+    "userSettings": "User Settings",
+    "changePassword": "Change Password",
+    "changePasswordTitle": "Change Password",
+    "changePasswordDescription": "Change your password regularly to keep your account secure.",
+    "enterOldPassword": "Enter Old Password",
+    "enterNewPassword": "Enter New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "passwordSuccessChanged": "Password changed successfully"
   },
   "contacts": {
     "title": "Contacts",

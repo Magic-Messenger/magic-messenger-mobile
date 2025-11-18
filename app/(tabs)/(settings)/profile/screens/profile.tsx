@@ -26,6 +26,7 @@ export default function ProfileScreen() {
     isPending,
     deleteProfile,
     handleChangeLanguage,
+    changePassword,
   } = useProfile();
 
   return (
@@ -56,7 +57,7 @@ export default function ProfileScreen() {
             onPress={() =>
               copyToClipboard(
                 data?.data?.username as string,
-                t("profile.successCopyUserId"),
+                t("profile.successCopyUserId")
               )
             }
           >
@@ -90,6 +91,17 @@ export default function ProfileScreen() {
           options={appSupportLanguages()}
           onValueChange={handleChangeLanguage}
           style={styles.mt7}
+        />
+      </View>
+
+      <View style={[styles.mainContainer, styles.mt5, styles.gap2]}>
+        <ThemedText type="title" size={16}>
+          {t("profile.userSettings")}
+        </ThemedText>
+        <Button
+          type="secondary"
+          label={t("profile.changePassword")}
+          onPress={changePassword}
         />
       </View>
 
