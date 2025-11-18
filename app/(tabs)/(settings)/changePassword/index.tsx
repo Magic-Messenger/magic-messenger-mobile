@@ -45,7 +45,7 @@ export default function ChangePassword() {
       footer={
         <Button
           type="primary"
-          label={t("login.button")}
+          label={t("profile.changePassword")}
           onPress={handleSubmit(onSubmit)}
           loading={isPending}
           disabled={isPending}
