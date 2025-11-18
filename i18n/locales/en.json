@@ -294,7 +294,11 @@
     "successAddNote": "Note added successfully",
     "successUpdateNote": "Note updated successfully",
     "successDeleteNote": "Note deleted successfully",
-    "listNotes": "List of Notes"
+    "listNotes": "List of Notes",
+    "noteUnlocked": "Note Unlocked Successfully",
+    "noteLocked": "Note Locked Successfully",
+    "lockNoteTitle": "Log in to see notes",
+    "lockNoteDescription": "Please log in to view your notes."
   },
   "chatDetail": {
     "writeMessage": "Write a message...",

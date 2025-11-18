@@ -56,7 +56,7 @@ export const useLogin = () => {
   } = useForm<RegisterFormData>({
     defaultValues: {
       username: userName ?? (__DEV__ ? "omer-test" : undefined),
-      password: __DEV__ ? "Omer123*+" : undefined,
+      password: __DEV__ ? "Kadir123*+" : undefined,
     },
   });
 
@@ -66,7 +66,7 @@ export const useLogin = () => {
     if (__DEV__) {
       reset({
         username: userName ?? (__DEV__ ? "omer-test" : undefined),
-        password: __DEV__ ? "Omer123*+" : undefined,
+        password: __DEV__ ? "Kadir123*+" : undefined,
       });
     }
   }, [__DEV__]);
@@ -90,7 +90,7 @@ export const useLogin = () => {
 
       login(
         data?.accessToken?.token as string,
-        data?.account?.username as string,
+        data?.account?.username as string
       );
 
       getApiAccountGetProfile().then((profileResponse) => {
@@ -146,7 +146,7 @@ export const useLogin = () => {
     if (!password) {
       Alert.alert(
         t("login.deleteAccountAlertTitle"),
-        t("login.deleteAccountPasswordRequired"),
+        t("login.deleteAccountPasswordRequired")
       );
       return;
     }
@@ -175,7 +175,7 @@ export const useLogin = () => {
           style: "destructive",
           onPress: onChangeAccount,
         },
-      ],
+      ]
     );
   };
 
@@ -193,7 +193,7 @@ export const useLogin = () => {
           style: "destructive",
           onPress: onDeleteAccount,
         },
-      ],
+      ]
     );
   };
 

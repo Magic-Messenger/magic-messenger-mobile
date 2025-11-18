@@ -21,6 +21,7 @@ export * from "./HapticTab";
 export * from "./Note/NoteItem";
 export * from "./PasswordInput";
 export * from "./ProductItem";
+export * from "./ProtectedRoute";
 export * from "./SectionHeader";
 export * from "./ThemedText";
 export * from "./TicketMessageItem";

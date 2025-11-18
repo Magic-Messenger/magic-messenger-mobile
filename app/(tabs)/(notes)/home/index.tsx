@@ -11,13 +11,16 @@ import {
   EmptyList,
   Icon,
   NoteItem,
+  ProtectedRoute,
   ThemedText,
 } from "@/components";
+import { useProtectRouteStore } from "@/store";
 import { NoteDto, useNoteStore } from "@/store/noteStore";
 import { useThemedStyles } from "@/theme";
 import {
   decrypt,
   heightPixel,
+  showToast,
   userPrivateKey,
   userPublicKey,
   widthPixel,
@@ -29,6 +32,7 @@ export default function NoteScreen() {
   const styles = useThemedStyles(createStyle);
 
   const { notes, sortType, setSortType } = useNoteStore();
+  const { isLoginProtected, setIsLoginProtected } = useProtectRouteStore();
 
   /** Safely decrypt notes */
   const decryptNotes = useMemo(() => {
@@ -39,7 +43,7 @@ export default function NoteScreen() {
             note.cipherText,
             note.nonce,
             userPublicKey()!,
-            userPrivateKey()!,
+            userPrivateKey()!
           );
           return JSON.parse(decrypted as never);
         }
@@ -76,7 +80,7 @@ export default function NoteScreen() {
         }
       />
     ),
-    [router, t],
+    [router, t]
   );
 
   /** Toggle sorting */
@@ -84,22 +88,38 @@ export default function NoteScreen() {
     setSortType(sortType === "asc" ? "desc" : "asc");
   }, [sortType, setSortType]);
 
+  const handleLockNotes = useCallback(() => {
+    setIsLoginProtected(false);
+    showToast({
+      type: "success",
+      text1: t("notes.noteLocked"),
+    });
+  }, [setIsLoginProtected]);
+
   const NotesHeader = useCallback(
     () => (
       <View style={styles.headerRow}>
         <ThemedText type="default" weight="semiBold" size={18}>
           {t("notes.listNotes")}
         </ThemedText>
-        <TouchableOpacity onPress={handleToggleSort} style={styles.sortButton}>
-          <Icon
-            type="fontawesome5"
-            size={18}
-            name={sortType === "asc" ? "sort-amount-up" : "sort-amount-down"}
-          />
-        </TouchableOpacity>
+        <View style={[styles.flexRow, styles.alignItemsCenter]}>
+          <TouchableOpacity onPress={handleLockNotes} style={styles.sortButton}>
+            <Icon size={20} name="lock" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleToggleSort}
+            style={styles.sortButton}
+          >
+            <Icon
+              type="fontawesome5"
+              size={18}
+              name={sortType === "asc" ? "sort-amount-up" : "sort-amount-down"}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
     ),
-    [],
+    []
   );
 
   const NotesEmptyList = useCallback(
@@ -111,9 +131,17 @@ export default function NoteScreen() {
         label={t("notes.empty")}
       />
     ),
-    [t, styles.emptyList, styles.textCenter],
+    [t, styles.emptyList, styles.textCenter]
   );
 
+  if (!isLoginProtected) {
+    return (
+      <ProtectedRoute
+        title={t("notes.lockNoteTitle")}
+        description={t("notes.lockNoteDescription")}
+      />
+    );
+  }
   return (
     <AppLayout
       container
