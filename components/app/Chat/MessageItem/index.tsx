@@ -11,7 +11,8 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { MessageDto, MessageStatus, MessageType } from "@/api/models";
-import { Icon } from "@/components";
+import { GradientBackground, Icon } from "@/components";
+import { Colors } from "@/constants";
 import { useChatHelper } from "@/hooks";
 import { useSignalRStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
@@ -89,7 +90,7 @@ function MessageItem({
           if (event.translationX > 0) {
             translateX.value = Math.min(
               event.translationX,
-              SWIPE_THRESHOLD * 1.2,
+              SWIPE_THRESHOLD * 1.2
             );
           }
         })
@@ -101,7 +102,7 @@ function MessageItem({
 
           translateX.value = withSpring(0, SPRING_CONFIG);
         }),
-    [triggerReply],
+    [triggerReply]
   );
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -113,14 +114,14 @@ function MessageItem({
       translateX.value,
       [0, SWIPE_THRESHOLD],
       [0, 1],
-      Extrapolation.CLAMP,
+      Extrapolation.CLAMP
     );
 
     const scale = interpolate(
       translateX.value,
       [0, SWIPE_THRESHOLD * 0.5, SWIPE_THRESHOLD],
       [0.5, 1, 1],
-      Extrapolation.CLAMP,
+      Extrapolation.CLAMP
     );
 
     return {
@@ -179,15 +180,21 @@ function MessageItem({
       </Animated.View>
 
       <GestureDetector gesture={panGesture}>
-        <Animated.View
-          style={[
-            animatedStyle,
-            isSentByCurrentUser
-              ? styles.senderContainer
-              : styles.receiverContainer,
-          ]}
-        >
-          {renderMessageContent()}
+        <Animated.View style={[animatedStyle]}>
+          <GradientBackground
+            colors={
+              isSentByCurrentUser
+                ? Colors.buttonPrimary
+                : Colors.buttonSecondary
+            }
+            style={[
+              isSentByCurrentUser
+                ? styles.senderContainer
+                : styles.receiverContainer,
+            ]}
+          >
+            {renderMessageContent()}
+          </GradientBackground>
         </Animated.View>
       </GestureDetector>
     </View>
@@ -210,7 +217,7 @@ const createStyle = (colors: ColorDto) =>
     },
     senderContainer: {
       alignSelf: "flex-end",
-      backgroundColor: colors.primary,
+      /* backgroundColor: colors.primary, */
       borderRadius: spacingPixel(8),
       borderBottomRightRadius: 0,
       padding: spacingPixel(10),
@@ -220,7 +227,7 @@ const createStyle = (colors: ColorDto) =>
     },
     receiverContainer: {
       alignSelf: "flex-start",
-      backgroundColor: colors.secondary,
+      /* backgroundColor: colors.secondary, */
       borderRadius: spacingPixel(8),
       borderBottomLeftRadius: 0,
       padding: spacingPixel(10),
