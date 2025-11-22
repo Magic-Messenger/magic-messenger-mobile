@@ -30,6 +30,7 @@ export function ImageMessage({
         </View>
       ) : (
         <AppImage
+          showDetail
           source={{ uri: decryptedContent as string }}
           style={styles.image}
           resizeMode="cover"
