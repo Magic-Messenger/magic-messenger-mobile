@@ -1,3 +1,4 @@
+import LogRocket from "@logrocket/react-native";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -21,6 +22,7 @@ import {
   getInstallationId,
   heightPixel,
   showToast,
+  trackEvent,
   userPublicKey,
   widthPixel,
 } from "@/utils";
@@ -87,18 +89,20 @@ export const useLogin = () => {
         setIsLoading(false);
         return;
       }
-
+      trackEvent("login_success");
       login(
         data?.accessToken?.token as string,
-        data?.account?.username as string
+        data?.account?.username as string,
       );
-
       getApiAccountGetProfile().then((profileResponse) => {
         if (profileResponse.success) {
           setProfile(profileResponse.data!);
+          LogRocket.identify(formValues?.username?.trim());
+          trackEvent("profile_fetched");
           if (profileResponse.data?.enableTor) {
             startTor()
               .then(() => {
+                trackEvent("tor_started");
                 showToast({
                   type: "success",
                   text1: t("common.torIsStarted"),
@@ -146,7 +150,7 @@ export const useLogin = () => {
     if (!password) {
       Alert.alert(
         t("login.deleteAccountAlertTitle"),
-        t("login.deleteAccountPasswordRequired")
+        t("login.deleteAccountPasswordRequired"),
       );
       return;
     }
@@ -175,7 +179,7 @@ export const useLogin = () => {
           style: "destructive",
           onPress: onChangeAccount,
         },
-      ]
+      ],
     );
   };
 
@@ -193,7 +197,7 @@ export const useLogin = () => {
           style: "destructive",
           onPress: onDeleteAccount,
         },
-      ]
+      ],
     );
   };
 

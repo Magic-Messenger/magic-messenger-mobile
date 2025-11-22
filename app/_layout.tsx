@@ -2,7 +2,9 @@ import "react-native-reanimated";
 
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { PortalProvider } from "@gorhom/portal";
+import LogRocket from "@logrocket/react-native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as Application from "expo-application";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -42,6 +44,13 @@ export default function RootLayout() {
     if (loaded) {
       SplashScreen.hideAsync();
     }
+    LogRocket.init(process?.env?.EXPO_PUBLIC_LOG_ROCKET_API as string, {
+      updateId: Application.nativeApplicationVersion,
+      expoChannel: __DEV__ ? "development" : "production",
+      network: {
+        isEnabled: true,
+      },
+    });
   }, [loaded]);
 
   if (!loaded || !rehydrated) {

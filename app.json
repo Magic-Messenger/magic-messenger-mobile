@@ -82,6 +82,7 @@
       "expo-iap",
       "expo-secure-store",
       "./plugins/trust-local-certs.js",
+      "@logrocket/react-native",
       [
         "expo-av",
         {
@@ -107,7 +108,8 @@
         {
           "android": {
             "usesCleartextTraffic": true,
-            "kotlinVersion": "2.0.21"
+            "kotlinVersion": "2.0.21",
+            "minSdkVersion": 25
           }
         }
       ]
