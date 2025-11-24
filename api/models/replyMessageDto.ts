@@ -4,12 +4,14 @@
  * MagicMessenger
  * OpenAPI spec version: v1
  */
+import type { MessageType } from "./messageType";
 import type { ReplyMessageDtoContent } from "./replyMessageDtoContent";
 import type { ReplyMessageDtoFile } from "./replyMessageDtoFile";
 
 export interface ReplyMessageDto {
   /** @nullable */
   readonly messageId?: string | null;
+  messageType?: MessageType;
   /** @nullable */
   senderUsername?: string | null;
   createdAt?: string;

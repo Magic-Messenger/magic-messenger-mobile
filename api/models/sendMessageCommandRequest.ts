@@ -23,5 +23,7 @@ export interface SendMessageCommandRequest {
   /** @nullable */
   expireAfterReadSeconds?: number | null;
   /** @nullable */
+  createdAt?: string | null;
+  /** @nullable */
   expireAt?: string | null;
 }

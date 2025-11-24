@@ -13,7 +13,5 @@ export interface LoginCommandRequest {
   /** @nullable */
   deviceId?: string | null;
   /** @nullable */
-  deviceToken?: string | null;
-  /** @nullable */
   publicKey?: string | null;
 }

@@ -15,4 +15,6 @@ export interface SendNotificationCommandRequest {
   data?: SendNotificationCommandRequestData;
   /** @nullable */
   deviceTokens?: string[] | null;
+  /** @nullable */
+  badgeCount?: number | null;
 }
