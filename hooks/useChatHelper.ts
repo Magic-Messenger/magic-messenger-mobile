@@ -28,7 +28,7 @@ export function useChatHelper(message: MessageDto, receiverPublicKey: string) {
         message.file.filePath.cipherText,
         message.file.filePath.nonce,
         senderKey as string,
-        receiverKey as string,
+        receiverKey as string
       );
     }
     if (
@@ -46,7 +46,7 @@ export function useChatHelper(message: MessageDto, receiverPublicKey: string) {
           message.file.filePath.cipherText,
           message.file.filePath.nonce,
           senderKey as string,
-          receiverKey as string,
+          receiverKey as string
         );
       }
     } else if (message?.messageType === MessageType.Text) {
@@ -59,7 +59,7 @@ export function useChatHelper(message: MessageDto, receiverPublicKey: string) {
           message.content.cipherText,
           message.content.nonce,
           senderKey as string,
-          receiverKey as string,
+          receiverKey as string
         );
       }
     }
@@ -79,7 +79,7 @@ export function useChatHelper(message: MessageDto, receiverPublicKey: string) {
         message?.repliedToMessage?.content?.cipherText as string,
         message?.repliedToMessage?.content?.nonce as string,
         senderKey as string,
-        receiverKey as string,
+        receiverKey as string
       );
     } else if (
       message?.repliedToMessage?.file &&
@@ -91,12 +91,19 @@ export function useChatHelper(message: MessageDto, receiverPublicKey: string) {
         message?.repliedToMessage?.file?.filePath?.cipherText as string,
         message?.repliedToMessage?.file?.filePath?.nonce as string,
         senderKey as string,
-        receiverKey as string,
+        receiverKey as string
       );
     }
   }, [message, currentUserName, receiverPublicKey]);
 
-  return { decryptedContent, isSentByCurrentUser, decryptedReplyMessage };
+  const replyMessageType = message?.repliedToMessage?.messageType;
+
+  return {
+    decryptedContent,
+    isSentByCurrentUser,
+    decryptedReplyMessage,
+    replyMessageType,
+  };
 }
 
 export function useGroupChatHelper(message: MessageDto) {
@@ -108,7 +115,7 @@ export function useGroupChatHelper(message: MessageDto) {
     groupKey as string,
     groupNonce as string,
     userPrivateKey() as string,
-    groupAdminAccount as string,
+    groupAdminAccount as string
   );
 
   const decryptedContent = useMemo(() => {
@@ -126,7 +133,7 @@ export function useGroupChatHelper(message: MessageDto) {
         return decryptForGroup(
           message?.file.filePath?.cipherText as string,
           message?.file.filePath?.nonce as string,
-          decryptedGroupKey as string,
+          decryptedGroupKey as string
         );
       }
     } else if (message?.messageType === MessageType.Text) {
@@ -138,7 +145,7 @@ export function useGroupChatHelper(message: MessageDto) {
         return decryptForGroup(
           message?.content?.cipherText as string,
           message?.content?.nonce as string,
-          decryptedGroupKey as string,
+          decryptedGroupKey as string
         );
       }
     }
@@ -153,7 +160,7 @@ export function useGroupChatHelper(message: MessageDto) {
       return decryptForGroup(
         message?.repliedToMessage?.content?.cipherText as string,
         message?.repliedToMessage?.content?.nonce as string,
-        decryptedGroupKey as string,
+        decryptedGroupKey as string
       );
     } else if (
       message?.repliedToMessage?.file &&
@@ -164,10 +171,17 @@ export function useGroupChatHelper(message: MessageDto) {
       return decryptForGroup(
         message?.repliedToMessage?.file?.filePath?.cipherText as string,
         message?.repliedToMessage?.file?.filePath?.nonce as string,
-        decryptedGroupKey as string,
+        decryptedGroupKey as string
       );
     }
   }, [message, currentUserName, decryptedGroupKey]);
 
-  return { decryptedContent, isSentByCurrentUser, decryptedReplyMessage };
+  const replyMessageType = message?.repliedToMessage?.messageType;
+
+  return {
+    decryptedContent,
+    isSentByCurrentUser,
+    decryptedReplyMessage,
+    replyMessageType,
+  };
 }

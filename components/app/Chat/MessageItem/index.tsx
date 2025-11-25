@@ -48,8 +48,12 @@ function MessageItem({
   const styles = useThemedStyles(createStyle);
   const magicHubClient = useSignalRStore((s) => s.magicHubClient);
 
-  const { decryptedContent, isSentByCurrentUser, decryptedReplyMessage } =
-    useChatHelper(message as MessageDto, receiverPublicKey);
+  const {
+    decryptedContent,
+    isSentByCurrentUser,
+    decryptedReplyMessage,
+    replyMessageType,
+  } = useChatHelper(message as MessageDto, receiverPublicKey);
 
   const translateX = useSharedValue(0);
 
@@ -148,6 +152,7 @@ function MessageItem({
       createdAt: message.createdAt!,
       messageStatus,
       isLoading,
+      replyMessageType,
     };
 
     switch (message.messageType) {

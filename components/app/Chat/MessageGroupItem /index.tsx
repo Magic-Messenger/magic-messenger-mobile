@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useMemo } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   Extrapolation,
@@ -11,15 +11,16 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { MessageDto, MessageStatus, MessageType } from "@/api/models";
-import { AppImage, Icon, ThemedText, VideoPreview } from "@/components";
-import { Images } from "@/constants";
-import { useAudioPlayer, useGroupChatHelper } from "@/hooks";
+import { Icon, ThemedText } from "@/components";
+import { useGroupChatHelper } from "@/hooks";
 import { useSignalRStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
 
-import { dateFormatter, renderMessageStatus } from "../../../../utils/helper";
 import { spacingPixel } from "../../../../utils/pixelHelper";
-import { ReplyMessageItem } from "../ReplyMessageItem";
+import { AudioMessage } from "../MessageItem/AudioMessage";
+import { ImageMessage } from "../MessageItem/ImageMessage";
+import { TextMessage } from "../MessageItem/TextMessage";
+import { VideoMessage } from "../MessageItem/VideoMessage";
 
 interface MessageItemProps {
   identifier: string;
@@ -44,10 +45,12 @@ function MessageGroupItem({
   const styles = useThemedStyles(createStyle);
   const magicHubClient = useSignalRStore((s) => s.magicHubClient);
 
-  const { decryptedContent, isSentByCurrentUser, decryptedReplyMessage } =
-    useGroupChatHelper(message as MessageDto);
-
-  const { loadAndPlay, pause, isPlaying } = useAudioPlayer();
+  const {
+    decryptedContent,
+    isSentByCurrentUser,
+    decryptedReplyMessage,
+    replyMessageType,
+  } = useGroupChatHelper(message as MessageDto);
 
   const translateX = useSharedValue(0);
 
@@ -88,7 +91,7 @@ function MessageGroupItem({
           if (event.translationX > 0) {
             translateX.value = Math.min(
               event.translationX,
-              SWIPE_THRESHOLD * 1.2,
+              SWIPE_THRESHOLD * 1.2
             );
           }
         })
@@ -100,7 +103,7 @@ function MessageGroupItem({
 
           translateX.value = withSpring(0, SPRING_CONFIG);
         }),
-    [triggerReply],
+    [triggerReply]
   );
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -112,14 +115,14 @@ function MessageGroupItem({
       translateX.value,
       [0, SWIPE_THRESHOLD],
       [0, 1],
-      Extrapolation.CLAMP,
+      Extrapolation.CLAMP
     );
 
     const scale = interpolate(
       translateX.value,
       [0, SWIPE_THRESHOLD * 0.5, SWIPE_THRESHOLD],
       [0.5, 1, 1],
-      Extrapolation.CLAMP,
+      Extrapolation.CLAMP
     );
 
     return {
@@ -134,166 +137,39 @@ function MessageGroupItem({
     };
   });
 
-  const handleAudioToggle = useCallback(() => {
-    if (isPlaying) {
-      pause();
-    } else {
-      loadAndPlay(decryptedContent as string);
-    }
-  }, [isPlaying, pause, loadAndPlay, decryptedContent]);
-
-  const renderMessageFooter = useCallback(
-    () => (
-      <View
-        style={[
-          styles.flex,
-          styles.flexRow,
-          styles.alignItemsCenter,
-          styles.justifyContentEnd,
-        ]}
-      >
-        <ThemedText
-          style={
-            isSentByCurrentUser
-              ? styles.messageDateSender
-              : styles.messageDateReceiver
-          }
-        >
-          {dateFormatter(message?.createdAt!, "HH:mm")}
-        </ThemedText>
-        {renderMessageStatus(messageStatus!, isSentByCurrentUser)}
-      </View>
-    ),
-    [
-      styles,
-      isSentByCurrentUser,
-      messageStatus,
-      message?.createdAt,
-      renderMessageStatus,
-    ],
-  );
-
-  const renderNickname = useCallback(() => {
-    if (isSentByCurrentUser || !message?.nickname) return null;
-
-    return (
-      <View>
-        <ThemedText size={11} numberOfLines={1} weight="semiBold">
-          {message.nickname}
-        </ThemedText>
-      </View>
-    );
-  }, [isSentByCurrentUser, message?.nickname]);
-
-  const renderReplyMessage = useCallback(() => {
-    if (!message?.repliedToMessage || !decryptedReplyMessage) return null;
-
-    return <ReplyMessageItem message={decryptedReplyMessage as string} />;
-  }, [message?.repliedToMessage, decryptedReplyMessage]);
-
-  const renderTextMessage = useCallback(
-    () => (
-      <>
-        {renderNickname()}
-        {renderReplyMessage()}
-        <ThemedText>{decryptedContent}</ThemedText>
-        {renderMessageFooter()}
-      </>
-    ),
-    [renderNickname, renderReplyMessage, decryptedContent, renderMessageFooter],
-  );
-
-  const renderAudioMessage = useCallback(
-    () => (
-      <View>
-        {renderNickname()}
-        {renderReplyMessage()}
-        <View style={[styles.flex, styles.flexRow]}>
-          <TouchableOpacity onPress={handleAudioToggle}>
-            <Icon name={isPlaying ? "pause-circle" : "play-circle"} size={30} />
-          </TouchableOpacity>
-
-          <AppImage
-            source={Images.soundPreview}
-            resizeMode="contain"
-            width={100}
-            height={30}
-            style={{ opacity: isPlaying ? 1 : 0.5 }}
-          />
-        </View>
-        {renderMessageFooter()}
-      </View>
-    ),
-    [
-      renderNickname,
-      renderReplyMessage,
-      handleAudioToggle,
-      isPlaying,
-      renderMessageFooter,
-      styles,
-    ],
-  );
-
-  const renderImageMessage = useCallback(
-    () => (
-      <View style={styles.gap2}>
-        {renderNickname()}
-        {renderReplyMessage()}
-        <AppImage
-          source={{ uri: decryptedContent as string }}
-          style={{
-            width: spacingPixel(200),
-            height: spacingPixel(200),
-            borderRadius: spacingPixel(8),
-          }}
-          resizeMode="cover"
-        />
-        {renderMessageFooter()}
-      </View>
-    ),
-    [
-      renderNickname,
-      renderReplyMessage,
-      decryptedContent,
-      renderMessageFooter,
-      styles,
-    ],
-  );
-
-  const renderVideoMessage = useCallback(
-    () => (
-      <>
-        {renderNickname()}
-        {renderReplyMessage()}
-        <VideoPreview source={decryptedContent as string} />
-        {renderMessageFooter()}
-      </>
-    ),
-    [renderNickname, renderReplyMessage, decryptedContent, renderMessageFooter],
-  );
-
-  const renderMessageContent = useMemo(() => {
+  const renderMessageContent = useCallback(() => {
     if (!message || !decryptedContent) return null;
+
+    const isLoading = (message as any)?.isPending === true;
+
+    const messageContentProps = {
+      decryptedContent,
+      decryptedReplyMessage,
+      isSentByCurrentUser,
+      createdAt: message.createdAt!,
+      isLoading,
+      replyMessageType,
+      messageStatus,
+    };
 
     switch (message.messageType) {
       case MessageType.Text:
-        return renderTextMessage();
+        return <TextMessage {...messageContentProps} />;
       case MessageType.Audio:
-        return renderAudioMessage();
+        return <AudioMessage {...messageContentProps} />;
       case MessageType.Image:
-        return renderImageMessage();
+        return <ImageMessage {...messageContentProps} />;
       case MessageType.Video:
-        return renderVideoMessage();
+        return <VideoMessage {...messageContentProps} />;
       default:
         return null;
     }
   }, [
     message,
+    messageStatus,
     decryptedContent,
-    renderTextMessage,
-    renderAudioMessage,
-    renderImageMessage,
-    renderVideoMessage,
+    decryptedReplyMessage,
+    isSentByCurrentUser,
   ]);
 
   if (!decryptedContent || !message) return null;
@@ -313,7 +189,10 @@ function MessageGroupItem({
               : styles.receiverContainer,
           ]}
         >
-          {renderMessageContent}
+          <ThemedText size={11} numberOfLines={1} weight="semiBold">
+            {message?.nickname}
+          </ThemedText>
+          {renderMessageContent()}
         </Animated.View>
       </GestureDetector>
     </View>

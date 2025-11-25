@@ -115,9 +115,9 @@ export const useDetail = () => {
         groupKey as string,
         groupNonce as string,
         userPrivateKey() as string,
-        groupAdminAccount as string,
+        groupAdminAccount as string
       ),
-    [groupKey, groupNonce, groupAdminAccount],
+    [groupKey, groupNonce, groupAdminAccount]
   );
 
   const usersPublicKey = useMemo(
@@ -125,7 +125,7 @@ export const useDetail = () => {
       receiverPublicKey: publicKey as string,
       senderPrivateKey: userPublicKey() as string,
     }),
-    [publicKey],
+    [publicKey]
   );
 
   const loadMessages = useCallback(
@@ -190,7 +190,7 @@ export const useDetail = () => {
         }
       }
     },
-    [chatId, pagination.pageSize, pagination.hasMore],
+    [chatId, pagination.pageSize, pagination.hasMore]
   );
 
   useEffect(() => {
@@ -218,9 +218,9 @@ export const useDetail = () => {
           }
         },
         1000,
-        { leading: true, trailing: false },
+        { leading: true, trailing: false }
       ),
-    [pagination.hasMore, pagination.currentPage, loadMessages],
+    [pagination.hasMore, pagination.currentPage, loadMessages]
   );
 
   const handleReply = useCallback((message: MessageDto) => {
@@ -235,6 +235,7 @@ export const useDetail = () => {
 
   const handleSendMessage = useCallback(
     async (message: string | UploadFileResultDto) => {
+      onClearReply?.();
       const isFileMessage =
         typeof message === "object" && message?.fileUrl !== undefined;
 
@@ -260,7 +261,7 @@ export const useDetail = () => {
               contentType: message.contentType,
               filePath: encryptForGroup(
                 message.fileUrl as string,
-                decryptedGroupKey as string,
+                decryptedGroupKey as string
               ),
             }
           : null,
@@ -286,7 +287,7 @@ export const useDetail = () => {
             ...(!isFileMessage && {
               content: encryptForGroup(
                 message as string,
-                decryptedGroupKey as string,
+                decryptedGroupKey as string
               ),
             }),
             ...(isFileMessage && {
@@ -295,26 +296,26 @@ export const useDetail = () => {
                 contentType: message.contentType,
                 filePath: encryptForGroup(
                   message.fileUrl as string,
-                  decryptedGroupKey as string,
+                  decryptedGroupKey as string
                 ),
               },
             }),
             ...(replyMessage && {
               repliedToMessage: replyMessage?.messageId,
             }),
+            createdAt: optimisticMessage?.createdAt,
           },
         });
 
         if (response?.success) {
-          onClearReply();
           // Remove optimistic message - the real one will come via SignalR
           setMessages((prev) =>
-            prev.filter((m) => (m as any).tempId !== tempId),
+            prev.filter((m) => (m as any).tempId !== tempId)
           );
         } else {
           // Remove a failed message
           setMessages((prev) =>
-            prev.filter((m) => (m as any).tempId !== tempId),
+            prev.filter((m) => (m as any).tempId !== tempId)
           );
         }
       } catch (error) {
@@ -330,7 +331,7 @@ export const useDetail = () => {
       replyMessage,
       sendApiMessage,
       onClearReply,
-    ],
+    ]
   );
 
   const handleChatControl = useCallback(
@@ -339,7 +340,7 @@ export const useDetail = () => {
         await handleSendMessage(message);
       }
     },
-    [chatId, handleSendMessage],
+    [chatId, handleSendMessage]
   );
 
   //#region SignalR Effects
@@ -416,7 +417,7 @@ export const useDetail = () => {
 
       scheduleBatchUpdate();
     },
-    [scheduleBatchUpdate],
+    [scheduleBatchUpdate]
   );
 
   const handleMessageSeen = useCallback(
@@ -455,7 +456,7 @@ export const useDetail = () => {
 
       scheduleBatchUpdate();
     },
-    [scheduleBatchUpdate],
+    [scheduleBatchUpdate]
   );
 
   const handleGroupMessageReceived = useCallback(
@@ -475,7 +476,7 @@ export const useDetail = () => {
           ...newMessage,
           messageType: convertMessageType(newMessage.messageType as never),
           messageStatus: convertMessageStatus(
-            newMessage.messageStatus as never,
+            newMessage.messageStatus as never
           ),
         },
       ]);
@@ -485,7 +486,7 @@ export const useDetail = () => {
         const newStatuses = new Map(prevStatuses);
         newStatuses.set(
           newMessage.messageId,
-          convertMessageStatus(newMessage.messageStatus as never),
+          convertMessageStatus(newMessage.messageStatus as never)
         );
         return newStatuses;
       });
@@ -496,7 +497,7 @@ export const useDetail = () => {
         listRef.current?.scrollToEnd({ animated: true });
       }, 100);
     },
-    [listRef, chatId],
+    [listRef, chatId]
   );
 
   useEffect(() => {
@@ -537,7 +538,7 @@ export const useDetail = () => {
     (messageId: string) => {
       return messageStatuses.get(messageId);
     },
-    [messageStatuses],
+    [messageStatuses]
   );
 
   //#endregion
@@ -577,7 +578,7 @@ export const useDetail = () => {
           style: "cancel",
         },
       ],
-      { cancelable: true },
+      { cancelable: true }
     );
   };
 
@@ -589,7 +590,7 @@ export const useDetail = () => {
         onPress: onDelete,
       },
     ],
-    [t, onDelete],
+    [t, onDelete]
   );
 
   useLayoutEffect(() => {
@@ -621,7 +622,7 @@ export const useDetail = () => {
 
   const groupedMessages = useMemo(
     () => groupMessagesByDate(messages),
-    [messages],
+    [messages]
   );
 
   return {

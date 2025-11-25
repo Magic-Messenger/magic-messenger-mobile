@@ -16,12 +16,13 @@ export function ImageMessage({
   createdAt,
   messageStatus,
   isLoading,
+  isReply = false,
 }: MessageContentProps) {
   const styles = useThemedStyles(createStyle);
 
   return (
     <View style={styles.container}>
-      <ReplyMessageItem message={decryptedReplyMessage} />
+      {!isReply && <ReplyMessageItem message={decryptedReplyMessage} />}
 
       {isLoading ? (
         <View style={styles.loadingContainer}>
@@ -37,11 +38,13 @@ export function ImageMessage({
         />
       )}
 
-      <MessageFooter
-        createdAt={createdAt}
-        isSentByCurrentUser={isSentByCurrentUser}
-        messageStatus={messageStatus}
-      />
+      {!isReply && (
+        <MessageFooter
+          createdAt={createdAt as string}
+          isSentByCurrentUser={isSentByCurrentUser as boolean}
+          messageStatus={messageStatus}
+        />
+      )}
     </View>
   );
 }

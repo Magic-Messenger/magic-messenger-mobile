@@ -22,12 +22,13 @@ export function AudioMessage({
   createdAt,
   messageStatus,
   isLoading,
+  isReply = false,
 }: MessageContentProps) {
   const { loadAndPlay, pause, isPlaying } = useAudioPlayer();
 
   return (
     <>
-      <ReplyMessageItem message={decryptedReplyMessage} />
+      {!isReply && <ReplyMessageItem message={decryptedReplyMessage} />}
 
       {isLoading ? (
         <View style={styles.loadingContainer}>
@@ -58,11 +59,13 @@ export function AudioMessage({
         </View>
       )}
 
-      <MessageFooter
-        createdAt={createdAt}
-        isSentByCurrentUser={isSentByCurrentUser}
-        messageStatus={messageStatus}
-      />
+      {!isReply && (
+        <MessageFooter
+          createdAt={createdAt as string}
+          isSentByCurrentUser={isSentByCurrentUser as boolean}
+          messageStatus={messageStatus}
+        />
+      )}
     </>
   );
 }

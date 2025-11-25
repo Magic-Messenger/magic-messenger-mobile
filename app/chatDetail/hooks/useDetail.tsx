@@ -110,7 +110,7 @@ export const useDetail = () => {
       receiverPublicKey: publicKey as string,
       senderPrivateKey: userPublicKey() as string,
     }),
-    [publicKey],
+    [publicKey]
   );
 
   useEffect(() => {
@@ -187,7 +187,7 @@ export const useDetail = () => {
         }
       }
     },
-    [chatId, pagination.pageSize, pagination.hasMore],
+    [chatId, pagination.pageSize, pagination.hasMore]
   );
 
   const initializeScreenshot = useCallback(async () => {
@@ -234,9 +234,9 @@ export const useDetail = () => {
           }
         },
         1000,
-        { leading: true, trailing: false },
+        { leading: true, trailing: false }
       ),
-    [pagination.hasMore, pagination.currentPage, loadMessages],
+    [pagination.hasMore, pagination.currentPage, loadMessages]
   );
 
   const handleReply = useCallback((message: MessageDto) => {
@@ -249,6 +249,7 @@ export const useDetail = () => {
 
   const handleSendMessage = useCallback(
     async (message: string | UploadFileResultDto) => {
+      onClearReply?.();
       let messageChatId = chatId as string;
       if (!messageChatId) {
         const createChatResponse = await createApiChat({
@@ -281,7 +282,7 @@ export const useDetail = () => {
           ? encrypt(
               message as string,
               usersPublicKey.receiverPublicKey,
-              usersPublicKey.senderPrivateKey,
+              usersPublicKey.senderPrivateKey
             )
           : null,
         file: isFileMessage
@@ -291,7 +292,7 @@ export const useDetail = () => {
               filePath: encrypt(
                 message.fileUrl as string,
                 usersPublicKey.receiverPublicKey,
-                usersPublicKey.senderPrivateKey,
+                usersPublicKey.senderPrivateKey
               ),
             }
           : null,
@@ -320,7 +321,7 @@ export const useDetail = () => {
               content: encrypt(
                 message as string,
                 usersPublicKey.receiverPublicKey,
-                usersPublicKey.senderPrivateKey,
+                usersPublicKey.senderPrivateKey
               ),
             }),
             ...(isFileMessage && {
@@ -330,26 +331,26 @@ export const useDetail = () => {
                 filePath: encrypt(
                   message.fileUrl as string,
                   usersPublicKey.receiverPublicKey,
-                  usersPublicKey.senderPrivateKey,
+                  usersPublicKey.senderPrivateKey
                 ),
               },
             }),
             ...(replyMessage && {
               repliedToMessage: replyMessage?.messageId,
             }),
+            createdAt: optimisticMessage?.createdAt,
           },
         });
 
         if (response?.success) {
-          onClearReply();
           // Remove optimistic message - the real one will come via SignalR
           setMessages((prev) =>
-            prev.filter((m) => (m as any).tempId !== tempId),
+            prev.filter((m) => (m as any).tempId !== tempId)
           );
         } else {
           // Remove a failed message
           setMessages((prev) =>
-            prev.filter((m) => (m as any).tempId !== tempId),
+            prev.filter((m) => (m as any).tempId !== tempId)
           );
         }
       } catch (error) {
@@ -366,7 +367,7 @@ export const useDetail = () => {
       replyMessage,
       sendApiMessage,
       onClearReply,
-    ],
+    ]
   );
 
   // Batch processor that applies all queued status updates at once
@@ -442,7 +443,7 @@ export const useDetail = () => {
 
       scheduleBatchUpdate();
     },
-    [scheduleBatchUpdate],
+    [scheduleBatchUpdate]
   );
 
   const handleMessageSeen = useCallback(
@@ -481,7 +482,7 @@ export const useDetail = () => {
 
       scheduleBatchUpdate();
     },
-    [scheduleBatchUpdate],
+    [scheduleBatchUpdate]
   );
 
   const handleMessageReceived = useCallback(
@@ -501,7 +502,7 @@ export const useDetail = () => {
           ...newMessage,
           messageType: convertMessageType(newMessage.messageType as never),
           messageStatus: convertMessageStatus(
-            newMessage.messageStatus as never,
+            newMessage.messageStatus as never
           ),
         },
       ]);
@@ -511,7 +512,7 @@ export const useDetail = () => {
         const newStatuses = new Map(prevStatuses);
         newStatuses.set(
           newMessage.messageId,
-          convertMessageStatus(newMessage.messageStatus as never),
+          convertMessageStatus(newMessage.messageStatus as never)
         );
         return newStatuses;
       });
@@ -522,7 +523,7 @@ export const useDetail = () => {
         listRef.current?.scrollToEnd({ animated: true });
       }, 100);
     },
-    [listRef, chatId],
+    [listRef, chatId]
   );
 
   useEffect(() => {
@@ -577,7 +578,7 @@ export const useDetail = () => {
           style: "cancel",
         },
       ],
-      { cancelable: true },
+      { cancelable: true }
     );
   };
 
@@ -596,7 +597,7 @@ export const useDetail = () => {
           style: "cancel",
         },
       ],
-      { cancelable: true },
+      { cancelable: true }
     );
   };
 
@@ -615,7 +616,7 @@ export const useDetail = () => {
           style: "cancel",
         },
       ],
-      { cancelable: true },
+      { cancelable: true }
     );
   };
 
@@ -637,7 +638,7 @@ export const useDetail = () => {
         onPress: onBlockContact,
       },
     ],
-    [t, onDelete, onChatClear, onBlockContact],
+    [t, onDelete, onChatClear, onBlockContact]
   );
 
   const handleDeleteChat = useCallback(async () => {
@@ -729,7 +730,7 @@ export const useDetail = () => {
 
   const groupedMessages = useMemo(
     () => groupMessagesByDate(messages),
-    [messages],
+    [messages]
   );
 
   return {

@@ -55,7 +55,7 @@ export default function GroupChatScreen() {
         />
       );
     },
-    [chatId, handleReply, getMessageStatus],
+    [chatId, handleReply, getMessageStatus]
   );
 
   // Key extractor for optimal list performance
@@ -69,7 +69,7 @@ export default function GroupChatScreen() {
   // Footer component
   const renderFooter = useCallback(
     () => <ChatTyping chatId={chatId} />,
-    [chatId],
+    [chatId]
   );
 
   // Optional: Item type for better recycling

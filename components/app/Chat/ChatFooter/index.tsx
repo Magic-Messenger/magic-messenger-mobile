@@ -87,7 +87,7 @@ export function ChatFooter({
         }
       }
     },
-    [magicHubClient, chatId],
+    [magicHubClient, chatId]
   );
 
   const handleSendRecording = async () => {
@@ -326,6 +326,7 @@ const createStyle = (colors: ColorDto) =>
       backgroundColor: colors.secondary,
       borderRadius: spacingPixel(9),
       padding: spacingPixel(10),
+      marginBottom: spacingPixel(5),
     },
     closeIcon: {
       position: "absolute",
