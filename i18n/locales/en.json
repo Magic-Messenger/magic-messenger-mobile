@@ -84,7 +84,8 @@
   "confirmPassword": "Confirm Password",
   "inputError": {
     "minLength": "{{field}} must be at least {{count}} characters",
-    "required": "{{field}} is required"
+    "required": "{{field}} is required",
+    "invalidUsername": "Username can only contain letters, numbers, and '_'. '.' and '$' are not allowed."
   },
   "securityPhrases": {
     "title": "Security Screen",

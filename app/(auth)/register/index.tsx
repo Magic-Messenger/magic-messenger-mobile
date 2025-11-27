@@ -141,6 +141,10 @@ export default function RegisterScreen() {
                   count: 3,
                 }),
               },
+              pattern: {
+                value: /^[A-Za-z0-9_]+$/,
+                message: t("inputError.invalidUsername"),
+              },
             }}
             error={errors.username?.message}
           />
