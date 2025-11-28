@@ -29,7 +29,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.png",
+        "foregroundImage": "./assets/images/icon-foreground.png",
         "backgroundColor": "#24003D"
       },
       "softwareKeyboardLayoutMode": "pan",
@@ -82,6 +82,7 @@
       "expo-iap",
       "expo-secure-store",
       "./plugins/trust-local-certs.js",
+      "./plugins/override-read-media-permission.js",
       "@logrocket/react-native",
       [
         "expo-av",

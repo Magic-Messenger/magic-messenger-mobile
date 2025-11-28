@@ -6,6 +6,7 @@ import LogRocket from "@logrocket/react-native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as Application from "expo-application";
 import { useFonts } from "expo-font";
+import * as Notifications from "expo-notifications";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -43,6 +44,7 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
+      Notifications.dismissAllNotificationsAsync();
     }
     LogRocket.init(process?.env?.EXPO_PUBLIC_LOG_ROCKET_API as string, {
       updateId: Application.nativeApplicationVersion,
