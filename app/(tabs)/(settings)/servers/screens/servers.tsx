@@ -13,7 +13,7 @@ export default function ServersScreen() {
     styles,
     title,
     isConnected,
-    loading,
+    isLoading,
     handleConnect,
     handleDisconnect,
     handleReconnect,
@@ -29,7 +29,7 @@ export default function ServersScreen() {
         <>
           {isConnected && (
             <Button
-              loading={loading}
+              loading={isLoading}
               type="danger"
               label={t("servers.disconnect")}
               leftIcon={<Icon type="ant" name="disconnect" />}
@@ -40,7 +40,7 @@ export default function ServersScreen() {
 
           {!isConnected && (
             <Button
-              loading={loading}
+              loading={isLoading}
               type="secondary"
               label={t("servers.startConnection")}
               leftIcon={<Icon type="ionicons" name="cloud-done-outline" />}

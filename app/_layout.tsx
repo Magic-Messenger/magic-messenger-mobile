@@ -16,7 +16,7 @@ import Toast from "react-native-toast-message";
 
 import { Colors } from "@/constants";
 import { useScreenProtection } from "@/hooks";
-import { SignalRProvider } from "@/providers";
+import { SignalRProvider, TorProvider } from "@/providers";
 import { useUserStore } from "@/store";
 import { headerImage, toastConfig } from "@/utils";
 
@@ -62,36 +62,44 @@ export default function RootLayout() {
       <PortalProvider>
         <ActionSheetProvider>
           <QueryClientProvider client={queryClient}>
-            <SignalRProvider>
-              <Stack
-                screenOptions={{
-                  headerTransparent: true,
-                  headerTintColor: Colors.white,
-                  headerBackTitle: t("back"),
-                  ...headerImage(),
-                  contentStyle: {
-                    backgroundColor: "transparent",
-                  },
-                  headerTitleAlign: "center",
-                }}
-              >
-                <Stack.Screen name="index" options={{ headerShown: false }} />
-                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen
-                  name="chatDetail"
-                  options={{ headerShown: true }}
-                />
-                <Stack.Screen
-                  name="ticketDetail"
-                  options={{ headerShown: true }}
-                />
-                <Stack.Screen name="+not-found" />
-              </Stack>
+            <TorProvider>
+              <SignalRProvider>
+                <Stack
+                  screenOptions={{
+                    headerTransparent: true,
+                    headerTintColor: Colors.white,
+                    headerBackTitle: t("back"),
+                    ...headerImage(),
+                    contentStyle: {
+                      backgroundColor: "transparent",
+                    },
+                    headerTitleAlign: "center",
+                  }}
+                >
+                  <Stack.Screen name="index" options={{ headerShown: false }} />
+                  <Stack.Screen
+                    name="(auth)"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="(tabs)"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="chatDetail"
+                    options={{ headerShown: true }}
+                  />
+                  <Stack.Screen
+                    name="ticketDetail"
+                    options={{ headerShown: true }}
+                  />
+                  <Stack.Screen name="+not-found" />
+                </Stack>
 
-              <Toast config={toastConfig} />
-              <StatusBar style="light" />
-            </SignalRProvider>
+                <Toast config={toastConfig} />
+                <StatusBar style="light" />
+              </SignalRProvider>
+            </TorProvider>
           </QueryClientProvider>
         </ActionSheetProvider>
       </PortalProvider>

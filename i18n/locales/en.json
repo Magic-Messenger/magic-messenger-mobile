@@ -51,7 +51,7 @@
     "changeAccountAlertMessage": "Do you want to login with another username? This will clear your current session.",
     "deleteAccount": "Delete Account",
     "deleteAccountAlertTitle": "Delete Account",
-    "deleteAccountAlertMessage": "Do you want to delete your account? This process cannot be undone.",
+    "deleteAccountAlertMessage": "You're about to delete your account.\nThis will permanently erase all your contacts, chats, notes, and account data.\nOnce deleted, your information cannot be recovered.",
     "deleteAccountPasswordRequired": "Password is required to delete account",
     "publicKeyUpdateError": "Failed to update public key. Please try again."
   },

@@ -26,6 +26,7 @@ export default function LoginScreen() {
     onSubmit,
     userName,
     profile,
+    showDeleteButton,
     isDeleteAccountLoading,
     handleChangeAccount,
     handleDeleteAccount,
@@ -65,7 +66,7 @@ export default function LoginScreen() {
                 leftIcon={<Icon type="feather" name="refresh-ccw" />}
               />
 
-              {profile?.deleteButton && (
+              {showDeleteButton && (
                 <Button
                   type="danger"
                   label={t("login.deleteAccount")}

@@ -14,14 +14,12 @@ import {
 } from "@/api/endpoints/magicMessenger";
 import { flexBox, spacing } from "@/constants";
 import { registerForPushNotificationsAsync } from "@/services";
-import { useTor } from "@/services/axios/tor";
-import { useUserStore } from "@/store";
+import { useTorStore, useUserStore } from "@/store";
 import { useThemedStyles } from "@/theme";
 import {
   fontPixel,
   getInstallationId,
   heightPixel,
-  showToast,
   trackEvent,
   userPublicKey,
   widthPixel,
@@ -36,7 +34,15 @@ export const useLogin = () => {
   const styles = useThemedStyles(createStyle);
   const { t } = useTranslation();
 
-  const { login, userName, profile, setProfile, setUsername } = useUserStore();
+  const {
+    login,
+    userName,
+    profile,
+    setProfile,
+    setUsername,
+    showDeleteButton,
+    setShowDeleteButton,
+  } = useUserStore();
   const { mutateAsync: loginApi } = usePostApiAccountLogin();
   const { mutateAsync: updatePublicKeyApi } =
     usePostApiAccountUpdatePublicKey();
@@ -45,7 +51,7 @@ export const useLogin = () => {
   const { mutateAsync: deleteAccount, isPending: isDeleteAccountLoading } =
     useDeleteApiAccountDeleteProfile();
 
-  const { startTor } = useTor();
+  const startTor = useTorStore((state) => state.startTor);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -58,7 +64,7 @@ export const useLogin = () => {
   } = useForm<RegisterFormData>({
     defaultValues: {
       username: userName ?? (__DEV__ ? "omer-test" : undefined),
-      password: __DEV__ ? "Kadir123*+" : undefined,
+      password: __DEV__ ? "Omer123*+" : undefined,
     },
   });
 
@@ -68,7 +74,7 @@ export const useLogin = () => {
     if (__DEV__) {
       reset({
         username: userName ?? (__DEV__ ? "omer-test" : undefined),
-        password: __DEV__ ? "Kadir123*+" : undefined,
+        password: __DEV__ ? "Omer123*+" : undefined,
       });
     }
   }, [__DEV__]);
@@ -96,25 +102,13 @@ export const useLogin = () => {
       );
       getApiAccountGetProfile().then((profileResponse) => {
         if (profileResponse.success) {
-          setProfile(profileResponse.data!);
           LogRocket.identify(formValues?.username?.trim());
           trackEvent("profile_fetched");
-          if (profileResponse.data?.enableTor) {
-            startTor()
-              .then(() => {
-                trackEvent("tor_started");
-                showToast({
-                  type: "success",
-                  text1: t("common.torIsStarted"),
-                });
-              })
-              .catch(() => {
-                showToast({
-                  type: "error",
-                  text1: t("common.torIsNotStarted"),
-                });
-              });
-          }
+
+          setProfile(profileResponse.data!);
+          setShowDeleteButton(profileResponse.data?.deleteButton ?? false);
+
+          if (profileResponse.data?.enableTor) startTor();
         }
       });
 
@@ -213,6 +207,7 @@ export const useLogin = () => {
     password,
     profile,
     isDeleteAccountLoading,
+    showDeleteButton,
     handleChangeAccount,
     handleDeleteAccount,
   };

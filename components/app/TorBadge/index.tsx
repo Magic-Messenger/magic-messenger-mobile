@@ -1,7 +1,7 @@
 import { StyleSheet, View } from "react-native";
 
 import { Colors } from "@/constants";
-import { useTor } from "@/services/axios/tor";
+import { useTorStore } from "@/store";
 import { useThemedStyles } from "@/theme";
 
 import {
@@ -13,8 +13,11 @@ import { GradientBackground } from "../../ui/GradientBackground";
 import { ThemedText } from "../ThemedText";
 
 export const TorBadge = () => {
-  const { isConnected, isStarting } = useTor();
   const styles = useThemedStyles(createStyle);
+
+  const isConnected = useTorStore((state) => state.torState?.connected);
+  const isLoading = useTorStore((state) => state.isLoading);
+
   return (
     <GradientBackground
       style={[
@@ -31,7 +34,7 @@ export const TorBadge = () => {
           styles.badgeStatus,
           isConnected
             ? styles.active
-            : isStarting
+            : isLoading
               ? styles.starting
               : styles.inActive,
         ]}

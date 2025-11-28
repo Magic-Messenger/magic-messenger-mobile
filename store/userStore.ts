@@ -33,6 +33,7 @@ const SecureStoreStorage = {
 interface UserStore {
   rehydrated: boolean;
   isLogin: boolean;
+  showDeleteButton: boolean;
   userName: string | null;
   accessToken: string | null;
   credentials: {
@@ -45,6 +46,7 @@ interface UserStore {
   logout: () => void;
   setUserKey: (publicKey: string | null, privateKey: string | null) => void;
   setUsername: (userName?: string | null) => void;
+  setShowDeleteButton: (showDeleteButton: boolean) => void;
 }
 
 export const useUserStore = create<UserStore>()(
@@ -54,6 +56,7 @@ export const useUserStore = create<UserStore>()(
       isLogin: false,
       userName: null,
       accessToken: null,
+      showDeleteButton: false,
       profile: undefined,
       credentials: {
         publicKey: null,
@@ -68,6 +71,9 @@ export const useUserStore = create<UserStore>()(
       },
       setProfile: (profile: AccountProfileDto) => {
         set({ profile });
+      },
+      setShowDeleteButton: (showDeleteButton: boolean) => {
+        set({ showDeleteButton });
       },
       setUserKey: (publicKey, privateKey) => {
         set((state) => ({
@@ -87,6 +93,7 @@ export const useUserStore = create<UserStore>()(
       storage: createJSONStorage(() => SecureStoreStorage),
       partialize: (state) => ({
         userName: state.userName,
+        showDeleteButton: state.showDeleteButton,
         credentials: state.credentials,
       }),
       onRehydrateStorage: () => () => {
