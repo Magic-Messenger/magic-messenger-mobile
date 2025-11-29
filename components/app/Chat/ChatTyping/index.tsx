@@ -43,6 +43,7 @@ const createStyle = (colors: ColorDto) =>
       backgroundColor: colors.secondary,
       justifyContent: "center",
       alignItems: "center",
+      marginBottom: spacingPixel(10),
     },
     lottie: {
       width: widthPixel(50),

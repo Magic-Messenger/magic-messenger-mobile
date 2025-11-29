@@ -13,6 +13,8 @@ import { Colors, Fonts } from "@/constants";
 interface LicenseInputProps {
   groupCount?: number;
   charactersPerGroup?: number;
+  grid?: boolean; // YENİ PROP
+  itemsPerRow?: number; // YENİ PROP
   value?: string;
   onChangeText?: (text: string) => void;
   onComplete?: (text: string) => void;
@@ -29,6 +31,8 @@ interface LicenseInputProps {
 export const LicenseInput: React.FC<LicenseInputProps> = ({
   groupCount = 4,
   charactersPerGroup = 4,
+  grid = false,
+  itemsPerRow = 3,
   value = "",
   onChangeText,
   onComplete,
@@ -44,6 +48,11 @@ export const LicenseInput: React.FC<LicenseInputProps> = ({
   const [inputValues, setInputValues] = useState<string[]>([]);
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
   const inputRefs = useRef<(TextInput | null)[]>([]);
+
+  // Calculate item width based on itemsPerRow (only for grid mode)
+  const itemWidth = grid
+    ? `${(100 - (itemsPerRow - 1) * 2.5) / itemsPerRow}%`
+    : undefined;
 
   // Initialize input values
   useEffect(() => {
@@ -69,6 +78,7 @@ export const LicenseInput: React.FC<LicenseInputProps> = ({
       const allChars = cleanText.split("");
       let charIndex = 0;
 
+      // Start from current group and distribute
       for (
         let i = groupIndex;
         i < groupCount && charIndex < allChars.length;
@@ -89,11 +99,16 @@ export const LicenseInput: React.FC<LicenseInputProps> = ({
       setInputValues(newInputValues);
 
       // Focus next empty group or last group
+      const filledGroups = Math.ceil(cleanText.length / charactersPerGroup);
       const nextGroupIndex = Math.min(
-        groupIndex + Math.ceil(cleanText.length / charactersPerGroup),
+        groupIndex + filledGroups,
         groupCount - 1,
       );
-      inputRefs.current[nextGroupIndex]?.focus();
+
+      // Use setTimeout to ensure the state update completes first
+      setTimeout(() => {
+        inputRefs.current[nextGroupIndex]?.focus();
+      }, 0);
     } else {
       // Normal input
       newInputValues[groupIndex] = cleanText;
@@ -151,9 +166,15 @@ export const LicenseInput: React.FC<LicenseInputProps> = ({
   };
 
   return (
-    <View style={[styles.container, style]}>
+    <View style={[grid ? styles.containerGrid : styles.container, style]}>
       {Array.from({ length: groupCount }).map((_, groupIndex) => (
-        <View key={groupIndex} style={styles.groupWrapper}>
+        <View
+          key={groupIndex}
+          style={[
+            grid ? styles.groupWrapperGrid : styles.groupWrapper,
+            grid && itemWidth ? { width: itemWidth } : undefined,
+          ]}
+        >
           <TextInput
             ref={(ref) => (inputRefs.current[groupIndex] = ref)}
             style={[
@@ -198,6 +219,24 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  /* containerGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacingPixel(10),
+  }, */
+  containerGrid: {
+    width: "100%",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    gap: 5,
+  },
+  groupWrapperGrid: {
+    minWidth: 60,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   input: {
     flex: 1,
