@@ -44,6 +44,7 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
+      Notifications.setBadgeCountAsync(0);
       Notifications.dismissAllNotificationsAsync();
     }
     LogRocket.init(process?.env?.EXPO_PUBLIC_LOG_ROCKET_API as string, {

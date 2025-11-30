@@ -49,8 +49,8 @@ export const ContactHeader = ({
         style={[styles.mt5, styles.mb5]}
         onChangeText={(_text) => setSearchText(_text)}
         rightIcon={{
-          type: "ant",
-          name: "search1",
+          type: "feather",
+          name: "search",
         }}
       />
 
