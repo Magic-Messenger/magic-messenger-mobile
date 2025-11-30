@@ -5,24 +5,16 @@ import { create } from "zustand";
 import TorManager from "@/services/axios/tor/TorManager";
 import { showToast, trackEvent } from "@/utils";
 
-export interface TorState {
-  enabled?: boolean;
-  connected?: boolean;
-  socksPort?: number;
-  ready?: boolean;
-  status: string;
-}
-
 type TorResponse = {
   message?: string;
   success: boolean;
 };
 
 type TorStore = {
-  torState?: TorState;
+  socksPort?: number;
   isLoading: boolean;
+  isConnected: boolean;
 
-  setTorState: (state: TorState) => void;
   updateState: () => void;
   startTor: () => Promise<TorResponse>;
   stopTor: () => Promise<TorResponse>;
@@ -31,29 +23,13 @@ type TorStore = {
 };
 
 export const useTorStore = create<TorStore>((set, get) => ({
-  torState: {
-    ...TorManager.getConnectionStatus(),
-    status: "OFF",
-  },
+  isConnected: false,
   isLoading: false,
-
-  setTorState: (state: TorState) => {
-    set({
-      torState: state,
-    });
-  },
 
   updateState: () => {
     const status = TorManager.getConnectionStatus();
-    const torStatus = ExpoTor.getTorStatus();
     set({
-      torState: {
-        enabled: status.enabled,
-        connected: status.connected,
-        socksPort: status.socksPort,
-        ready: status.ready,
-        status: torStatus,
-      },
+      socksPort: status.socksPort,
     });
   },
 
@@ -69,6 +45,10 @@ export const useTorStore = create<TorStore>((set, get) => ({
       showToast({
         type: "success",
         text1: t("common.torIsStarted"),
+      });
+
+      set({
+        isConnected: true,
       });
 
       return { success: true };
@@ -97,6 +77,10 @@ export const useTorStore = create<TorStore>((set, get) => ({
       await ExpoTor.stopTor();
 
       trackEvent("tor_stopped");
+
+      set({
+        isConnected: false,
+      });
 
       return { success: true };
     } catch (error: any) {

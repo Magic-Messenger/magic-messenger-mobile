@@ -11,7 +11,7 @@ export const useServers = () => {
   const styles = useThemedStyles(createStyle);
 
   const isLoading = useTorStore((state) => state.isLoading);
-  const isConnected = useTorStore((state) => state.torState?.connected);
+  const isConnected = useTorStore((state) => state.isConnected);
   const startTor = useTorStore((state) => state.startTor);
   const stopTor = useTorStore((state) => state.stopTor);
 

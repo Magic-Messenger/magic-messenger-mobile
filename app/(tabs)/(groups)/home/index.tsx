@@ -1,18 +1,23 @@
+import { useIsFocused } from "@react-navigation/core";
 import { FlashList, type ListRenderItemInfo } from "@shopify/flash-list";
 import { router, useFocusEffect } from "expo-router";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { RefreshControl, StyleSheet, View } from "react-native";
 
 import { useGetApiChatsList } from "@/api/endpoints/magicMessenger";
 import { ChatDto } from "@/api/models";
 import { AppLayout, Button, ChatItem, EmptyList, Icon } from "@/components";
+import { useSignalRStore } from "@/store";
 import { useThemedStyles } from "@/theme";
 import { heightPixel, widthPixel } from "@/utils";
 
 export default function ChatScreen() {
   const { t } = useTranslation();
   const styles = useThemedStyles(createStyle);
+
+  const isFocused = useIsFocused();
+  const receivedMessage = useSignalRStore((s) => s.receivedMessage);
 
   const { data, isLoading, refetch } = useGetApiChatsList({
     pageNumber: 1,
@@ -102,6 +107,10 @@ export default function ChatScreen() {
     ),
     [t, styles.newChatButton, handleCreateGroup],
   );
+
+  useEffect(() => {
+    if (isFocused && receivedMessage) refetch();
+  }, [receivedMessage, isFocused]);
 
   // Refetch on screen focus
   useFocusEffect(

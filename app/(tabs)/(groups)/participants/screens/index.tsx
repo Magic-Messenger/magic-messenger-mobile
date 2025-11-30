@@ -81,7 +81,11 @@ export default function ParticipantsScreen() {
           }}
           customAction={
             isSelected ? (
-              <Icon type="ant" name="checkcircle" color={colors.colors.white} />
+              <Icon
+                type="feather"
+                name="check-circle"
+                color={colors.colors.white}
+              />
             ) : null
           }
         />
@@ -148,8 +152,8 @@ export default function ParticipantsScreen() {
           onChangeText={handleSearchChange}
           value={searchText}
           rightIcon={{
-            type: "ant",
-            name: "search1",
+            type: "feather",
+            name: "search",
           }}
           inputStyle={{
             backgroundColor: colors.colors.secondarySelected,

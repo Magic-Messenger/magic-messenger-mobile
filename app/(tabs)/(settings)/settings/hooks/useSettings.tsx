@@ -21,7 +21,7 @@ export const useSettings = () => {
     (state) => state.setShowDeleteButton,
   );
 
-  const isTorConnected = useTorStore((state) => state.torState?.connected);
+  const isTorConnected = useTorStore((state) => state.isConnected);
   const isTorLoading = useTorStore((state) => state.isLoading);
   const startTor = useTorStore((state) => state.startTor);
   const stopTor = useTorStore((state) => state.stopTor);
@@ -112,11 +112,10 @@ export const useSettings = () => {
       value: isTorConnected ?? false,
       onSettingsChanged: async (value: number | boolean) => {
         if (value) {
-          startTor();
+          await startTor();
         } else {
-          stopTor();
+          await stopTor();
         }
-
         handleSettingsChange("enableTor", value);
       },
     },

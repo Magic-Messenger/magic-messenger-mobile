@@ -15,7 +15,7 @@ import { ThemedText } from "../ThemedText";
 export const TorBadge = () => {
   const styles = useThemedStyles(createStyle);
 
-  const isConnected = useTorStore((state) => state.torState?.connected);
+  const isConnected = useTorStore((state) => state.isConnected);
   const isLoading = useTorStore((state) => state.isLoading);
 
   return (

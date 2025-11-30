@@ -2,7 +2,7 @@ import { CameraView, CameraViewProps, useCameraPermissions } from "expo-camera";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
 
-import { spacing } from "../../../constants";
+import { spacingPixel } from "../../../utils/pixelHelper";
 import { ThemedText } from "../../app";
 import { Button } from "../Button";
 
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    ...spacing({ gap: 20 }),
+    gap: spacingPixel(20),
   },
   camera: {
     flex: 1,

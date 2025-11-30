@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
@@ -87,7 +87,7 @@ export function ChatFooter({
         }
       }
     },
-    [magicHubClient, chatId]
+    [magicHubClient, chatId],
   );
 
   const handleSendRecording = async () => {
@@ -254,12 +254,6 @@ export function ChatFooter({
       </View>
     );
   }, [replyMessage, currUserName, t]);
-
-  useEffect(() => {
-    return () => {
-      magicHubClient?.stopTyping(chatId);
-    };
-  }, [magicHubClient, chatId]);
 
   return (
     <>

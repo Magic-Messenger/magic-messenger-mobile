@@ -43,7 +43,7 @@ export default function NoteScreen() {
             note.cipherText,
             note.nonce,
             userPublicKey()!,
-            userPrivateKey()!
+            userPrivateKey()!,
           );
           return JSON.parse(decrypted as never);
         }
@@ -80,7 +80,7 @@ export default function NoteScreen() {
         }
       />
     ),
-    [router, t]
+    [router, t],
   );
 
   /** Toggle sorting */
@@ -119,7 +119,7 @@ export default function NoteScreen() {
         </View>
       </View>
     ),
-    []
+    [],
   );
 
   const NotesEmptyList = useCallback(
@@ -131,14 +131,16 @@ export default function NoteScreen() {
         label={t("notes.empty")}
       />
     ),
-    [t, styles.emptyList, styles.textCenter]
+    [t, styles.emptyList, styles.textCenter],
   );
 
   if (!isLoginProtected) {
     return (
       <ProtectedRoute
-        title={t("notes.lockNoteTitle")}
-        description={t("notes.lockNoteDescription")}
+        title="notes.lockNoteTitle"
+        description="notes.lockNoteDescription"
+        buttonText="notes.lockNoteButton"
+        buttonIcon={<Icon type="feather" name="eye" />}
       />
     );
   }

@@ -1,13 +1,14 @@
+import { ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 
 import { usePostApiAccountVerifyPassword } from "@/api/endpoints/magicMessenger";
-import { Button, Icon } from "@/components/ui";
 import { useProtectRouteStore } from "@/store";
 import { useThemedStyles } from "@/theme";
-import { showToast } from "@/utils";
 
+import { showToast } from "../../../utils/helper";
+import { Button, Icon } from "../../ui";
 import AppLayout from "../AppLayout";
 import { PasswordInput } from "../PasswordInput";
 import { ThemedText } from "../ThemedText";
@@ -15,12 +16,14 @@ import { ThemedText } from "../ThemedText";
 interface Props {
   title?: string;
   description?: string;
+  buttonText?: string;
+  buttonIcon?: ReactNode;
 }
 
 export function ProtectedRoute({ ...props }: Props) {
   const { t } = useTranslation();
   const styles = useThemedStyles();
-  const { title, description } = props;
+  const { title, description, buttonText, buttonIcon } = props;
   const { setIsLoginProtected } = useProtectRouteStore();
   const { mutateAsync: passwordRequest, isPending } = usePostApiAccountVerifyPassword(); //prettier-ignore
 
@@ -53,23 +56,23 @@ export function ProtectedRoute({ ...props }: Props) {
       footer={
         <Button
           type="primary"
-          label={t("login.button")}
+          label={t(buttonText ?? "login.button")}
           onPress={handleSubmit(onSubmit)}
           loading={isPending}
           disabled={isPending}
-          leftIcon={<Icon type="feather" name="log-in" />}
+          leftIcon={buttonIcon ?? <Icon type="feather" name="log-in" />}
         />
       }
     >
       <View style={[styles.alignItemsCenter, styles.gap2]}>
         {title && (
           <ThemedText type="subtitle" size={18} center>
-            {title}
+            {t(title)}
           </ThemedText>
         )}
         {description && (
           <ThemedText type="default" size={15} center>
-            {description}
+            {t(description)}
           </ThemedText>
         )}
       </View>
