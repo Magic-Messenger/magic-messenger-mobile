@@ -1,6 +1,5 @@
 import "react-native-reanimated";
 
-import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { PortalProvider } from "@gorhom/portal";
 import LogRocket from "@logrocket/react-native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -63,48 +62,40 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView>
       <PortalProvider>
-        <ActionSheetProvider>
-          <QueryClientProvider client={queryClient}>
-            <TorProvider>
-              <SignalRProvider>
-                <Stack
-                  screenOptions={{
-                    headerTransparent: true,
-                    headerTintColor: Colors.white,
-                    headerBackTitle: t("back"),
-                    ...headerImage(),
-                    contentStyle: {
-                      backgroundColor: "transparent",
-                    },
-                    headerTitleAlign: "center",
-                  }}
-                >
-                  <Stack.Screen name="index" options={{ headerShown: false }} />
-                  <Stack.Screen
-                    name="(auth)"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="(tabs)"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="chatDetail"
-                    options={{ headerShown: true }}
-                  />
-                  <Stack.Screen
-                    name="ticketDetail"
-                    options={{ headerShown: true }}
-                  />
-                  <Stack.Screen name="+not-found" />
-                </Stack>
+        <QueryClientProvider client={queryClient}>
+          <TorProvider>
+            <SignalRProvider>
+              <Stack
+                screenOptions={{
+                  headerTransparent: true,
+                  headerTintColor: Colors.white,
+                  headerBackTitle: t("back"),
+                  ...headerImage(),
+                  contentStyle: {
+                    backgroundColor: "transparent",
+                  },
+                  headerTitleAlign: "center",
+                }}
+              >
+                <Stack.Screen name="index" options={{ headerShown: false }} />
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="chatDetail"
+                  options={{ headerShown: true }}
+                />
+                <Stack.Screen
+                  name="ticketDetail"
+                  options={{ headerShown: true }}
+                />
+                <Stack.Screen name="+not-found" />
+              </Stack>
 
-                <Toast config={toastConfig} />
-                <StatusBar style="light" />
-              </SignalRProvider>
-            </TorProvider>
-          </QueryClientProvider>
-        </ActionSheetProvider>
+              <Toast config={toastConfig} />
+              <StatusBar style="light" />
+            </SignalRProvider>
+          </TorProvider>
+        </QueryClientProvider>
       </PortalProvider>
     </GestureHandlerRootView>
   );

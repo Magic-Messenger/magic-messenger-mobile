@@ -25,7 +25,6 @@ export default function LoginScreen() {
     handleSubmit,
     onSubmit,
     userName,
-    profile,
     showDeleteButton,
     isDeleteAccountLoading,
     handleChangeAccount,
@@ -135,6 +134,7 @@ export default function LoginScreen() {
             control={control}
             errors={errors.password?.message}
             placeholder="login.password"
+            onEndEditing={() => handleSubmit(onSubmit)}
           />
         </View>
       </View>

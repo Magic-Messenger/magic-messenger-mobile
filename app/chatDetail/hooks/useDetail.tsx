@@ -75,7 +75,7 @@ export const useDetail = () => {
   });
 
   // Add these refs at the top of your component
-  const updateQueueRef = useRef<Map<string, any>>(new Map());
+  const updateQueueRef = useRef<Map<string, MessageStatus>>(new Map());
   const batchTimeoutRef = useRef<NodeJS.Timeout | number | null>(null);
 
   const isLoadingRef = useRef(false);
@@ -377,15 +377,14 @@ export const useDetail = () => {
 
     setMessageStatuses((prevStatuses) => {
       const newStatuses = new Map(prevStatuses);
-
       updates.forEach((update, messageId) => {
         const currentStatus = prevStatuses.get(messageId);
         const currentPriority = MESSAGE_STATUS_PRIORITY[currentStatus] || 0;
-        const newPriority = MESSAGE_STATUS_PRIORITY[update.messageStatus];
+        const newPriority = MESSAGE_STATUS_PRIORITY[update];
 
         // Only update if new status has higher priority
         if (newPriority > currentPriority) {
-          newStatuses.set(messageId, update.messageStatus);
+          newStatuses.set(messageId, update);
         }
       });
 
@@ -410,7 +409,8 @@ export const useDetail = () => {
       trackEvent("message_delivered", { messageDeliveredEvent });
 
       const messageId = messageDeliveredEvent.message?.messageId;
-      const newStatus = Number(messageDeliveredEvent.message?.messageStatus);
+      const newStatus =
+        MESSAGE_STATUS_PRIORITY[messageDeliveredEvent.message?.messageStatus!];
 
       if (!messageId || !newStatus) return;
 
@@ -419,14 +419,14 @@ export const useDetail = () => {
       trackEvent("message_delivered existingUpdate", existingUpdate);
 
       if (existingUpdate) {
-        const existingPriority =
-          MESSAGE_STATUS_PRIORITY[existingUpdate.messageStatus as never];
+        const existingPriority = MESSAGE_STATUS_PRIORITY[existingUpdate];
 
         // Only update queue if new status has higher or equal priority
         if (newStatus >= existingPriority) {
-          updateQueueRef.current.set(messageId, {
-            messageStatus: newStatus,
-          });
+          updateQueueRef.current.set(
+            messageId,
+            messageDeliveredEvent.message?.messageStatus!,
+          );
         }
       } else {
         // No existing update, add to queue
@@ -434,9 +434,10 @@ export const useDetail = () => {
           messageId,
           messageStatus: newStatus,
         });
-        updateQueueRef.current.set(messageId, {
-          messageStatus: newStatus,
-        });
+        updateQueueRef.current.set(
+          messageId,
+          messageDeliveredEvent.message?.messageStatus!,
+        );
       }
 
       scheduleBatchUpdate();
@@ -449,7 +450,8 @@ export const useDetail = () => {
       trackEvent("message_seen", { messageSeenEvent });
 
       const messageId = messageSeenEvent.message?.messageId;
-      const newStatus = Number(messageSeenEvent.message?.messageStatus);
+      const newStatus =
+        MESSAGE_STATUS_PRIORITY[messageSeenEvent.message?.messageStatus!];
 
       if (!messageId || !newStatus) return;
 
@@ -458,14 +460,14 @@ export const useDetail = () => {
       trackEvent("message_seen existingUpdate", existingUpdate);
 
       if (existingUpdate) {
-        const existingPriority =
-          MESSAGE_STATUS_PRIORITY[existingUpdate.messageStatus as never];
+        const existingPriority = MESSAGE_STATUS_PRIORITY[existingUpdate];
 
         // Only update queue if new status has higher or equal priority
         if (newStatus >= existingPriority) {
-          updateQueueRef.current.set(messageId, {
-            messageStatus: newStatus,
-          });
+          updateQueueRef.current.set(
+            messageId,
+            messageSeenEvent.message?.messageStatus!,
+          );
         }
       } else {
         // No existing update, add to queue
@@ -473,9 +475,10 @@ export const useDetail = () => {
           messageId,
           messageStatus: newStatus,
         });
-        updateQueueRef.current.set(messageId, {
-          messageStatus: newStatus,
-        });
+        updateQueueRef.current.set(
+          messageId,
+          messageSeenEvent.message?.messageStatus!,
+        );
       }
 
       scheduleBatchUpdate();
@@ -691,7 +694,14 @@ export const useDetail = () => {
     navigation.setOptions({
       headerRight: () =>
         chatId ? (
-          <TouchableOpacity onPress={() => actionRef.current?.open()}>
+          <TouchableOpacity
+            onPress={() =>
+              setTimeout(() => {
+                actionRef.current?.open();
+              }, 10)
+            }
+            style={{ padding: 5 }}
+          >
             <Icon type="feather" name="more-vertical" />
           </TouchableOpacity>
         ) : null,
@@ -718,6 +728,23 @@ export const useDetail = () => {
     () => groupMessagesByDate(messages),
     [messages],
   );
+
+  useEffect(() => {
+    let showSub = null;
+    if (listRef) {
+      showSub = Keyboard.addListener(
+        Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+        (e) => {
+          console.log("keyboardWillShow: ", e.endCoordinates.screenY);
+          listRef.current?.scrollToOffset({ offset: e.endCoordinates.screenY });
+        },
+      );
+    }
+
+    return () => {
+      if (listRef && showSub) showSub.remove();
+    };
+  }, [listRef]);
 
   return {
     t,

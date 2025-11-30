@@ -55,7 +55,7 @@ export default function GroupChatScreen() {
         />
       );
     },
-    [chatId, handleReply, getMessageStatus]
+    [chatId, handleReply, getMessageStatus],
   );
 
   // Key extractor for optimal list performance
@@ -69,7 +69,7 @@ export default function GroupChatScreen() {
   // Footer component
   const renderFooter = useCallback(
     () => <ChatTyping chatId={chatId} />,
-    [chatId]
+    [chatId],
   );
 
   // Optional: Item type for better recycling
@@ -81,53 +81,52 @@ export default function GroupChatScreen() {
   }, []);
 
   return (
-    <ChatLayout
-      header={
-        <ChatHeader
-          chatId={chatId}
-          isGroupChat={true}
-          groupAccountCount={groupAccountCount as string}
-          userName={userName as string}
-        />
-      }
-      footer={
-        <ChatFooter
-          chatId={chatId}
-          replyMessage={replyMessage}
-          onSend={handleChatControl}
-          onClearReply={onClearReply}
-        />
-      }
-    >
-      <LoadingProvider loading={loading}>
-        <FlashList
-          ref={listRef}
-          data={groupedMessages}
-          renderItem={renderItem}
-          keyExtractor={keyExtractor}
-          onScroll={handleScroll}
-          scrollEventThrottle={16}
-          contentContainerStyle={styles.contentContainerStyle}
-          ListFooterComponent={renderFooter}
-          getItemType={getItemType}
-          showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}
-          drawDistance={400}
-          removeClippedSubviews
-          maintainVisibleContentPosition={{
-            autoscrollToTopThreshold: 10,
-          }}
-          ListHeaderComponent={
-            messages.length === 0 && !loading ? <EncryptionInfo /> : null
-          }
-        />
-      </LoadingProvider>
-      <ActionSheet
-        ref={actionRef}
-        snapPoints={["15%"]}
-        options={chatActionOptions}
-      />
-    </ChatLayout>
+    <>
+      <ChatLayout
+        header={
+          <ChatHeader
+            chatId={chatId}
+            isGroupChat={true}
+            groupAccountCount={groupAccountCount as string}
+            userName={userName as string}
+          />
+        }
+        footer={
+          <ChatFooter
+            chatId={chatId}
+            replyMessage={replyMessage}
+            onSend={handleChatControl}
+            onClearReply={onClearReply}
+          />
+        }
+      >
+        <LoadingProvider loading={loading}>
+          <FlashList
+            ref={listRef}
+            data={groupedMessages}
+            renderItem={renderItem}
+            keyExtractor={keyExtractor}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
+            contentContainerStyle={styles.contentContainerStyle}
+            ListFooterComponent={renderFooter}
+            getItemType={getItemType}
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
+            drawDistance={400}
+            removeClippedSubviews
+            maintainVisibleContentPosition={{
+              autoscrollToTopThreshold: 10,
+            }}
+            ListHeaderComponent={
+              messages.length === 0 && !loading ? <EncryptionInfo /> : null
+            }
+          />
+        </LoadingProvider>
+      </ChatLayout>
+
+      <ActionSheet ref={actionRef} options={chatActionOptions} />
+    </>
   );
 }
 

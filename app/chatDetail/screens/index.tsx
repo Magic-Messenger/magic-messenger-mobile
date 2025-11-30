@@ -81,48 +81,51 @@ export default function ChatScreen() {
   );
 
   return (
-    <ChatLayout
-      header={
-        <ChatHeader
-          chatId={chatId}
-          isGroupChat={false}
-          userName={userName as string}
-        />
-      }
-      footer={
-        <ChatFooter
-          chatId={chatId}
-          replyMessage={replyMessage}
-          onSend={handleSendMessage}
-          onClearReply={onClearReply}
-        />
-      }
-    >
-      <LoadingProvider loading={loading}>
-        <FlashList
-          ref={listRef}
-          data={groupedMessages}
-          renderItem={renderItem}
-          keyExtractor={keyExtractor}
-          onScroll={handleScroll}
-          scrollEventThrottle={16}
-          contentContainerStyle={styles.contentContainerStyle}
-          ListFooterComponent={renderFooter}
-          showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}
-          getItemType={getItemType}
-          drawDistance={400}
-          removeClippedSubviews
-          maintainVisibleContentPosition={{
-            autoscrollToTopThreshold: 10,
-          }}
-          ListHeaderComponent={
-            messages.length === 0 && !loading ? <EncryptionInfo /> : null
-          }
-        />
-      </LoadingProvider>
+    <>
+      <ChatLayout
+        header={
+          <ChatHeader
+            chatId={chatId}
+            isGroupChat={false}
+            userName={userName as string}
+          />
+        }
+        footer={
+          <ChatFooter
+            chatId={chatId}
+            replyMessage={replyMessage}
+            onSend={handleSendMessage}
+            onClearReply={onClearReply}
+          />
+        }
+      >
+        <LoadingProvider loading={loading}>
+          <FlashList
+            ref={listRef}
+            data={groupedMessages}
+            renderItem={renderItem}
+            keyExtractor={keyExtractor}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
+            contentContainerStyle={styles.contentContainerStyle}
+            ListFooterComponent={renderFooter}
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
+            getItemType={getItemType}
+            drawDistance={400}
+            removeClippedSubviews
+            maintainVisibleContentPosition={{
+              autoscrollToTopThreshold: 10,
+            }}
+            ListHeaderComponent={
+              messages.length === 0 && !loading ? <EncryptionInfo /> : null
+            }
+          />
+        </LoadingProvider>
+      </ChatLayout>
+
       <ActionSheet ref={actionRef} options={chatActionOptions} />
-    </ChatLayout>
+    </>
   );
 }
 

@@ -32,7 +32,13 @@ export const ActionSheet = forwardRef<ActionSheetRef, ActionSheetProps>(
     const modalRef = useRef<BottomSheet | null>(null);
 
     useImperativeHandle(ref, () => ({
-      open: () => modalRef.current?.expand(),
+      open: () => {
+        if (!modalRef.current) return;
+
+        requestAnimationFrame(() => {
+          modalRef.current?.expand();
+        });
+      },
       close: () => modalRef.current?.close(),
     }));
 
