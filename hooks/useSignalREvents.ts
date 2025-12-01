@@ -1,7 +1,12 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { router, usePathname } from "expo-router";
 import { useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
+import {
+  getGetApiChatsListQueryKey,
+  getGetApiChatsMessagesQueryKey,
+} from "@/api/endpoints/magicMessenger";
 import { ChatDto } from "@/api/models";
 import { Colors, MessageReceivedEvent } from "@/constants";
 import { useUserStore } from "@/store";
@@ -17,6 +22,7 @@ const isInChatScreen = (pathname?: string) => {
 export const useSignalREvents = () => {
   const { t } = useTranslation();
   const pathname = usePathname();
+  const queryClient = useQueryClient();
 
   const magicHubClient = useSignalRStore((s) => s.magicHubClient);
   const addOnlineUser = useSignalRStore((s) => s.addOnlineUser);
@@ -88,9 +94,21 @@ export const useSignalREvents = () => {
     ({ chat, message }: MessageReceivedEvent) => {
       trackEvent("chat_message_received", chat);
 
+      // Invalidate messages cache for this chat
+      if (chat?.chatId) {
+        queryClient.invalidateQueries({
+          queryKey: getGetApiChatsMessagesQueryKey({ chatId: chat.chatId }),
+        });
+      }
+
+      // Invalidate chat list cache to update last message preview
+      queryClient.invalidateQueries({
+        queryKey: getGetApiChatsListQueryKey(),
+      });
+
       setReceivedMessage({ chat, message });
     },
-    [setReceivedMessage],
+    [setReceivedMessage, queryClient],
   );
 
   useEffect(() => {

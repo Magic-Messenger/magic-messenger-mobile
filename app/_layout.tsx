@@ -12,6 +12,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 import Toast from "react-native-toast-message";
 
 import { Colors } from "@/constants";
@@ -63,38 +64,46 @@ export default function RootLayout() {
     <GestureHandlerRootView>
       <PortalProvider>
         <QueryClientProvider client={queryClient}>
-          <TorProvider>
-            <SignalRProvider>
-              <Stack
-                screenOptions={{
-                  headerTransparent: true,
-                  headerTintColor: Colors.white,
-                  headerBackTitle: t("back"),
-                  ...headerImage(),
-                  contentStyle: {
-                    backgroundColor: "transparent",
-                  },
-                  headerTitleAlign: "center",
-                }}
-              >
-                <Stack.Screen name="index" options={{ headerShown: false }} />
-                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen
-                  name="chatDetail"
-                  options={{ headerShown: true }}
-                />
-                <Stack.Screen
-                  name="ticketDetail"
-                  options={{ headerShown: true }}
-                />
-                <Stack.Screen name="+not-found" />
-              </Stack>
+          <KeyboardProvider>
+            <TorProvider>
+              <SignalRProvider>
+                <Stack
+                  screenOptions={{
+                    headerTransparent: true,
+                    headerTintColor: Colors.white,
+                    headerBackTitle: t("back"),
+                    ...headerImage(),
+                    contentStyle: {
+                      backgroundColor: "transparent",
+                    },
+                    headerTitleAlign: "center",
+                  }}
+                >
+                  <Stack.Screen name="index" options={{ headerShown: false }} />
+                  <Stack.Screen
+                    name="(auth)"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="(tabs)"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="chatDetail"
+                    options={{ headerShown: true }}
+                  />
+                  <Stack.Screen
+                    name="ticketDetail"
+                    options={{ headerShown: true }}
+                  />
+                  <Stack.Screen name="+not-found" />
+                </Stack>
 
-              <Toast config={toastConfig} />
-              <StatusBar style="light" />
-            </SignalRProvider>
-          </TorProvider>
+                <Toast config={toastConfig} />
+                <StatusBar style="light" />
+              </SignalRProvider>
+            </TorProvider>
+          </KeyboardProvider>
         </QueryClientProvider>
       </PortalProvider>
     </GestureHandlerRootView>

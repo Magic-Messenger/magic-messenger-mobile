@@ -1,6 +1,5 @@
-import { FlashList } from "@shopify/flash-list";
 import React, { useCallback } from "react";
-import { StyleSheet } from "react-native";
+import { FlatList, StyleSheet } from "react-native";
 
 import {
   ActionSheet,
@@ -34,12 +33,11 @@ export default function ChatScreen() {
     chatActionOptions,
     handleSendMessage,
     handleReply,
-    handleScroll,
+    handleEndReached,
     onClearReply,
     getMessageStatus,
   } = useDetail();
 
-  // Memoized render function for better performance
   const renderItem = useCallback(
     ({ item }: { item: MessageWithDate }) => {
       if (isDateSeparator(item)) {
@@ -59,7 +57,6 @@ export default function ChatScreen() {
     [chatId, usersPublicKey.receiverPublicKey, handleReply, getMessageStatus],
   );
 
-  // Key extractor for optimal list performance
   const keyExtractor = useCallback((item: MessageWithDate, index: number) => {
     if (isDateSeparator(item)) {
       return `date-${item.date}-${index}`;
@@ -67,17 +64,14 @@ export default function ChatScreen() {
     return item.messageId || `temp-${item.createdAt}`;
   }, []);
 
-  const getItemType = useCallback((item: MessageWithDate) => {
-    if (isDateSeparator(item)) {
-      return "date";
-    }
-    return item.messageType; // "text", "image", "audio", "video"
-  }, []);
-
-  // Footer component
-  const renderFooter = useCallback(
+  const renderHeader = useCallback(
     () => <ChatTyping chatId={chatId} />,
     [chatId],
+  );
+
+  const renderFooter = useCallback(
+    () => (messages.length === 0 && !loading ? <EncryptionInfo /> : null),
+    [messages.length, loading],
   );
 
   return (
@@ -100,26 +94,22 @@ export default function ChatScreen() {
         }
       >
         <LoadingProvider loading={loading}>
-          <FlashList
+          <FlatList
             ref={listRef}
             data={groupedMessages}
             renderItem={renderItem}
             keyExtractor={keyExtractor}
-            onScroll={handleScroll}
-            scrollEventThrottle={16}
+            inverted
+            onEndReached={handleEndReached}
+            onEndReachedThreshold={0.5}
             contentContainerStyle={styles.contentContainerStyle}
+            ListHeaderComponent={renderHeader}
             ListFooterComponent={renderFooter}
             showsVerticalScrollIndicator={false}
-            showsHorizontalScrollIndicator={false}
-            getItemType={getItemType}
-            drawDistance={400}
             removeClippedSubviews
-            maintainVisibleContentPosition={{
-              autoscrollToTopThreshold: 10,
-            }}
-            ListHeaderComponent={
-              messages.length === 0 && !loading ? <EncryptionInfo /> : null
-            }
+            maxToRenderPerBatch={15}
+            windowSize={10}
+            initialNumToRender={20}
           />
         </LoadingProvider>
       </ChatLayout>

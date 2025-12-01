@@ -1,5 +1,5 @@
 import { useIsFocused } from "@react-navigation/core";
-import { FlashListRef } from "@shopify/flash-list";
+import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { throttle } from "lodash";
 import {
@@ -13,7 +13,7 @@ import {
 import { useTranslation } from "react-i18next";
 import {
   Alert,
-  Keyboard,
+  FlatList,
   NativeScrollEvent,
   NativeSyntheticEvent,
   TouchableOpacity,
@@ -21,9 +21,10 @@ import {
 import { CaptureProtection } from "react-native-capture-protection";
 
 import {
-  getApiChatsMessages,
+  getGetApiChatsMessagesQueryKey,
   useDeleteApiChatsDelete,
   useGetApiAccountGetOnlineUsers,
+  useGetApiChatsMessages,
   usePostApiAccountBlockAccount,
   usePostApiChatsClear,
   usePostApiChatsCreate,
@@ -37,7 +38,6 @@ import {
   MessageDeliveredEvent,
   MessageReceivedEvent,
   MessageSeenEvent,
-  SCROLL_THRESHOLD,
   UploadFileResultDto,
 } from "@/constants";
 import { useSignalRStore, useUserStore } from "@/store";
@@ -54,7 +54,8 @@ export const useDetail = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const navigation = useNavigation();
-  const listRef = useRef<FlashListRef<MessageWithDate>>(null);
+  const queryClient = useQueryClient();
+  const listRef = useRef<FlatList<MessageWithDate>>(null);
   const actionRef = useRef<ActionSheetRef | null>(null);
 
   const isFocused = useIsFocused();
@@ -64,7 +65,6 @@ export const useDetail = () => {
   const [replyMessage, setReplyMessage] = useState<MessageDto | null>(null);
   const [messages, setMessages] = useState<MessageDto[]>([]);
   const [messageStatuses, setMessageStatuses] = useState(new Map());
-  const [loading, setLoading] = useState(false);
   const [chatId, setChatId] = useState<string | null>(null);
   const [pagination, setPagination] = useState({
     currentPage: 0,
@@ -73,7 +73,6 @@ export const useDetail = () => {
     hasMore: true,
   });
 
-  // Add these refs at the top of your component
   const updateQueueRef = useRef<Map<string, MessageStatus>>(new Map());
   const batchTimeoutRef = useRef<NodeJS.Timeout | number | null>(null);
 
@@ -102,6 +101,28 @@ export const useDetail = () => {
     },
   });
 
+  // React Query for messages with cache
+  const {
+    data: messagesData,
+    isLoading: isMessagesLoading,
+    isFetching: isMessagesFetching,
+  } = useGetApiChatsMessages(
+    {
+      chatId: chatId as string,
+      pageNumber: pagination.currentPage || 1,
+      pageSize: pagination.pageSize,
+    },
+    {
+      query: {
+        enabled: !!chatId && isFocused,
+        staleTime: 5 * 60 * 1000, // 5 minutes cache
+        gcTime: 10 * 60 * 1000, // 10 minutes garbage collection
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+      },
+    },
+  );
+
   const usersPublicKey = useMemo(
     () => ({
       receiverPublicKey: publicKey as string,
@@ -121,71 +142,55 @@ export const useDetail = () => {
     }
   }, [contactChatId]);
 
-  const loadMessages = useCallback(
-    async (pageNumber: number) => {
-      if (isLoadingRef.current || !pagination.hasMore || !chatId) {
-        return;
-      }
+  // Process messages from React Query
+  useEffect(() => {
+    if (!messagesData?.success || !messagesData?.data?.messages?.data) return;
 
-      isLoadingRef.current = true;
-      setLoading(true);
+    const data = messagesData.data;
+    if (data?.isScreenShotEnable !== undefined) {
+      setIsScreenshotEnabled(data.isScreenShotEnable);
+    }
 
-      try {
-        const { data, success } = await getApiChatsMessages({
-          chatId: chatId as string,
-          pageNumber,
-          pageSize: pagination.pageSize,
-        });
+    const newMessages = data.messages?.data as MessageDto[];
+    const isFirstLoad = pagination.currentPage <= 1;
 
-        if (!isMountedRef.current) return;
+    const messagesResult = isFirstLoad
+      ? newMessages
+      : [...newMessages, ...messages];
+    setMessages(messagesResult);
 
-        if (success && data?.isScreenShotEnable !== undefined)
-          setIsScreenshotEnabled(data?.isScreenShotEnable);
+    // Initialize status for the new messages
+    setMessageStatuses((prevStatuses) => {
+      const newStatuses = new Map(prevStatuses);
+      messagesResult.forEach((messageData) => {
+        newStatuses.set(messageData.messageId, messageData.messageStatus);
+      });
+      return newStatuses;
+    });
 
-        if (success && data?.messages?.data) {
-          const newMessages = data.messages.data as MessageDto[];
-          const isFirstLoad = pageNumber === 1;
+    setPagination((prev) => ({
+      ...prev,
+      currentPage: data.messages?.pageNumber as number,
+      totalPages: data.messages?.totalPages as number,
+      hasMore:
+        (data.messages?.pageNumber as number) <
+        (data.messages?.totalPages as number),
+    }));
+  }, [messagesData]);
 
-          const messagesData = isFirstLoad
-            ? newMessages
-            : [...newMessages, ...messages];
-          setMessages(messagesData);
-
-          // Initialize status for the new message
-          setMessageStatuses((prevStatuses) => {
-            const newStatuses = new Map(prevStatuses);
-            messagesData.forEach((messageData) => {
-              newStatuses.set(messageData.messageId, messageData.messageStatus);
-            });
-            return newStatuses;
-          });
-
-          setPagination((prev) => ({
-            ...prev,
-            currentPage: data.messages?.pageNumber as number,
-            totalPages: data.messages?.totalPages as number,
-            hasMore:
-              (data.messages?.pageNumber as number) <
-              (data.messages?.totalPages as number),
-          }));
-
-          if (isFirstLoad && listRef.current) {
-            setTimeout(() => {
-              listRef.current?.scrollToEnd({ animated: true });
-            }, 100);
-          }
-        }
-      } catch (error) {
-        console.error("Error loading messages:", error);
-      } finally {
-        if (isMountedRef.current) {
-          setLoading(false);
-          isLoadingRef.current = false;
-        }
-      }
-    },
-    [chatId, pagination.pageSize, pagination.hasMore],
-  );
+  const loadMoreMessages = useCallback(() => {
+    if (isLoadingRef.current || !pagination.hasMore || !chatId) {
+      return;
+    }
+    isLoadingRef.current = true;
+    setPagination((prev) => ({
+      ...prev,
+      currentPage: prev.currentPage + 1,
+    }));
+    setTimeout(() => {
+      isLoadingRef.current = false;
+    }, 500);
+  }, [chatId, pagination.hasMore]);
 
   const initializeScreenshot = useCallback(async () => {
     if (isScreenshotEnabled) {
@@ -204,36 +209,29 @@ export const useDetail = () => {
   }, [isScreenshotEnabled]);
 
   useEffect(() => {
-    if (chatId) {
-      loadMessages(1);
-    }
-  }, [chatId]);
-
-  useEffect(() => {
     isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
     };
   }, []);
 
+  // For inverted list, load more when scrolling towards the top (which appears as bottom due to inversion)
+  const handleEndReached = useCallback(() => {
+    if (pagination.hasMore && !isLoadingRef.current && !isMessagesFetching) {
+      loadMoreMessages();
+    }
+  }, [pagination.hasMore, loadMoreMessages, isMessagesFetching]);
+
   const handleScroll = useMemo(
     () =>
       throttle(
-        (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-          const offsetY = e.nativeEvent.contentOffset.y;
-
-          if (
-            offsetY <= SCROLL_THRESHOLD &&
-            pagination.hasMore &&
-            !isLoadingRef.current
-          ) {
-            loadMessages(pagination.currentPage + 1);
-          }
+        (_e: NativeSyntheticEvent<NativeScrollEvent>) => {
+          // Scroll handling kept for future use if needed
         },
         1000,
         { leading: true, trailing: false },
       ),
-    [pagination.hasMore, pagination.currentPage, loadMessages],
+    [],
   );
 
   const handleReply = useCallback((message: MessageDto) => {
@@ -299,13 +297,8 @@ export const useDetail = () => {
 
       trackEvent("sendMessage: ", optimisticMessage);
 
-      // Add an optimistic message to the list
+      // Add an optimistic message to the list (at the beginning for inverted list)
       setMessages((prev) => [...prev, optimisticMessage]);
-
-      // Scroll to end
-      setTimeout(() => {
-        listRef.current?.scrollToEnd({ animated: true });
-      }, 100);
 
       try {
         const response = await sendApiMessage({
@@ -505,13 +498,14 @@ export const useDetail = () => {
         return newStatuses;
       });
 
-      setReceivedMessage(undefined);
+      // Invalidate messages cache for this chat
+      queryClient.invalidateQueries({
+        queryKey: getGetApiChatsMessagesQueryKey({ chatId: chatId as string }),
+      });
 
-      setTimeout(() => {
-        listRef.current?.scrollToEnd({ animated: true });
-      }, 100);
+      setReceivedMessage(undefined);
     },
-    [listRef, chatId],
+    [chatId, queryClient],
   );
 
   useEffect(() => {
@@ -712,32 +706,22 @@ export const useDetail = () => {
     [messages],
   );
 
-  useEffect(() => {
-    const handleKeyboardShow = () => {
-      setTimeout(() => {
-        listRef.current?.scrollToEnd({ animated: true });
-      }, 100);
-    };
-
-    const keyboardShowListener = Keyboard.addListener(
-      "keyboardDidShow",
-      handleKeyboardShow,
-    );
-
-    return () => {
-      keyboardShowListener?.remove();
-    };
-  }, []);
+  // Inverted groupedMessages for FlatList inverted prop
+  const invertedGroupedMessages = useMemo(
+    () => [...groupedMessages].reverse(),
+    [groupedMessages],
+  );
 
   return {
     t,
     router,
     listRef,
-    loading,
+    loading: isMessagesLoading && messages.length === 0,
+    isFetching: isMessagesFetching,
     actionRef,
     chatId: chatId as string,
     messages,
-    groupedMessages,
+    groupedMessages: invertedGroupedMessages,
     chatActionOptions,
     userName,
     currentUserName,
@@ -746,6 +730,7 @@ export const useDetail = () => {
     handleReply,
     onClearReply,
     handleScroll,
+    handleEndReached,
     handleSendMessage,
     getMessageStatus,
   };
