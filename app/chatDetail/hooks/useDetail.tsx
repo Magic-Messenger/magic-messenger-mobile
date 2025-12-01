@@ -13,10 +13,8 @@ import {
 import { useTranslation } from "react-i18next";
 import {
   Alert,
-  Keyboard,
   NativeScrollEvent,
   NativeSyntheticEvent,
-  Platform,
   TouchableOpacity,
 } from "react-native";
 import { CaptureProtection } from "react-native-capture-protection";
@@ -708,43 +706,10 @@ export const useDetail = () => {
     });
   }, [navigation, chatId]);
 
-  useEffect(() => {
-    const onKeyboardShow = () => {
-      setTimeout(() => {
-        listRef.current?.scrollToEnd({ animated: true });
-      }, 100);
-    };
-
-    const showEvent =
-      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
-    const subscription = Keyboard.addListener(showEvent, onKeyboardShow);
-
-    return () => {
-      subscription.remove && subscription.remove();
-    };
-  }, [listRef]);
-
   const groupedMessages = useMemo(
     () => groupMessagesByDate(messages),
     [messages],
   );
-
-  useEffect(() => {
-    let showSub = null;
-    if (listRef) {
-      showSub = Keyboard.addListener(
-        Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
-        (e) => {
-          console.log("keyboardWillShow: ", e.endCoordinates.screenY);
-          listRef.current?.scrollToOffset({ offset: e.endCoordinates.screenY });
-        },
-      );
-    }
-
-    return () => {
-      if (listRef && showSub) showSub.remove();
-    };
-  }, [listRef]);
 
   return {
     t,

@@ -13,10 +13,8 @@ import {
 import { useTranslation } from "react-i18next";
 import {
   Alert,
-  Keyboard,
   NativeScrollEvent,
   NativeSyntheticEvent,
-  Platform,
   TouchableOpacity,
 } from "react-native";
 
@@ -600,22 +598,6 @@ export const useDetail = () => {
         ) : null,
     });
   }, [navigation, chatId]);
-
-  useEffect(() => {
-    const onKeyboardShow = () => {
-      setTimeout(() => {
-        listRef.current?.scrollToEnd({ animated: true });
-      }, 100);
-    };
-
-    const showEvent =
-      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
-    const subscription = Keyboard.addListener(showEvent, onKeyboardShow);
-
-    return () => {
-      subscription.remove && subscription.remove();
-    };
-  }, [listRef]);
 
   const groupedMessages = useMemo(
     () => groupMessagesByDate(messages),
