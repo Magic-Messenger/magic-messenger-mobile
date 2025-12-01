@@ -13,6 +13,7 @@ import {
 import { useTranslation } from "react-i18next";
 import {
   Alert,
+  Keyboard,
   NativeScrollEvent,
   NativeSyntheticEvent,
   TouchableOpacity,
@@ -710,6 +711,23 @@ export const useDetail = () => {
     () => groupMessagesByDate(messages),
     [messages],
   );
+
+  useEffect(() => {
+    const handleKeyboardShow = () => {
+      setTimeout(() => {
+        listRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    };
+
+    const keyboardShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      handleKeyboardShow,
+    );
+
+    return () => {
+      keyboardShowListener?.remove();
+    };
+  }, []);
 
   return {
     t,

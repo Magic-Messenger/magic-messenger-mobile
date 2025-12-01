@@ -1,10 +1,7 @@
 import React from "react";
-import {
-  ImageBackground,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-} from "react-native";
+import { ImageBackground, StyleSheet, View } from "react-native";
+import { useReanimatedKeyboardAnimation } from "react-native-keyboard-controller";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Colors, Images } from "@/constants";
@@ -23,6 +20,11 @@ const HEADER_PADDING = spacingPixel(50);
 
 export function ChatLayout({ header, footer, children }: ChatLayoutProps) {
   const styles = useThemedStyles(createStyle);
+  const { height } = useReanimatedKeyboardAnimation();
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    paddingBottom: -height.value,
+  }));
 
   return (
     <GradientBackground
@@ -38,14 +40,13 @@ export function ChatLayout({ header, footer, children }: ChatLayoutProps) {
         edges={["top", "left", "right"]}
         style={[styles.container, { paddingTop: HEADER_PADDING }]}
       >
-        {header}
-        <KeyboardAvoidingView
-          style={styles.keyboardAvoidingView}
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-        >
-          {children}
+        <View style={styles.headerContainer}>{header}</View>
+
+        <View style={styles.contentContainer}>{children}</View>
+
+        <Animated.View style={[styles.footerContainer, animatedStyle]}>
           {footer}
-        </KeyboardAvoidingView>
+        </Animated.View>
       </SafeAreaView>
     </GradientBackground>
   );
@@ -55,21 +56,22 @@ const createStyle = () =>
   StyleSheet.create({
     gradient: {
       flex: 1,
-      position: "relative",
     },
     imageBackground: {
-      position: "absolute",
-      top: 0,
-      bottom: 0,
-      left: 0,
-      right: 0,
+      ...StyleSheet.absoluteFillObject,
       opacity: 0.1,
       height: "60%",
     },
     container: {
       flex: 1,
     },
-    keyboardAvoidingView: {
+    headerContainer: {
+      zIndex: 10,
+    },
+    contentContainer: {
       flex: 1,
+    },
+    footerContainer: {
+      backgroundColor: "transparent",
     },
   });
