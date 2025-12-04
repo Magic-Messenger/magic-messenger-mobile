@@ -78,12 +78,14 @@ public class ExpoTorModule: Module {
       let method = options?["method"] as? String ?? "GET"
       let headers = options?["headers"] as? [String: String]
       let body = options?["body"] as? String
+      let formData = options?["formData"] as? [String: Any]
 
       TorHTTPClient.shared.makeRequest(
         url: url,
         method: method,
         headers: headers,
-        body: body
+        body: body,
+        formData: formData
       ) { result in
         switch result {
         case .success(let response):

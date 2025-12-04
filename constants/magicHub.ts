@@ -6,6 +6,7 @@ import {
   CallingType,
   CallUserCommandRequest,
   ChangeTicketStatusCommandRequest,
+  ChatDto,
   IceCandidateCommandRequest,
   MessageDto,
   SendMessageCommandRequest,
@@ -98,6 +99,11 @@ export interface MessageSeenEvent {
   readBy: string;
 }
 
+export interface MessageReceivedEvent {
+  message: MessageDto;
+  chat: ChatDto;
+}
+
 export interface IncomingCallEvent {
   callerUsername: string;
   callingType: CallingType;
@@ -119,8 +125,8 @@ export interface MagicHubEvents {
   typing: TypingEvent;
   stop_typing: StopTypingEvent;
   you_blocked: YouBlockedEvent;
-  message_received: MessageDto;
-  group_message_received: MessageDto;
+  message_received: MessageReceivedEvent;
+  group_message_received: MessageReceivedEvent;
   message_delivered: MessageDeliveredEvent;
   message_seen: MessageSeenEvent;
   user_online: UserOnlineEvent;

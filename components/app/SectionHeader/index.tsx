@@ -6,8 +6,7 @@ import {
   ViewStyle,
 } from "react-native";
 
-import { flexBox, spacing } from "@/constants";
-
+import { flexBox, spacing } from "../../../constants/Style";
 import { ThemedText } from "../ThemedText";
 
 interface Props {

@@ -1,30 +1,30 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /Users/kadirbarcin/Desktop/Dev/ReactNative/magic-mobil-expo/modules/expo-tor/android/src/main/AndroidManifest.xml:1:1-11:12
-INJECTED from /Users/kadirbarcin/Desktop/Dev/ReactNative/magic-mobil-expo/modules/expo-tor/android/src/main/AndroidManifest.xml:1:1-11:12
+ADDED from /Users/omerakyol/Documents/GitHub/magic-messenger-mobile/modules/expo-tor/android/src/main/AndroidManifest.xml:1:1-11:12
+INJECTED from /Users/omerakyol/Documents/GitHub/magic-messenger-mobile/modules/expo-tor/android/src/main/AndroidManifest.xml:1:1-11:12
 	package
-		INJECTED from /Users/kadirbarcin/Desktop/Dev/ReactNative/magic-mobil-expo/modules/expo-tor/android/src/main/AndroidManifest.xml
+		INJECTED from /Users/omerakyol/Documents/GitHub/magic-messenger-mobile/modules/expo-tor/android/src/main/AndroidManifest.xml
 	xmlns:android
-		ADDED from /Users/kadirbarcin/Desktop/Dev/ReactNative/magic-mobil-expo/modules/expo-tor/android/src/main/AndroidManifest.xml:1:11-69
+		ADDED from /Users/omerakyol/Documents/GitHub/magic-messenger-mobile/modules/expo-tor/android/src/main/AndroidManifest.xml:1:11-69
 uses-permission#android.permission.INTERNET
-ADDED from /Users/kadirbarcin/Desktop/Dev/ReactNative/magic-mobil-expo/modules/expo-tor/android/src/main/AndroidManifest.xml:2:3-64
+ADDED from /Users/omerakyol/Documents/GitHub/magic-messenger-mobile/modules/expo-tor/android/src/main/AndroidManifest.xml:2:3-64
 	android:name
-		ADDED from /Users/kadirbarcin/Desktop/Dev/ReactNative/magic-mobil-expo/modules/expo-tor/android/src/main/AndroidManifest.xml:2:20-62
+		ADDED from /Users/omerakyol/Documents/GitHub/magic-messenger-mobile/modules/expo-tor/android/src/main/AndroidManifest.xml:2:20-62
 application
-ADDED from /Users/kadirbarcin/Desktop/Dev/ReactNative/magic-mobil-expo/modules/expo-tor/android/src/main/AndroidManifest.xml:4:3-10:17
+ADDED from /Users/omerakyol/Documents/GitHub/magic-messenger-mobile/modules/expo-tor/android/src/main/AndroidManifest.xml:4:3-10:17
 service#org.torproject.jni.TorService
-ADDED from /Users/kadirbarcin/Desktop/Dev/ReactNative/magic-mobil-expo/modules/expo-tor/android/src/main/AndroidManifest.xml:5:5-9:15
+ADDED from /Users/omerakyol/Documents/GitHub/magic-messenger-mobile/modules/expo-tor/android/src/main/AndroidManifest.xml:5:5-9:15
 	android:enabled
-		ADDED from /Users/kadirbarcin/Desktop/Dev/ReactNative/magic-mobil-expo/modules/expo-tor/android/src/main/AndroidManifest.xml:7:7-29
+		ADDED from /Users/omerakyol/Documents/GitHub/magic-messenger-mobile/modules/expo-tor/android/src/main/AndroidManifest.xml:7:7-29
 	android:exported
-		ADDED from /Users/kadirbarcin/Desktop/Dev/ReactNative/magic-mobil-expo/modules/expo-tor/android/src/main/AndroidManifest.xml:8:7-31
+		ADDED from /Users/omerakyol/Documents/GitHub/magic-messenger-mobile/modules/expo-tor/android/src/main/AndroidManifest.xml:8:7-31
 	android:name
-		ADDED from /Users/kadirbarcin/Desktop/Dev/ReactNative/magic-mobil-expo/modules/expo-tor/android/src/main/AndroidManifest.xml:6:7-51
+		ADDED from /Users/omerakyol/Documents/GitHub/magic-messenger-mobile/modules/expo-tor/android/src/main/AndroidManifest.xml:6:7-51
 uses-sdk
-INJECTED from /Users/kadirbarcin/Desktop/Dev/ReactNative/magic-mobil-expo/modules/expo-tor/android/src/main/AndroidManifest.xml reason: use-sdk injection requested
-INJECTED from /Users/kadirbarcin/Desktop/Dev/ReactNative/magic-mobil-expo/modules/expo-tor/android/src/main/AndroidManifest.xml
-INJECTED from /Users/kadirbarcin/Desktop/Dev/ReactNative/magic-mobil-expo/modules/expo-tor/android/src/main/AndroidManifest.xml
+INJECTED from /Users/omerakyol/Documents/GitHub/magic-messenger-mobile/modules/expo-tor/android/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/omerakyol/Documents/GitHub/magic-messenger-mobile/modules/expo-tor/android/src/main/AndroidManifest.xml
+INJECTED from /Users/omerakyol/Documents/GitHub/magic-messenger-mobile/modules/expo-tor/android/src/main/AndroidManifest.xml
 	android:targetSdkVersion
-		INJECTED from /Users/kadirbarcin/Desktop/Dev/ReactNative/magic-mobil-expo/modules/expo-tor/android/src/main/AndroidManifest.xml
+		INJECTED from /Users/omerakyol/Documents/GitHub/magic-messenger-mobile/modules/expo-tor/android/src/main/AndroidManifest.xml
 	android:minSdkVersion
-		INJECTED from /Users/kadirbarcin/Desktop/Dev/ReactNative/magic-mobil-expo/modules/expo-tor/android/src/main/AndroidManifest.xml
+		INJECTED from /Users/omerakyol/Documents/GitHub/magic-messenger-mobile/modules/expo-tor/android/src/main/AndroidManifest.xml

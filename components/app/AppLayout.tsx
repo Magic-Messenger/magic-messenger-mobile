@@ -1,4 +1,3 @@
-import { LinearGradient } from "expo-linear-gradient";
 import React, { memo, useMemo } from "react";
 import {
   ActivityIndicator,
@@ -8,11 +7,16 @@ import {
   View,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 import { Colors, Images, spacing } from "@/constants";
 import { useThemedStyles } from "@/theme";
 
+import { needsBottomSafeArea, spacingPixel } from "../../utils/pixelHelper";
+import { GradientBackground } from "../ui/GradientBackground";
 import { ThemedText } from "./ThemedText";
 import { TorBadge } from "./TorBadge";
 
@@ -34,14 +38,23 @@ function AppLayout({
   loading = false,
   container = false,
   scrollable = false,
-  safeAreaBottom = false,
+  safeAreaBottom,
   safeAreaPadding = true,
   title,
   showBadge = true,
   footer,
   keyboardAvoiding = false,
 }: AppLayoutProps) {
+  const insets = useSafeAreaInsets();
+
   const styles = useThemedStyles(createStyle);
+
+  const shouldApplyBottomSafeArea = useMemo(() => {
+    if (safeAreaBottom !== undefined) {
+      return safeAreaBottom;
+    }
+    return needsBottomSafeArea() || insets.bottom > 0;
+  }, [safeAreaBottom, insets.bottom]);
 
   // Memoize container type to prevent unnecessary re-renders
   const Container: React.ElementType = useMemo(() => {
@@ -66,7 +79,7 @@ function AppLayout({
         showsVerticalScrollIndicator: false,
         showsHorizontalScrollIndicator: false,
         bounces: false,
-        overScrollMode: "never" as const, // Android
+        overScrollMode: "never" as const,
       };
     }
 
@@ -77,7 +90,7 @@ function AppLayout({
         showsVerticalScrollIndicator: false,
         showsHorizontalScrollIndicator: false,
         bounces: false,
-        overScrollMode: "never" as const, // Android
+        overScrollMode: "never" as const,
       };
     }
 
@@ -88,11 +101,13 @@ function AppLayout({
     styles.content,
     styles.contentPadding,
     safeAreaPadding,
+    shouldApplyBottomSafeArea,
+    insets.bottom,
   ]);
 
   return (
     <View style={styles.wrapper}>
-      <LinearGradient
+      <GradientBackground
         colors={Colors.backgroundColor as never}
         style={[styles.gradient, container ? styles.container : undefined]}
       >
@@ -104,7 +119,7 @@ function AppLayout({
         <SafeAreaView
           style={styles.safeArea}
           edges={
-            safeAreaBottom || !!footer
+            shouldApplyBottomSafeArea || !!footer
               ? ["top", "left", "right", "bottom"]
               : ["top", "left", "right"]
           }
@@ -143,9 +158,18 @@ function AppLayout({
             {children}
           </Container>
 
-          {footer && <>{footer}</>}
+          {footer && (
+            <View
+              style={{
+                paddingTop: spacingPixel(16),
+                paddingBottom: shouldApplyBottomSafeArea ? spacingPixel(16) : 0,
+              }}
+            >
+              {footer}
+            </View>
+          )}
         </SafeAreaView>
-      </LinearGradient>
+      </GradientBackground>
 
       {loading && (
         <View style={styles.loadingOverlay}>

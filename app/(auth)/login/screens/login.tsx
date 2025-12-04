@@ -21,11 +21,11 @@ export default function LoginScreen() {
     control,
     errors,
     styles,
-    isSubmitting,
+    isLoading,
     handleSubmit,
     onSubmit,
     userName,
-    profile,
+    showDeleteButton,
     isDeleteAccountLoading,
     handleChangeAccount,
     handleDeleteAccount,
@@ -42,8 +42,8 @@ export default function LoginScreen() {
             type="primary"
             label={t("login.button")}
             onPress={handleSubmit(onSubmit)}
-            loading={isSubmitting}
-            disabled={isSubmitting}
+            loading={isLoading}
+            disabled={isLoading}
             leftIcon={<Icon type="feather" name="log-in" />}
           />
 
@@ -65,7 +65,7 @@ export default function LoginScreen() {
                 leftIcon={<Icon type="feather" name="refresh-ccw" />}
               />
 
-              {profile?.deleteButton && (
+              {showDeleteButton && (
                 <Button
                   type="danger"
                   label={t("login.deleteAccount")}
@@ -134,6 +134,7 @@ export default function LoginScreen() {
             control={control}
             errors={errors.password?.message}
             placeholder="login.password"
+            onEndEditing={() => handleSubmit(onSubmit)}
           />
         </View>
       </View>

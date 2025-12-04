@@ -3,8 +3,8 @@ import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 import { AppImage, ThemedText } from "@/components";
 import { useThemedStyles } from "@/theme";
-import { spacingPixel } from "@/utils";
 
+import { spacingPixel } from "../../../../utils/pixelHelper";
 import { ReplyMessageItem } from "../ReplyMessageItem";
 import { MessageFooter } from "./MessageFooter";
 import { MessageContentProps } from "./types";
@@ -16,12 +16,13 @@ export function ImageMessage({
   createdAt,
   messageStatus,
   isLoading,
+  isReply = false,
 }: MessageContentProps) {
   const styles = useThemedStyles(createStyle);
 
   return (
     <View style={styles.container}>
-      <ReplyMessageItem message={decryptedReplyMessage} />
+      {!isReply && <ReplyMessageItem message={decryptedReplyMessage} />}
 
       {isLoading ? (
         <View style={styles.loadingContainer}>
@@ -30,17 +31,20 @@ export function ImageMessage({
         </View>
       ) : (
         <AppImage
+          showDetail
           source={{ uri: decryptedContent as string }}
           style={styles.image}
           resizeMode="cover"
         />
       )}
 
-      <MessageFooter
-        createdAt={createdAt}
-        isSentByCurrentUser={isSentByCurrentUser}
-        messageStatus={messageStatus}
-      />
+      {!isReply && (
+        <MessageFooter
+          createdAt={createdAt as string}
+          isSentByCurrentUser={isSentByCurrentUser as boolean}
+          messageStatus={messageStatus}
+        />
+      )}
     </View>
   );
 }

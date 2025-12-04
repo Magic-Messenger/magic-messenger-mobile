@@ -7,17 +7,31 @@ import {
   postApiChatsMessageDelivered,
   postApiChatsMessageRead,
 } from "@/api/endpoints/magicMessenger";
-import { trackEvent } from "@/utils";
+
+import { trackEvent } from "../../utils/helper";
+
+type DeliveredMessageNotificationData = {
+  ChatId: string;
+  MessageId: string;
+};
+
+Notifications.setNotificationHandler({
+  handleNotification: async () =>
+    ({
+      shouldShowBanner: false,
+      shouldShowList: false,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+    }) as NotificationBehavior,
+});
 
 if (Platform.OS === "android")
-  Notifications.setNotificationHandler({
-    handleNotification: async () =>
-      ({
-        shouldShowBanner: false,
-        shouldShowList: false,
-        shouldPlaySound: false,
-        shouldSetBadge: true,
-      }) as NotificationBehavior,
+  Notifications.setNotificationChannelAsync("default", {
+    name: "Default",
+    importance: Notifications.AndroidImportance.MAX,
+    sound: "default",
+    vibrationPattern: [0, 250, 250, 250],
+    lightColor: "#FF231F7C",
   });
 
 // --- Delivered listener (foreground + background) ---
@@ -25,15 +39,21 @@ export const registerDeliveredListener = () => {
   Notifications.addNotificationReceivedListener(async (notification) => {
     try {
       const messageData = notification.request.content.data;
-      if (!messageData && !messageData?.ChatId && messageData?.MessageId)
-        return;
+      if (!messageData) return;
 
-      trackEvent("📩 Message delivered:", messageData);
+      const deliveredMessageNotificationData =
+        messageData as DeliveredMessageNotificationData;
+      if (
+        deliveredMessageNotificationData.ChatId &&
+        deliveredMessageNotificationData.MessageId
+      ) {
+        trackEvent("📩 Message delivered:", messageData);
 
-      await postApiChatsMessageDelivered({
-        chatId: messageData?.ChatId as string,
-        messageId: messageData?.MessageId as string,
-      });
+        await postApiChatsMessageDelivered({
+          chatId: deliveredMessageNotificationData.ChatId,
+          messageId: deliveredMessageNotificationData.MessageId,
+        });
+      }
     } catch (err) {
       trackEvent("Delivered handler failed:", { err });
     }
@@ -45,15 +65,21 @@ export const registerOpenedListener = () => {
   Notifications.addNotificationResponseReceivedListener(async (response) => {
     try {
       const messageData = response.notification.request.content.data;
-      if (!messageData && !messageData?.ChatId && messageData?.MessageId)
-        return;
+      if (!messageData) return;
 
-      trackEvent("👆 Message opened:", messageData);
+      const deliveredMessageNotificationData =
+        messageData as DeliveredMessageNotificationData;
+      if (
+        deliveredMessageNotificationData.ChatId &&
+        deliveredMessageNotificationData.MessageId
+      ) {
+        trackEvent("👆 Message opened:", messageData);
 
-      await postApiChatsMessageRead({
-        chatId: messageData?.ChatId as string,
-        messageId: messageData?.MessageId as string,
-      });
+        await postApiChatsMessageRead({
+          chatId: deliveredMessageNotificationData.ChatId,
+          messageId: deliveredMessageNotificationData.MessageId,
+        });
+      }
     } catch (err) {
       trackEvent("Opened handler failed:", { err });
     }

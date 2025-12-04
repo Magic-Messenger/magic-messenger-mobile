@@ -1,4 +1,3 @@
-import { LinearGradient } from "expo-linear-gradient";
 import { useCallback, useEffect, useState } from "react";
 import {
   LayoutAnimation,
@@ -13,9 +12,11 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { Icon, ThemedText } from "@/components";
-import { Colors, Fonts, spacing } from "@/constants";
+import { Fonts, spacing } from "@/constants";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { fontPixel, spacingPixel } from "@/utils";
+
+import { fontPixel, spacingPixel } from "../../../utils/pixelHelper";
+import { GradientBackground } from "../../ui/GradientBackground";
 
 type CollapsibleProps = {
   question: string;
@@ -76,11 +77,7 @@ export const Collapsible = ({
         </Animated.View>
       </TouchableOpacity>
 
-      <LinearGradient
-        colors={Colors.buttonPrimary as never}
-        start={{ y: 0, x: 1 }}
-        end={{ y: 1, x: 0 }}
-      >
+      <GradientBackground>
         <Animated.View style={animatedStyle}>
           <ThemedText style={styles.answer}>{answer}</ThemedText>
         </Animated.View>
@@ -97,7 +94,7 @@ export const Collapsible = ({
             <ThemedText style={styles.answer}>{answer}</ThemedText>
           </View>
         )}
-      </LinearGradient>
+      </GradientBackground>
     </View>
   );
 };

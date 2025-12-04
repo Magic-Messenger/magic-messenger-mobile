@@ -6,9 +6,12 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { TicketMessageDto } from "@/api/models";
-import { ThemedText } from "@/components";
+import { GradientBackground, ThemedText } from "@/components";
+import { Colors } from "@/constants/Colors";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { dateFormatter, spacingPixel } from "@/utils";
+
+import { dateFormatter } from "../../../utils/helper";
+import { spacingPixel } from "../../../utils/pixelHelper";
 
 export function TicketMessageItem(props: TicketMessageDto) {
   const styles = useThemedStyles(createStyle);
@@ -47,13 +50,15 @@ export function TicketMessageItem(props: TicketMessageDto) {
 
   return (
     <View style={styles.messageWrapper}>
-      <Animated.View
-        style={[
-          animatedStyle,
-          isMyMessage ? styles.senderContainer : styles.receiverContainer,
-        ]}
-      >
-        {renderMessageContent}
+      <Animated.View style={[animatedStyle]}>
+        <GradientBackground
+          colors={isMyMessage ? Colors.buttonPrimary : Colors.buttonSecondary}
+          style={[
+            isMyMessage ? styles.senderContainer : styles.receiverContainer,
+          ]}
+        >
+          {renderMessageContent}
+        </GradientBackground>
       </Animated.View>
     </View>
   );
@@ -69,7 +74,7 @@ const createStyle = (colors: ColorDto) =>
     },
     senderContainer: {
       alignSelf: "flex-end",
-      backgroundColor: colors.primary,
+      /* backgroundColor: colors.primary, */
       borderRadius: spacingPixel(8),
       borderBottomRightRadius: 0,
       padding: spacingPixel(10),

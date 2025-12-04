@@ -12,8 +12,12 @@ import {
 
 import { Button, Icon, Input } from "@/components";
 import { Colors, Fonts } from "@/constants";
-import { fontPixel, heightPixel, spacingPixel } from "@/utils";
 
+import {
+  fontPixel,
+  heightPixel,
+  spacingPixel,
+} from "../../../utils/pixelHelper";
 import { ThemedText } from "../../app/ThemedText";
 
 export interface DropdownOption {

@@ -34,8 +34,10 @@ class TorHttpClient {
     // Tor hazır değilse hata fırlat
     if (!TorManager.isReady()) {
       const status = TorManager.getConnectionStatus();
+      console.error("❌ [TOR] Tor is not ready!", status);
+      TorManager.logStatus();
       throw new Error(
-        `Tor is not ready. Status: enabled=${status.enabled}, connected=${status.connected}`,
+        `Tor is not ready. Status: enabled=${status.enabled}, connected=${status.connected}, socksPort=${status.socksPort}`,
       );
     }
 
@@ -60,8 +62,37 @@ class TorHttpClient {
         headers: config.headers || {},
       };
 
-      // Body ekle (POST, PUT, PATCH için)
-      if (config.data && ["POST", "PUT", "PATCH"].includes(options.method!)) {
+      // FormData varsa onu kullan
+      if (config.data instanceof FormData) {
+        // FormData'yı native modülün anlayacağı formata çevir
+        const formDataObj: Record<string, any> = {};
+
+        // @ts-ignore - FormData'nın _parts özelliğine erişim (React Native FormData)
+        const parts = config.data._parts || [];
+
+        parts.forEach(([key, value]: [string, any]) => {
+          // Eğer value bir obje ise (dosya), düzleştir
+          if (typeof value === "object" && value !== null && "uri" in value) {
+            // Dosya objesi - düzleştirerek gönder
+            formDataObj[key] = {
+              uri: value.uri || "",
+              name: value.name || "file",
+              type: value.type || "application/octet-stream",
+            };
+          } else {
+            // String veya diğer tipler
+            formDataObj[key] = value;
+          }
+        });
+
+        options.formData = formDataObj;
+        options.headers!["Content-Type"] = "multipart/form-data";
+      }
+      // Normal body ekle (POST, PUT, PATCH için)
+      else if (
+        config.data &&
+        ["POST", "PUT", "PATCH"].includes(options.method!)
+      ) {
         if (typeof config.data === "object") {
           options.body = JSON.stringify(config.data);
           if (!options.headers!["Content-Type"]) {

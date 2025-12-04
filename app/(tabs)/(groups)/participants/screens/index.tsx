@@ -29,61 +29,108 @@ export default function ParticipantsScreen() {
   const { participants, setParticipants, removeParticipant } =
     useGroupChatCreateStore();
 
-  const { data: contactData, refetch } = useGetApiContactsList();
+  const { data: contactData, refetch, isLoading } = useGetApiContactsList();
 
   const [searchText, setSearchText] = useState<string>("");
 
+  // Filtered contacts with memoization
   const filteredData = useMemo(() => {
-    return contactData?.data?.filter((x) =>
-      x.nickname?.toLocaleLowerCase()?.includes(searchText?.toLowerCase()),
+    if (!contactData?.data) return [];
+
+    const searchLower = searchText?.toLowerCase()?.trim();
+    if (!searchLower) return contactData.data;
+
+    return contactData.data.filter((contact) =>
+      contact.nickname?.toLowerCase()?.includes(searchLower),
     );
   }, [searchText, contactData?.data]);
 
-  const handleSelectContact = useCallback(
-    (contact: ContactDto) => {
-      if (
-        participants?.find(
-          (x) => x?.contactUsername === contact?.contactUsername,
-        )
-      ) {
-        removeParticipant(contact?.contactUsername as string);
-      } else {
-        setParticipants(contact);
-      }
+  // Check if contact is selected
+  const isContactSelected = useCallback(
+    (contactUsername: string) => {
+      return participants?.some((p) => p.contactUsername === contactUsername);
     },
     [participants],
   );
 
-  const renderContactItem = useCallback(
-    ({ item }: { item: ContactDto }) => (
-      <ContactItem
-        nickname={item.nickname as string}
-        contactUsername={item.contactUsername as string}
-        onAction={{
-          onPress: () => handleSelectContact(item),
-        }}
-        customAction={
-          participants?.find(
-            (x) => x.contactUsername === item.contactUsername,
-          ) ? (
-            <Icon type="ant" name="checkcircle" color={colors.colors.white} />
-          ) : (
-            <></>
-          )
-        }
-      />
-    ),
-    [handleSelectContact, participants],
+  // Handle contact selection toggle
+  const handleSelectContact = useCallback(
+    (contact: ContactDto) => {
+      const username = contact.contactUsername as string;
+
+      if (isContactSelected(username)) {
+        removeParticipant(username);
+      } else {
+        setParticipants(contact);
+      }
+    },
+    [isContactSelected, removeParticipant, setParticipants],
   );
 
+  // Render contact item
+  const renderContactItem = useCallback(
+    ({ item }: { item: ContactDto }) => {
+      const isSelected = isContactSelected(item.contactUsername as string);
+
+      return (
+        <ContactItem
+          nickname={item.nickname as string}
+          contactUsername={item.contactUsername as string}
+          onAction={{
+            onPress: () => handleSelectContact(item),
+          }}
+          customAction={
+            isSelected ? (
+              <Icon
+                type="feather"
+                name="check-circle"
+                color={colors.colors.white}
+              />
+            ) : null
+          }
+        />
+      );
+    },
+    [handleSelectContact, isContactSelected, colors.colors.white],
+  );
+
+  // Key extractor for FlashList
+  const keyExtractor = useCallback(
+    (item: ContactDto) => item.contactUsername || item.nickname || "",
+    [],
+  );
+
+  // Handle modal close
   const handleSelectParticipants = useCallback(() => {
     modalRef.current?.close();
-  }, [modalRef]);
+  }, []);
 
+  // Handle search input
+  const handleSearchChange = useCallback((text: string) => {
+    setSearchText(text);
+  }, []);
+
+  // Refetch on screen focus
   useFocusEffect(
     useCallback(() => {
       refetch();
-    }, []),
+    }, [refetch]),
+  );
+
+  // Empty list component
+  const renderEmptyList = useCallback(
+    () => (
+      <>
+        {!isLoading && (
+          <EmptyList
+            label={t("contacts.notFound")}
+            icon="frown"
+            style={styles.mt10}
+          />
+        )}
+      </>
+    ),
+    [t, styles.mt10, isLoading],
   );
 
   return (
@@ -101,11 +148,12 @@ export default function ParticipantsScreen() {
       >
         <Input
           placeholder={t("common.search")}
-          style={[styles.mb5]}
-          onChangeText={(_text) => setSearchText(_text)}
+          style={styles.mb5}
+          onChangeText={handleSearchChange}
+          value={searchText}
           rightIcon={{
-            type: "ant",
-            name: "search1",
+            type: "feather",
+            name: "search",
           }}
           inputStyle={{
             backgroundColor: colors.colors.secondarySelected,
@@ -114,16 +162,17 @@ export default function ParticipantsScreen() {
         />
         <FlashList
           data={filteredData}
-          contentContainerStyle={{ gap: spacingPixel(10) }}
-          keyExtractor={(_, index) => index?.toString()}
+          contentContainerStyle={{ paddingBottom: spacingPixel(10) }}
+          keyExtractor={keyExtractor}
           renderItem={renderContactItem}
-          ListEmptyComponent={
-            <EmptyList
-              label={t("contacts.notFound")}
-              icon="frown"
-              style={styles.mt10}
-            />
-          }
+          ListEmptyComponent={renderEmptyList}
+          drawDistance={400}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+          removeClippedSubviews
+          maintainVisibleContentPosition={{
+            autoscrollToTopThreshold: 10,
+          }}
         />
 
         <Button

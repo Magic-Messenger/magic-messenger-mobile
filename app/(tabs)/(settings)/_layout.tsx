@@ -119,6 +119,13 @@ export default function SettingsStack() {
           headerShown: true,
         }}
       />
+
+      <Stack.Screen
+        name="changePassword/index"
+        options={{
+          headerShown: true,
+        }}
+      />
     </Stack>
   );
 }

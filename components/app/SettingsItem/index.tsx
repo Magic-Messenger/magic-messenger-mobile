@@ -11,8 +11,8 @@ import {
 import { ThemedText } from "@/components";
 import { Colors, flexBox, Fonts, spacing } from "@/constants";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { fontPixel, heightPixel, widthPixel } from "@/utils";
 
+import { fontPixel, heightPixel, widthPixel } from "../../../utils/pixelHelper";
 import { SettingsItemOption, SettingsItemType } from "./type";
 
 const SettingsItem = (props: SettingsItemType) => {
@@ -64,17 +64,21 @@ const SettingsItem = (props: SettingsItemType) => {
             renderItem={renderItem}
           />
         ) : (
-          <Switch
-            thumbColor={Colors.white}
-            trackColor={{
-              true: Colors.primary,
-              false: Colors.inactiveColor,
-            }}
-            ios_backgroundColor={value ? Colors.primary : Colors.inactiveColor}
-            value={value as boolean}
-            onValueChange={handleOnValueChanged}
-            style={{ transform: [{ scale: 0.75 }] }}
-          />
+          <View>
+            <Switch
+              thumbColor={Colors.white}
+              trackColor={{
+                true: Colors.primary,
+                false: Colors.inactiveColor,
+              }}
+              ios_backgroundColor={
+                value ? Colors.primary : Colors.inactiveColor
+              }
+              value={value as boolean}
+              onValueChange={handleOnValueChanged}
+              style={{ transform: [{ scale: 0.75 }] }}
+            />
+          </View>
         )}
       </View>
     </View>

@@ -1,20 +1,45 @@
+import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
 
+import { MessageType } from "@/api/models";
 import { Icon } from "@/components/ui";
 import { ColorDto, useColor, useThemedStyles } from "@/theme";
-import { spacingPixel } from "@/utils";
 
+import { spacingPixel } from "../../../../utils/pixelHelper";
 import { ThemedText } from "../../ThemedText";
+import { AudioMessage } from "../MessageItem/AudioMessage";
+import { ImageMessage } from "../MessageItem/ImageMessage";
+import { TextMessage } from "../MessageItem/TextMessage";
+import { VideoMessage } from "../MessageItem/VideoMessage";
 
 interface ReplyMessageItemProps {
   message?: any;
+  replyMessageType?: MessageType;
 }
 
-export function ReplyMessageItem({ message }: ReplyMessageItemProps) {
+export function ReplyMessageItem({
+  message,
+  replyMessageType,
+}: ReplyMessageItemProps) {
   const { t } = useTranslation();
   const styles = useThemedStyles(createStyles);
   const colors = useColor();
+
+  const renderMessageContent = useCallback(() => {
+    switch (replyMessageType) {
+      case MessageType.Text:
+        return <TextMessage isReply={true} decryptedContent={message} />;
+      case MessageType.Audio:
+        return <AudioMessage isReply={true} decryptedContent={message} />;
+      case MessageType.Image:
+        return <ImageMessage isReply={true} decryptedContent={message} />;
+      case MessageType.Video:
+        return <VideoMessage isReply={true} decryptedContent={message} />;
+      default:
+        return null;
+    }
+  }, [message, replyMessageType]);
 
   if (!message) return null;
 
@@ -25,9 +50,7 @@ export function ReplyMessageItem({ message }: ReplyMessageItemProps) {
       </View>
       <View style={styles.contentContainer}>
         <ThemedText style={styles.label}>{t("chat.repliedMessage")}</ThemedText>
-        <ThemedText numberOfLines={2} style={styles.message}>
-          {message}
-        </ThemedText>
+        {renderMessageContent()}
       </View>
     </View>
   );
@@ -53,8 +76,7 @@ const createStyles = (colors: ColorDto) =>
       marginRight: spacingPixel(8),
     },
     contentContainer: {
-      flex: 1,
-      gap: spacingPixel(2),
+      gap: spacingPixel(10),
     },
     label: {
       fontSize: spacingPixel(10),

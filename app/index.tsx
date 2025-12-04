@@ -3,16 +3,15 @@ import "@/i18n";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
 
-import { useGetApiAccountGetProfile } from "@/api/endpoints/magicMessenger";
 import { AppLayout, ThemedText } from "@/components";
 import { Images } from "@/constants";
 import {
   registerForPushNotificationsAsync,
   setupNotificationListeners,
 } from "@/services";
-import { useTor } from "@/services/axios/tor";
 import { useUserStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
 import {
@@ -25,27 +24,25 @@ import {
 } from "@/utils";
 
 export default function IndexPage() {
-  const isLogin = useUserStore((state) => state.isLogin);
+  const { t } = useTranslation();
   const rehydrated = useUserStore((state) => state.rehydrated);
-  const profile = useUserStore((state) => state.profile);
-  const setProfile = useUserStore((state) => state.setProfile);
-
-  const { startTor, isConnected: isTorConnected } = useTor();
 
   const styles = useThemedStyles(createStyle);
 
-  const { data: profileResponse, refetch } = useGetApiAccountGetProfile({
-    query: { enabled: isLogin },
-  });
-
-  const [appStarted, setAppStarted] = useState<boolean>(false);
   const [connected, setConnected] = useState<boolean>(false);
   const [dots, setDots] = useState<string>("");
 
-  let interval: number = 0;
+  useEffect(() => {
+    if (!rehydrated) return; // 👈 wait for the store to be ready
 
-  const setupInterval = () => {
-    interval = setInterval(() => {
+    const userPublicKeyCheck = checkUserCredentials();
+    if (!userPublicKeyCheck) {
+      generateKeyPairs();
+    }
+    registerForPushNotificationsAsync();
+    setupNotificationListeners();
+
+    const interval = setInterval(() => {
       setDots((prev) => {
         if (prev.length >= 3) {
           return "";
@@ -53,95 +50,26 @@ export default function IndexPage() {
         return prev + ".";
       });
     }, 1000);
-  };
 
-  const initializeTor = async () => {
-    try {
-      await startTor();
-    } catch (err) {
-      trackEvent("initializeTor error: ", { err });
-    }
-
-    initializeAppStart();
-  };
-
-  const initializeAppStart = async (withTimeout?: boolean) => {
-    if (withTimeout) {
-      setTimeout(() => {
-        setConnected(true);
-
-        clearTimeout(interval);
-        setAppStarted(true);
-
-        setTimeout(() => {
-          if (isLogin) {
-            //router.replace("/home");
-            router.push("/(calling)/videoCalling/screens");
-          } else {
-            router.replace("/(auth)/preLogin");
-          }
-        }, 500);
-      }, 2500);
-    } else {
+    const timeout = setTimeout(() => {
       setConnected(true);
-
       clearTimeout(interval);
-      setAppStarted(true);
 
       setTimeout(() => {
-        if (isLogin) {
-          //router.replace("/home");
-          router.push("/(calling)/videoCalling/screens");
+        const currentUser = useUserStore.getState().userName;
+        if (currentUser) {
+          router.replace("/(auth)/login/screens/login");
         } else {
           router.replace("/(auth)/preLogin");
         }
-      }, 1500);
-    }
-  };
+      }, 500);
+    }, 3000);
 
-  useEffect(() => {
-    setupInterval();
-  }, []);
-
-  useEffect(() => {
-    if (!rehydrated || appStarted) return;
-
-    if (profile?.enableTor) {
-      if (!isTorConnected) {
-        initializeTor();
-      } else initializeAppStart();
-    } else {
-      // When TOR is disabled, we simulate a connection delay
-      initializeAppStart(true);
-    }
-  }, [rehydrated, appStarted, profile, isTorConnected]);
-
-  useEffect(() => {
-    trackEvent("app_open", { isLogin, rehydrated });
-  }, [isLogin, rehydrated]);
-
-  useEffect(() => {
-    if (isLogin && profileResponse?.data) setProfile(profileResponse?.data);
-  }, [isLogin, profileResponse?.data]);
-
-  useEffect(() => {
-    if (isLogin) refetch();
-  }, [isLogin]);
-
-  useEffect(() => {
-    registerForPushNotificationsAsync();
-  }, []);
-
-  useEffect(() => {
-    setupNotificationListeners();
-  }, []);
-
-  useEffect(() => {
-    const userPublicKeyCheck = checkUserCredentials();
-    if (!userPublicKeyCheck) {
-      generateKeyPairs();
-    }
-  }, []);
+    return () => {
+      clearTimeout(interval);
+      clearTimeout(timeout);
+    };
+  }, [rehydrated]);
 
   useMemo(() => {
     if (__DEV__) {
@@ -193,23 +121,10 @@ export default function IndexPage() {
                 connected ? styles.active : styles.inActive,
               ]}
             />
-            <ThemedText type="default">Connecting{dots}</ThemedText>
-          </View>
-          <View
-            style={[
-              styles.flexRow,
-              styles.justifyContentStart,
-              styles.alignItemsCenter,
-              styles.gap3,
-            ]}
-          >
-            <View
-              style={[
-                styles.badgeStatus,
-                isTorConnected ? styles.active : styles.inActive,
-              ]}
-            />
-            <ThemedText type="default">TOR</ThemedText>
+            <ThemedText type="default">
+              {t("connecting")}
+              {dots}
+            </ThemedText>
           </View>
           <View
             style={[
@@ -220,7 +135,7 @@ export default function IndexPage() {
             ]}
           >
             <View style={[styles.badgeStatus, styles.active]} />
-            <ThemedText type="default">Encryption</ThemedText>
+            <ThemedText type="default">{t("encryption")}</ThemedText>
           </View>
         </View>
       </View>

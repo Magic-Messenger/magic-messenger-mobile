@@ -1,24 +1,26 @@
+import LogRocket from "@logrocket/react-native";
 import { router } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { Alert, StyleSheet } from "react-native";
 
 import {
+  getApiAccountGetProfile,
   useDeleteApiAccountDeleteProfile,
-  useGetApiAccountGetProfile,
   usePostApiAccountLogin,
   usePostApiAccountRegisterDeviceToken,
   usePostApiAccountUpdatePublicKey,
 } from "@/api/endpoints/magicMessenger";
 import { flexBox, spacing } from "@/constants";
 import { registerForPushNotificationsAsync } from "@/services";
-import { useUserStore } from "@/store";
+import { useTorStore, useUserStore } from "@/store";
 import { useThemedStyles } from "@/theme";
 import {
   fontPixel,
   getInstallationId,
   heightPixel,
+  trackEvent,
   userPublicKey,
   widthPixel,
 } from "@/utils";
@@ -29,13 +31,19 @@ interface RegisterFormData {
 }
 
 export const useLogin = () => {
+  const styles = useThemedStyles(createStyle);
   const { t } = useTranslation();
-  const { login, userName, isLogin, profile, setProfile, setUsername } =
-    useUserStore();
+
+  const {
+    login,
+    userName,
+    profile,
+    setProfile,
+    setUsername,
+    showDeleteButton,
+    setShowDeleteButton,
+  } = useUserStore();
   const { mutateAsync: loginApi } = usePostApiAccountLogin();
-  const { data: profileResponse, refetch } = useGetApiAccountGetProfile({
-    query: { enabled: isLogin },
-  });
   const { mutateAsync: updatePublicKeyApi } =
     usePostApiAccountUpdatePublicKey();
   const { mutateAsync: registerDeviceToken } =
@@ -43,18 +51,20 @@ export const useLogin = () => {
   const { mutateAsync: deleteAccount, isPending: isDeleteAccountLoading } =
     useDeleteApiAccountDeleteProfile();
 
-  const styles = useThemedStyles(createStyle);
+  const startTor = useTorStore((state) => state.startTor);
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const {
     control,
     handleSubmit,
     reset,
     watch,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<RegisterFormData>({
     defaultValues: {
-      username: userName ?? (__DEV__ ? "kadir-test-1" : undefined),
-      password: __DEV__ ? "Kadir123*+" : undefined,
+      username: userName ?? (__DEV__ ? "omer-test" : undefined),
+      password: __DEV__ ? "Omer123*+" : undefined,
     },
   });
 
@@ -63,37 +73,65 @@ export const useLogin = () => {
   useEffect(() => {
     if (__DEV__) {
       reset({
-        username: userName ?? (__DEV__ ? "kadir-test-1" : undefined),
-        password: __DEV__ ? "Kadir123*+" : undefined,
+        username: userName ?? (__DEV__ ? "omer-test" : undefined),
+        password: __DEV__ ? "Omer123*+" : undefined,
       });
     }
   }, [__DEV__]);
 
   const onSubmit = async (formValues: RegisterFormData) => {
-    const { success, data } = await loginApi({
-      data: {
-        username: formValues?.username,
-        password: formValues?.password,
-        deviceId: await getInstallationId(),
-      },
-    });
-    if (success && data?.accessToken) {
+    try {
+      setIsLoading(true);
+
+      const { success, data } = await loginApi({
+        data: {
+          username: formValues?.username?.trim(),
+          password: formValues?.password?.trim(),
+          deviceId: await getInstallationId(),
+        },
+      });
+
+      if (!success) {
+        setIsLoading(false);
+        return;
+      }
+      trackEvent("login_success");
       login(
         data?.accessToken?.token as string,
         data?.account?.username as string,
       );
+      getApiAccountGetProfile().then((profileResponse) => {
+        if (profileResponse.success) {
+          LogRocket.identify(formValues?.username?.trim());
+          trackEvent("profile_fetched");
 
-      //router.replace("/home");
-      router.push("/(calling)/videoCalling/screens");
+          setProfile(profileResponse.data!);
+          setShowDeleteButton(profileResponse.data?.deleteButton ?? false);
 
-      const token = await registerForPushNotificationsAsync();
-      token && (await registerDeviceToken({ data: { deviceToken: token } }));
+          if (profileResponse.data?.enableTor) startTor();
+        }
+      });
 
-      await updatePublicKeyApi({
+      registerForPushNotificationsAsync().then(async (token) => {
+        token &&
+          registerDeviceToken({ data: { deviceToken: token } })
+            .then()
+            .catch();
+      });
+
+      updatePublicKeyApi({
         data: {
           publicKey: userPublicKey(),
         },
-      });
+      })
+        .then()
+        .catch();
+
+      setIsLoading(false);
+
+      router.replace("/home");
+    } catch {
+      setIsLoading(false);
     }
   };
 
@@ -157,14 +195,6 @@ export const useLogin = () => {
     );
   };
 
-  useEffect(() => {
-    if (isLogin && profileResponse?.data) setProfile(profileResponse?.data);
-  }, [isLogin, profileResponse?.data]);
-
-  useEffect(() => {
-    if (isLogin) refetch();
-  }, [isLogin]);
-
   return {
     t,
     styles,
@@ -172,11 +202,12 @@ export const useLogin = () => {
     errors,
     handleSubmit,
     onSubmit,
-    isSubmitting,
+    isLoading,
     userName,
     password,
     profile,
     isDeleteAccountLoading,
+    showDeleteButton,
     handleChangeAccount,
     handleDeleteAccount,
   };

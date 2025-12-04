@@ -1,23 +1,27 @@
-import { LinearGradient } from "expo-linear-gradient";
 import { StyleSheet, View } from "react-native";
 
 import { Colors } from "@/constants";
-import { useTor } from "@/services/axios/tor";
+import { useTorStore } from "@/store";
 import { useThemedStyles } from "@/theme";
-import { heightPixel, spacingPixel, widthPixel } from "@/utils";
 
+import {
+  heightPixel,
+  spacingPixel,
+  widthPixel,
+} from "../../../utils/pixelHelper";
+import { GradientBackground } from "../../ui/GradientBackground";
 import { ThemedText } from "../ThemedText";
 
 export const TorBadge = () => {
-  const { isConnected } = useTor();
   const styles = useThemedStyles(createStyle);
+
+  const isConnected = useTorStore((state) => state.isConnected);
+  const isLoading = useTorStore((state) => state.isLoading);
+
   return (
-    <LinearGradient
-      colors={Colors.buttonPrimary as never}
-      start={{ y: 0, x: 1 }}
-      end={{ y: 1, x: 0 }}
+    <GradientBackground
       style={[
-        styles.bedge,
+        styles.badge,
         styles.alignItemsCenter,
         styles.justifyContentCenter,
         styles.gap2,
@@ -28,19 +32,23 @@ export const TorBadge = () => {
       <View
         style={[
           styles.badgeStatus,
-          isConnected ? styles.active : styles.inActive,
+          isConnected
+            ? styles.active
+            : isLoading
+              ? styles.starting
+              : styles.inActive,
         ]}
       />
       <ThemedText type="default" weight="semiBold">
         Tor
       </ThemedText>
-    </LinearGradient>
+    </GradientBackground>
   );
 };
 
 const createStyle = () =>
   StyleSheet.create({
-    bedge: {
+    badge: {
       flexDirection: "row",
       minWidth: widthPixel(60),
       height: heightPixel(30),
@@ -55,5 +63,8 @@ const createStyle = () =>
     },
     inActive: {
       backgroundColor: Colors.danger,
+    },
+    starting: {
+      backgroundColor: Colors.warning,
     },
   });

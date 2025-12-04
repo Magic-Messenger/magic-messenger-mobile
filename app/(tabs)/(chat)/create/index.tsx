@@ -16,18 +16,21 @@ export default function CreateChatScreen() {
 
   const [searchText, setSearchText] = useState<string>("");
 
+  // Filtered contacts with optimized search
   const filteredData = useMemo(() => {
-    return contactData?.data?.filter(
-      (x) =>
-        x.contactUsername
-          ?.toLocaleLowerCase()
-          ?.includes(searchText?.toLocaleLowerCase()) ||
-        x.nickname
-          ?.toLocaleLowerCase()
-          ?.includes(searchText?.toLocaleLowerCase()),
-    );
+    if (!contactData?.data) return [];
+
+    const searchLower = searchText?.toLowerCase()?.trim();
+    if (!searchLower) return contactData.data;
+
+    return contactData.data.filter((contact) => {
+      const username = contact.contactUsername?.toLowerCase() || "";
+      const nickname = contact.nickname?.toLowerCase() || "";
+      return username.includes(searchLower) || nickname.includes(searchLower);
+    });
   }, [searchText, contactData?.data]);
 
+  // Navigate to chat detail
   const handleCreateChat = useCallback((item: ContactDto) => {
     router.push({
       pathname: "/chatDetail/screens",
@@ -40,6 +43,7 @@ export default function CreateChatScreen() {
     });
   }, []);
 
+  // Render contact item
   const renderContactItem = useCallback(
     ({ item }: { item: ContactDto }) => (
       <ContactItem
@@ -50,32 +54,66 @@ export default function CreateChatScreen() {
         }}
       />
     ),
+    [handleCreateChat],
+  );
+
+  // Key extractor for optimal list performance
+  const keyExtractor = useCallback(
+    (item: ContactDto) =>
+      item.chatId || item.contactUsername || item.nickname || "",
     [],
   );
 
-  useFocusEffect(
-    useCallback(() => {
-      refetch();
-    }, []),
+  // Handle search input
+  const handleSearchChange = useCallback((text: string) => {
+    setSearchText(text);
+  }, []);
+
+  // List header component
+  const renderListHeader = useCallback(
+    () => <ContactHeader setSearchText={handleSearchChange} />,
+    [handleSearchChange],
   );
 
-  return (
-    <AppLayout container title={t("chat.newChat")} loading={isLoading}>
-      <FlashList
-        ListHeaderComponent={
-          <ContactHeader setSearchText={(_text) => setSearchText(_text)} />
-        }
-        data={filteredData}
-        contentContainerStyle={{ gap: spacingPixel(10) }}
-        keyExtractor={(_, index) => index?.toString()}
-        renderItem={renderContactItem}
-        ListEmptyComponent={
+  // Empty list component
+  const renderEmptyList = useCallback(
+    () => (
+      <>
+        {!isLoading && (
           <EmptyList
             label={t("contacts.notFound")}
             icon="frown"
             style={styles.mt10}
           />
-        }
+        )}
+      </>
+    ),
+    [t, styles.mt10, isLoading],
+  );
+
+  // Refetch on screen focus
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch]),
+  );
+
+  return (
+    <AppLayout container title={t("chat.newChat")} loading={isLoading}>
+      <FlashList
+        ListHeaderComponent={renderListHeader}
+        data={filteredData}
+        contentContainerStyle={{ paddingBottom: spacingPixel(10) }}
+        keyExtractor={keyExtractor}
+        renderItem={renderContactItem}
+        ListEmptyComponent={renderEmptyList}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+        drawDistance={400}
+        removeClippedSubviews
+        maintainVisibleContentPosition={{
+          autoscrollToTopThreshold: 10,
+        }}
       />
     </AppLayout>
   );

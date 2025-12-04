@@ -2,8 +2,8 @@ import React from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 import { ThemedText, VideoPreview } from "@/components";
-import { spacingPixel } from "@/utils";
 
+import { spacingPixel } from "../../../../utils/pixelHelper";
 import { ReplyMessageItem } from "../ReplyMessageItem";
 import { MessageFooter } from "./MessageFooter";
 import { MessageContentProps } from "./types";
@@ -15,11 +15,11 @@ export function VideoMessage({
   createdAt,
   messageStatus,
   isLoading,
+  isReply = false,
 }: MessageContentProps) {
   return (
     <>
-      <ReplyMessageItem message={decryptedReplyMessage} />
-
+      {!isReply && <ReplyMessageItem message={decryptedReplyMessage} />}
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#fff" />
@@ -29,11 +29,13 @@ export function VideoMessage({
         <VideoPreview source={decryptedContent as string} />
       )}
 
-      <MessageFooter
-        createdAt={createdAt}
-        isSentByCurrentUser={isSentByCurrentUser}
-        messageStatus={messageStatus}
-      />
+      {!isReply && (
+        <MessageFooter
+          createdAt={createdAt as string}
+          isSentByCurrentUser={isSentByCurrentUser as boolean}
+          messageStatus={messageStatus}
+        />
+      )}
     </>
   );
 }

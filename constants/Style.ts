@@ -1,7 +1,6 @@
 import { StyleSheet } from "react-native";
 
-import { fontPixel, spacingPixel } from "@/utils";
-
+import { fontPixel, spacingPixel } from "../utils/pixelHelper";
 import {
   AlignContent,
   AlignItems,
@@ -119,6 +118,18 @@ export const commonStyle = StyleSheet.create({
   textCenter: {
     textAlign: "center",
   },
+
+  statusIcon: {
+    marginLeft: spacingPixel(5),
+    opacity: 0.6,
+    color: "white",
+  },
+  statusIconSeen: {
+    marginLeft: spacingPixel(5),
+    opacity: 1,
+    color: "#90D5FF",
+  },
+
   mt1: { ...spacing({ mt: 4 }) },
   mt2: { ...spacing({ mt: 8 }) },
   mt3: { ...spacing({ mt: 12 }) },

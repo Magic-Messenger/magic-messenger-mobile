@@ -1,12 +1,14 @@
+import { useIsFocused } from "@react-navigation/core";
 import { FlashList, ListRenderItemInfo } from "@shopify/flash-list";
 import { router, useFocusEffect } from "expo-router";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { RefreshControl, StyleSheet, View } from "react-native";
 
 import { useGetApiChatsList } from "@/api/endpoints/magicMessenger";
-import { AppLayout, Button, ChatItem, Icon, ThemedText } from "@/components";
-import { ChatListItem } from "@/constants";
+import { ChatDto } from "@/api/models";
+import { AppLayout, Button, ChatItem, EmptyList, Icon } from "@/components";
+import { useSignalRStore } from "@/store";
 import { useThemedStyles } from "@/theme";
 import { heightPixel, widthPixel } from "@/utils";
 
@@ -14,100 +16,116 @@ export default function ChatScreen() {
   const { t } = useTranslation();
   const styles = useThemedStyles(createStyle);
 
+  const isFocused = useIsFocused();
+  const receivedMessage = useSignalRStore((s) => s.receivedMessage);
+
   const { data, isLoading, refetch } = useGetApiChatsList({
     pageNumber: 1,
-    pageSize: 40,
+    pageSize: 150,
   });
 
-  const chatListData = useMemo(() => {
-    const listData = data?.data?.data || [];
+  // Memoized chat list data
+  const chatList = useMemo(() => data?.data?.data ?? [], [data?.data?.data]);
 
-    const sections = [
-      {
-        title: t("common.unread"),
-        data: listData.filter((d) => d.unreadMessagesCount! > 0),
-      },
-      {
-        title: t("common.read"),
-        data: listData.filter((d) => d.unreadMessagesCount === 0),
-      },
-    ];
-
-    let finalData: ChatListItem[] = [];
-
-    sections.forEach((section) => {
-      if (section.data.length > 0) {
-        finalData.push({ type: "header", title: section.title });
-        finalData.push(
-          ...section.data.map((i) => ({ type: "item" as never, item: i }))
-        );
-      }
-    });
-
-    return finalData;
-  }, [data]);
-
+  // Render chat item
   const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<ChatListItem>) => (
-      <View>
-        {item.type === "header" ? (
-          <ThemedText
-            weight="semiBold"
-            size={16}
-            style={{ marginVertical: 10 }}
-          >
-            {item.title}
-          </ThemedText>
-        ) : (
-          <View style={styles.mb3}>
-            <ChatItem
-              chatId={item?.item?.chatId}
-              isGroupChat={item?.item?.isGroupChat}
-              groupName={item?.item?.groupName ?? ""}
-              publicKey={item?.item?.contact?.publicKey ?? ""}
-              nickname={item?.item?.contact?.nickname ?? ""}
-              lastMessageTime={item?.item?.lastMessageTime ?? ""}
-              contactUsername={item?.item?.contact?.contactUsername ?? ""}
-              unreadMessagesCount={item?.item?.unreadMessagesCount ?? 0}
-            />
-          </View>
-        )}
-      </View>
+    ({ item }: ListRenderItemInfo<ChatDto>) => (
+      <ChatItem
+        chatId={item.chatId as string}
+        isGroupChat={item.isGroupChat}
+        groupName={item.groupName ?? ""}
+        publicKey={item.contact?.publicKey ?? ""}
+        nickname={item.contact?.nickname ?? ""}
+        lastMessageTime={item.lastMessageTime ?? ""}
+        contactUsername={item.contact?.contactUsername ?? ""}
+        unreadMessagesCount={item.unreadMessagesCount ?? 0}
+      />
     ),
-    []
+    [],
   );
 
+  // Key extractor for optimal list performance
+  const keyExtractor = useCallback(
+    (item: ChatDto) => item.chatId || `chat-${item.contact?.contactUsername}`,
+    [],
+  );
+
+  // Handle refresh
+  const handleRefresh = useCallback(() => {
+    refetch();
+  }, [refetch]);
+
+  // Refresh control component
+  const refreshControl = useMemo(
+    () => <RefreshControl refreshing={isLoading} onRefresh={handleRefresh} />,
+    [isLoading, handleRefresh],
+  );
+
+  // Navigate to create chat
+  const handleCreateChat = useCallback(() => {
+    router.push("/(tabs)/(chat)/create");
+  }, []);
+
+  // Empty list component
+  const renderEmptyList = useCallback(
+    () => (
+      <>
+        {!isLoading && (
+          <EmptyList
+            label={t("chat.notFound")}
+            icon="message-square"
+            style={styles.mt10}
+          />
+        )}
+      </>
+    ),
+    [t, styles.mt10, isLoading],
+  );
+
+  // Header title with new chat button
+  const headerTitle = useMemo(
+    () => (
+      <View style={styles.newChatButton}>
+        <Button
+          type="primary"
+          label={t("home.newChat")}
+          leftIcon={<Icon type="feather" name="plus" size={18} />}
+          textProps={{
+            size: 14,
+          }}
+          onPress={handleCreateChat}
+        />
+      </View>
+    ),
+    [t, styles.newChatButton, handleCreateChat],
+  );
+
+  useEffect(() => {
+    if (isFocused && receivedMessage) refetch();
+  }, [receivedMessage, isFocused]);
+
+  // Refetch on screen focus
   useFocusEffect(
     useCallback(() => {
       refetch();
-    }, [])
+    }, [refetch]),
   );
 
   return (
-    <AppLayout
-      container
-      loading={isLoading}
-      title={
-        <View style={styles.newChatButton}>
-          <Button
-            type="primary"
-            label={t("home.newChat")}
-            leftIcon={<Icon type="feather" name="plus" size={18} />}
-            textProps={{
-              size: 14,
-            }}
-            onPress={() => router.push("/(tabs)/(chat)/create")}
-          />
-        </View>
-      }
-    >
+    <AppLayout container loading={isLoading} title={headerTitle}>
       <FlashList
-        data={chatListData}
-        refreshing={isLoading}
-        refreshControl={
-          <RefreshControl refreshing={isLoading} onRefresh={() => refetch()} />
-        }
+        data={chatList}
         renderItem={renderItem}
+        keyExtractor={keyExtractor}
+        refreshControl={refreshControl}
+        ListEmptyComponent={renderEmptyList}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+        drawDistance={400}
+        removeClippedSubviews
+        maintainVisibleContentPosition={{
+          autoscrollToTopThreshold: 10,
+        }}
       />
     </AppLayout>
   );
@@ -118,5 +136,8 @@ const createStyle = () =>
     newChatButton: {
       width: widthPixel(110),
       height: heightPixel(30),
+    },
+    mt10: {
+      marginTop: heightPixel(10),
     },
   });

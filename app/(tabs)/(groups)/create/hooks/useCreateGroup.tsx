@@ -85,7 +85,7 @@ export const useCreateGroup = () => {
         },
       });
       if (success && responseData) {
-        router.replace("/(tabs)/(groups)/home");
+        router.dismissAll();
       }
     }
   };

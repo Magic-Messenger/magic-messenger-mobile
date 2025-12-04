@@ -11,8 +11,13 @@ import {
   View,
   ViewStyle,
 } from "react-native";
+import ImageView from "react-native-image-viewing";
 
-import { fontPixel, heightPixel, spacingPixel } from "@/utils";
+import {
+  fontPixel,
+  heightPixel,
+  spacingPixel,
+} from "../../../utils/pixelHelper";
 
 interface AppImageProps extends Omit<ImageProps, "onLoad" | "onError"> {
   source: ImageProps["source"];
@@ -25,6 +30,7 @@ interface AppImageProps extends Omit<ImageProps, "onLoad" | "onError"> {
   onError?: () => void;
   resizeMode?: "cover" | "contain" | "stretch" | "repeat" | "center";
   showLoading?: boolean;
+  showDetail?: boolean;
 }
 
 export const AppImage: React.FC<AppImageProps> = ({
@@ -36,10 +42,12 @@ export const AppImage: React.FC<AppImageProps> = ({
   onError,
   resizeMode = "cover",
   showLoading = true,
+  showDetail = false,
   ...props
 }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
+  const [detailsVisible, setDetailsVisible] = useState<boolean>(false);
 
   const handleLoad = (): void => {
     setLoading(false);
@@ -70,15 +78,34 @@ export const AppImage: React.FC<AppImageProps> = ({
 
     return (
       <View style={style}>
-        <Image
-          source={source}
-          style={[styles.image, style]}
-          onLoad={handleLoad}
-          onError={handleError}
-          resizeMode={resizeMode}
-          {...props}
-        />
-        {loading && showLoading && <ActivityIndicator size="small" />}
+        <TouchableOpacity
+          activeOpacity={0.8}
+          disabled={!showDetail || loading}
+          onPress={() => setDetailsVisible(true)}
+        >
+          <Image
+            source={source}
+            style={[styles.image, style]}
+            onLoad={handleLoad}
+            onError={handleError}
+            resizeMode={resizeMode}
+            {...props}
+          />
+          {loading && showLoading && <ActivityIndicator size="small" />}
+          {showDetail && !loading && !error && (
+            <ImageView
+              key={`image-view-${Math.random()}`}
+              images={
+                (source as any)?.uri
+                  ? [{ uri: `${(source as any)?.uri}?v=${Math.random()}` }]
+                  : []
+              }
+              imageIndex={0}
+              visible={detailsVisible}
+              onRequestClose={() => setDetailsVisible(false)}
+            />
+          )}
+        </TouchableOpacity>
       </View>
     );
   };

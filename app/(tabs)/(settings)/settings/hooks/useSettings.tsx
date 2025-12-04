@@ -7,8 +7,7 @@ import {
 } from "@/api/endpoints/magicMessenger";
 import { AccountProfileDto } from "@/api/models";
 import { SettingsItem } from "@/components";
-import { useTor } from "@/services/axios/tor";
-import { useUserStore } from "@/store";
+import { useTorStore, useUserStore } from "@/store";
 import { useThemedStyles } from "@/theme";
 
 export const useSettings = () => {
@@ -17,8 +16,15 @@ export const useSettings = () => {
 
   const profile = useUserStore((state) => state.profile);
   const setProfile = useUserStore((state) => state.setProfile);
+  const showDeleteButton = useUserStore((state) => state.showDeleteButton);
+  const setShowDeleteButton = useUserStore(
+    (state) => state.setShowDeleteButton,
+  );
 
-  const { startTor, stopTor } = useTor();
+  const isTorConnected = useTorStore((state) => state.isConnected);
+  const isTorLoading = useTorStore((state) => state.isLoading);
+  const startTor = useTorStore((state) => state.startTor);
+  const stopTor = useTorStore((state) => state.stopTor);
 
   const { data, isLoading } = useGetApiAccountGetProfile();
   const { mutateAsync: changeAccountSettings } =
@@ -58,9 +64,11 @@ export const useSettings = () => {
       id: 1,
       title: "settings.deleteButton",
       description: "settings.deleteButtonDescription",
-      value: profile?.deleteButton ?? false,
-      onSettingsChanged: (value: number | boolean) =>
-        handleSettingsChange("deleteButton", value as boolean),
+      value: showDeleteButton ?? false,
+      onSettingsChanged: (value: number | boolean) => {
+        setShowDeleteButton(value as boolean);
+        handleSettingsChange("deleteButton", value as boolean);
+      },
     },
     {
       id: 2,
@@ -101,14 +109,14 @@ export const useSettings = () => {
       id: 5,
       title: "settings.torNetwork",
       description: "settings.torNetworkDescription",
-      value: profile?.enableTor ?? false,
-      onSettingsChanged: (value: number | boolean) => {
-        handleSettingsChange("enableTor", value);
+      value: isTorConnected ?? false,
+      onSettingsChanged: async (value: number | boolean) => {
         if (value) {
-          startTor();
+          await startTor();
         } else {
-          stopTor();
+          await stopTor();
         }
+        handleSettingsChange("enableTor", value);
       },
     },
     {
@@ -154,7 +162,7 @@ export const useSettings = () => {
   return {
     t,
     styles,
-    isLoading: isLoading,
+    isLoading: isLoading || isTorLoading,
     settingsItems,
     renderItem,
     handleSettingsChange,

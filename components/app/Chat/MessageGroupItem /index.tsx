@@ -1,7 +1,9 @@
-import React, { useMemo } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import React, { memo, useCallback, useEffect, useMemo } from "react";
+import { StyleSheet, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
+  Extrapolation,
+  interpolate,
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
@@ -9,314 +11,168 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { MessageDto, MessageStatus, MessageType } from "@/api/models";
-import { AppImage, Icon, ThemedText, VideoPreview } from "@/components";
-import { Images } from "@/constants";
-import { useAudioPlayer, useGroupChatHelper } from "@/hooks";
+import { Icon, ThemedText } from "@/components";
+import { useGroupChatHelper } from "@/hooks";
 import { useSignalRStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { dateFormatter, spacingPixel, trackEvent } from "@/utils";
 
-import { ReplyMessageItem } from "../ReplyMessageItem";
+import { spacingPixel } from "../../../../utils/pixelHelper";
+import { AudioMessage } from "../MessageItem/AudioMessage";
+import { ImageMessage } from "../MessageItem/ImageMessage";
+import { TextMessage } from "../MessageItem/TextMessage";
+import { VideoMessage } from "../MessageItem/VideoMessage";
 
 interface MessageItemProps {
   identifier: string;
+  messageStatus: MessageStatus;
   message?: MessageDto;
   onReply?: (message: MessageDto) => void;
 }
 
 const SWIPE_THRESHOLD = 60;
 const REPLY_ICON_WIDTH = 30;
+const SPRING_CONFIG = {
+  damping: 20,
+  stiffness: 300,
+};
 
-export function MessageGroupItem({
+function MessageGroupItem({
   identifier,
   message,
+  messageStatus,
   onReply,
 }: MessageItemProps) {
   const styles = useThemedStyles(createStyle);
   const magicHubClient = useSignalRStore((s) => s.magicHubClient);
 
-  const { decryptedContent, isSentByCurrentUser, decryptedReplyMessage } =
-    useGroupChatHelper(message as MessageDto);
-
-  const { loadAndPlay, pause, isPlaying } = useAudioPlayer();
+  const {
+    decryptedContent,
+    isSentByCurrentUser,
+    decryptedReplyMessage,
+    replyMessageType,
+  } = useGroupChatHelper(message as MessageDto);
 
   const translateX = useSharedValue(0);
-  const opacity = useSharedValue(0);
 
-  const triggerReply = () => {
-    if (message && onReply) {
-      onReply({
-        ...message,
-        content: decryptedContent as string,
-      } as MessageDto);
-    }
-  };
-
-  const panGesture = Gesture.Pan()
-    .onUpdate((event) => {
-      "worklet";
-      if (event.translationX > 0) {
-        translateX.value = Math.min(event.translationX, SWIPE_THRESHOLD * 1.2);
-
-        const progress = Math.min(event.translationX / SWIPE_THRESHOLD, 1);
-        opacity.value = progress;
-      }
-    })
-    .onEnd((event) => {
-      "worklet";
-      if (event.translationX > SWIPE_THRESHOLD) {
-        runOnJS(triggerReply)();
-      }
-
-      translateX.value = withSpring(0, {
-        damping: 20,
-        stiffness: 300,
-      });
-      opacity.value = withSpring(0);
-    });
-
-  const animatedStyle = useAnimatedStyle(() => {
-    "worklet";
-    return {
-      transform: [{ translateX: translateX.value }],
-    };
-  });
-
-  const replyIconStyle = useAnimatedStyle(() => {
-    "worklet";
-    return {
-      opacity: opacity.value,
-      transform: [
-        {
-          translateX:
-            translateX.value > 0 ? translateX.value - REPLY_ICON_WIDTH - 10 : 0,
-        },
-      ],
-    };
-  });
-
-  useMemo(() => {
+  // Mark message as seen
+  useEffect(() => {
     if (
       magicHubClient &&
       !isSentByCurrentUser &&
-      message?.messageStatus !== MessageStatus.Seen
+      messageStatus !== MessageStatus.Seen &&
+      message?.messageId
     ) {
-      trackEvent("message_seen", { messageId: message?.messageId });
-      magicHubClient.viewedMessage(identifier, message?.messageId as string);
+      magicHubClient.viewedMessage(identifier, message.messageId);
     }
   }, [
     identifier,
     isSentByCurrentUser,
     magicHubClient,
     message?.messageId,
-    message?.messageStatus,
+    messageStatus,
   ]);
 
-  const renderMessageStatus = useMemo(() => {
-    if (isSentByCurrentUser) {
-      if (message?.messageStatus === MessageStatus.Sent) {
-        return (
-          <Icon
-            type="ionicons"
-            name="checkmark"
-            size={16}
-            color="white"
-            style={{ marginLeft: spacingPixel(5), opacity: 0.6 }}
-          />
-        );
-      } else if (message?.messageStatus === MessageStatus.Delivered) {
-        return (
-          <Icon
-            type="ionicons"
-            name="checkmark-done"
-            size={16}
-            color="white"
-            style={{ marginLeft: spacingPixel(5), opacity: 0.6 }}
-          />
-        );
-      } else if (message?.messageStatus === MessageStatus.Seen) {
-        return (
-          <Icon
-            type="ionicons"
-            name="checkmark-done"
-            size={16}
-            color="lightblue"
-            style={{ marginLeft: spacingPixel(5) }}
-          />
-        );
-      }
+  const triggerReply = useCallback(() => {
+    if (message && onReply && decryptedContent) {
+      onReply({
+        ...message,
+        content: decryptedContent as string,
+      } as MessageDto);
     }
-    return null;
-  }, [isSentByCurrentUser, message?.messageStatus]);
+  }, [message, onReply, decryptedContent]);
 
-  const renderMessageContent = useMemo(() => {
-    if (message?.messageType === MessageType.Text) {
-      return (
-        <>
-          {!isSentByCurrentUser && (
-            <View>
-              <ThemedText size={11} numberOfLines={1} weight="semiBold">
-                {message?.nickname}
-              </ThemedText>
-            </View>
-          )}
+  const panGesture = useMemo(
+    () =>
+      Gesture.Pan()
+        .activeOffsetX(10)
+        .failOffsetY([-10, 10])
+        .onUpdate((event) => {
+          "worklet";
+          if (event.translationX > 0) {
+            translateX.value = Math.min(
+              event.translationX,
+              SWIPE_THRESHOLD * 1.2,
+            );
+          }
+        })
+        .onEnd((event) => {
+          "worklet";
+          if (event.translationX > SWIPE_THRESHOLD) {
+            runOnJS(triggerReply)();
+          }
 
-          {message?.repliedToMessage && (
-            <ReplyMessageItem message={decryptedReplyMessage as string} />
-          )}
-          <ThemedText>{decryptedContent}</ThemedText>
-          <View
-            style={[
-              styles.flex,
-              styles.flexRow,
-              styles.alignItemsCenter,
-              styles.justifyContentEnd,
-            ]}
-          >
-            <ThemedText
-              style={
-                isSentByCurrentUser
-                  ? styles.messageDateSender
-                  : styles.messageDateReceiver
-              }
-            >
-              {dateFormatter(message?.createdAt!, "HH:mm")}
-            </ThemedText>
-            {renderMessageStatus}
-          </View>
-        </>
-      );
-    } else if (message?.messageType === MessageType.Audio) {
-      return (
-        <View>
-          {!isSentByCurrentUser && (
-            <View>
-              <ThemedText size={11} numberOfLines={1} weight="semiBold">
-                {message?.nickname}
-              </ThemedText>
-            </View>
-          )}
-          {message?.repliedToMessage && (
-            <ReplyMessageItem message={decryptedReplyMessage as string} />
-          )}
-          <View style={[styles.flex, styles.flexRow]}>
-            <TouchableOpacity
-              onPress={() => {
-                if (isPlaying) {
-                  pause();
-                } else {
-                  loadAndPlay(decryptedContent as string);
-                }
-              }}
-            >
-              <Icon
-                name={isPlaying ? "pause-circle" : "play-circle"}
-                size={30}
-              />
-            </TouchableOpacity>
+          translateX.value = withSpring(0, SPRING_CONFIG);
+        }),
+    [triggerReply],
+  );
 
-            <AppImage
-              source={Images.soundPreview}
-              resizeMode="contain"
-              width={100}
-              height={30}
-              style={isPlaying ? { opacity: 1 } : { opacity: 0.5 }}
-            />
-          </View>
-          <View style={[styles.flex, styles.flexRow, styles.alignItemsCenter]}>
-            <ThemedText
-              style={
-                isSentByCurrentUser
-                  ? styles.messageDateSender
-                  : styles.messageDateReceiver
-              }
-            >
-              {dateFormatter(message?.createdAt!, "HH:mm")}
-            </ThemedText>
-            {renderMessageStatus}
-          </View>
-        </View>
-      );
-    } else if (message?.messageType === MessageType.Image) {
-      return (
-        <View style={styles.gap2}>
-          {!isSentByCurrentUser && (
-            <View>
-              <ThemedText size={11} numberOfLines={1} weight="semiBold">
-                {message?.nickname}
-              </ThemedText>
-            </View>
-          )}
-          {message?.repliedToMessage && (
-            <ReplyMessageItem message={decryptedReplyMessage as string} />
-          )}
-          <AppImage
-            source={{ uri: decryptedContent as string }}
-            style={{
-              width: spacingPixel(200),
-              height: spacingPixel(200),
-              borderRadius: spacingPixel(8),
-            }}
-            resizeMode="cover"
-          />
-          <View style={[styles.flex, styles.flexRow, styles.alignItemsCenter]}>
-            <ThemedText
-              style={
-                isSentByCurrentUser
-                  ? styles.messageDateSender
-                  : styles.messageDateReceiver
-              }
-            >
-              {dateFormatter(message?.createdAt!, "HH:mm")}
-            </ThemedText>
-            {renderMessageStatus}
-          </View>
-        </View>
-      );
-    } else if (message?.messageType === MessageType.Video) {
-      return (
-        <>
-          {!isSentByCurrentUser && (
-            <View>
-              <ThemedText size={11} numberOfLines={1} weight="semiBold">
-                {message?.nickname}
-              </ThemedText>
-            </View>
-          )}
-          {message?.repliedToMessage && (
-            <ReplyMessageItem message={decryptedReplyMessage as string} />
-          )}
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+  }));
 
-          <VideoPreview source={decryptedContent as string} />
+  const replyIconStyle = useAnimatedStyle(() => {
+    const opacity = interpolate(
+      translateX.value,
+      [0, SWIPE_THRESHOLD],
+      [0, 1],
+      Extrapolation.CLAMP,
+    );
 
-          <View style={[styles.flex, styles.flexRow, styles.alignItemsCenter]}>
-            <ThemedText
-              style={
-                isSentByCurrentUser
-                  ? styles.messageDateSender
-                  : styles.messageDateReceiver
-              }
-            >
-              {dateFormatter(message?.createdAt!, "HH:mm")}
-            </ThemedText>
-            {renderMessageStatus}
-          </View>
-        </>
-      );
+    const scale = interpolate(
+      translateX.value,
+      [0, SWIPE_THRESHOLD * 0.5, SWIPE_THRESHOLD],
+      [0.5, 1, 1],
+      Extrapolation.CLAMP,
+    );
+
+    return {
+      opacity,
+      transform: [
+        {
+          translateX:
+            translateX.value > 0 ? translateX.value - REPLY_ICON_WIDTH - 10 : 0,
+        },
+        { scale },
+      ],
+    };
+  });
+
+  const renderMessageContent = useCallback(() => {
+    if (!message || !decryptedContent) return null;
+
+    const isLoading = (message as any)?.isPending === true;
+
+    const messageContentProps = {
+      decryptedContent,
+      decryptedReplyMessage,
+      isSentByCurrentUser,
+      createdAt: message.createdAt!,
+      isLoading,
+      replyMessageType,
+      messageStatus,
+    };
+
+    switch (message.messageType) {
+      case MessageType.Text:
+        return <TextMessage {...messageContentProps} />;
+      case MessageType.Audio:
+        return <AudioMessage {...messageContentProps} />;
+      case MessageType.Image:
+        return <ImageMessage {...messageContentProps} />;
+      case MessageType.Video:
+        return <VideoMessage {...messageContentProps} />;
+      default:
+        return null;
     }
-
-    return null;
   }, [
-    styles,
     message,
+    messageStatus,
     decryptedContent,
+    decryptedReplyMessage,
     isSentByCurrentUser,
-    styles.messageDateSender,
-    styles.messageDateReceiver,
-    isPlaying,
-    pause,
-    loadAndPlay,
   ]);
+
+  if (!decryptedContent || !message) return null;
 
   return (
     <View style={styles.messageWrapper}>
@@ -333,12 +189,30 @@ export function MessageGroupItem({
               : styles.receiverContainer,
           ]}
         >
-          {renderMessageContent}
+          {!isSentByCurrentUser && (
+            <ThemedText
+              size={11}
+              numberOfLines={1}
+              weight="semiBold"
+              style={styles.mb1}
+            >
+              {message?.nickname}
+            </ThemedText>
+          )}
+
+          {renderMessageContent()}
         </Animated.View>
       </GestureDetector>
     </View>
   );
 }
+
+export default memo(MessageGroupItem, (prevProps, nextProps) => {
+  return (
+    prevProps.message?.messageId === nextProps.message?.messageId &&
+    prevProps.messageStatus === nextProps.messageStatus
+  );
+});
 
 const createStyle = (colors: ColorDto) =>
   StyleSheet.create({
@@ -385,6 +259,23 @@ const createStyle = (colors: ColorDto) =>
       height: REPLY_ICON_WIDTH,
       backgroundColor: colors.secondary,
       borderRadius: REPLY_ICON_WIDTH / 2,
-      transform: [{ translateY: -REPLY_ICON_WIDTH / 2 }],
+      left: 0,
+      top: "50%",
+      marginTop: -REPLY_ICON_WIDTH / 2,
+    },
+    flex: {
+      flex: 1,
+    },
+    flexRow: {
+      flexDirection: "row",
+    },
+    alignItemsCenter: {
+      alignItems: "center",
+    },
+    justifyContentEnd: {
+      justifyContent: "flex-end",
+    },
+    gap2: {
+      gap: spacingPixel(2),
     },
   });

@@ -6,7 +6,8 @@ import { AppImage, ThemedText, TorBadge } from "@/components";
 import { Images } from "@/constants";
 import { useSignalRStore } from "@/store";
 import { useThemedStyles } from "@/theme";
-import { spacingPixel, widthPixel } from "@/utils";
+
+import { spacingPixel, widthPixel } from "../../../../utils/pixelHelper";
 
 interface ChatHeaderProps {
   chatId: string;

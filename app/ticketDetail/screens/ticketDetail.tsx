@@ -45,6 +45,11 @@ export default function TicketDetailScreen() {
           contentContainerStyle={styles.contentContainerStyle}
           renderItem={({ item }) => <TicketMessageItem {...item} />}
           ListFooterComponent={<ChatTyping chatId={ticketId as string} />}
+          drawDistance={400}
+          removeClippedSubviews
+          maintainVisibleContentPosition={{
+            autoscrollToTopThreshold: 10,
+          }}
         />
       </LoadingProvider>
     </ChatLayout>

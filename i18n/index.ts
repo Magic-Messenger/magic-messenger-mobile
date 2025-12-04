@@ -42,6 +42,7 @@ const initI18n = async () => {
     interpolation: {
       escapeValue: false,
     },
+    pluralSeparator: "_",
   });
 };
 

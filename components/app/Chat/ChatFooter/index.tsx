@@ -4,12 +4,17 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 import { usePostApiChatsUpload } from "@/api/endpoints/magicMessenger";
 import { MessageDto, MessageType } from "@/api/models";
-import { Icon, Input, ThemedText } from "@/components";
 import { UploadFileResultDto } from "@/constants";
 import { useAudioRecorder, usePicker } from "@/hooks";
 import { useSignalRStore, useUserStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { heightPixel, spacingPixel, trackEvent } from "@/utils";
+
+import { trackEvent } from "../../../../utils/helper";
+import { heightPixel, spacingPixel } from "../../../../utils/pixelHelper";
+import { GradientBackground } from "../../../ui/GradientBackground";
+import { Icon } from "../../../ui/Icon";
+import { Input } from "../../../ui/Input";
+import { ThemedText } from "../../ThemedText";
 
 interface ChatFooterProps {
   chatId: string;
@@ -20,6 +25,13 @@ interface ChatFooterProps {
   displaySendImage?: boolean;
   displaySendVoice?: boolean;
 }
+
+const MESSAGE_TYPE_LABELS: Record<MessageType, string> = {
+  [MessageType.Text]: "chatDetail.text",
+  [MessageType.Image]: "common.image",
+  [MessageType.Audio]: "common.audio",
+  [MessageType.Video]: "common.video",
+};
 
 export function ChatFooter({
   chatId,
@@ -34,7 +46,13 @@ export function ChatFooter({
   const styles = useThemedStyles(createStyle);
   const { userName: currUserName } = useUserStore();
 
-  const { isRecording, startRecording, stopRecording, deleteRecording, duration } = useAudioRecorder(); //prettier-ignore
+  const {
+    isRecording,
+    startRecording,
+    stopRecording,
+    deleteRecording,
+    duration,
+  } = useAudioRecorder();
   const { pickImage } = usePicker();
   const magicHubClient = useSignalRStore((s) => s.magicHubClient);
 
@@ -43,22 +61,29 @@ export function ChatFooter({
   const [message, setMessage] = useState("");
 
   const handleSendMessage = useCallback(() => {
-    if (!message.trim()) return;
-    onSend(message);
+    const trimmedMessage = message.trim();
+    if (!trimmedMessage) return;
+
+    // Clear message immediately before sending
     setMessage("");
-    if (chatId) {
-      magicHubClient?.stopTyping(chatId as string);
+
+    // Send the message
+    onSend(trimmedMessage);
+
+    // Stop typing indicator
+    if (chatId && magicHubClient) {
+      magicHubClient.stopTyping(chatId);
     }
   }, [magicHubClient, chatId, message, onSend]);
 
   const onChangeText = useCallback(
     (text: string) => {
       setMessage(text);
-      if (chatId) {
+      if (chatId && magicHubClient) {
         if (text.length > 0) {
-          magicHubClient?.typing(chatId as string);
+          magicHubClient.typing(chatId);
         } else {
-          magicHubClient?.stopTyping(chatId as string);
+          magicHubClient.stopTyping(chatId);
         }
       }
     },
@@ -68,59 +93,69 @@ export function ChatFooter({
   const handleSendRecording = async () => {
     try {
       const uri = await stopRecording();
-      if (uri) {
-        const responseFetch = await fetch(uri);
-        const audioData = await responseFetch.blob();
+      if (!uri) return;
 
-        const { data, success } = await requestUpload({
-          data: {
-            file: {
-              uri: uri,
-              name: `${Date.now()}-recording.m4a`,
-              type: audioData.type,
-            } as any,
-          },
+      const responseFetch = await fetch(uri);
+      const audioData = await responseFetch.blob();
+
+      const { data, success } = await requestUpload({
+        data: {
+          file: {
+            uri,
+            name: `${Date.now()}-recording.m4a`,
+            type: audioData.type,
+          } as any,
+        },
+      });
+
+      if (success && data?.fileUrl) {
+        onSend({
+          ...data,
+          messageType: MessageType.Audio,
         });
-
-        if (success && data?.fileUrl) {
-          onSend?.({
-            ...data,
-            messageType: MessageType.Audio,
-          });
-        }
       }
     } catch (error) {
-      trackEvent("send_audio_message_error: ", error);
+      trackEvent("send_audio_message_error", error);
     }
   };
 
   const handleSendImage = async () => {
     try {
       const uri = await pickImage();
-      if (uri) {
-        const responseFetch = await fetch(uri);
-        const imageData = await responseFetch.blob();
+      if (!uri) return;
 
-        const { data, success } = await requestUpload({
-          data: {
-            file: {
-              uri: uri,
-              name: `${Date.now()}-image.jpg`,
-              type: imageData.type,
-            } as any,
-          },
+      const responseFetch = await fetch(uri);
+      const imageData = await responseFetch.blob();
+
+      const extensionMatch = uri.match(/\.(\w+)(?:\?|$)/);
+      const extension = extensionMatch?.[1] ?? "jpg";
+
+      const { data, success } = await requestUpload({
+        data: {
+          file: {
+            uri,
+            name: `${Date.now()}.${extension}`,
+            type: imageData.type || `image/${extension}`,
+          } as any,
+        },
+      });
+
+      if (success && data?.fileUrl) {
+        onSend({
+          ...data,
+          messageType: MessageType.Image,
         });
-
-        if (success && data?.fileUrl) {
-          onSend?.({
-            ...data,
-            messageType: MessageType.Image,
-          });
-        }
       }
     } catch (error) {
-      trackEvent("send_image_message_error: ", error);
+      trackEvent("send_image_message_error", error);
     }
+  };
+
+  const formatDuration = (millis: number): string => {
+    const totalSeconds = Math.floor(millis / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
   const renderMessageInput = () => (
@@ -133,17 +168,10 @@ export function ChatFooter({
     />
   );
 
-  const formatDuration = (millis: number) => {
-    const totalSeconds = Math.floor(millis / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-  };
-
   const renderRecordingUI = () => (
     <View style={styles.recordingContainer}>
       <TouchableOpacity onPress={deleteRecording}>
-        <Icon type="feather" name="trash" />
+        <Icon type="feather" name="trash" color="white" />
       </TouchableOpacity>
       <View style={styles.recordingContent}>
         <ThemedText style={styles.recordingTime}>
@@ -170,7 +198,7 @@ export function ChatFooter({
             <Icon
               type="feather"
               name="image"
-              color={isRecording ? "gray" : "white"}
+              color={isRecording ? "#D3D3D3" : "white"}
             />
           </TouchableOpacity>
         )}
@@ -178,62 +206,62 @@ export function ChatFooter({
           <TouchableOpacity
             onPress={isRecording ? handleSendRecording : startRecording}
           >
-            <Icon type="feather" name={isRecording ? "send" : "mic"} />
+            <Icon
+              type="feather"
+              name={isRecording ? "send" : "mic"}
+              color="white"
+            />
           </TouchableOpacity>
         )}
       </View>
     );
   };
 
-  const renderReplayMessage = useMemo(() => {
+  const renderReplyMessage = useMemo(() => {
     if (!replyMessage) return null;
 
     const senderName =
-      replyMessage?.senderUsername === currUserName
+      replyMessage.senderUsername === currUserName
         ? currUserName
-        : replyMessage?.senderUsername;
+        : replyMessage.senderUsername;
+
+    const messageTypeKey =
+      MESSAGE_TYPE_LABELS[replyMessage.messageType as never];
+    const messageLabel = messageTypeKey
+      ? t(messageTypeKey)
+      : (replyMessage.content as string);
+
     return (
       <View style={styles.replayContainer}>
         <TouchableOpacity style={styles.closeIcon} onPress={onClearReply}>
-          <Icon name="close" size={18} />
+          <Icon name="close" size={18} color="white" />
         </TouchableOpacity>
         <ThemedText weight="bold" type="link" size={13}>
-          {t("chatDetail.replyingTo", {
-            senderName,
-          })}
+          {t("chatDetail.replyingTo", { senderName })}
         </ThemedText>
-
-        {replyMessage?.messageType === MessageType.Text && (
-          <ThemedText numberOfLines={1} ellipsizeMode="tail" size={13}>
-            {replyMessage?.content as string}
-          </ThemedText>
-        )}
-        {replyMessage?.messageType === MessageType.Image && (
-          <ThemedText type="link" size={13}>
-            {t("common.image")}
-          </ThemedText>
-        )}
-        {replyMessage?.messageType === MessageType.Audio && (
-          <ThemedText type="link" size={13}>
-            {t("common.audio")}
-          </ThemedText>
-        )}
-        {replyMessage?.messageType === MessageType.Video && (
-          <ThemedText type="link" size={13}>
-            {t("common.video")}
-          </ThemedText>
-        )}
+        <ThemedText
+          numberOfLines={1}
+          ellipsizeMode="tail"
+          size={13}
+          type={
+            replyMessage.messageType === MessageType.Text ? "default" : "link"
+          }
+        >
+          {replyMessage.messageType === MessageType.Text
+            ? (replyMessage.content as string)
+            : messageLabel}
+        </ThemedText>
       </View>
     );
-  }, [replyMessage]);
+  }, [replyMessage, currUserName, t]);
 
   return (
     <>
-      {renderReplayMessage}
-      <View style={styles.container}>
+      {renderReplyMessage}
+      <GradientBackground style={styles.container}>
         {isRecording ? renderRecordingUI() : renderMessageInput()}
         <View style={styles.iconContainer}>{renderActionButtons()}</View>
-      </View>
+      </GradientBackground>
     </>
   );
 }
@@ -242,9 +270,13 @@ const createStyle = (colors: ColorDto) =>
   StyleSheet.create({
     container: {
       flexDirection: "row",
+      alignItems: "center",
       paddingHorizontal: spacingPixel(15),
       gap: spacingPixel(10),
-      marginVertical: spacingPixel(10),
+      height: heightPixel(80),
+    },
+    flex: {
+      flex: 1,
     },
     input: {
       flex: 1,
@@ -253,6 +285,15 @@ const createStyle = (colors: ColorDto) =>
     iconContainer: {
       justifyContent: "center",
       alignItems: "center",
+    },
+    flexRow: {
+      flexDirection: "row",
+    },
+    alignItemsCenter: {
+      alignItems: "center",
+    },
+    gap3: {
+      gap: spacingPixel(10),
     },
     recordingContainer: {
       flex: 1,
@@ -270,13 +311,16 @@ const createStyle = (colors: ColorDto) =>
       borderRadius: spacingPixel(9),
       paddingHorizontal: spacingPixel(10),
     },
-    recordingTime: { color: colors.danger },
+    recordingTime: {
+      color: colors.danger,
+    },
     replayContainer: {
       position: "relative",
       marginHorizontal: spacingPixel(15),
       backgroundColor: colors.secondary,
       borderRadius: spacingPixel(9),
       padding: spacingPixel(10),
+      marginBottom: spacingPixel(5),
     },
     closeIcon: {
       position: "absolute",

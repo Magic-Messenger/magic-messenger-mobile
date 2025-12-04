@@ -37,10 +37,17 @@ export type TorStopResponse = {
   message: string;
 };
 
+export type TorFileData = {
+  uri: string;
+  name: string;
+  type: string;
+};
+
 export type TorRequestOptions = {
   method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "HEAD";
   headers?: Record<string, string>;
   body?: string;
+  formData?: Record<string, string | TorFileData>;
 };
 
 export type TorRequestResponse = {

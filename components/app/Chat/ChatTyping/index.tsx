@@ -1,11 +1,12 @@
 import { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { LottiePlayer } from "@/components";
 import { Lottie } from "@/constants";
 import { useSignalRStore, useUserStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { spacingPixel, widthPixel } from "@/utils";
+
+import { spacingPixel, widthPixel } from "../../../../utils/pixelHelper";
+import { LottiePlayer } from "../../../ui/LottiePlayer";
 
 interface Props {
   chatId: string;
@@ -42,6 +43,7 @@ const createStyle = (colors: ColorDto) =>
       backgroundColor: colors.secondary,
       justifyContent: "center",
       alignItems: "center",
+      marginBottom: spacingPixel(10),
     },
     lottie: {
       width: widthPixel(50),

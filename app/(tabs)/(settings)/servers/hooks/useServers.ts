@@ -3,27 +3,31 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Alert, StyleSheet } from "react-native";
 
-import { useTor } from "@/services/axios/tor";
+import { useTorStore } from "@/store";
 import { useThemedStyles } from "@/theme";
 
 export const useServers = () => {
   const { t } = useTranslation();
   const styles = useThemedStyles(createStyle);
-  const { startTor, stopTor, isConnected, loading } = useTor();
+
+  const isLoading = useTorStore((state) => state.isLoading);
+  const isConnected = useTorStore((state) => state.isConnected);
+  const startTor = useTorStore((state) => state.startTor);
+  const stopTor = useTorStore((state) => state.stopTor);
 
   const title = useMemo(
     () => t("servers.title", { status: isConnected ? `3/3` : `2/3` }),
-    [t, isConnected]
+    [t, isConnected],
   );
 
   const handleDisconnect = () => {
     stopTor();
   };
-  const handleReconnect = () => {
-    stopTor();
+  const handleReconnect = async () => {
+    await stopTor();
     setTimeout(() => {
       startTor();
-    }, 500);
+    }, 1500);
   };
   const handleConnect = () => startTor();
 
@@ -32,7 +36,7 @@ export const useServers = () => {
       "https://check.torproject.org/api/ip",
       {
         method: "GET",
-      }
+      },
     );
     if (response?.data) {
       const data = JSON.parse(response.data);
@@ -48,7 +52,7 @@ export const useServers = () => {
     t,
     styles,
     title,
-    loading,
+    isLoading,
     isConnected,
     handleConnect,
     handleDisconnect,

@@ -9,12 +9,7 @@ import {
   Input,
   ThemedText,
 } from "@/components";
-import {
-  appSupportLanguages,
-  changeLanguage,
-  copyToClipboard,
-  fontPixel,
-} from "@/utils";
+import { appSupportLanguages, copyToClipboard } from "@/utils";
 
 import { useProfile } from "../hooks";
 
@@ -30,10 +25,16 @@ export default function ProfileScreen() {
     setUserPassword,
     isPending,
     deleteProfile,
+    handleChangeLanguage,
+    changePassword,
   } = useProfile();
 
   return (
-    <AppLayout scrollable loading={isLoading} title={t("profile.yourProfile")}>
+    <AppLayout
+      keyboardAvoiding
+      loading={isLoading}
+      title={t("profile.yourProfile")}
+    >
       <View style={styles.mainContainer}>
         <View
           style={[
@@ -86,13 +87,21 @@ export default function ProfileScreen() {
 
         <Dropdown
           label={t("profile.language")}
-          labelStyle={{
-            fontSize: fontPixel(16),
-          }}
           selectedValue={settings?.language ?? "en"}
           options={appSupportLanguages()}
-          onValueChange={(item) => changeLanguage(item as string)}
+          onValueChange={handleChangeLanguage}
           style={styles.mt7}
+        />
+      </View>
+
+      <View style={[styles.mainContainer, styles.mt5, styles.gap2]}>
+        <ThemedText type="title" size={16}>
+          {t("profile.userSettings")}
+        </ThemedText>
+        <Button
+          type="secondary"
+          label={t("profile.changePassword")}
+          onPress={changePassword}
         />
       </View>
 

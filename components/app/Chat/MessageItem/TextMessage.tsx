@@ -12,16 +12,25 @@ export function TextMessage({
   isSentByCurrentUser,
   createdAt,
   messageStatus,
+  replyMessageType,
+  isReply = false,
 }: MessageContentProps) {
   return (
     <>
-      <ReplyMessageItem message={decryptedReplyMessage} />
+      {!isReply && (
+        <ReplyMessageItem
+          message={decryptedReplyMessage}
+          replyMessageType={replyMessageType}
+        />
+      )}
       <ThemedText>{decryptedContent}</ThemedText>
-      <MessageFooter
-        createdAt={createdAt}
-        isSentByCurrentUser={isSentByCurrentUser}
-        messageStatus={messageStatus}
-      />
+      {!isReply && (
+        <MessageFooter
+          createdAt={createdAt as string}
+          isSentByCurrentUser={isSentByCurrentUser as boolean}
+          messageStatus={messageStatus}
+        />
+      )}
     </>
   );
 }

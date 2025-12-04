@@ -1,13 +1,16 @@
+import LogRocket from "@logrocket/react-native";
 import dayjs from "dayjs";
 import * as Application from "expo-application";
 import * as Clipboard from "expo-clipboard";
 import { Image } from "expo-image";
 import { changeLanguage as i18nChangeLanguage } from "i18next";
+import React from "react";
 import { Platform } from "react-native";
 import Toast, { ToastShowParams } from "react-native-toast-message";
 
-import { MessageStatus, MessageType } from "@/api/models";
-import { Images, SUPPORT_LANGUAGES } from "@/constants";
+import { MessageStatus } from "@/api/models";
+import { Icon } from "@/components";
+import { commonStyle, Images, SUPPORT_LANGUAGES } from "@/constants";
 import i18n from "@/i18n";
 import { useAppStore } from "@/store";
 
@@ -43,6 +46,10 @@ export const showToast = (toastConfig: ToastShowParams) => {
   Toast.show({
     ...toastConfig,
   });
+};
+
+export const hideToast = () => {
+  Toast.hide();
 };
 
 export const getInstallationId = async () => {
@@ -114,32 +121,73 @@ export const chatDateFormatter = (dateString: string) => {
 
 export const trackEvent = (eventName: string, params?: any) => {
   if (__DEV__) console.log(`Event: ${eventName}`, params ?? "");
+  LogRocket.track(eventName, params ?? {});
 };
 
-export const convertMessageType = (messageType: number) => {
-  switch (messageType) {
-    case 0:
-      return MessageType.Text;
-    case 1:
-      return MessageType.Image;
-    case 2:
-      return MessageType.Video;
-    case 3:
-      return MessageType.Audio;
-    default:
-      return MessageType.Text;
-  }
-};
+export const renderMessageStatus = (
+  messageStatus: MessageStatus,
+  isSentByCurrentUser?: boolean,
+) => {
+  if (!isSentByCurrentUser) return null;
 
-export const convertMessageStatus = (messageStatus: number) => {
   switch (messageStatus) {
-    case 0:
-      return MessageStatus.Sent;
-    case 1:
-      return MessageStatus.Delivered;
-    case 2:
-      return MessageStatus.Seen;
+    case MessageStatus.Sent:
+      return (
+        <Icon
+          type="ionicons"
+          name="checkmark"
+          size={16}
+          color="white"
+          style={commonStyle.statusIcon}
+        />
+      );
+    case MessageStatus.Delivered:
+      return (
+        <Icon
+          type="ionicons"
+          name="checkmark-done"
+          size={16}
+          color="white"
+          style={commonStyle.statusIcon}
+        />
+      );
+    case MessageStatus.Seen:
+      return (
+        <Icon
+          type="ionicons"
+          name="checkmark-done"
+          size={16}
+          color="#90D5FF"
+          style={commonStyle.statusIconSeen}
+        />
+      );
     default:
-      return MessageStatus.Sent;
+      return (
+        <Icon
+          type="feather"
+          name="clock"
+          size={16}
+          color="white"
+          style={commonStyle.statusIcon}
+        />
+      );
   }
 };
+
+export function uuidv4() {
+  if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+    const bytes = crypto.getRandomValues(new Uint8Array(16));
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    const hex = Array.from(bytes)
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+  }
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+console.log(uuidv4());

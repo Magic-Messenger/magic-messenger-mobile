@@ -1,13 +1,20 @@
 import { router } from "expo-router";
-import { useForm } from "react-hook-form";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
 
 import { usePostApiAccountVerifyPhrases } from "@/api/endpoints/magicMessenger";
-import { AppImage, AppLayout, Button, Input, ThemedText } from "@/components";
+import {
+  AppImage,
+  AppLayout,
+  Button,
+  Input,
+  LicenseInput,
+  ThemedText,
+} from "@/components";
 import { Images, spacing } from "@/constants";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { fontPixel, heightPixel, spacingPixel, widthPixel } from "@/utils";
+import { heightPixel, showToast, widthPixel } from "@/utils";
 
 interface RegisterFormData {
   username: string;
@@ -17,25 +24,24 @@ interface RegisterFormData {
 export default function VerifyPhrasesScreen() {
   const { t } = useTranslation();
   const styles = useThemedStyles(createStyle);
-  const { mutateAsync: verifyPhrases } = usePostApiAccountVerifyPhrases();
-
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<RegisterFormData>({
-    defaultValues: {
-      username: "",
-      phrases: "",
-    },
+  const { mutateAsync: verifyPhrases, isPending } =
+    usePostApiAccountVerifyPhrases();
+  const [formData, setFormData] = useState<RegisterFormData>({
+    username: "",
+    phrases: "",
   });
 
-  const onSubmit = async (formValues: RegisterFormData) => {
-    if (formValues) {
+  const onSubmit = async () => {
+    if (
+      formData &&
+      formData.username &&
+      formData.username?.length <= 3 &&
+      formData.phrases
+    ) {
       const { success } = await verifyPhrases({
         data: {
-          username: formValues?.username,
-          phrases: formValues?.phrases?.match(/.{1,4}/g),
+          username: formData?.username,
+          phrases: formData?.phrases?.match(/.{1,4}/g),
         },
       });
 
@@ -43,11 +49,16 @@ export default function VerifyPhrasesScreen() {
         router.push({
           pathname: "/(auth)/resetPassword",
           params: {
-            username: formValues?.username,
-            phrases: formValues?.phrases?.match(/.{1,4}/g),
+            username: formData?.username,
+            phrases: formData?.phrases?.match(/.{1,4}/g),
           },
         });
       }
+    } else {
+      showToast({
+        type: "error",
+        text1: t("common.emptyFile"),
+      });
     }
   };
 
@@ -60,9 +71,8 @@ export default function VerifyPhrasesScreen() {
         <Button
           type="primary"
           label={t("register.button")}
-          onPress={handleSubmit(onSubmit)}
-          loading={isSubmitting}
-          disabled={isSubmitting}
+          onPress={onSubmit}
+          loading={isPending}
         />
       }
     >
@@ -80,37 +90,27 @@ export default function VerifyPhrasesScreen() {
 
         <View style={[styles.formContainer, styles.fullWidth, styles.mt7]}>
           <Input
-            control={control}
-            name="username"
             label={t("userName")}
-            rules={{
-              required: t("inputError.required", {
-                field: t("userName"),
-              }),
-              minLength: {
-                value: 3,
-                message: t("inputError.minLength", {
-                  field: t("userName"),
-                  count: 3,
-                }),
-              },
-            }}
-            error={errors.username?.message}
+            onChangeText={(text) =>
+              setFormData({ ...formData, username: text })
+            }
           />
 
-          <Input
-            control={control}
-            name="phrases"
-            label={t("forgotAccount.inputPhrases")}
-            inputStyle={styles.phrasesInput}
-            multiline
-            rules={{
-              required: t("inputError.required", {
-                field: t("forgotAccount.inputPhrases"),
-              }),
-            }}
-            error={errors.phrases?.message}
-          />
+          <View style={styles.phrasesInputContainer}>
+            <ThemedText weight="semiBold" size={13}>
+              {t("forgotAccount.inputPhrases")}
+            </ThemedText>
+            <LicenseInput
+              grid
+              groupCount={15}
+              charactersPerGroup={4}
+              itemsPerRow={3}
+              value={formData.phrases}
+              onChangeText={(text) =>
+                setFormData({ ...formData, phrases: text })
+              }
+            />
+          </View>
         </View>
       </View>
     </AppLayout>
@@ -129,9 +129,7 @@ const createStyle = (colors: ColorDto) =>
       width: widthPixel(220),
       height: heightPixel(50),
     },
-    phrasesInput: {
-      padding: spacingPixel(15),
-      height: heightPixel(200),
-      fontSize: fontPixel(15),
+    phrasesInputContainer: {
+      gap: 10,
     },
   });

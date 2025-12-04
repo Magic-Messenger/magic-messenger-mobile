@@ -5,7 +5,9 @@ import { StyleSheet, View } from "react-native";
 
 import { ContactItem, ThemedText } from "@/components";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { chatDateFormatter, spacingPixel } from "@/utils";
+
+import { chatDateFormatter } from "../../../../utils/helper";
+import { spacingPixel } from "../../../../utils/pixelHelper";
 
 interface ChatItemProps extends React.ComponentProps<typeof ContactItem> {
   chatId?: string;
@@ -19,6 +21,7 @@ interface ChatItemProps extends React.ComponentProps<typeof ContactItem> {
   groupNonce?: string;
   groupAccountCount?: string;
   groupAdminAccount?: string;
+  groupAdminUsername?: string;
 }
 
 export function ChatItem({
@@ -34,6 +37,7 @@ export function ChatItem({
   groupNonce,
   groupAccountCount,
   groupAdminAccount,
+  groupAdminUsername,
 }: ChatItemProps) {
   const styles = useThemedStyles(createStyle);
   const { t } = useTranslation();
@@ -56,6 +60,7 @@ export function ChatItem({
           groupAccountCount,
           groupAdminAccount,
           isGroupChat: (isGroupChat as never) ?? false,
+          groupAdminUsername,
         },
       });
     } else {

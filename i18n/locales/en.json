@@ -5,6 +5,8 @@
   "loading": "Loading",
   "image_not_loading": "Image could not load",
   "recently": "Recently",
+  "connecting": "Connecting",
+  "encryption": "Encryption",
   "common": {
     "successCopy": "Successfully Copied",
     "cancel": "Cancel",
@@ -23,17 +25,21 @@
     "image": "Image",
     "video": "Video",
     "audio": "Audio",
-    "secondsAgo": "{{count}} second ago",
-    "secondsAgo_plural": "{{count}} seconds ago",
-    "minutesAgo": "{{count}} minute ago",
-    "minutesAgo_plural": "{{count}} minutes ago",
-    "hoursAgo": "{{count}} hour ago",
-    "hoursAgo_plural": "{{count}} hours ago",
+    "secondsAgo_one": "{{count}} second ago",
+    "secondsAgo_other": "{{count}} seconds ago",
+    "minutesAgo_one": "{{count}} minute ago",
+    "minutesAgo_other": "{{count}} minutes ago",
+    "hoursAgo_one": "{{count}} hour ago",
+    "hoursAgo_other": "{{count}} hours ago",
     "daysAgo": "{{count}} day ago",
     "daysAgo_plural": "{{count}} days ago",
     "unread": "Unread",
     "read": "Read",
-    "someThingWentWrong": "Something went wrong."
+    "someThingWentWrong": "Something went wrong.",
+    "newMessageReceived": "New Message Received",
+    "newMessageReceivedDesc": "You have received a new message in chat {{title}}.",
+    "torIsStarted": "TOR is started successfully",
+    "torIsNotStarted": "TOR is not started, please try again later"
   },
   "login": {
     "title": "Login",
@@ -45,7 +51,7 @@
     "changeAccountAlertMessage": "Do you want to login with another username? This will clear your current session.",
     "deleteAccount": "Delete Account",
     "deleteAccountAlertTitle": "Delete Account",
-    "deleteAccountAlertMessage": "Do you want to delete your account? This process cannot be undone.",
+    "deleteAccountAlertMessage": "You're about to delete your account.\nThis will permanently erase all your contacts, chats, notes, and account data.\nOnce deleted, your information cannot be recovered.",
     "deleteAccountPasswordRequired": "Password is required to delete account",
     "publicKeyUpdateError": "Failed to update public key. Please try again."
   },
@@ -78,7 +84,8 @@
   "confirmPassword": "Confirm Password",
   "inputError": {
     "minLength": "{{field}} must be at least {{count}} characters",
-    "required": "{{field}} is required"
+    "required": "{{field}} is required",
+    "invalidUsername": "Username can only contain letters, numbers, and '_'. '.' and '$' are not allowed."
   },
   "securityPhrases": {
     "title": "Security Screen",
@@ -143,7 +150,15 @@
     "deleteProfileNote": "NOTE: THIS ACTION IS IRREVERSIBLE AND CANNOT BE UNDONE",
     "successCopyUserId": "User Name successfully copied",
     "password": "Your Password",
-    "passwordError": "Password must be at least 8 characters"
+    "passwordError": "Password must be at least 8 characters",
+    "userSettings": "User Settings",
+    "changePassword": "Change Password",
+    "changePasswordTitle": "Change Password",
+    "changePasswordDescription": "Change your password regularly to keep your account secure.",
+    "enterOldPassword": "Enter Old Password",
+    "enterNewPassword": "Enter New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "passwordSuccessChanged": "Password changed successfully"
   },
   "contacts": {
     "title": "Contacts",
@@ -159,7 +174,7 @@
     "scanQRCode": "Scan QR code",
     "scanSuccessfull": "Scan Successful",
     "successCopyUserName": "Username copied successfully",
-    "notFound": "Contact data not found",
+    "notFound": "You have no contact yet",
     "successAddedContact": "Contact added successfully",
     "successEditedContact": "Contact updated successfully",
     "deleteContact": "Delete Contact",
@@ -248,7 +263,8 @@
     "myTickets": "My Tickets",
     "open": "Open",
     "waiting": "Waiting",
-    "closed": "Closed"
+    "closed": "Closed",
+    "notFound": "You have no ticket yet"
   },
   "chat": {
     "title": "Chat",
@@ -259,7 +275,8 @@
     "online": "online",
     "offline": "offline",
     "typing": "is typing...",
-    "repliedMessage": "Replied Message"
+    "repliedMessage": "Replied Message",
+    "notFound": "You have no chat yet"
   },
   "groups": {
     "title": "Groups",
@@ -269,10 +286,11 @@
     "searchContacts": "Search from contact list to add in group",
     "inThisGroup": "In this group (max. 15 users)",
     "create": "Create",
-    "selectParticipants": "Select participants"
+    "selectParticipants": "Select participants",
+    "notFound": "You have no group chat yet"
   },
   "notes": {
-    "empty": "No notes available. Click the + button to add a new note.",
+    "empty": "You have no note yet, Click the + button to add a new note.",
     "lastUpdate": "Last update: {{date}}",
     "newNote": "New Note",
     "editNote": "Edit Note",
@@ -285,7 +303,12 @@
     "successAddNote": "Note added successfully",
     "successUpdateNote": "Note updated successfully",
     "successDeleteNote": "Note deleted successfully",
-    "listNotes": "List of Notes"
+    "listNotes": "List of Notes",
+    "noteUnlocked": "Note Unlocked Successfully",
+    "noteLocked": "Note Locked Successfully",
+    "lockNoteTitle": "Magic Notes",
+    "lockNoteDescription": "Please enter your password to view your notes.",
+    "lockNoteButton": "View Notes"
   },
   "chatDetail": {
     "writeMessage": "Write a message...",
@@ -296,6 +319,26 @@
       "success": "Chat deleted successfully",
       "cancel": "Cancel",
       "confirm": "Delete"
+    },
+    "encryptionInfo": "This chat is end-to-end encrypted. Only the receiver and you can read this chat.",
+    "menu": {
+      "clearMessages": "Clear Messages",
+      "deleteConversation": "Delete Conversation",
+      "blockContact": "Block Contact"
+    },
+    "clear": {
+      "title": "Clear Chat",
+      "message": "Are you sure you want to clear this chat?",
+      "success": "Chat cleared successfully",
+      "cancel": "Cancel",
+      "confirm": "Clear"
+    },
+    "block": {
+      "title": "Block Contact and Delete Chat",
+      "message": "Are you sure you want to block this contact and chat will be deleted?",
+      "success": "Contact blocked and chat deleted successfully",
+      "cancel": "Cancel",
+      "confirm": "Block"
     }
   }
 }

@@ -5,11 +5,16 @@ import BottomSheet, {
 import { Portal } from "@gorhom/portal";
 import React, { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
+import Animated, {
+  Extrapolate,
+  interpolate,
+  useAnimatedStyle,
+} from "react-native-reanimated";
 
 import { ThemedText } from "@/components/app";
 import { useColor, useThemedStyles } from "@/theme";
-import { spacingPixel } from "@/utils";
 
+import { spacingPixel } from "../../../utils/pixelHelper";
 import { Icon } from "../Icon";
 
 interface BottomSheetComponentProps extends BottomSheetProps {
@@ -18,6 +23,37 @@ interface BottomSheetComponentProps extends BottomSheetProps {
   initialIndex?: number;
   closeButton?: boolean;
 }
+
+const CustomBackdrop = ({ animatedIndex, style }: any) => {
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: interpolate(
+        animatedIndex.value,
+        [0, 1],
+        [0, 1],
+        Extrapolate.CLAMP,
+      ),
+    };
+  });
+
+  return (
+    <Animated.View
+      pointerEvents={animatedIndex.value > 0 ? "auto" : "none"}
+      style={[
+        style,
+        {
+          backgroundColor: "rgba(0,0,0,0.6)",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+        },
+        animatedStyle,
+      ]}
+    />
+  );
+};
 
 export const BottomSheetComponent = forwardRef<any, BottomSheetComponentProps>(
   (
@@ -36,7 +72,13 @@ export const BottomSheetComponent = forwardRef<any, BottomSheetComponentProps>(
     const bottomSheetRef = useRef<BottomSheet>(null);
 
     useImperativeHandle(ref, () => ({
-      expand: () => bottomSheetRef.current?.expand(),
+      expand: () => {
+        if (!bottomSheetRef.current) return;
+
+        requestAnimationFrame(() => {
+          bottomSheetRef.current?.expand();
+        });
+      },
       collapse: () => bottomSheetRef.current?.collapse(),
       close: () => bottomSheetRef.current?.close(),
       snapToIndex: (index: number) =>
@@ -51,6 +93,7 @@ export const BottomSheetComponent = forwardRef<any, BottomSheetComponentProps>(
           ref={bottomSheetRef}
           index={initialIndex}
           snapPoints={memoSnapPoints}
+          backdropComponent={(props) => <CustomBackdrop {...props} />}
           backgroundStyle={{
             backgroundColor: colors.colors.secondaryBackground,
           }}

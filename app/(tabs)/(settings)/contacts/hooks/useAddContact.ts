@@ -43,6 +43,7 @@ export const useAddContact = () => {
     }
 
     return () => {
+      reset();
       setQrCode("");
     };
   }, [username, reset]);
