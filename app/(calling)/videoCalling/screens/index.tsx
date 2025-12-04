@@ -14,6 +14,7 @@ export default function VideoCallingScreen() {
     remoteStream,
     connectionState,
     isIncoming,
+    startCall,
     endCall,
   } = useVideoCalling();
 
@@ -21,36 +22,48 @@ export default function VideoCallingScreen() {
     <AppLayout container title={"Video Calling"} showBadge={false}>
       <View style={styles.container}>
         {/* Remote Video */}
-        {remoteStream ? (
+        {remoteStream && (
           <RTCView
             streamURL={remoteStream.toURL()}
             style={styles.remoteVideo}
             objectFit="cover"
             mirror={false}
           />
-        ) : (
-          <View style={styles.waitingContainer}>
-            <ThemedText style={styles.waitingText}>
-              {isIncoming ? "Connecting..." : "Calling..."}
-            </ThemedText>
-            <ThemedText style={styles.stateText}>
-              State: {connectionState}
-            </ThemedText>
-          </View>
         )}
 
         {/* Local Video */}
         {localStream && (
-          <RTCView
-            streamURL={localStream.toURL()}
-            style={styles.localVideo}
-            objectFit="cover"
-            mirror={true}
-          />
+          <>
+            <View style={styles.waitingContainer}>
+              <ThemedText style={styles.waitingText}>
+                {isIncoming ? "Connecting..." : "Calling..."}
+              </ThemedText>
+              <ThemedText style={styles.stateText}>
+                State: {connectionState}
+              </ThemedText>
+            </View>
+
+            <RTCView
+              streamURL={localStream.toURL()}
+              style={styles.localVideo}
+              objectFit="cover"
+              mirror={true}
+            />
+          </>
         )}
 
         {/* Controls */}
         <View style={styles.controls}>
+          <Button
+            type="primary"
+            label="Start Call"
+            onPress={() =>
+              startCall({
+                targetUsername: "omer-call",
+                callingType: "Video",
+              })
+            }
+          />
           <Button type="danger" label="End Call" onPress={endCall} />
         </View>
 

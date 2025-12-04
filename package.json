@@ -11,6 +11,7 @@
     "release-apk": "cd android && ./gradlew assembleRelease  && cd ..",
     "ios": "expo run:ios",
     "ios-simulator:14": "expo run:ios --device 'iPhone 14'",
+    "ios-simulator:16": "expo run:ios --device 'iPhone 16'",
     "ios-device": "npx expo run:ios --device 'iPhone 12'",
     "ios-device-release": "npx expo run:ios --device 'iPhone 12' --configuration Release",
     "web": "expo start --web",

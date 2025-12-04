@@ -142,7 +142,7 @@ export default function RegisterScreen() {
                 }),
               },
               pattern: {
-                value: /^[A-Za-z0-9_]+$/,
+                value: /^[A-Za-z0-9_-]+$/,
                 message: t("inputError.invalidUsername"),
               },
             }}
