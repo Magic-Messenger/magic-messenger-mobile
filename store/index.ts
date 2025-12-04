@@ -1,4 +1,5 @@
 export * from "./appStore";
+export * from "./chatStore";
 export * from "./groupChatStore";
 export * from "./noteStore";
 export * from "./protectRouteStore";

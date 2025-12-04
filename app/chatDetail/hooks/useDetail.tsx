@@ -40,14 +40,14 @@ import {
   MessageSeenEvent,
   UploadFileResultDto,
 } from "@/constants";
-import { useSignalRStore, useUserStore } from "@/store";
+import { useChatStore, useSignalRStore, useUserStore } from "@/store";
 import {
   encrypt,
-  groupMessagesByDate,
   MessageWithDate,
   showToast,
   trackEvent,
   userPublicKey,
+  uuidv4,
 } from "@/utils";
 
 export const useDetail = () => {
@@ -57,13 +57,15 @@ export const useDetail = () => {
   const queryClient = useQueryClient();
   const listRef = useRef<FlatList<MessageWithDate>>(null);
   const actionRef = useRef<ActionSheetRef | null>(null);
+  const chatStore = useChatStore();
 
   const isFocused = useIsFocused();
 
   const [isScreenshotEnabled, setIsScreenshotEnabled] =
     useState<boolean>(false);
   const [replyMessage, setReplyMessage] = useState<MessageDto | null>(null);
-  const [messages, setMessages] = useState<MessageDto[]>([]);
+  /* const [messages, setMessages] = useState<MessageDto[]>([]); */
+  const messages = chatStore.messages;
   const [messageStatuses, setMessageStatuses] = useState(new Map());
   const [chatId, setChatId] = useState<string | null>(null);
   const [pagination, setPagination] = useState({
@@ -115,10 +117,10 @@ export const useDetail = () => {
     {
       query: {
         enabled: !!chatId && isFocused,
-        staleTime: 5 * 60 * 1000, // 5 minutes cache
-        gcTime: 10 * 60 * 1000, // 10 minutes garbage collection
+        /* staleTime: 5 * 60 * 1000, 
+        gcTime: 10 * 60 * 1000,  
         refetchOnWindowFocus: false,
-        refetchOnMount: false,
+        refetchOnMount: false, */
       },
     },
   );
@@ -157,7 +159,9 @@ export const useDetail = () => {
     const messagesResult = isFirstLoad
       ? newMessages
       : [...newMessages, ...messages];
-    setMessages(messagesResult);
+    /* setMessages(messagesResult); */
+
+    chatStore.setMessages(messagesResult);
 
     // Initialize status for the new messages
     setMessageStatuses((prevStatuses) => {
@@ -176,6 +180,10 @@ export const useDetail = () => {
         (data.messages?.pageNumber as number) <
         (data.messages?.totalPages as number),
     }));
+
+    return () => {
+      chatStore.clearStore();
+    };
   }, [messagesData]);
 
   const loadMoreMessages = useCallback(() => {
@@ -256,16 +264,12 @@ export const useDetail = () => {
         messageChatId = newChatId;
         setChatId(newChatId);
       }
+      const tempId = uuidv4();
 
       const isFileMessage =
         typeof message === "object" && message?.fileUrl !== undefined;
 
-      // Create an optimistic message
-      const tempId = `temp-${Date.now()}-${Math.random()}`;
-      const optimisticMessage: MessageDto & {
-        isPending?: boolean;
-        tempId?: string;
-      } = {
+      const messageInfo = {
         messageId: tempId,
         tempId,
         isPending: true,
@@ -291,63 +295,38 @@ export const useDetail = () => {
               ),
             }
           : null,
-        repliedToMessage: replyMessage || null,
-        messageStatus: MessageStatus.Sent, // Pending status
-      } as any;
+        repliedToMessage: replyMessage?.messageId || null,
+      };
+      if (messageInfo) {
+        trackEvent("sendMessage: ", messageInfo);
+        chatStore.sendMessage(messageInfo as MessageDto);
 
-      trackEvent("sendMessage: ", optimisticMessage);
-
-      // Add an optimistic message to the list (at the beginning for inverted list)
-      setMessages((prev) => [...prev, optimisticMessage]);
-
-      try {
         const response = await sendApiMessage({
           data: {
-            chatId: messageChatId,
-            messageType: isFileMessage
-              ? message?.messageType
-              : MessageType.Text,
-            ...(!isFileMessage && {
-              content: encrypt(
-                message as string,
-                usersPublicKey.receiverPublicKey,
-                usersPublicKey.senderPrivateKey,
-              ),
-            }),
-            ...(isFileMessage && {
-              file: {
-                size: message.contentLength,
-                contentType: message.contentType,
-                filePath: encrypt(
-                  message.fileUrl as string,
-                  usersPublicKey.receiverPublicKey,
-                  usersPublicKey.senderPrivateKey,
-                ),
-              },
-            }),
-            ...(replyMessage && {
-              repliedToMessage: replyMessage?.messageId,
-            }),
-            createdAt: optimisticMessage?.createdAt,
+            ...messageInfo,
           },
         });
-
         if (response?.success) {
-          // Remove optimistic message - the real one will come via SignalR
-          setMessages((prev) =>
-            prev.filter((m) => (m as any).tempId !== tempId),
-          );
-        } else {
-          // Remove a failed message
-          setMessages((prev) =>
-            prev.filter((m) => (m as any).tempId !== tempId),
-          );
+          chatStore.updateMessageId(tempId, response.data?.messageId as string);
+          setMessageStatuses((prevStatuses) => {
+            const newStatuses = new Map(prevStatuses);
+            newStatuses.set(
+              response.data?.messageId,
+              response.data?.messageStatus,
+            );
+            return newStatuses;
+          });
+          trackEvent("message_sent", {
+            chatId: messageChatId,
+            messageId: response.data,
+          });
         }
-      } catch (error) {
-        console.error("Error sending message:", error);
-        // Remove a failed message
-        setMessages((prev) => prev.filter((m) => (m as any).tempId !== tempId));
+      } else {
+        trackEvent("messageInfo is undefined", { messageInfo });
+        chatStore.deleteTempMessage(tempId);
       }
+
+      return;
     },
     [
       chatId,
@@ -361,6 +340,7 @@ export const useDetail = () => {
   );
 
   // Batch processor that applies all queued status updates at once
+  // İlk mesajdan (en eski) son mesaja (en yeni) doğru işler
   const processBatchUpdates = useCallback(() => {
     if (updateQueueRef.current.size === 0) return;
 
@@ -369,20 +349,36 @@ export const useDetail = () => {
 
     setMessageStatuses((prevStatuses) => {
       const newStatuses = new Map(prevStatuses);
-      updates.forEach((update, messageId) => {
+
+      // Güncellenecek mesajları createdAt'e göre sırala (eskiden yeniye - ascending)
+      const sortedUpdates = Array.from(updates.entries())
+        .map(([messageId, status]) => {
+          const message = messages.find((m) => m.messageId === messageId);
+          return {
+            messageId,
+            status,
+            createdAt: message?.createdAt
+              ? new Date(message.createdAt).getTime()
+              : 0,
+          };
+        })
+        .sort((a, b) => a.createdAt - b.createdAt); // Eskiden yeniye doğru sırala (ascending)
+
+      // Sıralanmış güncellemeleri uygula (ilk mesajdan son mesaja doğru)
+      sortedUpdates.forEach(({ messageId, status }) => {
         const currentStatus = prevStatuses.get(messageId);
         const currentPriority = MESSAGE_STATUS_PRIORITY[currentStatus] || 0;
-        const newPriority = MESSAGE_STATUS_PRIORITY[update];
+        const newPriority = MESSAGE_STATUS_PRIORITY[status];
 
-        // Only update if new status has higher priority
+        // Sadece daha yüksek öncelikli durumları güncelle
         if (newPriority > currentPriority) {
-          newStatuses.set(messageId, update);
+          newStatuses.set(messageId, status);
         }
       });
 
       return newStatuses;
     });
-  }, []);
+  }, [messages]);
 
   // Schedule batch processing
   const scheduleBatchUpdate = useCallback(() => {
@@ -393,7 +389,7 @@ export const useDetail = () => {
     batchTimeoutRef.current = setTimeout(() => {
       processBatchUpdates();
       batchTimeoutRef.current = null;
-    }, 500); // Batch updates within 500ms window
+    }, 250); // Batch updates within 250ms window
   }, [processBatchUpdates]);
 
   const handleMessageDelivered = useCallback(
@@ -442,40 +438,58 @@ export const useDetail = () => {
       trackEvent("message_seen", { messageSeenEvent });
 
       const messageId = messageSeenEvent.message?.messageId;
-      const newStatus =
-        MESSAGE_STATUS_PRIORITY[messageSeenEvent.message?.messageStatus!];
+      const messageStatus = messageSeenEvent.message?.messageStatus;
 
-      if (!messageId || !newStatus) return;
+      if (!messageId || !messageStatus) return;
 
-      // Check if this update should override the queued one
-      const existingUpdate = updateQueueRef.current.get(messageId);
-      trackEvent("message_seen existingUpdate", existingUpdate);
+      // Görülen mesajı bul
+      const seenMessage = messages.find((m) => m.messageId === messageId);
+      if (!seenMessage) return;
 
-      if (existingUpdate) {
-        const existingPriority = MESSAGE_STATUS_PRIORITY[existingUpdate];
+      const seenMessageTime = seenMessage.createdAt
+        ? new Date(seenMessage.createdAt).getTime()
+        : 0;
 
-        // Only update queue if new status has higher or equal priority
-        if (newStatus >= existingPriority) {
-          updateQueueRef.current.set(
-            messageId,
-            messageSeenEvent.message?.messageStatus!,
+      // Bu mesaj ve öncesindeki tüm mesajları (currentUser tarafından gönderilenleri) "seen" olarak işaretle
+      // Eskiden yeniye doğru sırala ve işle
+      const messagesToUpdate = messages
+        .filter((m) => {
+          const msgTime = m.createdAt ? new Date(m.createdAt).getTime() : 0;
+          // Sadece bu mesaj ve önceki mesajları al
+          // Ve sadece current user tarafından gönderilen mesajları güncelle
+          return (
+            msgTime <= seenMessageTime && m.senderUsername === currentUserName
           );
-        }
-      } else {
-        // No existing update, add to queue
-        trackEvent("message_seen no existing update", {
-          messageId,
-          messageStatus: newStatus,
+        })
+        .sort((a, b) => {
+          const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return timeA - timeB; // Eskiden yeniye (ascending)
         });
-        updateQueueRef.current.set(
-          messageId,
-          messageSeenEvent.message?.messageStatus!,
-        );
-      }
+
+      trackEvent("message_seen messagesToUpdate", {
+        count: messagesToUpdate.length,
+        messageIds: messagesToUpdate.map((m) => m.messageId),
+      });
+
+      // Tüm mesajları queue'ya ekle
+      messagesToUpdate.forEach((msg) => {
+        const existingUpdate = updateQueueRef.current.get(msg.messageId!);
+        const newPriority = MESSAGE_STATUS_PRIORITY[messageStatus];
+
+        if (existingUpdate) {
+          const existingPriority = MESSAGE_STATUS_PRIORITY[existingUpdate];
+          if (newPriority >= existingPriority) {
+            updateQueueRef.current.set(msg.messageId!, messageStatus);
+          }
+        } else {
+          updateQueueRef.current.set(msg.messageId!, messageStatus);
+        }
+      });
 
       scheduleBatchUpdate();
     },
-    [scheduleBatchUpdate],
+    [scheduleBatchUpdate, messages, currentUserName],
   );
 
   const handleMessageReceived = useCallback(
@@ -489,7 +503,9 @@ export const useDetail = () => {
       )
         return;
 
-      setMessages((prev) => [...prev, newMessage]);
+      /* setMessages((prev) => [...prev, newMessage]); */
+
+      chatStore.sendMessage(newMessage);
 
       // Initialize status for the new message
       setMessageStatuses((prevStatuses) => {
@@ -701,16 +717,9 @@ export const useDetail = () => {
     });
   }, [navigation, chatId]);
 
-  const groupedMessages = useMemo(
-    () => groupMessagesByDate(messages),
-    [messages],
-  );
-
-  // Inverted groupedMessages for FlatList inverted prop
-  const invertedGroupedMessages = useMemo(
-    () => [...groupedMessages].reverse(),
-    [groupedMessages],
-  );
+  const invertedGroupedMessages = useMemo(() => {
+    return [...messages].reverse();
+  }, [messages]);
 
   return {
     t,
