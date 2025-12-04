@@ -69,11 +69,6 @@ export default function ChatScreen() {
     [chatId],
   );
 
-  const renderFooter = useCallback(
-    () => (messages.length === 0 && !loading ? <EncryptionInfo /> : null),
-    [messages.length, loading],
-  );
-
   return (
     <>
       <ChatLayout
@@ -93,6 +88,7 @@ export default function ChatScreen() {
           />
         }
       >
+        {messages.length === 0 && !loading && <EncryptionInfo />}
         <LoadingProvider loading={loading}>
           <FlatList
             ref={listRef}
@@ -104,7 +100,6 @@ export default function ChatScreen() {
             onEndReachedThreshold={0.5}
             contentContainerStyle={styles.contentContainerStyle}
             ListHeaderComponent={renderHeader}
-            ListFooterComponent={renderFooter}
             showsVerticalScrollIndicator={false}
             removeClippedSubviews
             maxToRenderPerBatch={15}

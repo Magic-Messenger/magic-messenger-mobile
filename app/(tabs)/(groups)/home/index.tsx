@@ -47,6 +47,7 @@ export default function ChatScreen() {
         groupNonce={item.groupNonce as string}
         groupAccountCount={item.groupAccountCount as string}
         groupAdminAccount={item.groupAdminAccount as string}
+        groupAdminUsername={item.groupAdminUsername as string}
       />
     ),
     [],

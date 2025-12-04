@@ -1,6 +1,5 @@
-import { FlashList } from "@shopify/flash-list";
 import React, { useCallback } from "react";
-import { StyleSheet } from "react-native";
+import { FlatList, StyleSheet } from "react-native";
 
 import {
   ActionSheet,
@@ -32,14 +31,13 @@ export default function GroupChatScreen() {
     chatActionOptions,
     groupAccountCount,
     replyMessage,
-    handleChatControl,
+    handleSendMessage,
     handleReply,
+    handleEndReached,
     onClearReply,
-    handleScroll,
     getMessageStatus,
   } = useDetail();
 
-  // Memoized render function for better performance
   const renderItem = useCallback(
     ({ item }: { item: MessageWithDate }) => {
       if (isDateSeparator(item)) {
@@ -58,7 +56,6 @@ export default function GroupChatScreen() {
     [chatId, handleReply, getMessageStatus],
   );
 
-  // Key extractor for optimal list performance
   const keyExtractor = useCallback((item: MessageWithDate, index: number) => {
     if (isDateSeparator(item)) {
       return `date-${item.date}-${index}`;
@@ -66,19 +63,10 @@ export default function GroupChatScreen() {
     return item.messageId || `temp-${item.createdAt}`;
   }, []);
 
-  // Footer component
-  const renderFooter = useCallback(
+  const renderHeader = useCallback(
     () => <ChatTyping chatId={chatId} />,
     [chatId],
   );
-
-  // Optional: Item type for better recycling
-  const getItemType = useCallback((item: MessageWithDate) => {
-    if (isDateSeparator(item)) {
-      return "date";
-    }
-    return item.messageType; // "text", "image", "audio", "video"
-  }, []);
 
   return (
     <>
@@ -95,37 +83,37 @@ export default function GroupChatScreen() {
           <ChatFooter
             chatId={chatId}
             replyMessage={replyMessage}
-            onSend={handleChatControl}
+            onSend={handleSendMessage}
             onClearReply={onClearReply}
           />
         }
       >
+        {messages.length === 0 && !loading && <EncryptionInfo />}
         <LoadingProvider loading={loading}>
-          <FlashList
+          <FlatList
             ref={listRef}
             data={groupedMessages}
             renderItem={renderItem}
             keyExtractor={keyExtractor}
-            onScroll={handleScroll}
-            scrollEventThrottle={16}
+            inverted
+            onEndReached={handleEndReached}
+            onEndReachedThreshold={0.5}
             contentContainerStyle={styles.contentContainerStyle}
-            ListFooterComponent={renderFooter}
-            getItemType={getItemType}
+            ListHeaderComponent={renderHeader}
             showsVerticalScrollIndicator={false}
-            showsHorizontalScrollIndicator={false}
-            drawDistance={400}
             removeClippedSubviews
-            maintainVisibleContentPosition={{
-              autoscrollToTopThreshold: 10,
-            }}
-            ListHeaderComponent={
-              messages.length === 0 && !loading ? <EncryptionInfo /> : null
-            }
+            maxToRenderPerBatch={15}
+            windowSize={10}
+            initialNumToRender={20}
           />
         </LoadingProvider>
       </ChatLayout>
 
-      <ActionSheet ref={actionRef} options={chatActionOptions} />
+      <ActionSheet
+        ref={actionRef}
+        options={chatActionOptions}
+        snapPoints={["20%"]}
+      />
     </>
   );
 }

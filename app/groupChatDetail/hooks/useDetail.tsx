@@ -1,5 +1,4 @@
 import { useIsFocused } from "@react-navigation/core";
-import { FlashListRef } from "@shopify/flash-list";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { throttle } from "lodash";
 import {
@@ -13,6 +12,7 @@ import {
 import { useTranslation } from "react-i18next";
 import {
   Alert,
+  FlatList,
   NativeScrollEvent,
   NativeSyntheticEvent,
   TouchableOpacity,
@@ -32,32 +32,32 @@ import {
   MessageDeliveredEvent,
   MessageReceivedEvent,
   MessageSeenEvent,
-  SCROLL_THRESHOLD,
   UploadFileResultDto,
 } from "@/constants";
-import { useSignalRStore, useUserStore } from "@/store";
+import { useChatStore, useSignalRStore, useUserStore } from "@/store";
 import {
   decryptGroupKeyForUser,
   encryptForGroup,
-  groupMessagesByDate,
   MessageWithDate,
   showToast,
   trackEvent,
   userPrivateKey,
   userPublicKey,
+  uuidv4,
 } from "@/utils";
 
 export const useDetail = () => {
   const { t } = useTranslation();
   const router = useRouter();
-  const listRef = useRef<FlashListRef<MessageWithDate>>(null);
+  const listRef = useRef<FlatList<MessageWithDate>>(null);
   const actionRef = useRef<ActionSheetRef | null>(null);
   const navigation = useNavigation();
+  const chatStore = useChatStore();
+  const messages = useChatStore((state) => state.messages);
 
   const isFocused = useIsFocused();
 
   const [replyMessage, setReplyMessage] = useState<MessageDto | null>(null);
-  const [messages, setMessages] = useState<MessageDto[]>([]);
   const [messageStatuses, setMessageStatuses] = useState(new Map());
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({
@@ -103,7 +103,12 @@ export const useDetail = () => {
     groupNonce,
     groupAccountCount,
     groupAdminAccount,
+    groupAdminUsername,
   } = useLocalSearchParams();
+
+  const isCreatedByCurrentUser = useMemo(() => {
+    return groupAdminUsername === currentUserName;
+  }, [groupAdminUsername, currentUserName]);
 
   const decryptedGroupKey = useMemo(
     () =>
@@ -141,15 +146,19 @@ export const useDetail = () => {
         });
 
         if (!isMountedRef.current) return;
-
         if (success && data?.messages?.data) {
           const newMessages = data.messages.data as MessageDto[];
           const isFirstLoad = pageNumber === 1;
 
+          if (newMessages.length === 0) {
+            return;
+          }
+
           const messagesData = isFirstLoad
             ? newMessages
             : [...newMessages, ...messages];
-          setMessages(messagesData);
+
+          chatStore.setMessages(messagesData);
 
           // Initialize status for the new message
           setMessageStatuses((prevStatuses) => {
@@ -170,12 +179,6 @@ export const useDetail = () => {
               ((data.messages?.pageNumber as number) ?? prev.currentPage) <
               ((data.messages?.totalPages as number) ?? prev.totalPages),
           }));
-
-          if (isFirstLoad && listRef.current) {
-            setTimeout(() => {
-              listRef.current?.scrollToEnd({ animated: false });
-            }, 100);
-          }
         }
       } catch (error) {
         console.error("Error loading messages:", error);
@@ -186,7 +189,7 @@ export const useDetail = () => {
         }
       }
     },
-    [chatId, pagination.pageSize, pagination.hasMore],
+    [chatId, pagination.pageSize, pagination.hasMore, messages],
   );
 
   useEffect(() => {
@@ -200,23 +203,36 @@ export const useDetail = () => {
     };
   }, []);
 
+  const loadMoreMessages = useCallback(() => {
+    if (isLoadingRef.current || !pagination.hasMore || !chatId) {
+      return;
+    }
+    isLoadingRef.current = true;
+    setPagination((prev) => ({
+      ...prev,
+      currentPage: prev.currentPage + 1,
+    }));
+    setTimeout(() => {
+      isLoadingRef.current = false;
+    }, 500);
+  }, [chatId, pagination.hasMore]);
+
+  const handleEndReached = useCallback(() => {
+    if (pagination.hasMore && !isLoadingRef.current && !loading) {
+      loadMoreMessages();
+    }
+  }, [pagination.hasMore, loadMoreMessages, loading]);
+
   const handleScroll = useMemo(
     () =>
       throttle(
-        (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-          const offsetY = e.nativeEvent.contentOffset.y;
-          if (
-            offsetY <= SCROLL_THRESHOLD &&
-            pagination.hasMore &&
-            !isLoadingRef.current
-          ) {
-            loadMessages(pagination.currentPage + 1);
-          }
+        (_e: NativeSyntheticEvent<NativeScrollEvent>) => {
+          // Scroll handling kept for future use if needed
         },
         1000,
         { leading: true, trailing: false },
       ),
-    [pagination.hasMore, pagination.currentPage, loadMessages],
+    [],
   );
 
   const handleReply = useCallback((message: MessageDto) => {
@@ -232,15 +248,12 @@ export const useDetail = () => {
   const handleSendMessage = useCallback(
     async (message: string | UploadFileResultDto) => {
       onClearReply?.();
+      const tempId = uuidv4();
+
       const isFileMessage =
         typeof message === "object" && message?.fileUrl !== undefined;
 
-      // Create an optimistic message
-      const tempId = `temp-${Date.now()}-${Math.random()}`;
-      const optimisticMessage: MessageDto & {
-        isPending?: boolean;
-        tempId?: string;
-      } = {
+      const messageInfo = {
         messageId: tempId,
         tempId,
         isPending: true,
@@ -261,64 +274,39 @@ export const useDetail = () => {
               ),
             }
           : null,
-        repliedToMessage: replyMessage || null,
-        messageStatus: MessageStatus.Sent, // Pending status
-      } as any;
+        repliedToMessage: replyMessage?.messageId || null,
+      };
 
-      // Add an optimistic message to the list
-      setMessages((prev) => [...prev, optimisticMessage]);
+      trackEvent("sendMessage: ", messageInfo);
+      chatStore.sendMessage(messageInfo as MessageDto);
 
-      // Scroll to end
-      setTimeout(() => {
-        listRef.current?.scrollToEnd({ animated: true });
-      }, 100);
+      const response = await sendApiMessage({
+        data: {
+          ...messageInfo,
+        },
+      });
 
-      try {
-        const response = await sendApiMessage({
-          data: {
-            chatId: chatId as string,
-            messageType: isFileMessage
-              ? message?.messageType
-              : MessageType.Text,
-            ...(!isFileMessage && {
-              content: encryptForGroup(
-                message as string,
-                decryptedGroupKey as string,
-              ),
-            }),
-            ...(isFileMessage && {
-              file: {
-                size: message.contentLength,
-                contentType: message.contentType,
-                filePath: encryptForGroup(
-                  message.fileUrl as string,
-                  decryptedGroupKey as string,
-                ),
-              },
-            }),
-            ...(replyMessage && {
-              repliedToMessage: replyMessage?.messageId,
-            }),
-            createdAt: optimisticMessage?.createdAt,
-          },
+      if (response?.success) {
+        chatStore.updateMessageId(tempId, response.data?.messageId as string);
+        setMessageStatuses((prevStatuses) => {
+          const newStatuses = new Map(prevStatuses);
+          newStatuses.set(
+            response.data?.messageId,
+            response.data?.messageStatus,
+          );
+          return newStatuses;
         });
 
-        if (response?.success) {
-          // Remove optimistic message - the real one will come via SignalR
-          setMessages((prev) =>
-            prev.filter((m) => (m as any).tempId !== tempId),
-          );
-        } else {
-          // Remove a failed message
-          setMessages((prev) =>
-            prev.filter((m) => (m as any).tempId !== tempId),
-          );
-        }
-      } catch (error) {
-        console.error("Error sending message:", error);
-        // Remove a failed message
-        setMessages((prev) => prev.filter((m) => (m as any).tempId !== tempId));
+        trackEvent("message_sent", {
+          chatId: chatId as string,
+          messageId: response.data,
+        });
+      } else {
+        trackEvent("messageInfo is undefined", { messageInfo });
+        chatStore.deleteTempMessage(tempId);
       }
+
+      return;
     },
     [
       chatId,
@@ -330,18 +318,9 @@ export const useDetail = () => {
     ],
   );
 
-  const handleChatControl = useCallback(
-    async (message: string | UploadFileResultDto) => {
-      if (chatId) {
-        await handleSendMessage(message);
-      }
-    },
-    [chatId, handleSendMessage],
-  );
-
   //#region SignalR Effects
   // Batch processor that applies all queued status updates at once
-  // Batch processor that applies all queued status updates at once
+  // İlk mesajdan (en eski) son mesaja (en yeni) doğru işler
   const processBatchUpdates = useCallback(() => {
     if (updateQueueRef.current.size === 0) return;
 
@@ -350,20 +329,36 @@ export const useDetail = () => {
 
     setMessageStatuses((prevStatuses) => {
       const newStatuses = new Map(prevStatuses);
-      updates.forEach((update, messageId) => {
+
+      // Güncellenecek mesajları createdAt'e göre sırala (eskiden yeniye - ascending)
+      const sortedUpdates = Array.from(updates.entries())
+        .map(([messageId, status]) => {
+          const message = messages.find((m) => m.messageId === messageId);
+          return {
+            messageId,
+            status,
+            createdAt: message?.createdAt
+              ? new Date(message.createdAt).getTime()
+              : 0,
+          };
+        })
+        .sort((a, b) => a.createdAt - b.createdAt); // Eskiden yeniye doğru sırala (ascending)
+
+      // Sıralanmış güncellemeleri uygula (ilk mesajdan son mesaja doğru)
+      sortedUpdates.forEach(({ messageId, status }) => {
         const currentStatus = prevStatuses.get(messageId);
         const currentPriority = MESSAGE_STATUS_PRIORITY[currentStatus] || 0;
-        const newPriority = MESSAGE_STATUS_PRIORITY[update];
+        const newPriority = MESSAGE_STATUS_PRIORITY[status];
 
-        // Only update if new status has higher priority
+        // Sadece daha yüksek öncelikli durumları güncelle
         if (newPriority > currentPriority) {
-          newStatuses.set(messageId, update);
+          newStatuses.set(messageId, status);
         }
       });
 
       return newStatuses;
     });
-  }, []);
+  }, [messages]);
 
   // Schedule batch processing
   const scheduleBatchUpdate = useCallback(() => {
@@ -374,7 +369,7 @@ export const useDetail = () => {
     batchTimeoutRef.current = setTimeout(() => {
       processBatchUpdates();
       batchTimeoutRef.current = null;
-    }, 500); // Batch updates within 500ms window
+    }, 250); // Batch updates within 250ms window
   }, [processBatchUpdates]);
 
   const handleMessageDelivered = useCallback(
@@ -423,40 +418,58 @@ export const useDetail = () => {
       trackEvent("message_seen", { messageSeenEvent });
 
       const messageId = messageSeenEvent.message?.messageId;
-      const newStatus =
-        MESSAGE_STATUS_PRIORITY[messageSeenEvent.message?.messageStatus!];
+      const messageStatus = messageSeenEvent.message?.messageStatus;
 
-      if (!messageId || !newStatus) return;
+      if (!messageId || !messageStatus) return;
 
-      // Check if this update should override the queued one
-      const existingUpdate = updateQueueRef.current.get(messageId);
-      trackEvent("message_seen existingUpdate", existingUpdate);
+      // Görülen mesajı bul
+      const seenMessage = messages.find((m) => m.messageId === messageId);
+      if (!seenMessage) return;
 
-      if (existingUpdate) {
-        const existingPriority = MESSAGE_STATUS_PRIORITY[existingUpdate];
+      const seenMessageTime = seenMessage.createdAt
+        ? new Date(seenMessage.createdAt).getTime()
+        : 0;
 
-        // Only update queue if new status has higher or equal priority
-        if (newStatus >= existingPriority) {
-          updateQueueRef.current.set(
-            messageId,
-            messageSeenEvent.message?.messageStatus!,
+      // Bu mesaj ve öncesindeki tüm mesajları (currentUser tarafından gönderilenleri) "seen" olarak işaretle
+      // Eskiden yeniye doğru sırala ve işle
+      const messagesToUpdate = messages
+        .filter((m) => {
+          const msgTime = m.createdAt ? new Date(m.createdAt).getTime() : 0;
+          // Sadece bu mesaj ve önceki mesajları al
+          // Ve sadece current user tarafından gönderilen mesajları güncelle
+          return (
+            msgTime <= seenMessageTime && m.senderUsername === currentUserName
           );
-        }
-      } else {
-        // No existing update, add to queue
-        trackEvent("message_seen no existing update", {
-          messageId,
-          messageStatus: newStatus,
+        })
+        .sort((a, b) => {
+          const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return timeA - timeB; // Eskiden yeniye (ascending)
         });
-        updateQueueRef.current.set(
-          messageId,
-          messageSeenEvent.message?.messageStatus!,
-        );
-      }
+
+      trackEvent("message_seen messagesToUpdate", {
+        count: messagesToUpdate.length,
+        messageIds: messagesToUpdate.map((m) => m.messageId),
+      });
+
+      // Tüm mesajları queue'ya ekle
+      messagesToUpdate.forEach((msg) => {
+        const existingUpdate = updateQueueRef.current.get(msg.messageId!);
+        const newPriority = MESSAGE_STATUS_PRIORITY[messageStatus];
+
+        if (existingUpdate) {
+          const existingPriority = MESSAGE_STATUS_PRIORITY[existingUpdate];
+          if (newPriority >= existingPriority) {
+            updateQueueRef.current.set(msg.messageId!, messageStatus);
+          }
+        } else {
+          updateQueueRef.current.set(msg.messageId!, messageStatus);
+        }
+      });
 
       scheduleBatchUpdate();
     },
-    [scheduleBatchUpdate],
+    [scheduleBatchUpdate, messages, currentUserName],
   );
 
   const handleGroupMessageReceived = useCallback(
@@ -470,7 +483,7 @@ export const useDetail = () => {
       )
         return;
 
-      setMessages((prev) => [...prev, newMessage]);
+      chatStore.sendMessage(newMessage);
 
       // Initialize status for the new message
       setMessageStatuses((prevStatuses) => {
@@ -480,12 +493,8 @@ export const useDetail = () => {
       });
 
       setReceivedMessage(undefined);
-
-      setTimeout(() => {
-        listRef.current?.scrollToEnd({ animated: true });
-      }, 100);
     },
-    [listRef, chatId],
+    [chatId],
   );
 
   useEffect(() => {
@@ -582,27 +591,36 @@ export const useDetail = () => {
   );
 
   useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () =>
-        chatId ? (
-          <TouchableOpacity
-            onPress={() =>
-              setTimeout(() => {
-                actionRef.current?.open();
-              }, 10)
-            }
-            style={{ padding: 5 }}
-          >
-            <Icon type="feather" name="more-vertical" />
-          </TouchableOpacity>
-        ) : null,
-    });
-  }, [navigation, chatId]);
+    if (isCreatedByCurrentUser) {
+      navigation.setOptions({
+        headerRight: () =>
+          chatId ? (
+            <TouchableOpacity
+              onPress={() =>
+                setTimeout(() => {
+                  actionRef.current?.open();
+                }, 10)
+              }
+              style={{ padding: 5 }}
+            >
+              <Icon type="feather" name="more-vertical" />
+            </TouchableOpacity>
+          ) : null,
+      });
+    }
+  }, [navigation, chatId, isCreatedByCurrentUser]);
 
-  const groupedMessages = useMemo(
-    () => groupMessagesByDate(messages),
-    [messages],
-  );
+  const invertedGroupedMessages = useMemo(() => {
+    return [...messages].reverse();
+  }, [messages]);
+
+  useEffect(() => {
+    chatStore.clearStore();
+
+    return () => {
+      chatStore.clearStore();
+    };
+  }, []);
 
   return {
     t,
@@ -612,7 +630,7 @@ export const useDetail = () => {
     actionRef,
     chatId: chatId as string,
     messages,
-    groupedMessages,
+    groupedMessages: invertedGroupedMessages,
     chatActionOptions,
     userName,
     groupAccountCount,
@@ -622,7 +640,8 @@ export const useDetail = () => {
     handleReply,
     onClearReply,
     handleScroll,
-    handleChatControl,
+    handleEndReached,
+    handleSendMessage,
     getMessageStatus,
   };
 };

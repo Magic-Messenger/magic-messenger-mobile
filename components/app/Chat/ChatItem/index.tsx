@@ -21,6 +21,7 @@ interface ChatItemProps extends React.ComponentProps<typeof ContactItem> {
   groupNonce?: string;
   groupAccountCount?: string;
   groupAdminAccount?: string;
+  groupAdminUsername?: string;
 }
 
 export function ChatItem({
@@ -36,6 +37,7 @@ export function ChatItem({
   groupNonce,
   groupAccountCount,
   groupAdminAccount,
+  groupAdminUsername,
 }: ChatItemProps) {
   const styles = useThemedStyles(createStyle);
   const { t } = useTranslation();
@@ -58,6 +60,7 @@ export function ChatItem({
           groupAccountCount,
           groupAdminAccount,
           isGroupChat: (isGroupChat as never) ?? false,
+          groupAdminUsername,
         },
       });
     } else {

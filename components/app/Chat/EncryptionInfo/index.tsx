@@ -26,9 +26,9 @@ const createStyle = () =>
   StyleSheet.create({
     container: {
       borderRadius: spacingPixel(10),
+      marginHorizontal: spacingPixel(15),
     },
     content: {
-      flex: 1,
       flexDirection: "row",
       padding: spacingPixel(10),
     },

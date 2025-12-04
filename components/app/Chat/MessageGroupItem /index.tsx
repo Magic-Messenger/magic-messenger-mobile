@@ -91,7 +91,7 @@ function MessageGroupItem({
           if (event.translationX > 0) {
             translateX.value = Math.min(
               event.translationX,
-              SWIPE_THRESHOLD * 1.2
+              SWIPE_THRESHOLD * 1.2,
             );
           }
         })
@@ -103,7 +103,7 @@ function MessageGroupItem({
 
           translateX.value = withSpring(0, SPRING_CONFIG);
         }),
-    [triggerReply]
+    [triggerReply],
   );
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -115,14 +115,14 @@ function MessageGroupItem({
       translateX.value,
       [0, SWIPE_THRESHOLD],
       [0, 1],
-      Extrapolation.CLAMP
+      Extrapolation.CLAMP,
     );
 
     const scale = interpolate(
       translateX.value,
       [0, SWIPE_THRESHOLD * 0.5, SWIPE_THRESHOLD],
       [0.5, 1, 1],
-      Extrapolation.CLAMP
+      Extrapolation.CLAMP,
     );
 
     return {
@@ -189,9 +189,17 @@ function MessageGroupItem({
               : styles.receiverContainer,
           ]}
         >
-          <ThemedText size={11} numberOfLines={1} weight="semiBold">
-            {message?.nickname}
-          </ThemedText>
+          {!isSentByCurrentUser && (
+            <ThemedText
+              size={11}
+              numberOfLines={1}
+              weight="semiBold"
+              style={styles.mb1}
+            >
+              {message?.nickname}
+            </ThemedText>
+          )}
+
           {renderMessageContent()}
         </Animated.View>
       </GestureDetector>

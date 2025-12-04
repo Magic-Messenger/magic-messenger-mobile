@@ -58,6 +58,7 @@ export const useDetail = () => {
   const listRef = useRef<FlatList<MessageWithDate>>(null);
   const actionRef = useRef<ActionSheetRef | null>(null);
   const chatStore = useChatStore();
+  const messages = useChatStore((state) => state.messages);
 
   const isFocused = useIsFocused();
 
@@ -65,9 +66,9 @@ export const useDetail = () => {
     useState<boolean>(false);
   const [replyMessage, setReplyMessage] = useState<MessageDto | null>(null);
   /* const [messages, setMessages] = useState<MessageDto[]>([]); */
-  const messages = chatStore.messages;
   const [messageStatuses, setMessageStatuses] = useState(new Map());
   const [chatId, setChatId] = useState<string | null>(null);
+  console.log("chatId: ", chatId);
   const [pagination, setPagination] = useState({
     currentPage: 0,
     pageSize: INITIAL_PAGE_SIZE,
@@ -108,6 +109,7 @@ export const useDetail = () => {
     data: messagesData,
     isLoading: isMessagesLoading,
     isFetching: isMessagesFetching,
+    refetch: refetchMessages,
   } = useGetApiChatsMessages(
     {
       chatId: chatId as string,
@@ -117,8 +119,8 @@ export const useDetail = () => {
     {
       query: {
         enabled: !!chatId && isFocused,
-        /* staleTime: 5 * 60 * 1000, 
-        gcTime: 10 * 60 * 1000,  
+        /* staleTime: 5 * 60 * 1000,
+        gcTime: 10 * 60 * 1000,
         refetchOnWindowFocus: false,
         refetchOnMount: false, */
       },
@@ -154,7 +156,12 @@ export const useDetail = () => {
     }
 
     const newMessages = data.messages?.data as MessageDto[];
+    console.log("newMessages: ", newMessages);
     const isFirstLoad = pagination.currentPage <= 1;
+
+    if (newMessages.length === 0) {
+      return;
+    }
 
     const messagesResult = isFirstLoad
       ? newMessages
@@ -180,10 +187,6 @@ export const useDetail = () => {
         (data.messages?.pageNumber as number) <
         (data.messages?.totalPages as number),
     }));
-
-    return () => {
-      chatStore.clearStore();
-    };
   }, [messagesData]);
 
   const loadMoreMessages = useCallback(() => {
@@ -297,30 +300,30 @@ export const useDetail = () => {
           : null,
         repliedToMessage: replyMessage?.messageId || null,
       };
-      if (messageInfo) {
-        trackEvent("sendMessage: ", messageInfo);
-        chatStore.sendMessage(messageInfo as MessageDto);
 
-        const response = await sendApiMessage({
-          data: {
-            ...messageInfo,
-          },
+      trackEvent("sendMessage: ", messageInfo);
+      chatStore.sendMessage(messageInfo as MessageDto);
+
+      const response = await sendApiMessage({
+        data: {
+          ...messageInfo,
+        },
+      });
+      if (response?.success) {
+        chatStore.updateMessageId(tempId, response.data?.messageId as string);
+        setMessageStatuses((prevStatuses) => {
+          const newStatuses = new Map(prevStatuses);
+          newStatuses.set(
+            response.data?.messageId,
+            response.data?.messageStatus,
+          );
+          return newStatuses;
         });
-        if (response?.success) {
-          chatStore.updateMessageId(tempId, response.data?.messageId as string);
-          setMessageStatuses((prevStatuses) => {
-            const newStatuses = new Map(prevStatuses);
-            newStatuses.set(
-              response.data?.messageId,
-              response.data?.messageStatus,
-            );
-            return newStatuses;
-          });
-          trackEvent("message_sent", {
-            chatId: messageChatId,
-            messageId: response.data,
-          });
-        }
+
+        trackEvent("message_sent", {
+          chatId: messageChatId,
+          messageId: response.data,
+        });
       } else {
         trackEvent("messageInfo is undefined", { messageInfo });
         chatStore.deleteTempMessage(tempId);
@@ -340,7 +343,6 @@ export const useDetail = () => {
   );
 
   // Batch processor that applies all queued status updates at once
-  // İlk mesajdan (en eski) son mesaja (en yeni) doğru işler
   const processBatchUpdates = useCallback(() => {
     if (updateQueueRef.current.size === 0) return;
 
@@ -558,8 +560,12 @@ export const useDetail = () => {
   ]);
 
   // Helper function to get message status
-  const getMessageStatus = (messageId: string) =>
-    messageStatuses.get(messageId);
+  const getMessageStatus = useCallback(
+    (messageId: string) => {
+      return messageStatuses.get(messageId);
+    },
+    [messageStatuses],
+  );
 
   const onDelete = () => {
     Alert.alert(
@@ -720,6 +726,14 @@ export const useDetail = () => {
   const invertedGroupedMessages = useMemo(() => {
     return [...messages].reverse();
   }, [messages]);
+
+  useEffect(() => {
+    chatStore.clearStore();
+
+    return () => {
+      chatStore.clearStore();
+    };
+  }, []);
 
   return {
     t,
