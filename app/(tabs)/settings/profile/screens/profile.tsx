@@ -57,7 +57,7 @@ export default function ProfileScreen() {
             onPress={() =>
               copyToClipboard(
                 data?.data?.username as string,
-                t("profile.successCopyUserId")
+                t("profile.successCopyUserId"),
               )
             }
           >

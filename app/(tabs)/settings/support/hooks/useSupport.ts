@@ -11,13 +11,13 @@ export const useSupport = () => {
   const styles = useThemedStyles(createStyle);
 
   const handleGoToFaq = () =>
-    router.push("/(tabs)/(settings)/support/screens/faq");
+    router.push("/(tabs)/settings/support/screens/faq");
 
   const handleGoToTickets = () =>
-    router.push("/(tabs)/(settings)/support/screens/tickets");
+    router.push("/(tabs)/settings/support/screens/tickets");
 
   const handleGoToCreateTicket = () =>
-    router.push("/(tabs)/(settings)/support/screens/createTicket");
+    router.push("/(tabs)/settings/support/screens/createTicket");
 
   return {
     t,

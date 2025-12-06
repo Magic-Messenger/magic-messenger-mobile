@@ -129,7 +129,7 @@ export const useLogin = () => {
 
       setIsLoading(false);
 
-      router.replace("/home");
+      router.replace("/chat/home");
     } catch {
       setIsLoading(false);
     }
