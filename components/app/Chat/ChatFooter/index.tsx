@@ -1,6 +1,12 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Modal,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import { usePostApiChatsUpload } from "@/api/endpoints/magicMessenger";
 import { MessageDto, MessageType } from "@/api/models";
@@ -59,18 +65,17 @@ export function ChatFooter({
   const { mutateAsync: requestUpload } = usePostApiChatsUpload();
 
   const [message, setMessage] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadType, setUploadType] = useState<"image" | "audio" | null>(null);
 
   const handleSendMessage = useCallback(() => {
     const trimmedMessage = message.trim();
     if (!trimmedMessage) return;
 
-    // Clear message immediately before sending
     setMessage("");
 
-    // Send the message
     onSend(trimmedMessage);
 
-    // Stop typing indicator
     if (chatId && magicHubClient) {
       magicHubClient.stopTyping(chatId);
     }
@@ -95,6 +100,9 @@ export function ChatFooter({
       const uri = await stopRecording();
       if (!uri) return;
 
+      setIsUploading(true);
+      setUploadType("audio");
+
       const responseFetch = await fetch(uri);
       const audioData = await responseFetch.blob();
 
@@ -116,6 +124,9 @@ export function ChatFooter({
       }
     } catch (error) {
       trackEvent("send_audio_message_error", error);
+    } finally {
+      setIsUploading(false);
+      setUploadType(null);
     }
   };
 
@@ -123,6 +134,9 @@ export function ChatFooter({
     try {
       const uri = await pickImage();
       if (!uri) return;
+
+      setIsUploading(true);
+      setUploadType("image");
 
       const responseFetch = await fetch(uri);
       const imageData = await responseFetch.blob();
@@ -148,6 +162,9 @@ export function ChatFooter({
       }
     } catch (error) {
       trackEvent("send_image_message_error", error);
+    } finally {
+      setIsUploading(false);
+      setUploadType(null);
     }
   };
 
@@ -217,6 +234,21 @@ export function ChatFooter({
     );
   };
 
+  const renderUploadingModal = () => (
+    <Modal transparent visible={isUploading} animationType="fade">
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <ActivityIndicator size="large" color="white" />
+          <ThemedText style={styles.uploadingText}>
+            {uploadType === "image"
+              ? t("chatDetail.uploadingImage")
+              : t("chatDetail.uploadingAudio")}
+          </ThemedText>
+        </View>
+      </View>
+    </Modal>
+  );
+
   const renderReplyMessage = useMemo(() => {
     if (!replyMessage) return null;
 
@@ -253,10 +285,11 @@ export function ChatFooter({
         </ThemedText>
       </View>
     );
-  }, [replyMessage, currUserName, t]);
+  }, [replyMessage, currUserName, t, styles, onClearReply]);
 
   return (
     <>
+      {renderUploadingModal()}
       {renderReplyMessage}
       <GradientBackground style={styles.container}>
         {isRecording ? renderRecordingUI() : renderMessageInput()}
@@ -332,5 +365,23 @@ const createStyle = (colors: ColorDto) =>
       borderRadius: spacingPixel(50),
       justifyContent: "center",
       alignItems: "center",
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    modalContent: {
+      backgroundColor: colors.secondary,
+      borderRadius: spacingPixel(12),
+      padding: spacingPixel(24),
+      alignItems: "center",
+      gap: spacingPixel(12),
+      minWidth: spacingPixel(150),
+    },
+    uploadingText: {
+      marginTop: spacingPixel(8),
+      color: "white",
     },
   });

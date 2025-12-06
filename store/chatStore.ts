@@ -27,6 +27,7 @@ export const useChatStore = create<ChatStore>()(
               ? {
                   ...msg,
                   messageId: newId,
+                  isPending: false,
                 }
               : msg,
           ),
