@@ -47,11 +47,11 @@ export const useFaq = () => {
   };
 
   const handleGoToFaq = () =>
-    router.push("/(tabs)/(settings)/support/screens/faq");
+    router.push("/(tabs)/settings/support/screens/faq");
 
   const handleGoToFaqDetail = (faqCategory: FaqCategory) => {
     router.push({
-      pathname: "/(tabs)/(settings)/support/screens/faqDetail",
+      pathname: "/(tabs)/settings/support/screens/faqDetail",
       params: {
         category: faqCategory,
       } as never,

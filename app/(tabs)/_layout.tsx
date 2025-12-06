@@ -17,6 +17,7 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         animation: "none",
+        freezeOnBlur: true,
         tabBarHideOnKeyboard: true,
         tabBarActiveTintColor: Colors.white,
         tabBarInactiveTintColor: Colors.menuInactiveColor,
@@ -36,7 +37,7 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="(chat)"
+        name="chat"
         options={{
           title: t("tabs.chat"),
           tabBarLabelStyle: { ...spacing({ mt: 5 }) },
@@ -54,7 +55,7 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="(groups)"
+        name="groups"
         options={{
           title: t("tabs.groups"),
           tabBarLabelStyle: { ...spacing({ mt: 5 }) },
@@ -70,7 +71,7 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="(notes)"
+        name="notes"
         options={{
           title: t("tabs.notes"),
           tabBarLabelStyle: { ...spacing({ mt: 5 }) },
@@ -86,7 +87,7 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="(settings)"
+        name="settings"
         options={{
           title: t("tabs.settings"),
           tabBarLabelStyle: { ...spacing({ mt: 5 }) },

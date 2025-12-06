@@ -30,13 +30,13 @@ export default function SettingsScreen() {
       label: t("settings.profile"),
       iconType: "feather",
       iconName: "user",
-      onPress: () => router.push("/(tabs)/(settings)/profile/screens/profile"),
+      onPress: () => router.push("/(tabs)/settings/profile/screens/profile"),
     },
     {
       label: t("settings.contact"),
       iconType: "feather",
       iconName: "message-circle",
-      onPress: () => router.push("/(tabs)/(settings)/contacts/screens/list"),
+      onPress: () => router.push("/(tabs)/settings/contacts/screens/list"),
     },
     {
       label: t("settings.scan-qr"),
@@ -44,7 +44,7 @@ export default function SettingsScreen() {
       iconName: "qr-code-outline",
       onPress: () =>
         router.push({
-          pathname: "/(tabs)/(settings)/scanQr/screens/scanQr",
+          pathname: "/(tabs)/settings/scanQr/screens/scanQr",
           params: { goToPage: "contact.add" },
         }),
     },
@@ -52,26 +52,25 @@ export default function SettingsScreen() {
       label: t("settings.license"),
       iconType: "entypo",
       iconName: "text-document",
-      onPress: () => router.push("/(tabs)/(settings)/license/screens/license"),
+      onPress: () => router.push("/(tabs)/settings/license/screens/license"),
     },
     {
       label: t("settings.settings"),
       iconType: "feather",
       iconName: "settings",
-      onPress: () =>
-        router.push("/(tabs)/(settings)/settings/screens/settings"),
+      onPress: () => router.push("/(tabs)/settings/settings/screens/settings"),
     },
     {
       label: t("settings.server"),
       iconType: "feather",
       iconName: "server",
-      onPress: () => router.push("/(tabs)/(settings)/servers/screens/servers"),
+      onPress: () => router.push("/(tabs)/settings/servers/screens/servers"),
     },
     {
       label: t("settings.support"),
       iconType: "material-community",
       iconName: "comment-question-outline",
-      onPress: () => router.push("/(tabs)/(settings)/support/screens/support"),
+      onPress: () => router.push("/(tabs)/settings/support/screens/support"),
     },
     {
       label: t("settings.logout"),

@@ -20,7 +20,7 @@ export const useCreateTicket = () => {
   const { mutateAsync: createTicket, isPending } = usePostApiTicketsCreate();
 
   const handleGoToTickets = () =>
-    router.navigate("/(tabs)/(settings)/support/screens/tickets");
+    router.navigate("/(tabs)/settings/support/screens/tickets");
 
   const onSubmit = async (formValues: CreateTicketCommandRequest) => {
     const { success } = await createTicket({

@@ -74,7 +74,7 @@ export default function NoteScreen() {
         })}
         onPress={() =>
           router.push({
-            pathname: "/(tabs)/(notes)/edit",
+            pathname: "/(tabs)/notes/edit",
             params: { noteId: item.id },
           })
         }
@@ -154,7 +154,7 @@ export default function NoteScreen() {
             label={t("notes.newNote")}
             leftIcon={<Icon type="feather" name="plus" size={18} />}
             textProps={{ size: 14 }}
-            onPress={() => router.push("/(tabs)/(notes)/create")}
+            onPress={() => router.push("/(tabs)/notes/create")}
           />
         </View>
       }

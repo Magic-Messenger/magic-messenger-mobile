@@ -1,5 +1,5 @@
 import { useIsFocused } from "@react-navigation/core";
-import { FlashList, ListRenderItemInfo } from "@shopify/flash-list";
+import { FlashList, type ListRenderItemInfo } from "@shopify/flash-list";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
@@ -22,12 +22,16 @@ export default function ChatScreen() {
   const { data, isLoading, refetch } = useGetApiChatsList({
     pageNumber: 1,
     pageSize: 150,
+    isGroupChat: true,
   });
 
-  // Memoized chat list data
-  const chatList = useMemo(() => data?.data?.data ?? [], [data?.data?.data]);
+  // Memoized group chat list data
+  const groupChatList = useMemo(
+    () => data?.data?.data ?? [],
+    [data?.data?.data],
+  );
 
-  // Render chat item
+  // Render group chat item
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<ChatDto>) => (
       <ChatItem
@@ -39,6 +43,11 @@ export default function ChatScreen() {
         lastMessageTime={item.lastMessageTime ?? ""}
         contactUsername={item.contact?.contactUsername ?? ""}
         unreadMessagesCount={item.unreadMessagesCount ?? 0}
+        groupKey={item.groupKey as string}
+        groupNonce={item.groupNonce as string}
+        groupAccountCount={item.groupAccountCount as string}
+        groupAdminAccount={item.groupAdminAccount as string}
+        groupAdminUsername={item.groupAdminUsername as string}
       />
     ),
     [],
@@ -46,7 +55,7 @@ export default function ChatScreen() {
 
   // Key extractor for optimal list performance
   const keyExtractor = useCallback(
-    (item: ChatDto) => item.chatId || `chat-${item.contact?.contactUsername}`,
+    (item: ChatDto) => item.chatId || `group-${item.groupName}`,
     [],
   );
 
@@ -61,9 +70,9 @@ export default function ChatScreen() {
     [isLoading, handleRefresh],
   );
 
-  // Navigate to create chat
-  const handleCreateChat = useCallback(() => {
-    router.push("/(tabs)/(chat)/create");
+  // Navigate to create a group
+  const handleCreateGroup = useCallback(() => {
+    router.push("/(tabs)/groups/create/screens");
   }, []);
 
   // Empty list component
@@ -72,8 +81,8 @@ export default function ChatScreen() {
       <>
         {!isLoading && (
           <EmptyList
-            label={t("chat.notFound")}
-            icon="message-square"
+            label={t("groups.notFound")}
+            icon="users"
             style={styles.mt10}
           />
         )}
@@ -82,22 +91,22 @@ export default function ChatScreen() {
     [t, styles.mt10, isLoading],
   );
 
-  // Header title with new chat button
+  // Header title with new group button
   const headerTitle = useMemo(
     () => (
       <View style={styles.newChatButton}>
         <Button
           type="primary"
-          label={t("home.newChat")}
+          label={t("groups.newGroup")}
           leftIcon={<Icon type="feather" name="plus" size={18} />}
           textProps={{
             size: 14,
           }}
-          onPress={handleCreateChat}
+          onPress={handleCreateGroup}
         />
       </View>
     ),
-    [t, styles.newChatButton, handleCreateChat],
+    [t, styles.newChatButton, handleCreateGroup],
   );
 
   useEffect(() => {
@@ -114,7 +123,7 @@ export default function ChatScreen() {
   return (
     <AppLayout container loading={isLoading} title={headerTitle}>
       <FlashList
-        data={chatList}
+        data={groupChatList}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         refreshControl={refreshControl}

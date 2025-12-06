@@ -36,7 +36,7 @@ export const ContactHeader = ({
         <Button
           type="secondary"
           label={t("contacts.addUser")}
-          onPress={() => router.push("/(tabs)/(settings)/contacts/screens/add")}
+          onPress={() => router.push("/(tabs)/settings/contacts/screens/add")}
           style={styles.contactButton}
           textProps={{
             size: 14,

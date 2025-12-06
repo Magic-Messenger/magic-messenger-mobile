@@ -17,7 +17,7 @@ export const useScanQr = () => {
     if (barcode?.data) {
       setQrCode(barcode.data);
       if (goToPage === "contact.add") {
-        router.replace("/(tabs)/(settings)/contacts/screens/add");
+        router.replace("/(tabs)/settings/contacts/screens/add");
       } else {
         router.back();
       }
