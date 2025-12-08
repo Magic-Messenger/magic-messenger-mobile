@@ -36,6 +36,7 @@ export default function ChatScreen() {
     handleEndReached,
     onClearReply,
     getMessageStatus,
+    onCallingPress,
   } = useDetail();
 
   const renderItem = useCallback(
@@ -77,6 +78,7 @@ export default function ChatScreen() {
             chatId={chatId}
             isGroupChat={false}
             userName={userName as string}
+            onCallingPress={onCallingPress}
           />
         }
         footer={

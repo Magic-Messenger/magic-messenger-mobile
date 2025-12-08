@@ -21,7 +21,7 @@ export default function CallingStacks() {
       <Stack.Screen
         name="videoCalling/screens/index"
         options={{
-          headerShown: false,
+          headerShown: true,
         }}
       />
     </Stack>

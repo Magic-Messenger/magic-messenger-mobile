@@ -1,12 +1,19 @@
+import { router, useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet } from "react-native";
 
-import { useWebRTCStore } from "@/store";
+import { StartCallingType, useWebRTCStore } from "@/store";
 import { useThemedStyles } from "@/theme";
 
 export const useVideoCalling = () => {
   const { t } = useTranslation();
   const styles = useThemedStyles(createStyle);
+
+  const { targetUsername, callingType } =
+    useLocalSearchParams<StartCallingType>();
+
+  const [loading, isLoading] = useState(true);
 
   const connectionState = useWebRTCStore((s) => s.connectionState);
   const isIncoming = useWebRTCStore((s) => s.isIncoming);
@@ -17,15 +24,37 @@ export const useVideoCalling = () => {
   const startCall = useWebRTCStore((s) => s.startCall);
   const endCall = useWebRTCStore((s) => s.endCall);
 
+  const handleCallEnd = () => {
+    endCall();
+    router.back();
+  };
+
+  useEffect(() => {
+    if (!targetUsername || !callingType) {
+      router.back();
+      return;
+    }
+
+    startCall({
+      targetUsername: targetUsername,
+      callingType: callingType,
+    }).finally(() => {
+      setTimeout(() => {
+        isLoading(false);
+      }, 500);
+    });
+  }, [targetUsername, callingType]);
+
   return {
     t,
     styles,
+    loading,
     localStream,
     remoteStream,
     connectionState,
     isIncoming,
     startCall,
-    endCall,
+    handleCallEnd,
   };
 };
 

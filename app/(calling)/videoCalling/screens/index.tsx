@@ -10,16 +10,22 @@ export default function VideoCallingScreen() {
   const {
     t,
     styles,
+    loading,
     localStream,
     remoteStream,
     connectionState,
     isIncoming,
     startCall,
-    endCall,
+    handleCallEnd,
   } = useVideoCalling();
 
   return (
-    <AppLayout container title={"Video Calling"} showBadge={false}>
+    <AppLayout
+      container
+      title={"Video Calling"}
+      showBadge={false}
+      loading={loading}
+    >
       <View style={styles.container}>
         {/* Remote Video */}
         {remoteStream && (
@@ -54,7 +60,7 @@ export default function VideoCallingScreen() {
 
         {/* Controls */}
         <View style={styles.controls}>
-          <Button
+          {/*   <Button
             type="primary"
             label="Start Call"
             onPress={() =>
@@ -63,8 +69,8 @@ export default function VideoCallingScreen() {
                 callingType: "Video",
               })
             }
-          />
-          <Button type="danger" label="End Call" onPress={endCall} />
+          /> */}
+          <Button type="danger" label="End Call" onPress={handleCallEnd} />
         </View>
 
         {/* Debug Info */}

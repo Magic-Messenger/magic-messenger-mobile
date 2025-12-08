@@ -12,7 +12,7 @@ import { trackEvent } from "@/utils";
 
 import { useSignalRStore, useUserStore } from "../store";
 
-type StartCallingType = {
+export type StartCallingType = {
   targetUsername: string;
   callingType: CallingType;
 };

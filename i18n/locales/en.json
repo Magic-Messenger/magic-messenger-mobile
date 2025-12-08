@@ -339,6 +339,12 @@
       "success": "Contact blocked and chat deleted successfully",
       "cancel": "Cancel",
       "confirm": "Block"
+    },
+    "calling": {
+      "title": "Start {{type}} Call",
+      "areYouSure": "Are you sure you want to start a {{type}} call with {{userName}}?",
+      "cancel": "Cancel",
+      "confirm": "Start Call"
     }
   }
 }

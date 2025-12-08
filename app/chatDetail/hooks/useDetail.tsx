@@ -30,7 +30,12 @@ import {
   usePostApiChatsCreate,
   usePostApiChatsSendMessage,
 } from "@/api/endpoints/magicMessenger";
-import { MessageDto, MessageStatus, MessageType } from "@/api/models";
+import {
+  CallingType,
+  MessageDto,
+  MessageStatus,
+  MessageType,
+} from "@/api/models";
 import { ActionSheetRef, Icon } from "@/components";
 import {
   INITIAL_PAGE_SIZE,
@@ -735,6 +740,48 @@ export const useDetail = () => {
     };
   }, []);
 
+  //#region Calling Handlers
+  const onCallingPress = useCallback(
+    (callingType: CallingType) => {
+      Alert.alert(
+        t("chatDetail.calling.title", {
+          type: callingType === CallingType.Audio ? "audio" : "video",
+        }),
+        t("chatDetail.calling.areYouSure", {
+          type: callingType === CallingType.Audio ? "audio" : "video",
+          userName: userName,
+        }),
+        [
+          {
+            text: t("chatDetail.calling.cancel"),
+            style: "cancel",
+          },
+          {
+            text: t("chatDetail.calling.confirm"),
+            style: "default",
+            onPress: () => {
+              trackEvent("calling_initiated", {
+                chatId,
+                callingType,
+              });
+
+              router.push({
+                pathname: "/(calling)/videoCalling/screens",
+                params: {
+                  targetUsername: userName as string,
+                  callingType,
+                },
+              });
+            },
+          },
+        ],
+        { cancelable: true },
+      );
+    },
+    [chatId, userName, router],
+  );
+  //#endregion
+
   return {
     t,
     router,
@@ -756,5 +803,6 @@ export const useDetail = () => {
     handleEndReached,
     handleSendMessage,
     getMessageStatus,
+    onCallingPress,
   };
 };

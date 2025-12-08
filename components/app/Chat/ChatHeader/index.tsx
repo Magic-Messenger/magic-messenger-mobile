@@ -1,8 +1,9 @@
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 
-import { AppImage, ThemedText, TorBadge } from "@/components";
+import { CallingType } from "@/api/models";
+import { AppImage, Icon, ThemedText, TorBadge } from "@/components";
 import { Images } from "@/constants";
 import { useSignalRStore } from "@/store";
 import { useThemedStyles } from "@/theme";
@@ -14,6 +15,7 @@ interface ChatHeaderProps {
   userName?: string;
   isGroupChat?: boolean;
   groupAccountCount?: string;
+  onCallingPress?: (callingType: CallingType) => void;
 }
 
 export function ChatHeader({
@@ -21,6 +23,7 @@ export function ChatHeader({
   userName,
   isGroupChat = false,
   groupAccountCount,
+  onCallingPress,
 }: ChatHeaderProps) {
   const styles = useThemedStyles(createStyle);
   const { t } = useTranslation();
@@ -73,6 +76,14 @@ export function ChatHeader({
                   : t("chat.offline")}
             </ThemedText>
           )}
+        </View>
+        <View style={[styles.flex, styles.flexRow, styles.gap4]}>
+          <TouchableOpacity onPress={() => onCallingPress?.(CallingType.Audio)}>
+            <Icon name="phone" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => onCallingPress?.(CallingType.Video)}>
+            <Icon name="video-call" />
+          </TouchableOpacity>
         </View>
       </View>
 
