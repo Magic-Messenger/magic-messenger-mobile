@@ -348,7 +348,16 @@ export const useDetail = () => {
               ),
             }
           : null,
-        repliedToMessage: replyMessage?.messageId || null,
+        // Full object for store (to render reply)
+        repliedToMessage: replyMessage
+          ? {
+              messageId: replyMessage.messageId,
+              senderUsername: replyMessage.senderUsername,
+              content: replyMessage.content,
+              file: replyMessage.file,
+              messageType: replyMessage.messageType,
+            }
+          : null,
       };
 
       trackEvent("sendMessage: ", messageInfo);
@@ -357,6 +366,8 @@ export const useDetail = () => {
       const response = await sendApiMessage({
         data: {
           ...messageInfo,
+          // API expects only messageId string
+          repliedToMessage: replyMessage?.messageId || null,
         },
       });
       if (response?.success) {

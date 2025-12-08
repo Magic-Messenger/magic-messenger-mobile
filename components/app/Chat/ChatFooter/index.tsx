@@ -259,9 +259,10 @@ export function ChatFooter({
 
     const messageTypeKey =
       MESSAGE_TYPE_LABELS[replyMessage.messageType as never];
-    const messageLabel = messageTypeKey
-      ? t(messageTypeKey)
-      : (replyMessage.content as string);
+
+    // Use decryptedContent for display (added by MessageItem/MessageGroupItem)
+    const decryptedText = (replyMessage as any).decryptedContent as string;
+    const messageLabel = messageTypeKey ? t(messageTypeKey) : decryptedText;
 
     return (
       <View style={styles.replayContainer}>
@@ -280,7 +281,7 @@ export function ChatFooter({
           }
         >
           {replyMessage.messageType === MessageType.Text
-            ? (replyMessage.content as string)
+            ? decryptedText
             : messageLabel}
         </ThemedText>
       </View>

@@ -77,9 +77,11 @@ function MessageItem({
 
   const triggerReply = useCallback(() => {
     if (message && onReply && decryptedContent) {
+      // Keep original message with encrypted content for store
+      // Add decryptedContent for display in reply preview (ChatFooter)
       onReply({
         ...message,
-        content: decryptedContent as string,
+        decryptedContent: decryptedContent as string,
       } as MessageDto);
     }
   }, [message, onReply, decryptedContent]);
@@ -94,7 +96,7 @@ function MessageItem({
           if (event.translationX > 0) {
             translateX.value = Math.min(
               event.translationX,
-              SWIPE_THRESHOLD * 1.2
+              SWIPE_THRESHOLD * 1.2,
             );
           }
         })
@@ -106,7 +108,7 @@ function MessageItem({
 
           translateX.value = withSpring(0, SPRING_CONFIG);
         }),
-    [triggerReply]
+    [triggerReply],
   );
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -118,14 +120,14 @@ function MessageItem({
       translateX.value,
       [0, SWIPE_THRESHOLD],
       [0, 1],
-      Extrapolation.CLAMP
+      Extrapolation.CLAMP,
     );
 
     const scale = interpolate(
       translateX.value,
       [0, SWIPE_THRESHOLD * 0.5, SWIPE_THRESHOLD],
       [0.5, 1, 1],
-      Extrapolation.CLAMP
+      Extrapolation.CLAMP,
     );
 
     return {
