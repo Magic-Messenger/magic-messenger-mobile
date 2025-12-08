@@ -34,7 +34,12 @@ import {
   MessageSeenEvent,
   UploadFileResultDto,
 } from "@/constants";
-import { useChatStore, useSignalRStore, useUserStore } from "@/store";
+import {
+  useChatMessages,
+  useChatStore,
+  useSignalRStore,
+  useUserStore,
+} from "@/store";
 import {
   decryptGroupKeyForUser,
   encryptForGroup,
@@ -53,7 +58,6 @@ export const useDetail = () => {
   const actionRef = useRef<ActionSheetRef | null>(null);
   const navigation = useNavigation();
   const chatStore = useChatStore();
-  const messages = useChatStore((state) => state.messages);
 
   const isFocused = useIsFocused();
 
@@ -106,6 +110,9 @@ export const useDetail = () => {
     groupAdminUsername,
   } = useLocalSearchParams();
 
+  // Get messages for the current chat from store
+  const messages = useChatMessages(chatId as string);
+
   const isCreatedByCurrentUser = useMemo(() => {
     return groupAdminUsername === currentUserName;
   }, [groupAdminUsername, currentUserName]);
@@ -154,11 +161,29 @@ export const useDetail = () => {
             return;
           }
 
-          const messagesData = isFirstLoad
-            ? newMessages
-            : [...newMessages, ...messages];
+          // Merge API messages with existing store messages
+          // Keep messages that are in store but not in API (newly sent, pending)
+          const existingMessages = chatStore.getMessages(chatId as string);
+          const apiMessageIds = new Set(newMessages.map((m) => m.messageId));
+          const pendingMessages = existingMessages.filter(
+            (m) => !apiMessageIds.has(m.messageId),
+          );
 
-          chatStore.setMessages(messagesData);
+          const messagesData = isFirstLoad
+            ? [...newMessages, ...pendingMessages]
+            : [
+                ...newMessages,
+                ...messages.filter((m) => !apiMessageIds.has(m.messageId)),
+              ];
+
+          // Sort by createdAt to maintain order
+          messagesData.sort((a, b) => {
+            const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return dateA - dateB;
+          });
+
+          chatStore.setMessages(chatId as string, messagesData);
 
           // Initialize status for the new message
           setMessageStatuses((prevStatuses) => {
@@ -278,7 +303,7 @@ export const useDetail = () => {
       };
 
       trackEvent("sendMessage: ", messageInfo);
-      chatStore.sendMessage(messageInfo as MessageDto);
+      chatStore.sendMessage(chatId as string, messageInfo as MessageDto);
 
       const response = await sendApiMessage({
         data: {
@@ -287,7 +312,11 @@ export const useDetail = () => {
       });
 
       if (response?.success) {
-        chatStore.updateMessageId(tempId, response.data?.messageId as string);
+        chatStore.updateMessageId(
+          chatId as string,
+          tempId,
+          response.data?.messageId as string,
+        );
         setMessageStatuses((prevStatuses) => {
           const newStatuses = new Map(prevStatuses);
           newStatuses.set(
@@ -303,7 +332,7 @@ export const useDetail = () => {
         });
       } else {
         trackEvent("messageInfo is undefined", { messageInfo });
-        chatStore.deleteTempMessage(tempId);
+        chatStore.deleteTempMessage(chatId as string, tempId);
       }
 
       return;
@@ -483,7 +512,7 @@ export const useDetail = () => {
       )
         return;
 
-      chatStore.sendMessage(newMessage);
+      chatStore.sendMessage(chatId as string, newMessage);
 
       // Initialize status for the new message
       setMessageStatuses((prevStatuses) => {
@@ -614,13 +643,8 @@ export const useDetail = () => {
     return [...messages].reverse();
   }, [messages]);
 
-  useEffect(() => {
-    chatStore.clearStore();
-
-    return () => {
-      chatStore.clearStore();
-    };
-  }, []);
+  // Note: Store is no longer cleared on mount/unmount
+  // Messages persist across navigation and are cleared only when app closes
 
   return {
     t,

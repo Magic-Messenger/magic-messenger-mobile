@@ -40,7 +40,12 @@ import {
   MessageSeenEvent,
   UploadFileResultDto,
 } from "@/constants";
-import { useChatStore, useSignalRStore, useUserStore } from "@/store";
+import {
+  useChatMessages,
+  useChatStore,
+  useSignalRStore,
+  useUserStore,
+} from "@/store";
 import {
   encrypt,
   MessageWithDate,
@@ -58,7 +63,6 @@ export const useDetail = () => {
   const listRef = useRef<FlatList<MessageWithDate>>(null);
   const actionRef = useRef<ActionSheetRef | null>(null);
   const chatStore = useChatStore();
-  const messages = useChatStore((state) => state.messages);
 
   const isFocused = useIsFocused();
 
@@ -89,6 +93,9 @@ export const useDetail = () => {
   const setReceivedMessage = useSignalRStore((s) => s.setReceivedMessage);
 
   const { chatId: contactChatId, userName, publicKey } = useLocalSearchParams();
+
+  // Get messages for the current chat from store
+  const messages = useChatMessages(chatId);
 
   const { mutateAsync: sendApiMessage } = usePostApiChatsSendMessage();
   const { mutateAsync: createApiChat } = usePostApiChatsCreate();
@@ -163,12 +170,29 @@ export const useDetail = () => {
       return;
     }
 
-    const messagesResult = isFirstLoad
-      ? newMessages
-      : [...newMessages, ...messages];
-    /* setMessages(messagesResult); */
+    // Merge API messages with existing store messages
+    // Keep messages that are in store but not in API (newly sent, pending)
+    const existingMessages = chatStore.getMessages(chatId as string);
+    const apiMessageIds = new Set(newMessages.map((m) => m.messageId));
+    const pendingMessages = existingMessages.filter(
+      (m) => !apiMessageIds.has(m.messageId),
+    );
 
-    chatStore.setMessages(messagesResult);
+    const messagesResult = isFirstLoad
+      ? [...newMessages, ...pendingMessages]
+      : [
+          ...newMessages,
+          ...messages.filter((m) => !apiMessageIds.has(m.messageId)),
+        ];
+
+    // Sort by createdAt to maintain order
+    messagesResult.sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateA - dateB;
+    });
+
+    chatStore.setMessages(chatId as string, messagesResult);
 
     // Initialize status for the new messages
     setMessageStatuses((prevStatuses) => {
@@ -302,7 +326,7 @@ export const useDetail = () => {
       };
 
       trackEvent("sendMessage: ", messageInfo);
-      chatStore.sendMessage(messageInfo as MessageDto);
+      chatStore.sendMessage(messageChatId, messageInfo as MessageDto);
 
       const response = await sendApiMessage({
         data: {
@@ -310,7 +334,11 @@ export const useDetail = () => {
         },
       });
       if (response?.success) {
-        chatStore.updateMessageId(tempId, response.data?.messageId as string);
+        chatStore.updateMessageId(
+          messageChatId,
+          tempId,
+          response.data?.messageId as string,
+        );
         setMessageStatuses((prevStatuses) => {
           const newStatuses = new Map(prevStatuses);
           newStatuses.set(
@@ -326,7 +354,7 @@ export const useDetail = () => {
         });
       } else {
         trackEvent("messageInfo is undefined", { messageInfo });
-        chatStore.deleteTempMessage(tempId);
+        chatStore.deleteTempMessage(messageChatId, tempId);
       }
 
       return;
@@ -507,7 +535,7 @@ export const useDetail = () => {
 
       /* setMessages((prev) => [...prev, newMessage]); */
 
-      chatStore.sendMessage(newMessage);
+      chatStore.sendMessage(chatId as string, newMessage);
 
       // Initialize status for the new message
       setMessageStatuses((prevStatuses) => {
@@ -727,13 +755,8 @@ export const useDetail = () => {
     return [...messages].reverse();
   }, [messages]);
 
-  useEffect(() => {
-    chatStore.clearStore();
-
-    return () => {
-      chatStore.clearStore();
-    };
-  }, []);
+  // Note: Store is no longer cleared on mount/unmount
+  // Messages persist across navigation and are cleared only when app closes
 
   return {
     t,
