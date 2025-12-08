@@ -445,40 +445,59 @@ export const useDetail = () => {
       trackEvent("message_delivered", { messageDeliveredEvent });
 
       const messageId = messageDeliveredEvent.message?.messageId;
-      const newStatus =
-        MESSAGE_STATUS_PRIORITY[messageDeliveredEvent.message?.messageStatus!];
+      const messageStatus = messageDeliveredEvent.message?.messageStatus;
 
-      if (!messageId || !newStatus) return;
+      if (!messageId || !messageStatus) return;
 
-      // Check if this update should override the queued one
-      const existingUpdate = updateQueueRef.current.get(messageId);
-      trackEvent("message_delivered existingUpdate", existingUpdate);
+      // Delivered olan mesajı bul
+      const deliveredMessage = messages.find((m) => m.messageId === messageId);
+      if (!deliveredMessage) return;
 
-      if (existingUpdate) {
-        const existingPriority = MESSAGE_STATUS_PRIORITY[existingUpdate];
+      const deliveredMessageTime = deliveredMessage.createdAt
+        ? new Date(deliveredMessage.createdAt).getTime()
+        : 0;
 
-        // Only update queue if new status has higher or equal priority
-        if (newStatus >= existingPriority) {
-          updateQueueRef.current.set(
-            messageId,
-            messageDeliveredEvent.message?.messageStatus!,
+      // Bu mesaj ve öncesindeki tüm mesajları (currentUser tarafından gönderilenleri) "delivered" olarak işaretle
+      // Eskiden yeniye doğru sırala ve işle
+      const messagesToUpdate = messages
+        .filter((m) => {
+          const msgTime = m.createdAt ? new Date(m.createdAt).getTime() : 0;
+          // Sadece bu mesaj ve önceki mesajları al
+          // Ve sadece current user tarafından gönderilen mesajları güncelle
+          return (
+            msgTime <= deliveredMessageTime &&
+            m.senderUsername === currentUserName
           );
-        }
-      } else {
-        // No existing update, add to queue
-        trackEvent("message_delivered no existing update", {
-          messageId,
-          messageStatus: newStatus,
+        })
+        .sort((a, b) => {
+          const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return timeA - timeB; // Eskiden yeniye (ascending)
         });
-        updateQueueRef.current.set(
-          messageId,
-          messageDeliveredEvent.message?.messageStatus!,
-        );
-      }
+
+      trackEvent("message_delivered messagesToUpdate", {
+        count: messagesToUpdate.length,
+        messageIds: messagesToUpdate.map((m) => m.messageId),
+      });
+
+      // Tüm mesajları queue'ya ekle
+      messagesToUpdate.forEach((msg) => {
+        const existingUpdate = updateQueueRef.current.get(msg.messageId!);
+        const newPriority = MESSAGE_STATUS_PRIORITY[messageStatus];
+
+        if (existingUpdate) {
+          const existingPriority = MESSAGE_STATUS_PRIORITY[existingUpdate];
+          if (newPriority >= existingPriority) {
+            updateQueueRef.current.set(msg.messageId!, messageStatus);
+          }
+        } else {
+          updateQueueRef.current.set(msg.messageId!, messageStatus);
+        }
+      });
 
       scheduleBatchUpdate();
     },
-    [scheduleBatchUpdate],
+    [scheduleBatchUpdate, messages, currentUserName],
   );
 
   const handleMessageSeen = useCallback(
