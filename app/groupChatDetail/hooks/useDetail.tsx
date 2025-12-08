@@ -162,19 +162,48 @@ export const useDetail = () => {
           }
 
           // Merge API messages with existing store messages
-          // Keep messages that are in store but not in API (newly sent, pending)
+          // Keep only pending messages that don't exist in API yet
           const existingMessages = chatStore.getMessages(chatId as string);
           const apiMessageIds = new Set(newMessages.map((m) => m.messageId));
+
+          // Helper to check if a store message already exists in API response
+          const isDuplicate = (storeMsg: MessageDto) => {
+            // Direct messageId match
+            if (apiMessageIds.has(storeMsg.messageId)) return true;
+
+            // Check by tempId field
+            if ((storeMsg as any).tempId) {
+              const matchByTempId = newMessages.some(
+                (apiMsg) => apiMsg.messageId === (storeMsg as any).tempId,
+              );
+              if (matchByTempId) return true;
+            }
+
+            // Check by content (encrypted) + sender + similar timestamp (within 5 seconds)
+            const matchByContent = newMessages.some((apiMsg) => {
+              if (apiMsg.senderUsername !== storeMsg.senderUsername)
+                return false;
+              if (apiMsg.content?.cipherText !== storeMsg.content?.cipherText)
+                return false;
+              if (!apiMsg.createdAt || !storeMsg.createdAt) return false;
+              const timeDiff = Math.abs(
+                new Date(apiMsg.createdAt).getTime() -
+                  new Date(storeMsg.createdAt).getTime(),
+              );
+              return timeDiff < 5000; // 5 seconds tolerance
+            });
+            if (matchByContent) return true;
+
+            return false;
+          };
+
           const pendingMessages = existingMessages.filter(
-            (m) => !apiMessageIds.has(m.messageId),
+            (m) => !isDuplicate(m),
           );
 
           const messagesData = isFirstLoad
             ? [...newMessages, ...pendingMessages]
-            : [
-                ...newMessages,
-                ...messages.filter((m) => !apiMessageIds.has(m.messageId)),
-              ];
+            : [...newMessages, ...messages.filter((m) => !isDuplicate(m))];
 
           // Sort by createdAt to maintain order
           messagesData.sort((a, b) => {
