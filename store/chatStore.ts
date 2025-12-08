@@ -87,7 +87,9 @@ export const useChatStore = create<ChatStore>()(
           updatedChats[existingChatIndex] = {
             ...updatedChats[existingChatIndex],
             messages: updatedChats[existingChatIndex].messages.map((msg) =>
-              msg.messageId === tempId ? { ...msg, messageId: newId } : msg,
+              msg.messageId === tempId
+                ? { ...msg, messageId: newId, isPending: false }
+                : msg,
             ),
           };
           return { chats: updatedChats };
