@@ -114,7 +114,7 @@ export const useSignalREvents = () => {
   useEffect(() => {
     if (isInChatScreen(currentRoute) || !receivedMessage) return;
 
-    const receivedMessageChat = receivedMessage.chat;
+    const receivedMessageChat = { ...receivedMessage.chat };
 
     setReceivedMessage(undefined);
 
