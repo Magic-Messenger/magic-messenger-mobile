@@ -26,7 +26,6 @@ import { VideoMessage } from "./VideoMessage";
 interface MessageItemProps {
   identifier: string;
   message?: MessageDto;
-  messageStatus: MessageStatus;
   receiverPublicKey: string;
   onReply?: (message: MessageDto) => void;
 }
@@ -41,7 +40,6 @@ const SPRING_CONFIG = {
 function MessageItem({
   identifier,
   message,
-  messageStatus,
   receiverPublicKey,
   onReply,
 }: MessageItemProps) {
@@ -62,23 +60,21 @@ function MessageItem({
     if (
       magicHubClient &&
       !isSentByCurrentUser &&
-      messageStatus !== MessageStatus.Seen &&
+      message?.messageStatus !== MessageStatus.Seen &&
       message?.messageId
     ) {
-      magicHubClient.viewedMessage(identifier, message.messageId);
+      magicHubClient.viewedMessage?.(identifier, message.messageId);
     }
   }, [
     identifier,
     isSentByCurrentUser,
     magicHubClient,
     message?.messageId,
-    messageStatus,
+    message?.messageStatus,
   ]);
 
   const triggerReply = useCallback(() => {
     if (message && onReply && decryptedContent) {
-      // Keep original message with encrypted content for store
-      // Add decryptedContent for display in reply preview (ChatFooter)
       onReply({
         ...message,
         decryptedContent: decryptedContent as string,
@@ -152,7 +148,7 @@ function MessageItem({
       decryptedReplyMessage,
       isSentByCurrentUser,
       createdAt: message.createdAt!,
-      messageStatus,
+      messageStatus: message?.messageStatus,
       isLoading,
       replyMessageType,
     };
@@ -169,13 +165,7 @@ function MessageItem({
       default:
         return null;
     }
-  }, [
-    message,
-    messageStatus,
-    decryptedContent,
-    decryptedReplyMessage,
-    isSentByCurrentUser,
-  ]);
+  }, [message, decryptedContent, decryptedReplyMessage, isSentByCurrentUser]);
 
   // Early return if no content
   if (!decryptedContent || !message) return null;
@@ -211,7 +201,7 @@ function MessageItem({
 export default memo(MessageItem, (prevProps, nextProps) => {
   return (
     prevProps.message?.messageId === nextProps.message?.messageId &&
-    prevProps.messageStatus === nextProps.messageStatus
+    prevProps.message?.messageStatus === nextProps.message?.messageStatus
   );
 });
 const createStyle = (colors: ColorDto) =>

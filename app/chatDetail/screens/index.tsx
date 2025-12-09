@@ -35,7 +35,6 @@ export default function ChatScreen() {
     handleReply,
     handleEndReached,
     onClearReply,
-    getMessageStatus,
   } = useDetail();
 
   const renderItem = useCallback(
@@ -43,18 +42,16 @@ export default function ChatScreen() {
       if (isDateSeparator(item)) {
         return <DateSeparator date={item.date} />;
       }
-      const messageStatus = getMessageStatus(item.messageId!);
       return (
         <MessageItem
           identifier={chatId}
           message={item}
-          messageStatus={messageStatus}
           receiverPublicKey={usersPublicKey.receiverPublicKey}
           onReply={handleReply}
         />
       );
     },
-    [chatId, usersPublicKey.receiverPublicKey, handleReply, getMessageStatus],
+    [chatId, usersPublicKey.receiverPublicKey, handleReply],
   );
 
   const keyExtractor = useCallback((item: MessageWithDate, index: number) => {

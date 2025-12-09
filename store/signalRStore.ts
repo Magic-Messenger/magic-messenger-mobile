@@ -5,11 +5,7 @@ import {
 } from "@microsoft/signalr";
 import { create } from "zustand";
 
-import {
-  createMagicHubClient,
-  MagicHubClient,
-  MessageReceivedEvent,
-} from "@/constants";
+import { createMagicHubClient, MagicHubClient } from "@/constants";
 
 type TypingUser = {
   username: string;
@@ -22,7 +18,6 @@ type SignalRStore = {
   isConnected: boolean;
   onlineUsers: string[];
   typingUsers: TypingUser[];
-  receivedMessage?: MessageReceivedEvent;
   currentRoute?: string;
 
   startConnection: (token: string) => Promise<void>;
@@ -34,7 +29,6 @@ type SignalRStore = {
   stopTyping: (chatId: string, user: string) => void;
 
   setCurrentRoute: (route: string) => void;
-  setReceivedMessage: (messageEvent?: MessageReceivedEvent) => void;
 };
 
 export const useSignalRStore = create<SignalRStore>((set, get) => ({
@@ -112,9 +106,5 @@ export const useSignalRStore = create<SignalRStore>((set, get) => ({
 
   setCurrentRoute: (route: string) => {
     set({ currentRoute: route });
-  },
-
-  setReceivedMessage: (messageEvent?: MessageReceivedEvent) => {
-    set({ receivedMessage: messageEvent ?? undefined });
   },
 }));
