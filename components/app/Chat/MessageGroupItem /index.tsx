@@ -74,9 +74,11 @@ function MessageGroupItem({
 
   const triggerReply = useCallback(() => {
     if (message && onReply && decryptedContent) {
+      // Keep original message with encrypted content for store
+      // Add decryptedContent for display in reply preview (ChatFooter)
       onReply({
         ...message,
-        content: decryptedContent as string,
+        decryptedContent: decryptedContent as string,
       } as MessageDto);
     }
   }, [message, onReply, decryptedContent]);

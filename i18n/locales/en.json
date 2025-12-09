@@ -339,6 +339,8 @@
       "success": "Contact blocked and chat deleted successfully",
       "cancel": "Cancel",
       "confirm": "Block"
-    }
+    },
+    "uploadingImage": "Uploading media...",
+    "uploadingAudio": "Uploading audio..."
   }
 }
