@@ -3,7 +3,7 @@ import { defineConfig } from "orval";
 export default defineConfig({
   api: {
     input: {
-      target: "https://dev-new-api.magicmessenger.app/swagger/v1/swagger.json",
+      target: "https://api.magicmessenger.app/swagger/v1/swagger.json",
       validation: false,
     },
     output: {

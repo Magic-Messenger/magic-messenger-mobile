@@ -1,5 +1,4 @@
 import { useIsFocused } from "@react-navigation/core";
-import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { throttle } from "lodash";
 import {
@@ -21,7 +20,6 @@ import {
 import { CaptureProtection } from "react-native-capture-protection";
 
 import {
-  getGetApiChatsMessagesQueryKey,
   useDeleteApiChatsDelete,
   useGetApiAccountGetOnlineUsers,
   useGetApiChatsMessages,
@@ -30,16 +28,9 @@ import {
   usePostApiChatsCreate,
   usePostApiChatsSendMessage,
 } from "@/api/endpoints/magicMessenger";
-import { MessageDto, MessageStatus, MessageType } from "@/api/models";
+import { MessageDto, MessageType } from "@/api/models";
 import { ActionSheetRef, Icon } from "@/components";
-import {
-  INITIAL_PAGE_SIZE,
-  MESSAGE_STATUS_PRIORITY,
-  MessageDeliveredEvent,
-  MessageReceivedEvent,
-  MessageSeenEvent,
-  UploadFileResultDto,
-} from "@/constants";
+import { INITIAL_PAGE_SIZE, UploadFileResultDto } from "@/constants";
 import {
   useChatMessages,
   useChatStore,
@@ -59,20 +50,19 @@ export const useDetail = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const navigation = useNavigation();
-  const queryClient = useQueryClient();
+  const isFocused = useIsFocused();
+
+  const { chatId: contactChatId, userName, publicKey } = useLocalSearchParams();
+
   const listRef = useRef<FlatList<MessageWithDate>>(null);
   const actionRef = useRef<ActionSheetRef | null>(null);
-  const chatStore = useChatStore();
-
-  const isFocused = useIsFocused();
 
   const [isScreenshotEnabled, setIsScreenshotEnabled] =
     useState<boolean>(false);
   const [replyMessage, setReplyMessage] = useState<MessageDto | null>(null);
-  /* const [messages, setMessages] = useState<MessageDto[]>([]); */
-  const [messageStatuses, setMessageStatuses] = useState(new Map());
+
   const [chatId, setChatId] = useState<string | null>(null);
-  console.log("chatId: ", chatId);
+
   const [pagination, setPagination] = useState({
     currentPage: 0,
     pageSize: INITIAL_PAGE_SIZE,
@@ -80,21 +70,14 @@ export const useDetail = () => {
     hasMore: true,
   });
 
-  const updateQueueRef = useRef<Map<string, MessageStatus>>(new Map());
-  const batchTimeoutRef = useRef<NodeJS.Timeout | number | null>(null);
-
   const isLoadingRef = useRef(false);
-  const isMountedRef = useRef(true);
 
   const currentUserName = useUserStore((s) => s.userName);
   const magicHubClient = useSignalRStore((s) => s.magicHubClient);
   const setOnlineUsers = useSignalRStore((s) => s.setOnlineUsers);
-  const receivedMessage = useSignalRStore((s) => s.receivedMessage);
-  const setReceivedMessage = useSignalRStore((s) => s.setReceivedMessage);
 
-  const { chatId: contactChatId, userName, publicKey } = useLocalSearchParams();
-
-  // Get messages for the current chat from store
+  const chatStore = useChatStore();
+  // Get messages for the current chat from the store
   const messages = useChatMessages(chatId);
 
   const { mutateAsync: sendApiMessage } = usePostApiChatsSendMessage();
@@ -111,12 +94,10 @@ export const useDetail = () => {
     },
   });
 
-  // React Query for messages with cache
   const {
     data: messagesData,
     isLoading: isMessagesLoading,
     isFetching: isMessagesFetching,
-    refetch: refetchMessages,
   } = useGetApiChatsMessages(
     {
       chatId: chatId as string,
@@ -126,10 +107,6 @@ export const useDetail = () => {
     {
       query: {
         enabled: !!chatId && isFocused,
-        /* staleTime: 5 * 60 * 1000,
-        gcTime: 10 * 60 * 1000,
-        refetchOnWindowFocus: false,
-        refetchOnMount: false, */
       },
     },
   );
@@ -163,12 +140,9 @@ export const useDetail = () => {
     }
 
     const newMessages = data.messages?.data as MessageDto[];
-    console.log("newMessages: ", newMessages);
     const isFirstLoad = pagination.currentPage <= 1;
 
-    if (newMessages.length === 0) {
-      return;
-    }
+    if (!newMessages.length) return;
 
     // Merge API messages with existing store messages
     // Keep only pending messages that don't exist in API yet
@@ -188,8 +162,8 @@ export const useDetail = () => {
         if (matchByTempId) return true;
       }
 
-      // Check by content (encrypted) + sender + similar timestamp (within 5 seconds)
-      const matchByContent = newMessages.some((apiMsg) => {
+      // Check by content (encrypted), sender, similar timestamp (within 5 seconds)
+      return newMessages.some?.((apiMsg) => {
         if (apiMsg.senderUsername !== storeMsg.senderUsername) return false;
         if (apiMsg.content?.cipherText !== storeMsg.content?.cipherText)
           return false;
@@ -198,11 +172,8 @@ export const useDetail = () => {
           new Date(apiMsg.createdAt).getTime() -
             new Date(storeMsg.createdAt).getTime(),
         );
-        return timeDiff < 5000; // 5 seconds tolerance
+        return timeDiff < 5000;
       });
-      if (matchByContent) return true;
-
-      return false;
     };
 
     const pendingMessages = existingMessages.filter((m) => !isDuplicate(m));
@@ -219,15 +190,6 @@ export const useDetail = () => {
     });
 
     chatStore.setMessages(chatId as string, messagesResult);
-
-    // Initialize status for the new messages
-    setMessageStatuses((prevStatuses) => {
-      const newStatuses = new Map(prevStatuses);
-      messagesResult.forEach((messageData) => {
-        newStatuses.set(messageData.messageId, messageData.messageStatus);
-      });
-      return newStatuses;
-    });
 
     setPagination((prev) => ({
       ...prev,
@@ -266,15 +228,8 @@ export const useDetail = () => {
   }, [isScreenshotEnabled]);
 
   useEffect(() => {
-    initializeScreenshot();
+    initializeScreenshot().then().catch();
   }, [isScreenshotEnabled]);
-
-  useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
 
   // For inverted list, load more when scrolling towards the top (which appears as bottom due to inversion)
   const handleEndReached = useCallback(() => {
@@ -375,15 +330,8 @@ export const useDetail = () => {
           messageChatId,
           tempId,
           response.data?.messageId as string,
+          response.data?.messageStatus,
         );
-        setMessageStatuses((prevStatuses) => {
-          const newStatuses = new Map(prevStatuses);
-          newStatuses.set(
-            response.data?.messageId,
-            response.data?.messageStatus,
-          );
-          return newStatuses;
-        });
 
         trackEvent("message_sent", {
           chatId: messageChatId,
@@ -407,249 +355,17 @@ export const useDetail = () => {
     ],
   );
 
-  // Batch processor that applies all queued status updates at once
-  const processBatchUpdates = useCallback(() => {
-    if (updateQueueRef.current.size === 0) return;
-
-    const updates = new Map(updateQueueRef.current);
-    updateQueueRef.current.clear();
-
-    setMessageStatuses((prevStatuses) => {
-      const newStatuses = new Map(prevStatuses);
-
-      // Güncellenecek mesajları createdAt'e göre sırala (eskiden yeniye - ascending)
-      const sortedUpdates = Array.from(updates.entries())
-        .map(([messageId, status]) => {
-          const message = messages.find((m) => m.messageId === messageId);
-          return {
-            messageId,
-            status,
-            createdAt: message?.createdAt
-              ? new Date(message.createdAt).getTime()
-              : 0,
-          };
-        })
-        .sort((a, b) => a.createdAt - b.createdAt); // Eskiden yeniye doğru sırala (ascending)
-
-      // Sıralanmış güncellemeleri uygula (ilk mesajdan son mesaja doğru)
-      sortedUpdates.forEach(({ messageId, status }) => {
-        const currentStatus = prevStatuses.get(messageId);
-        const currentPriority = MESSAGE_STATUS_PRIORITY[currentStatus] || 0;
-        const newPriority = MESSAGE_STATUS_PRIORITY[status];
-
-        // Sadece daha yüksek öncelikli durumları güncelle
-        if (newPriority > currentPriority) {
-          newStatuses.set(messageId, status);
-        }
-      });
-
-      return newStatuses;
-    });
-  }, [messages]);
-
-  // Schedule batch processing
-  const scheduleBatchUpdate = useCallback(() => {
-    if (batchTimeoutRef.current) {
-      clearTimeout(batchTimeoutRef.current);
-    }
-
-    batchTimeoutRef.current = setTimeout(() => {
-      processBatchUpdates();
-      batchTimeoutRef.current = null;
-    }, 250); // Batch updates within 250ms window
-  }, [processBatchUpdates]);
-
-  const handleMessageDelivered = useCallback(
-    (messageDeliveredEvent: MessageDeliveredEvent) => {
-      trackEvent("message_delivered", { messageDeliveredEvent });
-
-      const messageId = messageDeliveredEvent.message?.messageId;
-      const messageStatus = messageDeliveredEvent.message?.messageStatus;
-
-      if (!messageId || !messageStatus) return;
-
-      // Delivered olan mesajı bul
-      const deliveredMessage = messages.find((m) => m.messageId === messageId);
-      if (!deliveredMessage) return;
-
-      const deliveredMessageTime = deliveredMessage.createdAt
-        ? new Date(deliveredMessage.createdAt).getTime()
-        : 0;
-
-      // Bu mesaj ve öncesindeki tüm mesajları (currentUser tarafından gönderilenleri) "delivered" olarak işaretle
-      // Eskiden yeniye doğru sırala ve işle
-      const messagesToUpdate = messages
-        .filter((m) => {
-          const msgTime = m.createdAt ? new Date(m.createdAt).getTime() : 0;
-          // Sadece bu mesaj ve önceki mesajları al
-          // Ve sadece current user tarafından gönderilen mesajları güncelle
-          return (
-            msgTime <= deliveredMessageTime &&
-            m.senderUsername === currentUserName
-          );
-        })
-        .sort((a, b) => {
-          const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-          const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-          return timeA - timeB; // Eskiden yeniye (ascending)
-        });
-
-      trackEvent("message_delivered messagesToUpdate", {
-        count: messagesToUpdate.length,
-        messageIds: messagesToUpdate.map((m) => m.messageId),
-      });
-
-      // Tüm mesajları queue'ya ekle
-      messagesToUpdate.forEach((msg) => {
-        const existingUpdate = updateQueueRef.current.get(msg.messageId!);
-        const newPriority = MESSAGE_STATUS_PRIORITY[messageStatus];
-
-        if (existingUpdate) {
-          const existingPriority = MESSAGE_STATUS_PRIORITY[existingUpdate];
-          if (newPriority >= existingPriority) {
-            updateQueueRef.current.set(msg.messageId!, messageStatus);
-          }
-        } else {
-          updateQueueRef.current.set(msg.messageId!, messageStatus);
-        }
-      });
-
-      scheduleBatchUpdate();
-    },
-    [scheduleBatchUpdate, messages, currentUserName],
-  );
-
-  const handleMessageSeen = useCallback(
-    (messageSeenEvent: MessageSeenEvent) => {
-      trackEvent("message_seen", { messageSeenEvent });
-
-      const messageId = messageSeenEvent.message?.messageId;
-      const messageStatus = messageSeenEvent.message?.messageStatus;
-
-      if (!messageId || !messageStatus) return;
-
-      // Görülen mesajı bul
-      const seenMessage = messages.find((m) => m.messageId === messageId);
-      if (!seenMessage) return;
-
-      const seenMessageTime = seenMessage.createdAt
-        ? new Date(seenMessage.createdAt).getTime()
-        : 0;
-
-      // Bu mesaj ve öncesindeki tüm mesajları (currentUser tarafından gönderilenleri) "seen" olarak işaretle
-      // Eskiden yeniye doğru sırala ve işle
-      const messagesToUpdate = messages
-        .filter((m) => {
-          const msgTime = m.createdAt ? new Date(m.createdAt).getTime() : 0;
-          // Sadece bu mesaj ve önceki mesajları al
-          // Ve sadece current user tarafından gönderilen mesajları güncelle
-          return (
-            msgTime <= seenMessageTime && m.senderUsername === currentUserName
-          );
-        })
-        .sort((a, b) => {
-          const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-          const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-          return timeA - timeB; // Eskiden yeniye (ascending)
-        });
-
-      trackEvent("message_seen messagesToUpdate", {
-        count: messagesToUpdate.length,
-        messageIds: messagesToUpdate.map((m) => m.messageId),
-      });
-
-      // Tüm mesajları queue'ya ekle
-      messagesToUpdate.forEach((msg) => {
-        const existingUpdate = updateQueueRef.current.get(msg.messageId!);
-        const newPriority = MESSAGE_STATUS_PRIORITY[messageStatus];
-
-        if (existingUpdate) {
-          const existingPriority = MESSAGE_STATUS_PRIORITY[existingUpdate];
-          if (newPriority >= existingPriority) {
-            updateQueueRef.current.set(msg.messageId!, messageStatus);
-          }
-        } else {
-          updateQueueRef.current.set(msg.messageId!, messageStatus);
-        }
-      });
-
-      scheduleBatchUpdate();
-    },
-    [scheduleBatchUpdate, messages, currentUserName],
-  );
-
-  const handleMessageReceived = useCallback(
-    (messageReceivedEvent: MessageReceivedEvent) => {
-      trackEvent("message_received", { messageReceivedEvent });
-
-      const newMessage = messageReceivedEvent.message;
-      if (
-        !newMessage ||
-        (chatId as string) !== messageReceivedEvent?.chat?.chatId
-      )
-        return;
-
-      /* setMessages((prev) => [...prev, newMessage]); */
-
-      chatStore.sendMessage(chatId as string, newMessage);
-
-      // Initialize status for the new message
-      setMessageStatuses((prevStatuses) => {
-        const newStatuses = new Map(prevStatuses);
-        newStatuses.set(newMessage.messageId, newMessage.messageStatus);
-        return newStatuses;
-      });
-
-      // Invalidate messages cache for this chat
-      queryClient.invalidateQueries({
-        queryKey: getGetApiChatsMessagesQueryKey({ chatId: chatId as string }),
-      });
-
-      setReceivedMessage(undefined);
-    },
-    [chatId, queryClient],
-  );
-
-  useEffect(() => {
-    if (receivedMessage) handleMessageReceived(receivedMessage);
-  }, [receivedMessage]);
-
   useEffect(() => {
     if (magicHubClient && chatId) {
-      magicHubClient.joinChat(chatId as string);
-      magicHubClient.on("message_delivered", handleMessageDelivered);
-      magicHubClient.on("message_seen", handleMessageSeen);
+      magicHubClient.joinChat?.(chatId as string);
     }
 
     return () => {
       if (magicHubClient && chatId) {
-        magicHubClient.leaveChat(chatId as string);
-        magicHubClient.off("message_delivered");
-        magicHubClient.off("message_seen");
+        magicHubClient.leaveChat?.(chatId as string);
       }
-
-      // Clear any pending batch updates on unmounting
-      if (batchTimeoutRef.current) {
-        clearTimeout(batchTimeoutRef.current);
-        batchTimeoutRef.current = null;
-      }
-      updateQueueRef.current.clear();
     };
-  }, [
-    magicHubClient,
-    chatId,
-    handleMessageReceived,
-    handleMessageDelivered,
-    handleMessageSeen,
-  ]);
-
-  // Helper function to get message status
-  const getMessageStatus = useCallback(
-    (messageId: string) => {
-      return messageStatuses.get(messageId);
-    },
-    [messageStatuses],
-  );
+  }, [magicHubClient, chatId]);
 
   const onDelete = () => {
     Alert.alert(
@@ -785,7 +501,7 @@ export const useDetail = () => {
         await handleDeleteChat();
       }
     } catch (error) {
-      console.log("error: ", error);
+      trackEvent("handleBlockContact error: ", error);
     }
   }, [userName, chatId]);
 
@@ -811,9 +527,6 @@ export const useDetail = () => {
     return [...messages].reverse();
   }, [messages]);
 
-  // Note: Store is no longer cleared on mount/unmount
-  // Messages persist across navigation and are cleared only when app closes
-
   return {
     t,
     router,
@@ -834,6 +547,5 @@ export const useDetail = () => {
     handleScroll,
     handleEndReached,
     handleSendMessage,
-    getMessageStatus,
   };
 };

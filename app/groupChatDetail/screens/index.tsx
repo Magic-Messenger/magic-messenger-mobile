@@ -35,7 +35,6 @@ export default function GroupChatScreen() {
     handleReply,
     handleEndReached,
     onClearReply,
-    getMessageStatus,
   } = useDetail();
 
   const renderItem = useCallback(
@@ -43,17 +42,15 @@ export default function GroupChatScreen() {
       if (isDateSeparator(item)) {
         return <DateSeparator date={item.date} />;
       }
-      const messageStatus = getMessageStatus(item.messageId!);
       return (
         <MessageGroupItem
           identifier={chatId}
           message={item}
-          messageStatus={messageStatus}
           onReply={handleReply}
         />
       );
     },
-    [chatId, handleReply, getMessageStatus],
+    [chatId, handleReply],
   );
 
   const keyExtractor = useCallback((item: MessageWithDate, index: number) => {

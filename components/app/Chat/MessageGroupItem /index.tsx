@@ -24,7 +24,6 @@ import { VideoMessage } from "../MessageItem/VideoMessage";
 
 interface MessageItemProps {
   identifier: string;
-  messageStatus: MessageStatus;
   message?: MessageDto;
   onReply?: (message: MessageDto) => void;
 }
@@ -36,12 +35,7 @@ const SPRING_CONFIG = {
   stiffness: 300,
 };
 
-function MessageGroupItem({
-  identifier,
-  message,
-  messageStatus,
-  onReply,
-}: MessageItemProps) {
+function MessageGroupItem({ identifier, message, onReply }: MessageItemProps) {
   const styles = useThemedStyles(createStyle);
   const magicHubClient = useSignalRStore((s) => s.magicHubClient);
 
@@ -59,23 +53,21 @@ function MessageGroupItem({
     if (
       magicHubClient &&
       !isSentByCurrentUser &&
-      messageStatus !== MessageStatus.Seen &&
+      message?.messageStatus !== MessageStatus.Seen &&
       message?.messageId
     ) {
-      magicHubClient.viewedMessage(identifier, message.messageId);
+      magicHubClient.viewedMessage?.(identifier, message.messageId);
     }
   }, [
     identifier,
     isSentByCurrentUser,
     magicHubClient,
     message?.messageId,
-    messageStatus,
+    message?.messageStatus,
   ]);
 
   const triggerReply = useCallback(() => {
     if (message && onReply && decryptedContent) {
-      // Keep original message with encrypted content for store
-      // Add decryptedContent for display in reply preview (ChatFooter)
       onReply({
         ...message,
         decryptedContent: decryptedContent as string,
@@ -149,9 +141,9 @@ function MessageGroupItem({
       decryptedReplyMessage,
       isSentByCurrentUser,
       createdAt: message.createdAt!,
+      messageStatus: message?.messageStatus,
       isLoading,
       replyMessageType,
-      messageStatus,
     };
 
     switch (message.messageType) {
@@ -166,13 +158,7 @@ function MessageGroupItem({
       default:
         return null;
     }
-  }, [
-    message,
-    messageStatus,
-    decryptedContent,
-    decryptedReplyMessage,
-    isSentByCurrentUser,
-  ]);
+  }, [message, decryptedContent, decryptedReplyMessage, isSentByCurrentUser]);
 
   if (!decryptedContent || !message) return null;
 
@@ -212,7 +198,7 @@ function MessageGroupItem({
 export default memo(MessageGroupItem, (prevProps, nextProps) => {
   return (
     prevProps.message?.messageId === nextProps.message?.messageId &&
-    prevProps.messageStatus === nextProps.messageStatus
+    prevProps.message?.messageStatus === nextProps.message?.messageStatus
   );
 });
 
