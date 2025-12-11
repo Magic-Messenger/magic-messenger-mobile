@@ -64,6 +64,9 @@ export const registerDeliveredListener = () => {
 export const registerOpenedListener = () => {
   Notifications.addNotificationResponseReceivedListener(async (response) => {
     try {
+      Notifications.setBadgeCountAsync(0);
+      Notifications.dismissAllNotificationsAsync();
+
       const messageData = response.notification.request.content.data;
       if (!messageData) return;
 

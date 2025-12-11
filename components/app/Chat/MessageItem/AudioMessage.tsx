@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   StyleSheet,
@@ -24,6 +25,7 @@ export function AudioMessage({
   isLoading,
   isReply = false,
 }: MessageContentProps) {
+  const { t } = useTranslation();
   const { loadAndPlay, pause, isPlaying } = useAudioPlayer();
 
   return (
@@ -33,7 +35,7 @@ export function AudioMessage({
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="small" color="#fff" />
-          <ThemedText style={styles.loadingText}>Sending...</ThemedText>
+          <ThemedText style={styles.loadingText}>{t("sending")}</ThemedText>
         </View>
       ) : (
         <View style={styles.audioContainer}>

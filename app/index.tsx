@@ -8,10 +8,6 @@ import { StyleSheet, View } from "react-native";
 
 import { AppLayout, ThemedText } from "@/components";
 import { Images } from "@/constants";
-import {
-  registerForPushNotificationsAsync,
-  setupNotificationListeners,
-} from "@/services";
 import { useUserStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
 import {
@@ -33,14 +29,12 @@ export default function IndexPage() {
   const [dots, setDots] = useState<string>("");
 
   useEffect(() => {
-    if (!rehydrated) return; // 👈 wait for the store to be ready
+    if (!rehydrated) return;
 
     const userPublicKeyCheck = checkUserCredentials();
     if (!userPublicKeyCheck) {
       generateKeyPairs();
     }
-    registerForPushNotificationsAsync();
-    setupNotificationListeners();
 
     const interval = setInterval(() => {
       setDots((prev) => {

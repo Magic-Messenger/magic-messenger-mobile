@@ -17,7 +17,7 @@ export default function ChatScreen() {
   const styles = useThemedStyles(createStyle);
 
   const isFocused = useIsFocused();
-  const receivedMessage = useSignalRStore((s) => s.receivedMessage);
+  const receivedMessage = useSignalRStore((s) => s.lastReceivedMessage);
 
   const { data, isLoading, refetch } = useGetApiChatsList({
     pageNumber: 1,

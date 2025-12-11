@@ -1,4 +1,5 @@
 import * as SecureStore from "expo-secure-store";
+import { AppState, AppStateStatus } from "react-native";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -27,14 +28,10 @@ const SecureStoreStorage = {
   },
 };
 
-interface SettingDto {
-  language?: string;
-  timeZone?: string;
-}
-
 interface AppStore {
-  settings: SettingDto;
+  language?: string;
   appVersion: string;
+  appState: AppStateStatus;
   rehydrated: boolean;
   changeLanguage: (language: string) => void;
 }
@@ -42,24 +39,22 @@ interface AppStore {
 export const useAppStore = create<AppStore>()(
   persist(
     (set) => ({
-      settings: {
-        language: "en",
-        timeZone: undefined,
-      },
+      language: "en",
       appVersion: "",
+      appState: AppState.currentState,
       rehydrated: false,
       changeLanguage: (language: string) => {
-        set((state) => ({
-          settings: {
-            ...state.settings,
-            language,
-          },
-        }));
+        set({
+          language,
+        });
       },
     }),
     {
       name: "app-store",
       storage: createJSONStorage(() => SecureStoreStorage),
+      partialize: (state) => ({
+        language: state.language,
+      }),
       onRehydrateStorage: () => () => {
         useAppStore.setState({ rehydrated: true });
       },

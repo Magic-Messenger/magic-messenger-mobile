@@ -30,7 +30,7 @@ export const Colors = {
   /* text */
   text: "#fff",
   placeholder: "#9DB2CE",
-  textDisabled: "#555",
+  textDisabled: "#ADB5BD",
 
   /* gradient */
   backgroundColor: ["rgba(23, 7, 50, 1)", "rgba(1, 1, 3, 1)"],
