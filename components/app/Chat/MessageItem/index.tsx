@@ -214,20 +214,19 @@ const createStyle = (colors: ColorDto) =>
     },
     senderContainer: {
       alignSelf: "flex-end",
-      /* backgroundColor: colors.primary, */
       borderRadius: spacingPixel(8),
       borderBottomRightRadius: 0,
       padding: spacingPixel(10),
-      paddingHorizontal: spacingPixel(15),
+      paddingHorizontal: spacingPixel(16),
       marginVertical: spacingPixel(4),
       maxWidth: "80%",
     },
     receiverContainer: {
       alignSelf: "flex-start",
-      /* backgroundColor: colors.secondary, */
       borderRadius: spacingPixel(8),
       borderBottomLeftRadius: 0,
       padding: spacingPixel(10),
+      paddingHorizontal: spacingPixel(16),
       marginVertical: spacingPixel(4),
       maxWidth: "80%",
     },

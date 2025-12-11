@@ -15,8 +15,8 @@ import { changeLanguage, showToast, widthPixel } from "@/utils";
 
 export const useProfile = () => {
   const { t } = useTranslation();
-  const { settings } = useAppStore();
-  const { logout } = useUserStore();
+  const language = useAppStore((state) => state.language);
+  const logout = useUserStore((state) => state.logout);
   const styles = useThemedStyles(createStyle);
 
   const { data, isLoading } = useGetApiAccountGetProfile();
@@ -54,12 +54,12 @@ export const useProfile = () => {
   };
 
   const changePassword = () => {
-    router.push("/changePassword");
+    router.push("/(tabs)/settings/changePassword");
   };
 
   return {
     t,
-    settings,
+    language,
     styles,
     data,
     isLoading,

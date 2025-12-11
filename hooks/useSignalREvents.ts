@@ -35,8 +35,10 @@ export const useSignalREvents = () => {
   const startTyping = useSignalRStore((s) => s.startTyping);
   const stopTyping = useSignalRStore((s) => s.stopTyping);
   const setCurrentRoute = useSignalRStore((s) => s.setCurrentRoute);
+  const setLastReceivedMessage = useSignalRStore(
+    (s) => s.setLastReceivedMessage,
+  );
   const currentRoute = useSignalRStore((s) => s.currentRoute);
-
   const currentUserName = useUserStore((state) => state.userName);
 
   const sendMessage = useChatStore((state) => state.sendMessage);
@@ -205,6 +207,7 @@ export const useSignalREvents = () => {
       const chatId = messageReceivedEvent?.chat?.chatId;
       if (!newMessage || !chatId) return;
 
+      setLastReceivedMessage(newMessage);
       sendMessage(chatId, newMessage);
 
       // Invalidate messages cache for this chat

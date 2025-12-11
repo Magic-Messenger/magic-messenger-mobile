@@ -5,7 +5,9 @@ import {
 } from "@microsoft/signalr";
 import { create } from "zustand";
 
+import { MessageDto } from "@/api/models";
 import { createMagicHubClient, MagicHubClient } from "@/constants";
+import { trackEvent } from "@/utils";
 
 type TypingUser = {
   username: string;
@@ -19,6 +21,7 @@ type SignalRStore = {
   onlineUsers: string[];
   typingUsers: TypingUser[];
   currentRoute?: string;
+  lastReceivedMessage?: MessageDto;
 
   startConnection: (token: string) => Promise<void>;
   stopConnection: () => Promise<void>;
@@ -29,6 +32,7 @@ type SignalRStore = {
   stopTyping: (chatId: string, user: string) => void;
 
   setCurrentRoute: (route: string) => void;
+  setLastReceivedMessage: (message: MessageDto) => void;
 };
 
 export const useSignalRStore = create<SignalRStore>((set, get) => ({
@@ -36,13 +40,16 @@ export const useSignalRStore = create<SignalRStore>((set, get) => ({
   onlineUsers: [],
   typingUsers: [],
   currentRoute: undefined,
-  receivedMessage: undefined,
+  lastReceivedMessage: undefined,
 
   startConnection: async (token: string) => {
     if (get().connection) return;
 
+    const hubUrl = `${process.env.EXPO_PUBLIC_API_URL}/hub/magic-app`;
+    trackEvent("hubUrl: ", hubUrl);
+
     const connection = new HubConnectionBuilder()
-      .withUrl(process.env.EXPO_PUBLIC_API_URL + "/hub/magic-app", {
+      .withUrl(hubUrl, {
         accessTokenFactory: () => token,
       })
       .withAutomaticReconnect()
@@ -106,5 +113,9 @@ export const useSignalRStore = create<SignalRStore>((set, get) => ({
 
   setCurrentRoute: (route: string) => {
     set({ currentRoute: route });
+  },
+
+  setLastReceivedMessage: (message: MessageDto) => {
+    set({ lastReceivedMessage: message });
   },
 }));

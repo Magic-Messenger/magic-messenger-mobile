@@ -19,7 +19,7 @@ export default function ProfileScreen() {
     styles,
     isLoading,
     data,
-    settings,
+    language,
     deleteApprove,
     setDeleteApprove,
     setUserPassword,
@@ -87,7 +87,7 @@ export default function ProfileScreen() {
 
         <Dropdown
           label={t("profile.language")}
-          selectedValue={settings?.language ?? "en"}
+          selectedValue={language ?? "en"}
           options={appSupportLanguages()}
           onValueChange={handleChangeLanguage}
           style={styles.mt7}

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 import { AppImage, ThemedText } from "@/components";
@@ -18,6 +19,7 @@ export function ImageMessage({
   isLoading,
   isReply = false,
 }: MessageContentProps) {
+  const { t } = useTranslation();
   const styles = useThemedStyles(createStyle);
 
   return (
@@ -27,7 +29,7 @@ export function ImageMessage({
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#fff" />
-          <ThemedText style={styles.loadingText}>Sending...</ThemedText>
+          <ThemedText style={styles.loadingText}>{t("sending")}</ThemedText>
         </View>
       ) : (
         <AppImage
