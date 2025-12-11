@@ -1,5 +1,11 @@
 import { useIsFocused } from "@react-navigation/core";
-import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  useFocusEffect,
+  useLocalSearchParams,
+  useNavigation,
+  useRouter,
+} from "expo-router";
 import { throttle } from "lodash";
 import {
   useCallback,
@@ -12,6 +18,7 @@ import {
 import { useTranslation } from "react-i18next";
 import {
   Alert,
+  AppState,
   FlatList,
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -19,6 +26,7 @@ import {
 } from "react-native";
 
 import {
+  getGetApiChatsGroupMessagesQueryKey,
   useDeleteApiChatsDelete,
   useGetApiAccountGetOnlineUsers,
   useGetApiChatsGroupMessages,
@@ -47,11 +55,13 @@ import {
 export const useDetail = () => {
   const { t } = useTranslation();
   const router = useRouter();
+  const navigation = useNavigation();
+  const isFocused = useIsFocused();
+  const queryClient = useQueryClient();
+
   const listRef = useRef<FlatList<MessageWithDate>>(null);
   const actionRef = useRef<ActionSheetRef | null>(null);
-  const navigation = useNavigation();
-
-  const isFocused = useIsFocused();
+  const appState = useRef(AppState.currentState);
 
   const {
     chatId,
@@ -342,6 +352,39 @@ export const useDetail = () => {
   }, [magicHubClient, chatId]);
 
   //#endregion
+
+  useFocusEffect(
+    useCallback(() => {
+      if (chatId) {
+        queryClient.invalidateQueries?.({
+          queryKey: getGetApiChatsGroupMessagesQueryKey({
+            chatId: chatId as string,
+          }),
+        });
+      }
+    }, [chatId]),
+  );
+
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (nextState) => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextState === "active"
+      ) {
+        if (chatId) {
+          queryClient.invalidateQueries?.({
+            queryKey: getGetApiChatsGroupMessagesQueryKey({
+              chatId: chatId as string,
+            }),
+          });
+        }
+      }
+
+      appState.current = nextState;
+    });
+
+    return () => sub.remove();
+  }, [chatId]);
 
   const handleDeleteChat = useCallback(async () => {
     try {

@@ -1,11 +1,15 @@
 import { useIsFocused } from "@react-navigation/core";
 import { FlashList, type ListRenderItemInfo } from "@shopify/flash-list";
+import { useQueryClient } from "@tanstack/react-query";
 import { router, useFocusEffect } from "expo-router";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { RefreshControl, StyleSheet, View } from "react-native";
+import { AppState, RefreshControl, StyleSheet, View } from "react-native";
 
-import { useGetApiChatsList } from "@/api/endpoints/magicMessenger";
+import {
+  getGetApiChatsListQueryKey,
+  useGetApiChatsList,
+} from "@/api/endpoints/magicMessenger";
 import { ChatDto } from "@/api/models";
 import { AppLayout, Button, ChatItem, EmptyList, Icon } from "@/components";
 import { useSignalRStore } from "@/store";
@@ -17,7 +21,11 @@ export default function ChatScreen() {
   const styles = useThemedStyles(createStyle);
 
   const isFocused = useIsFocused();
+  const queryClient = useQueryClient();
+
   const receivedMessage = useSignalRStore((s) => s.lastReceivedMessage);
+
+  const appState = useRef(AppState.currentState);
 
   const { data, isLoading, refetch } = useGetApiChatsList({
     pageNumber: 1,
@@ -112,6 +120,25 @@ export default function ChatScreen() {
   useEffect(() => {
     if (isFocused && receivedMessage) refetch();
   }, [receivedMessage, isFocused]);
+
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (nextState) => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextState === "active"
+      ) {
+        queryClient.invalidateQueries?.({
+          queryKey: getGetApiChatsListQueryKey(),
+        });
+
+        refetch();
+      }
+
+      appState.current = nextState;
+    });
+
+    return () => sub.remove();
+  }, []);
 
   // Refetch on screen focus
   useFocusEffect(

@@ -39,7 +39,6 @@ export const useSignalREvents = () => {
     (s) => s.setLastReceivedMessage,
   );
   const currentRoute = useSignalRStore((s) => s.currentRoute);
-
   const currentUserName = useUserStore((state) => state.userName);
 
   const sendMessage = useChatStore((state) => state.sendMessage);
