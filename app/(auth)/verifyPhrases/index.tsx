@@ -105,6 +105,7 @@ export default function VerifyPhrasesScreen() {
               groupCount={15}
               charactersPerGroup={4}
               itemsPerRow={3}
+              placeholder="----"
               value={formData.phrases}
               onChangeText={(text) =>
                 setFormData({ ...formData, phrases: text })

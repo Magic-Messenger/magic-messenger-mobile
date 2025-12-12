@@ -32,7 +32,7 @@ export const useListContact = () => {
           copy: true,
           onEdit: () =>
             router.push({
-              pathname: "/contacts/screens/edit",
+              pathname: "/settings/contacts/screens/edit",
               params: {
                 ...item,
               } as never,
