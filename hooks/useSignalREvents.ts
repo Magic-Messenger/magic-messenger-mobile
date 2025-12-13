@@ -71,27 +71,17 @@ export const useSignalREvents = () => {
 
   const navigateToChat = useCallback(
     (chat: ChatDto) => {
-      console.log("chat: ", chat);
       if (chat?.isGroupChat) {
-        router.navigate("/groups/home");
-        /* router.navigate({
+        const { groupKey, nonce: groupNonce } = chat?.encryptedGroupKeys?.find(
+          (egk) => egk.username === currentUserName,
+        ) as never;
+
+        router.push({
           pathname: "/groupChatDetail/screens",
           params: {
             chatId: chat?.chatId,
-            groupKey: chat?.groupKey,
-            groupNonce: chat?.groupNonce,
-            userName: currentUserName,
-            groupAccountCount: chat?.groupAccountCount,
-            groupAdminAccount: chat?.groupAdminAccount,
-            isGroupChat: (chat?.isGroupChat as never) ?? false,
-          },
-        }); */
-        /* router.push({
-          pathname: "/groupChatDetail/screens",
-          params: {
-            chatId: chat?.chatId,
-            groupKey: chat?.groupKey,
-            groupNonce: chat?.groupNonce,
+            groupKey,
+            groupNonce,
             userName: currentUserName,
             title: chat?.groupName,
             groupAccountCount: chat?.groupAccountCount,
@@ -99,7 +89,7 @@ export const useSignalREvents = () => {
             isGroupChat: (chat?.isGroupChat as never) ?? false,
             groupAdminUsername: "test-i17",
           },
-        }); */
+        });
       } else {
         router.navigate({
           pathname: "/chatDetail/screens",
