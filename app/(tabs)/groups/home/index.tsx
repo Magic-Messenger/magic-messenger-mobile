@@ -6,10 +6,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { AppState, RefreshControl, StyleSheet, View } from "react-native";
 
-import {
-  getGetApiChatsListQueryKey,
-  useGetApiChatsList,
-} from "@/api/endpoints/magicMessenger";
+import { useGetApiChatsList } from "@/api/endpoints/magicMessenger";
 import { ChatDto } from "@/api/models";
 import { AppLayout, Button, ChatItem, EmptyList, Icon } from "@/components";
 import { useSignalRStore } from "@/store";
@@ -36,7 +33,7 @@ export default function ChatScreen() {
   // Memoized group chat list data
   const groupChatList = useMemo(
     () => data?.data?.data ?? [],
-    [data?.data?.data],
+    [data?.data?.data, receivedMessage, appState, isFocused],
   );
 
   // Render group chat item
@@ -127,9 +124,9 @@ export default function ChatScreen() {
         appState.current.match(/inactive|background/) &&
         nextState === "active"
       ) {
-        queryClient.invalidateQueries?.({
+        /* queryClient.invalidateQueries?.({
           queryKey: getGetApiChatsListQueryKey(),
-        });
+        }); */
 
         refetch();
       }

@@ -61,7 +61,12 @@ export const useDetail = () => {
   const isFocused = useIsFocused();
   const queryClient = useQueryClient();
 
-  const { chatId: contactChatId, userName, publicKey } = useLocalSearchParams();
+  const {
+    chatId: contactChatId,
+    userName,
+    publicKey,
+    title,
+  } = useLocalSearchParams();
 
   const listRef = useRef<FlatList<MessageWithDate>>(null);
   const actionRef = useRef<ActionSheetRef | null>(null);
@@ -568,6 +573,7 @@ export const useDetail = () => {
 
   return {
     t,
+    title,
     router,
     listRef,
     loading: isMessagesLoading && messages.length === 0,

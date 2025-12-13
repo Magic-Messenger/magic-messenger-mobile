@@ -65,6 +65,7 @@ export const useDetail = () => {
 
   const {
     chatId,
+    title,
     userName,
     publicKey,
     groupKey,
@@ -462,6 +463,7 @@ export const useDetail = () => {
 
   return {
     t,
+    title,
     router,
     listRef,
     loading: isMessagesLoading && messages.length === 0,

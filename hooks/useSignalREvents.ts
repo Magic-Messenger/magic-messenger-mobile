@@ -71,8 +71,10 @@ export const useSignalREvents = () => {
 
   const navigateToChat = useCallback(
     (chat: ChatDto) => {
+      console.log("chat: ", chat);
       if (chat?.isGroupChat) {
-        router.navigate({
+        router.navigate("/groups/home");
+        /* router.navigate({
           pathname: "/groupChatDetail/screens",
           params: {
             chatId: chat?.chatId,
@@ -83,7 +85,21 @@ export const useSignalREvents = () => {
             groupAdminAccount: chat?.groupAdminAccount,
             isGroupChat: (chat?.isGroupChat as never) ?? false,
           },
-        });
+        }); */
+        /* router.push({
+          pathname: "/groupChatDetail/screens",
+          params: {
+            chatId: chat?.chatId,
+            groupKey: chat?.groupKey,
+            groupNonce: chat?.groupNonce,
+            userName: currentUserName,
+            title: chat?.groupName,
+            groupAccountCount: chat?.groupAccountCount,
+            groupAdminAccount: chat?.groupAdminAccount,
+            isGroupChat: (chat?.isGroupChat as never) ?? false,
+            groupAdminUsername: "test-i17",
+          },
+        }); */
       } else {
         router.navigate({
           pathname: "/chatDetail/screens",

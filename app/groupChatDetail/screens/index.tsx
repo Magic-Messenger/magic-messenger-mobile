@@ -22,6 +22,7 @@ export default function GroupChatScreen() {
 
   const {
     loading,
+    title,
     chatId,
     messages,
     groupedMessages,
@@ -74,6 +75,7 @@ export default function GroupChatScreen() {
             isGroupChat={true}
             groupAccountCount={groupAccountCount as string}
             userName={userName as string}
+            title={title as string}
           />
         }
         footer={

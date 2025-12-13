@@ -22,6 +22,7 @@ export default function ChatScreen() {
 
   const {
     loading,
+    title,
     chatId,
     messages,
     groupedMessages,
@@ -74,6 +75,7 @@ export default function ChatScreen() {
             chatId={chatId}
             isGroupChat={false}
             userName={userName as string}
+            title={title as string}
           />
         }
         footer={
