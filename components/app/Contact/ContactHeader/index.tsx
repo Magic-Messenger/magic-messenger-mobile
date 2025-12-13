@@ -11,12 +11,16 @@ interface Props {
   setSearchText: (_text: string) => void;
   onBlockedPress?: () => void;
   isBlocked?: boolean;
+  isShowBlocked?: boolean;
+  addContactRoute?: string;
 }
 
 export const ContactHeader = ({
   setSearchText,
   onBlockedPress,
   isBlocked,
+  isShowBlocked = true,
+  addContactRoute = "/(tabs)/settings/contacts/screens/add",
 }: Props) => {
   const { t } = useTranslation();
   const styles = useThemedStyles(createStyle);
@@ -24,19 +28,23 @@ export const ContactHeader = ({
   return (
     <View>
       <View style={[styles.flexRow, styles.gap3, styles.justifyContentEnd]}>
-        <Button
-          type="primary"
-          label={!isBlocked ? t("contacts.blocked") : t("contacts.allContacts")}
-          style={styles.contactButton}
-          textProps={{
-            size: 14,
-          }}
-          onPress={onBlockedPress}
-        />
+        {isShowBlocked && (
+          <Button
+            type="primary"
+            label={
+              !isBlocked ? t("contacts.blocked") : t("contacts.allContacts")
+            }
+            style={styles.contactButton}
+            textProps={{
+              size: 14,
+            }}
+            onPress={onBlockedPress}
+          />
+        )}
         <Button
           type="secondary"
           label={t("contacts.addUser")}
-          onPress={() => router.push("/(tabs)/settings/contacts/screens/add")}
+          onPress={() => router.push(addContactRoute as any)}
           style={styles.contactButton}
           textProps={{
             size: 14,
