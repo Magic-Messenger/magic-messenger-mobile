@@ -23,7 +23,7 @@
     "create-component": "node scripts/create-component.js",
     "generate-api": "orval --config orval.config.ts",
     "generate-api:watch": "orval --config orval.config.ts --watch",
-    "build:ios": "eas build -p ios --profile production && eas submit -p ios --profile production",
+    "build:ios": "eas build -p ios --clear-cache --profile production && eas submit -p ios --profile production",
     "build:android": "eas build -p android --profile production && eas submit -p android --profile production",
     "prepare-hooks": "husky install",
     "prepare": "husky"
@@ -51,7 +51,7 @@
     "expo-device": "~8.0.9",
     "expo-font": "~14.0.9",
     "expo-haptics": "~15.0.7",
-    "expo-iap": "^3.1.9",
+    "expo-iap": "^3.2.0",
     "expo-image": "~3.0.10",
     "expo-image-picker": "~17.0.8",
     "expo-linear-gradient": "~15.0.7",
