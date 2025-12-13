@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { startTransition, useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
@@ -100,18 +100,20 @@ export function ChatFooter({
       const uri = await stopRecording();
       if (!uri) return;
 
-      setIsUploading(true);
-      setUploadType("audio");
+      startTransition(() => {
+        setIsUploading(true);
+        setUploadType("audio");
+      });
 
-      const responseFetch = await fetch(uri);
-      const audioData = await responseFetch.blob();
+      const extensionMatch = uri.match(/\.(\w+)(?:\?|$)/);
+      const extension = extensionMatch?.[1];
 
       const { data, success } = await requestUpload({
         data: {
           file: {
             uri,
-            name: `${Date.now()}-recording.m4a`,
-            type: audioData.type,
+            name: `${Date.now()}.${extension}`,
+            type: `audio/${extension}`,
           } as any,
         },
       });
@@ -125,8 +127,10 @@ export function ChatFooter({
     } catch (error) {
       trackEvent("send_audio_message_error", error);
     } finally {
-      setIsUploading(false);
-      setUploadType(null);
+      startTransition(() => {
+        setIsUploading(false);
+        setUploadType(null);
+      });
     }
   };
 
@@ -135,21 +139,20 @@ export function ChatFooter({
       const uri = await pickImage();
       if (!uri) return;
 
-      setIsUploading(true);
-      setUploadType("image");
-
-      const responseFetch = await fetch(uri);
-      const imageData = await responseFetch.blob();
+      startTransition(() => {
+        setIsUploading(true);
+        setUploadType("image");
+      });
 
       const extensionMatch = uri.match(/\.(\w+)(?:\?|$)/);
-      const extension = extensionMatch?.[1] ?? "jpg";
+      const extension = extensionMatch?.[1];
 
       const { data, success } = await requestUpload({
         data: {
           file: {
             uri,
             name: `${Date.now()}.${extension}`,
-            type: imageData.type || `image/${extension}`,
+            type: `image/${extension}`,
           } as any,
         },
       });
@@ -163,8 +166,10 @@ export function ChatFooter({
     } catch (error) {
       trackEvent("send_image_message_error", error);
     } finally {
-      setIsUploading(false);
-      setUploadType(null);
+      startTransition(() => {
+        setIsUploading(false);
+        setUploadType(null);
+      });
     }
   };
 

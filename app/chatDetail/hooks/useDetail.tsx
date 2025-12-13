@@ -8,6 +8,7 @@ import {
 } from "expo-router";
 import { throttle } from "lodash";
 import {
+  startTransition,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -201,10 +202,12 @@ export const useDetail = () => {
     messagesResult.sort((a, b) => {
       const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
       const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-      return dateA - dateB;
+      return dateB - dateA;
     });
 
-    chatStore.setMessages(chatId as string, messagesResult);
+    startTransition(() => {
+      chatStore.setMessages(chatId as string, messagesResult);
+    });
 
     setPagination((prev) => ({
       ...prev,
@@ -567,10 +570,6 @@ export const useDetail = () => {
     });
   }, [navigation, chatId]);
 
-  const invertedGroupedMessages = useMemo(() => {
-    return [...messages].reverse();
-  }, [messages]);
-
   return {
     t,
     title,
@@ -581,7 +580,6 @@ export const useDetail = () => {
     actionRef,
     chatId: chatId as string,
     messages,
-    groupedMessages: invertedGroupedMessages,
     chatActionOptions,
     userName,
     currentUserName,

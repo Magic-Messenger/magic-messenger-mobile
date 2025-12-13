@@ -25,7 +25,6 @@ export default function ChatScreen() {
     title,
     chatId,
     messages,
-    groupedMessages,
     userName,
     listRef,
     usersPublicKey,
@@ -91,7 +90,7 @@ export default function ChatScreen() {
         <LoadingProvider loading={loading}>
           <FlatList
             ref={listRef}
-            data={groupedMessages}
+            data={messages}
             renderItem={renderItem}
             keyExtractor={keyExtractor}
             inverted
