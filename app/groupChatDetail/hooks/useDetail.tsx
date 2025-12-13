@@ -158,6 +158,7 @@ export const useDetail = () => {
     const isFirstLoad = pagination.currentPage <= 1;
 
     const newMessages = data.messages?.data as MessageDto[];
+
     if (!newMessages.length) return;
 
     // Merge API messages with existing store messages
@@ -302,7 +303,10 @@ export const useDetail = () => {
       };
 
       trackEvent("sendMessage: ", messageInfo);
-      chatStore.sendMessage(chatId as string, messageInfo as MessageDto);
+
+      startTransition(() => {
+        chatStore.sendMessage(chatId as string, messageInfo as MessageDto);
+      });
 
       const response = await sendApiMessage({
         data: {
@@ -310,23 +314,30 @@ export const useDetail = () => {
           // API expects only messageId string
           repliedToMessage: replyMessage?.messageId || null,
         },
+      }).catch(() => {
+        startTransition(() => {
+          chatStore.deleteTempMessage(chatId as string, tempId);
+        });
       });
 
       if (response?.success) {
-        chatStore.updateMessageId(
-          chatId as string,
-          tempId,
-          response.data?.messageId as string,
-          response.data?.messageStatus,
-        );
+        startTransition(() => {
+          chatStore.updateMessageId(
+            chatId as string,
+            tempId,
+            response.data?.messageId as string,
+            response.data?.messageStatus,
+          );
+        });
 
         trackEvent("message_sent", {
           chatId: chatId as string,
           messageId: response.data,
         });
       } else {
-        trackEvent("messageInfo is undefined", { messageInfo });
-        chatStore.deleteTempMessage(chatId as string, tempId);
+        startTransition(() => {
+          chatStore.deleteTempMessage(chatId as string, tempId);
+        });
       }
 
       return;

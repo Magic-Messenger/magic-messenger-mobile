@@ -334,7 +334,10 @@ export const useDetail = () => {
       };
 
       trackEvent("sendMessage: ", messageInfo);
-      chatStore.sendMessage(messageChatId, messageInfo as MessageDto);
+
+      startTransition(() => {
+        chatStore.sendMessage(messageChatId, messageInfo as MessageDto);
+      });
 
       const response = await sendApiMessage({
         data: {
@@ -342,22 +345,29 @@ export const useDetail = () => {
           // API expects only messageId string
           repliedToMessage: replyMessage?.messageId || null,
         },
+      }).catch(() => {
+        startTransition(() => {
+          chatStore.deleteTempMessage(messageChatId, tempId);
+        });
       });
       if (response?.success) {
-        chatStore.updateMessageId(
-          messageChatId,
-          tempId,
-          response.data?.messageId as string,
-          response.data?.messageStatus,
-        );
+        startTransition(() => {
+          chatStore.updateMessageId(
+            messageChatId,
+            tempId,
+            response.data?.messageId as string,
+            response.data?.messageStatus,
+          );
+        });
 
         trackEvent("message_sent", {
           chatId: messageChatId,
           messageId: response.data,
         });
       } else {
-        trackEvent("messageInfo is undefined", { messageInfo });
-        chatStore.deleteTempMessage(messageChatId, tempId);
+        startTransition(() => {
+          chatStore.deleteTempMessage(messageChatId, tempId);
+        });
       }
 
       return;
