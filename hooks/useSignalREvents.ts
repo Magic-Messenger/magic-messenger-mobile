@@ -71,7 +71,7 @@ export const useSignalREvents = () => {
 
   const navigateToChat = useCallback(
     (chat: ChatDto) => {
-      if (chat.isGroupChat) {
+      if (chat?.isGroupChat) {
         router.navigate({
           pathname: "/groupChatDetail/screens",
           params: {
@@ -90,7 +90,7 @@ export const useSignalREvents = () => {
           params: {
             chatId: chat?.chatId,
             publicKey: chat?.contact?.publicKey,
-            userName: chat?.contact?.contactUsername,
+            userName: chat?.contact?.nickname,
             isGroupChat: (chat?.isGroupChat as never) ?? false,
           },
         });
