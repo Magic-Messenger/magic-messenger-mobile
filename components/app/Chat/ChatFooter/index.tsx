@@ -2,7 +2,6 @@ import React, { startTransition, useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
-  Modal,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -263,22 +262,18 @@ export function ChatFooter({
     }
   };
 
-  const renderUploadingModal = () => (
-    <Modal
-      transparent
-      visible={isUploading || isProcessing}
-      animationType="fade"
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <ActivityIndicator size="large" color="white" />
-          <ThemedText style={styles.uploadingText}>
-            {getUploadingText()}
-          </ThemedText>
-        </View>
+  // Inline loading indicator instead of Modal to prevent iOS touch lock bug
+  const renderUploadingIndicator = () => {
+    if (!isUploading && !isProcessing) return null;
+    return (
+      <View style={styles.uploadingIndicator}>
+        <ActivityIndicator size="small" color="white" />
+        <ThemedText style={styles.uploadingIndicatorText}>
+          {getUploadingText()}
+        </ThemedText>
       </View>
-    </Modal>
-  );
+    );
+  };
 
   const renderReplyMessage = useMemo(() => {
     if (!replyMessage) return null;
@@ -321,7 +316,7 @@ export function ChatFooter({
 
   return (
     <>
-      {renderUploadingModal()}
+      {renderUploadingIndicator()}
       {renderReplyMessage}
       <GradientBackground style={styles.container}>
         {isRecording ? renderRecordingUI() : renderMessageInput()}
@@ -398,22 +393,20 @@ const createStyle = (colors: ColorDto) =>
       justifyContent: "center",
       alignItems: "center",
     },
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
+    uploadingIndicator: {
+      flexDirection: "row",
+      alignItems: "center",
       justifyContent: "center",
-      alignItems: "center",
-    },
-    modalContent: {
       backgroundColor: colors.secondary,
-      borderRadius: spacingPixel(12),
-      padding: spacingPixel(24),
-      alignItems: "center",
-      gap: spacingPixel(12),
-      minWidth: spacingPixel(150),
+      marginHorizontal: spacingPixel(15),
+      borderRadius: spacingPixel(9),
+      paddingHorizontal: spacingPixel(10),
+      paddingVertical: spacingPixel(15),
+      marginBottom: spacingPixel(5),
+      gap: spacingPixel(8),
     },
-    uploadingText: {
-      marginTop: spacingPixel(8),
+    uploadingIndicatorText: {
       color: "white",
+      fontSize: 13,
     },
   });

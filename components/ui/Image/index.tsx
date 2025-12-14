@@ -1,4 +1,4 @@
-import React, { JSX, useState } from "react";
+import React, { JSX, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -49,6 +49,12 @@ export const AppImage: React.FC<AppImageProps> = ({
   const [error, setError] = useState<boolean>(false);
   const [detailsVisible, setDetailsVisible] = useState<boolean>(false);
 
+  // Memoize images array to prevent unnecessary re-renders
+  const imageViewImages = useMemo(() => {
+    const uri = (source as any)?.uri;
+    return uri ? [{ uri }] : [];
+  }, [(source as any)?.uri]);
+
   const handleLoad = (): void => {
     setLoading(false);
     setError(false);
@@ -65,6 +71,10 @@ export const AppImage: React.FC<AppImageProps> = ({
     if (onPress && !loading && !error) {
       onPress();
     }
+  };
+
+  const handleCloseImageView = (): void => {
+    setDetailsVisible(false);
   };
 
   const renderContent = (): JSX.Element => {
@@ -92,20 +102,16 @@ export const AppImage: React.FC<AppImageProps> = ({
             {...props}
           />
           {loading && showLoading && <ActivityIndicator size="small" />}
-          {showDetail && !loading && !error && (
-            <ImageView
-              key={`image-view-${Math.random()}`}
-              images={
-                (source as any)?.uri
-                  ? [{ uri: `${(source as any)?.uri}?v=${Math.random()}` }]
-                  : []
-              }
-              imageIndex={0}
-              visible={detailsVisible}
-              onRequestClose={() => setDetailsVisible(false)}
-            />
-          )}
         </TouchableOpacity>
+        {/* Only render ImageView when visible to prevent gesture handler conflicts */}
+        {showDetail && detailsVisible && (
+          <ImageView
+            images={imageViewImages}
+            imageIndex={0}
+            visible={detailsVisible}
+            onRequestClose={handleCloseImageView}
+          />
+        )}
       </View>
     );
   };
