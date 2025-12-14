@@ -60,7 +60,7 @@ export function ChatHeader({
         <AppImage source={Images.icon} style={styles.avatar} />
         <View>
           <ThemedText type="title" size={16} numberOfLines={1}>
-            {title}
+            {title ?? userName}
           </ThemedText>
           {isGroupChat ? (
             <ThemedText type="subtitle">
