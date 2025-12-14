@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { router, usePathname } from "expo-router";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -38,8 +38,10 @@ export const useSignalREvents = () => {
   const setLastReceivedMessage = useSignalRStore(
     (s) => s.setLastReceivedMessage,
   );
-  const currentRoute = useSignalRStore((s) => s.currentRoute);
   const currentUserName = useUserStore((state) => state.userName);
+
+  // Use ref to always have the latest pathname without re-creating callbacks
+  const pathnameRef = useRef(pathname);
 
   const sendMessage = useChatStore((state) => state.sendMessage);
   const getMessages = useChatStore((state) => state.getMessages);
@@ -228,7 +230,8 @@ export const useSignalREvents = () => {
         queryKey: getGetApiChatsListQueryKey(),
       });
 
-      if (isInChatScreen(currentRoute)) return;
+      // Use ref to get the latest pathname (avoids stale closure)
+      if (isInChatScreen(pathnameRef.current)) return;
 
       showToast({
         type: "success",
@@ -244,10 +247,12 @@ export const useSignalREvents = () => {
         onPress: () => navigateToChat(messageReceivedEvent.chat),
       });
     },
-    [queryClient, currentRoute, isInChatScreen, navigateToChat],
+    [queryClient, navigateToChat, sendMessage, setLastReceivedMessage, t],
   );
 
+  // Keep ref in sync with pathname
   useEffect(() => {
+    pathnameRef.current = pathname;
     setCurrentRoute(pathname);
   }, [pathname, setCurrentRoute]);
 
