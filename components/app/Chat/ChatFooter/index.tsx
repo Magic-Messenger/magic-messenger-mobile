@@ -59,14 +59,16 @@ export function ChatFooter({
     deleteRecording,
     duration,
   } = useAudioRecorder();
-  const { pickImage } = usePicker();
+  const { pickMedia, isProcessing, progress } = usePicker();
   const magicHubClient = useSignalRStore((s) => s.magicHubClient);
 
   const { mutateAsync: requestUpload } = usePostApiChatsUpload();
 
   const [message, setMessage] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadType, setUploadType] = useState<"image" | "audio" | null>(null);
+  const [uploadType, setUploadType] = useState<
+    "image" | "video" | "audio" | null
+  >(null);
 
   const handleSendMessage = useCallback(() => {
     const trimmedMessage = message.trim();
@@ -134,25 +136,28 @@ export function ChatFooter({
     }
   };
 
-  const handleSendImage = async () => {
+  const handleSendMedia = async () => {
     try {
-      const uri = await pickImage();
-      if (!uri) return;
+      const media = await pickMedia();
+      if (!media) return;
+
+      const isVideo = media.type === "video";
 
       startTransition(() => {
         setIsUploading(true);
-        setUploadType("image");
+        setUploadType(isVideo ? "video" : "image");
       });
 
-      const extensionMatch = uri.match(/\.(\w+)(?:\?|$)/);
-      const extension = extensionMatch?.[1];
+      const extensionMatch = media.uri.match(/\.(\w+)(?:\?|$)/);
+      const extension = isVideo ? "mp4" : extensionMatch?.[1] || "jpg";
+      const mimeType = isVideo ? "video/mp4" : `image/${extension}`;
 
       const { data, success } = await requestUpload({
         data: {
           file: {
-            uri,
+            uri: media.uri,
             name: `${Date.now()}.${extension}`,
-            type: `image/${extension}`,
+            type: mimeType,
           } as any,
         },
       });
@@ -160,11 +165,11 @@ export function ChatFooter({
       if (success && data?.fileUrl) {
         onSend({
           ...data,
-          messageType: MessageType.Image,
+          messageType: isVideo ? MessageType.Video : MessageType.Image,
         });
       }
     } catch (error) {
-      trackEvent("send_image_message_error", error);
+      trackEvent("send_media_message_error", error);
     } finally {
       startTransition(() => {
         setIsUploading(false);
@@ -216,11 +221,14 @@ export function ChatFooter({
     return (
       <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap3]}>
         {displaySendImage && (
-          <TouchableOpacity disabled={isRecording} onPress={handleSendImage}>
+          <TouchableOpacity
+            disabled={isRecording || isProcessing}
+            onPress={handleSendMedia}
+          >
             <Icon
               type="feather"
               name="image"
-              color={isRecording ? "#D3D3D3" : "white"}
+              color={isRecording || isProcessing ? "#D3D3D3" : "white"}
             />
           </TouchableOpacity>
         )}
@@ -239,15 +247,33 @@ export function ChatFooter({
     );
   };
 
+  const getUploadingText = () => {
+    if (isProcessing && progress > 0) {
+      return `${t("chatDetail.compressingVideo")} ${progress}%`;
+    }
+    switch (uploadType) {
+      case "video":
+        return t("chatDetail.uploadingVideo");
+      case "image":
+        return t("chatDetail.uploadingImage");
+      case "audio":
+        return t("chatDetail.uploadingAudio");
+      default:
+        return "Waiting...";
+    }
+  };
+
   const renderUploadingModal = () => (
-    <Modal transparent visible={isUploading} animationType="fade">
+    <Modal
+      transparent
+      visible={isUploading || isProcessing}
+      animationType="fade"
+    >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <ActivityIndicator size="large" color="white" />
           <ThemedText style={styles.uploadingText}>
-            {uploadType === "image"
-              ? t("chatDetail.uploadingImage")
-              : t("chatDetail.uploadingAudio")}
+            {getUploadingText()}
           </ThemedText>
         </View>
       </View>
