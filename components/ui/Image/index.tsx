@@ -1,4 +1,4 @@
-import React, { JSX, useMemo, useState } from "react";
+import React, { JSX, useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -6,18 +6,15 @@ import {
   ImageStyle,
   StyleSheet,
   Text,
-  TextStyle,
   TouchableOpacity,
   View,
-  ViewStyle,
 } from "react-native";
-import ImageView from "react-native-image-viewing";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import Animated, { FadeIn, FadeOut, runOnJS } from "react-native-reanimated";
 
-import {
-  fontPixel,
-  heightPixel,
-  spacingPixel,
-} from "../../../utils/pixelHelper";
+import { useImageViewer } from "@/providers";
+
+import { heightPixel } from "../../../utils/pixelHelper";
 
 interface AppImageProps extends Omit<ImageProps, "onLoad" | "onError"> {
   source: ImageProps["source"];
@@ -36,6 +33,7 @@ interface AppImageProps extends Omit<ImageProps, "onLoad" | "onError"> {
 export const AppImage: React.FC<AppImageProps> = ({
   source,
   style,
+  fallbackSource,
   errorText = "image_not_load",
   onPress,
   onLoad,
@@ -45,15 +43,29 @@ export const AppImage: React.FC<AppImageProps> = ({
   showDetail = false,
   ...props
 }) => {
+  const { open } = useImageViewer();
+
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
-  const [detailsVisible, setDetailsVisible] = useState<boolean>(false);
 
-  // Memoize images array to prevent unnecessary re-renders
-  const imageViewImages = useMemo(() => {
+  const imageSource = error && fallbackSource ? fallbackSource : source;
+
+  // Memoize image array to prevent unnecessary re-renders
+  const images = useMemo(() => {
     const uri = (source as any)?.uri;
     return uri ? [{ uri }] : [];
   }, [(source as any)?.uri]);
+
+  const handleOpen = useCallback(() => {
+    if (!images.length) return;
+    open(images, 0);
+  }, [images, open]);
+
+  const tapGesture = Gesture.Tap()
+    .enabled(showDetail && !loading && !error)
+    .onEnd(() => {
+      runOnJS(handleOpen)();
+    });
 
   const handleLoad = (): void => {
     setLoading(false);
@@ -73,9 +85,7 @@ export const AppImage: React.FC<AppImageProps> = ({
     }
   };
 
-  const handleCloseImageView = (): void => {
-    setDetailsVisible(false);
-  };
+  const imageStyle = StyleSheet.flatten([styles.image, style]);
 
   const renderContent = (): JSX.Element => {
     if (error) {
@@ -88,30 +98,24 @@ export const AppImage: React.FC<AppImageProps> = ({
 
     return (
       <View style={style}>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          disabled={!showDetail || loading}
-          onPress={() => setDetailsVisible(true)}
-        >
-          <Image
-            source={source}
-            style={[styles.image, style]}
-            onLoad={handleLoad}
-            onError={handleError}
-            resizeMode={resizeMode}
-            {...props}
-          />
-          {loading && showLoading && <ActivityIndicator size="small" />}
-        </TouchableOpacity>
-        {/* Only render ImageView when visible to prevent gesture handler conflicts */}
-        {showDetail && detailsVisible && (
-          <ImageView
-            images={imageViewImages}
-            imageIndex={0}
-            visible={detailsVisible}
-            onRequestClose={handleCloseImageView}
-          />
-        )}
+        <GestureDetector gesture={tapGesture}>
+          <Animated.View entering={FadeIn} exiting={FadeOut} style={style}>
+            <Image
+              source={imageSource}
+              style={imageStyle}
+              onLoad={handleLoad}
+              onError={handleError}
+              resizeMode={resizeMode}
+              {...props}
+            />
+
+            {loading && showLoading && (
+              <View style={styles.loadingOverlay}>
+                <ActivityIndicator size="large" color="white" />
+              </View>
+            )}
+          </Animated.View>
+        </GestureDetector>
       </View>
     );
   };
@@ -127,17 +131,15 @@ export const AppImage: React.FC<AppImageProps> = ({
   return renderContent();
 };
 
-interface Styles {
-  image: ImageStyle;
-  placeholder: ViewStyle;
-  errorText: TextStyle;
-  loadingText: TextStyle;
-}
-
-const styles = StyleSheet.create<Styles>({
+const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: heightPixel(200),
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
   },
   placeholder: {
     backgroundColor: "#f0f0f0",
@@ -150,10 +152,5 @@ const styles = StyleSheet.create<Styles>({
     color: "#666",
     fontSize: 16,
     textAlign: "center",
-  },
-  loadingText: {
-    color: "#666",
-    fontSize: fontPixel(14),
-    marginTop: spacingPixel(8),
   },
 });
