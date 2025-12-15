@@ -70,6 +70,7 @@ import type {
   GetApiAccountGetAccountForContactParams,
   GetApiAccountGetParams,
   GetApiAccountListParams,
+  GetApiChatsGetUnreadCountsParams,
   GetApiChatsGroupMessagesParams,
   GetApiChatsListParams,
   GetApiChatsMessagesParams,
@@ -95,6 +96,7 @@ import type {
   GetNotificationCommandRequest,
   IceCandidateCommandRequest,
   IceServer,
+  Int32IDataResult,
   InviteToGroupCommandRequest,
   InvoiceDetailDtoIDataResult,
   InvoiceDtoListPaginatedResult,
@@ -6027,6 +6029,181 @@ export const usePostApiChatsUpload = <
 
   return useMutation(mutationOptions, queryClient);
 };
+
+/**
+ * @summary Get unread message count
+ */
+export const getApiChatsGetUnreadCounts = (
+  params?: GetApiChatsGetUnreadCountsParams,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<Int32IDataResult>(
+    { url: `/api/chats/get-unread-counts`, method: "GET", params, signal },
+    options,
+  );
+};
+
+export const getGetApiChatsGetUnreadCountsQueryKey = (
+  params?: GetApiChatsGetUnreadCountsParams,
+) => {
+  return [`/api/chats/get-unread-counts`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetApiChatsGetUnreadCountsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getApiChatsGetUnreadCounts>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiChatsGetUnreadCountsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiChatsGetUnreadCounts>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetApiChatsGetUnreadCountsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getApiChatsGetUnreadCounts>>
+  > = ({ signal }) =>
+    getApiChatsGetUnreadCounts(params, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    staleTime: 10000,
+    refetchOnWindowFocus: false,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getApiChatsGetUnreadCounts>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetApiChatsGetUnreadCountsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getApiChatsGetUnreadCounts>>
+>;
+export type GetApiChatsGetUnreadCountsQueryError = ResultMessage[] | void;
+
+export function useGetApiChatsGetUnreadCounts<
+  TData = Awaited<ReturnType<typeof getApiChatsGetUnreadCounts>>,
+  TError = ResultMessage[] | void,
+>(
+  params: undefined | GetApiChatsGetUnreadCountsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiChatsGetUnreadCounts>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiChatsGetUnreadCounts>>,
+          TError,
+          Awaited<ReturnType<typeof getApiChatsGetUnreadCounts>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiChatsGetUnreadCounts<
+  TData = Awaited<ReturnType<typeof getApiChatsGetUnreadCounts>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiChatsGetUnreadCountsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiChatsGetUnreadCounts>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiChatsGetUnreadCounts>>,
+          TError,
+          Awaited<ReturnType<typeof getApiChatsGetUnreadCounts>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetApiChatsGetUnreadCounts<
+  TData = Awaited<ReturnType<typeof getApiChatsGetUnreadCounts>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiChatsGetUnreadCountsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiChatsGetUnreadCounts>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get unread message count
+ */
+
+export function useGetApiChatsGetUnreadCounts<
+  TData = Awaited<ReturnType<typeof getApiChatsGetUnreadCounts>>,
+  TError = ResultMessage[] | void,
+>(
+  params?: GetApiChatsGetUnreadCountsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getApiChatsGetUnreadCounts>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetApiChatsGetUnreadCountsQueryOptions(
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
 
 /**
  * @summary Create a contact

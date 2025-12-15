@@ -70,7 +70,7 @@ export const useChatStore = create<ChatStore>()((set, get) => ({
         const updatedChats = [...state.chats];
         updatedChats[existingChatIndex] = {
           ...updatedChats[existingChatIndex],
-          messages: [...updatedChats[existingChatIndex].messages, message],
+          messages: [message, ...updatedChats[existingChatIndex].messages],
         };
         return { chats: updatedChats };
       } else {

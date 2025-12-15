@@ -1,8 +1,7 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { startTransition, useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
-  Modal,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -59,14 +58,16 @@ export function ChatFooter({
     deleteRecording,
     duration,
   } = useAudioRecorder();
-  const { pickImage } = usePicker();
+  const { pickMedia, isProcessing, progress } = usePicker();
   const magicHubClient = useSignalRStore((s) => s.magicHubClient);
 
   const { mutateAsync: requestUpload } = usePostApiChatsUpload();
 
   const [message, setMessage] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadType, setUploadType] = useState<"image" | "audio" | null>(null);
+  const [uploadType, setUploadType] = useState<
+    "image" | "video" | "audio" | null
+  >(null);
 
   const handleSendMessage = useCallback(() => {
     const trimmedMessage = message.trim();
@@ -100,18 +101,20 @@ export function ChatFooter({
       const uri = await stopRecording();
       if (!uri) return;
 
-      setIsUploading(true);
-      setUploadType("audio");
+      startTransition(() => {
+        setIsUploading(true);
+        setUploadType("audio");
+      });
 
-      const responseFetch = await fetch(uri);
-      const audioData = await responseFetch.blob();
+      const extensionMatch = uri.match(/\.(\w+)(?:\?|$)/);
+      const extension = extensionMatch?.[1];
 
       const { data, success } = await requestUpload({
         data: {
           file: {
             uri,
-            name: `${Date.now()}-recording.m4a`,
-            type: audioData.type,
+            name: `${Date.now()}.${extension}`,
+            type: `audio/${extension}`,
           } as any,
         },
       });
@@ -125,31 +128,35 @@ export function ChatFooter({
     } catch (error) {
       trackEvent("send_audio_message_error", error);
     } finally {
-      setIsUploading(false);
-      setUploadType(null);
+      startTransition(() => {
+        setIsUploading(false);
+        setUploadType(null);
+      });
     }
   };
 
-  const handleSendImage = async () => {
+  const handleSendMedia = async () => {
     try {
-      const uri = await pickImage();
-      if (!uri) return;
+      const media = await pickMedia();
+      if (!media) return;
 
-      setIsUploading(true);
-      setUploadType("image");
+      const isVideo = media.type === "video";
 
-      const responseFetch = await fetch(uri);
-      const imageData = await responseFetch.blob();
+      startTransition(() => {
+        setIsUploading(true);
+        setUploadType(isVideo ? "video" : "image");
+      });
 
-      const extensionMatch = uri.match(/\.(\w+)(?:\?|$)/);
-      const extension = extensionMatch?.[1] ?? "jpg";
+      const extensionMatch = media.uri.match(/\.(\w+)(?:\?|$)/);
+      const extension = isVideo ? "mp4" : extensionMatch?.[1] || "jpg";
+      const mimeType = isVideo ? "video/mp4" : `image/${extension}`;
 
       const { data, success } = await requestUpload({
         data: {
           file: {
-            uri,
+            uri: media.uri,
             name: `${Date.now()}.${extension}`,
-            type: imageData.type || `image/${extension}`,
+            type: mimeType,
           } as any,
         },
       });
@@ -157,14 +164,16 @@ export function ChatFooter({
       if (success && data?.fileUrl) {
         onSend({
           ...data,
-          messageType: MessageType.Image,
+          messageType: isVideo ? MessageType.Video : MessageType.Image,
         });
       }
     } catch (error) {
-      trackEvent("send_image_message_error", error);
+      trackEvent("send_media_message_error", error);
     } finally {
-      setIsUploading(false);
-      setUploadType(null);
+      startTransition(() => {
+        setIsUploading(false);
+        setUploadType(null);
+      });
     }
   };
 
@@ -211,11 +220,14 @@ export function ChatFooter({
     return (
       <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap3]}>
         {displaySendImage && (
-          <TouchableOpacity disabled={isRecording} onPress={handleSendImage}>
+          <TouchableOpacity
+            disabled={isRecording || isProcessing}
+            onPress={handleSendMedia}
+          >
             <Icon
               type="feather"
               name="image"
-              color={isRecording ? "#D3D3D3" : "white"}
+              color={isRecording || isProcessing ? "#D3D3D3" : "white"}
             />
           </TouchableOpacity>
         )}
@@ -234,20 +246,34 @@ export function ChatFooter({
     );
   };
 
-  const renderUploadingModal = () => (
-    <Modal transparent visible={isUploading} animationType="fade">
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <ActivityIndicator size="large" color="white" />
-          <ThemedText style={styles.uploadingText}>
-            {uploadType === "image"
-              ? t("chatDetail.uploadingImage")
-              : t("chatDetail.uploadingAudio")}
-          </ThemedText>
-        </View>
+  const getUploadingText = () => {
+    if (isProcessing && progress > 0) {
+      return `${t("chatDetail.compressingVideo")} ${progress}%`;
+    }
+    switch (uploadType) {
+      case "video":
+        return t("chatDetail.uploadingVideo");
+      case "image":
+        return t("chatDetail.uploadingImage");
+      case "audio":
+        return t("chatDetail.uploadingAudio");
+      default:
+        return "Waiting...";
+    }
+  };
+
+  // Inline loading indicator instead of Modal to prevent iOS touch lock bug
+  const renderUploadingIndicator = () => {
+    if (!isUploading && !isProcessing) return null;
+    return (
+      <View style={styles.uploadingIndicator}>
+        <ActivityIndicator size="small" color="white" />
+        <ThemedText style={styles.uploadingIndicatorText}>
+          {getUploadingText()}
+        </ThemedText>
       </View>
-    </Modal>
-  );
+    );
+  };
 
   const renderReplyMessage = useMemo(() => {
     if (!replyMessage) return null;
@@ -290,7 +316,7 @@ export function ChatFooter({
 
   return (
     <>
-      {renderUploadingModal()}
+      {renderUploadingIndicator()}
       {renderReplyMessage}
       <GradientBackground style={styles.container}>
         {isRecording ? renderRecordingUI() : renderMessageInput()}
@@ -367,22 +393,20 @@ const createStyle = (colors: ColorDto) =>
       justifyContent: "center",
       alignItems: "center",
     },
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
+    uploadingIndicator: {
+      flexDirection: "row",
+      alignItems: "center",
       justifyContent: "center",
-      alignItems: "center",
-    },
-    modalContent: {
       backgroundColor: colors.secondary,
-      borderRadius: spacingPixel(12),
-      padding: spacingPixel(24),
-      alignItems: "center",
-      gap: spacingPixel(12),
-      minWidth: spacingPixel(150),
+      marginHorizontal: spacingPixel(15),
+      borderRadius: spacingPixel(9),
+      paddingHorizontal: spacingPixel(10),
+      paddingVertical: spacingPixel(15),
+      marginBottom: spacingPixel(5),
+      gap: spacingPixel(8),
     },
-    uploadingText: {
-      marginTop: spacingPixel(8),
+    uploadingIndicatorText: {
       color: "white",
+      fontSize: 13,
     },
   });

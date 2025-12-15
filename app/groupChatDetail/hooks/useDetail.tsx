@@ -8,6 +8,7 @@ import {
 } from "expo-router";
 import { throttle } from "lodash";
 import {
+  startTransition,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -65,6 +66,7 @@ export const useDetail = () => {
 
   const {
     chatId,
+    title,
     userName,
     publicKey,
     groupKey,
@@ -153,8 +155,9 @@ export const useDetail = () => {
 
     const data = messagesData.data;
 
-    const newMessages = data.messages?.data as MessageDto[];
     const isFirstLoad = pagination.currentPage <= 1;
+
+    const newMessages = data.messages?.data as MessageDto[];
 
     if (!newMessages.length) return;
 
@@ -200,10 +203,12 @@ export const useDetail = () => {
     messagesResult.sort((a, b) => {
       const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
       const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-      return dateA - dateB;
+      return dateB - dateA;
     });
 
-    chatStore.setMessages(chatId as string, messagesResult);
+    startTransition(() => {
+      chatStore.setMessages(chatId as string, messagesResult);
+    });
 
     setPagination((prev) => ({
       ...prev,
@@ -298,7 +303,10 @@ export const useDetail = () => {
       };
 
       trackEvent("sendMessage: ", messageInfo);
-      chatStore.sendMessage(chatId as string, messageInfo as MessageDto);
+
+      startTransition(() => {
+        chatStore.sendMessage(chatId as string, messageInfo as MessageDto);
+      });
 
       const response = await sendApiMessage({
         data: {
@@ -306,23 +314,30 @@ export const useDetail = () => {
           // API expects only messageId string
           repliedToMessage: replyMessage?.messageId || null,
         },
+      }).catch(() => {
+        startTransition(() => {
+          chatStore.deleteTempMessage(chatId as string, tempId);
+        });
       });
 
       if (response?.success) {
-        chatStore.updateMessageId(
-          chatId as string,
-          tempId,
-          response.data?.messageId as string,
-          response.data?.messageStatus,
-        );
+        startTransition(() => {
+          chatStore.updateMessageId(
+            chatId as string,
+            tempId,
+            response.data?.messageId as string,
+            response.data?.messageStatus,
+          );
+        });
 
         trackEvent("message_sent", {
           chatId: chatId as string,
           messageId: response.data,
         });
       } else {
-        trackEvent("messageInfo is undefined", { messageInfo });
-        chatStore.deleteTempMessage(chatId as string, tempId);
+        startTransition(() => {
+          chatStore.deleteTempMessage(chatId as string, tempId);
+        });
       }
 
       return;
@@ -456,12 +471,9 @@ export const useDetail = () => {
     }
   }, [navigation, chatId, isCreatedByCurrentUser]);
 
-  const invertedGroupedMessages = useMemo(() => {
-    return [...messages].reverse();
-  }, [messages]);
-
   return {
     t,
+    title,
     router,
     listRef,
     loading: isMessagesLoading && messages.length === 0,
@@ -469,7 +481,6 @@ export const useDetail = () => {
     actionRef,
     chatId: chatId as string,
     messages,
-    groupedMessages: invertedGroupedMessages,
     chatActionOptions,
     userName,
     groupAccountCount,

@@ -56,7 +56,8 @@ export function ChatItem({
           chatId: chatId,
           groupKey,
           groupNonce,
-          userName: chatTitle,
+          userName: contactUsername,
+          title: chatTitle,
           groupAccountCount,
           groupAdminAccount,
           isGroupChat: (isGroupChat as never) ?? false,
@@ -69,7 +70,8 @@ export function ChatItem({
         params: {
           chatId: chatId,
           publicKey: publicKey,
-          userName: chatTitle,
+          userName: contactUsername,
+          title: chatTitle,
           isGroupChat: (isGroupChat as never) ?? false,
         },
       });

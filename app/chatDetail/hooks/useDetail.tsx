@@ -8,6 +8,7 @@ import {
 } from "expo-router";
 import { throttle } from "lodash";
 import {
+  startTransition,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -61,7 +62,12 @@ export const useDetail = () => {
   const isFocused = useIsFocused();
   const queryClient = useQueryClient();
 
-  const { chatId: contactChatId, userName, publicKey } = useLocalSearchParams();
+  const {
+    chatId: contactChatId,
+    userName,
+    publicKey,
+    title,
+  } = useLocalSearchParams();
 
   const listRef = useRef<FlatList<MessageWithDate>>(null);
   const actionRef = useRef<ActionSheetRef | null>(null);
@@ -196,10 +202,12 @@ export const useDetail = () => {
     messagesResult.sort((a, b) => {
       const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
       const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-      return dateA - dateB;
+      return dateB - dateA;
     });
 
-    chatStore.setMessages(chatId as string, messagesResult);
+    startTransition(() => {
+      chatStore.setMessages(chatId as string, messagesResult);
+    });
 
     setPagination((prev) => ({
       ...prev,
@@ -326,7 +334,10 @@ export const useDetail = () => {
       };
 
       trackEvent("sendMessage: ", messageInfo);
-      chatStore.sendMessage(messageChatId, messageInfo as MessageDto);
+
+      startTransition(() => {
+        chatStore.sendMessage(messageChatId, messageInfo as MessageDto);
+      });
 
       const response = await sendApiMessage({
         data: {
@@ -334,22 +345,29 @@ export const useDetail = () => {
           // API expects only messageId string
           repliedToMessage: replyMessage?.messageId || null,
         },
+      }).catch(() => {
+        startTransition(() => {
+          chatStore.deleteTempMessage(messageChatId, tempId);
+        });
       });
       if (response?.success) {
-        chatStore.updateMessageId(
-          messageChatId,
-          tempId,
-          response.data?.messageId as string,
-          response.data?.messageStatus,
-        );
+        startTransition(() => {
+          chatStore.updateMessageId(
+            messageChatId,
+            tempId,
+            response.data?.messageId as string,
+            response.data?.messageStatus,
+          );
+        });
 
         trackEvent("message_sent", {
           chatId: messageChatId,
           messageId: response.data,
         });
       } else {
-        trackEvent("messageInfo is undefined", { messageInfo });
-        chatStore.deleteTempMessage(messageChatId, tempId);
+        startTransition(() => {
+          chatStore.deleteTempMessage(messageChatId, tempId);
+        });
       }
 
       return;
@@ -562,12 +580,9 @@ export const useDetail = () => {
     });
   }, [navigation, chatId]);
 
-  const invertedGroupedMessages = useMemo(() => {
-    return [...messages].reverse();
-  }, [messages]);
-
   return {
     t,
+    title,
     router,
     listRef,
     loading: isMessagesLoading && messages.length === 0,
@@ -575,7 +590,6 @@ export const useDetail = () => {
     actionRef,
     chatId: chatId as string,
     messages,
-    groupedMessages: invertedGroupedMessages,
     chatActionOptions,
     userName,
     currentUserName,

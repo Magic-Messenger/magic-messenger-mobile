@@ -19,7 +19,7 @@ import Toast from "react-native-toast-message";
 import { Colors } from "@/constants";
 import { useScreenProtection } from "@/hooks";
 import { initDayjs } from "@/i18n";
-import { SignalRProvider, TorProvider } from "@/providers";
+import { ImageViewerProvider, SignalRProvider, TorProvider } from "@/providers";
 import {
   registerForPushNotificationsAsync,
   setupNotificationListeners,
@@ -95,44 +95,49 @@ export default function RootLayout() {
           <KeyboardProvider>
             <TorProvider>
               <SignalRProvider>
-                <Stack
-                  screenOptions={{
-                    headerTransparent: true,
-                    headerTintColor: Colors.white,
-                    headerBackTitle: t("back"),
-                    ...headerImage(),
-                    contentStyle: {
-                      backgroundColor: "transparent",
-                    },
-                    headerTitleAlign: "center",
-                  }}
-                >
-                  <Stack.Screen name="index" options={{ headerShown: false }} />
-                  <Stack.Screen
-                    name="(auth)"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="(tabs)"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="(calling)"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="chatDetail"
-                    options={{ headerShown: true }}
-                  />
-                  <Stack.Screen
-                    name="ticketDetail"
-                    options={{ headerShown: true }}
-                  />
-                  <Stack.Screen name="+not-found" />
-                </Stack>
+                <ImageViewerProvider>
+                  <Stack
+                    screenOptions={{
+                      headerTransparent: true,
+                      headerTintColor: Colors.white,
+                      headerBackTitle: t("back"),
+                      ...headerImage(),
+                      contentStyle: {
+                        backgroundColor: "transparent",
+                      },
+                      headerTitleAlign: "center",
+                    }}
+                  >
+                    <Stack.Screen
+                      name="index"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(auth)"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(tabs)"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(calling)"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="chatDetail"
+                      options={{ headerShown: true }}
+                    />
+                    <Stack.Screen
+                      name="ticketDetail"
+                      options={{ headerShown: true }}
+                    />
+                    <Stack.Screen name="+not-found" />
+                  </Stack>
 
-                <Toast config={toastConfig} />
-                <StatusBar style="light" />
+                  <Toast config={toastConfig} />
+                  <StatusBar style="light" />
+                </ImageViewerProvider>
               </SignalRProvider>
             </TorProvider>
           </KeyboardProvider>

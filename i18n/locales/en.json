@@ -341,7 +341,9 @@
       "cancel": "Cancel",
       "confirm": "Block"
     },
-    "uploadingImage": "Uploading media...",
-    "uploadingAudio": "Uploading audio..."
+    "uploadingImage": "Uploading image...",
+    "uploadingVideo": "Uploading video...",
+    "uploadingAudio": "Uploading audio...",
+    "compressingVideo": "Compressing video..."
   }
 }

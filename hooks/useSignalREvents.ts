@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { router, usePathname } from "expo-router";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -38,8 +38,10 @@ export const useSignalREvents = () => {
   const setLastReceivedMessage = useSignalRStore(
     (s) => s.setLastReceivedMessage,
   );
-  const currentRoute = useSignalRStore((s) => s.currentRoute);
   const currentUserName = useUserStore((state) => state.userName);
+
+  // Use ref to always have the latest pathname without re-creating callbacks
+  const pathnameRef = useRef(pathname);
 
   const sendMessage = useChatStore((state) => state.sendMessage);
   const getMessages = useChatStore((state) => state.getMessages);
@@ -71,17 +73,23 @@ export const useSignalREvents = () => {
 
   const navigateToChat = useCallback(
     (chat: ChatDto) => {
-      if (chat.isGroupChat) {
-        router.navigate({
+      if (chat?.isGroupChat) {
+        const { groupKey, nonce: groupNonce } = chat?.encryptedGroupKeys?.find(
+          (egk) => egk.username === currentUserName,
+        ) as never;
+
+        router.push({
           pathname: "/groupChatDetail/screens",
           params: {
             chatId: chat?.chatId,
-            groupKey: chat?.groupKey,
-            groupNonce: chat?.groupNonce,
+            groupKey,
+            groupNonce,
             userName: currentUserName,
+            title: chat?.groupName,
             groupAccountCount: chat?.groupAccountCount,
             groupAdminAccount: chat?.groupAdminAccount,
             isGroupChat: (chat?.isGroupChat as never) ?? false,
+            groupAdminUsername: "test-i17",
           },
         });
       } else {
@@ -90,7 +98,7 @@ export const useSignalREvents = () => {
           params: {
             chatId: chat?.chatId,
             publicKey: chat?.contact?.publicKey,
-            userName: chat?.contact?.contactUsername,
+            userName: chat?.contact?.nickname,
             isGroupChat: (chat?.isGroupChat as never) ?? false,
           },
         });
@@ -222,7 +230,8 @@ export const useSignalREvents = () => {
         queryKey: getGetApiChatsListQueryKey(),
       });
 
-      if (isInChatScreen(currentRoute)) return;
+      // Use ref to get the latest pathname (avoids stale closure)
+      if (isInChatScreen(pathnameRef.current)) return;
 
       showToast({
         type: "success",
@@ -238,10 +247,12 @@ export const useSignalREvents = () => {
         onPress: () => navigateToChat(messageReceivedEvent.chat),
       });
     },
-    [queryClient, currentRoute, isInChatScreen, navigateToChat],
+    [queryClient, navigateToChat, sendMessage, setLastReceivedMessage, t],
   );
 
+  // Keep ref in sync with pathname
   useEffect(() => {
+    pathnameRef.current = pathname;
     setCurrentRoute(pathname);
   }, [pathname, setCurrentRoute]);
 

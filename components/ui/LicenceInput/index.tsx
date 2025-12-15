@@ -194,6 +194,7 @@ export const LicenseInput: React.FC<LicenseInputProps> = ({
             secureTextEntry={secureTextEntry}
             editable={editable}
             placeholder={placeholder}
+            placeholderTextColor={Colors.textDisabled}
             autoFocus={autoFocus && groupIndex === 0}
             selectTextOnFocus
             textAlign="center"
