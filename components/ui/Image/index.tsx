@@ -111,7 +111,7 @@ export const AppImage: React.FC<AppImageProps> = ({
 
             {loading && showLoading && (
               <View style={styles.loadingOverlay}>
-                <ActivityIndicator size="large" color="white" />
+                <ActivityIndicator size="small" color="white" />
               </View>
             )}
           </Animated.View>

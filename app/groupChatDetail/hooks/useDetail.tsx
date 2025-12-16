@@ -476,7 +476,7 @@ export const useDetail = () => {
     title,
     router,
     listRef,
-    loading: isMessagesLoading && messages.length === 0,
+    loading: isMessagesLoading,
     isFetching: isMessagesFetching,
     actionRef,
     chatId: chatId as string,

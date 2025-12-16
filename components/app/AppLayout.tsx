@@ -7,6 +7,7 @@ import {
   View,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import Animated from "react-native-reanimated";
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -125,35 +126,26 @@ function AppLayout({
           }
         >
           <Container {...containerProps}>
-            {showBadge && (
-              <View
-                style={[
-                  styles.flexRow,
-                  styles.alignItemsCenter,
-                  styles.mt2,
-                  styles.mb5,
-                  !container ? styles.container : undefined,
-                ]}
-              >
-                {typeof title === "string" ? (
-                  <ThemedText type="title" weight="semiBold">
-                    {title}
-                  </ThemedText>
-                ) : (
-                  title
-                )}
+            <Animated.View
+              pointerEvents={showBadge ? "auto" : "none"}
+              style={[
+                styles.header,
+                !showBadge && styles.headerHidden,
+                !container && styles.container,
+              ]}
+            >
+              {typeof title === "string" ? (
+                <ThemedText type="title" weight="semiBold">
+                  {title}
+                </ThemedText>
+              ) : (
+                title
+              )}
 
-                <View
-                  style={[
-                    styles.flex,
-                    styles.justifyContentEnd,
-                    styles.alignItemsEnd,
-                  ]}
-                >
-                  <TorBadge />
-                </View>
+              <View style={styles.headerRight}>
+                <TorBadge />
               </View>
-            )}
+            </Animated.View>
 
             {children}
           </Container>
@@ -226,6 +218,21 @@ const createStyle = () =>
       justifyContent: "center",
       alignItems: "center",
       zIndex: 9999,
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginTop: spacingPixel(8),
+      marginBottom: spacingPixel(20),
+    },
+    headerHidden: {
+      height: 0,
+      display: "none",
+      overflow: "hidden",
+    },
+    headerRight: {
+      flex: 1,
+      alignItems: "flex-end",
     },
   });
 
