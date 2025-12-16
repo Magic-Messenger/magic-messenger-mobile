@@ -1,8 +1,14 @@
 import { useIsFocused } from "@react-navigation/core";
 import { useQueryClient } from "@tanstack/react-query";
-import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
+import {
+  useFocusEffect,
+  useLocalSearchParams,
+  useNavigation,
+  useRouter,
+} from "expo-router";
 import { throttle } from "lodash";
 import {
+  startTransition,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -13,6 +19,7 @@ import {
 import { useTranslation } from "react-i18next";
 import {
   Alert,
+  AppState,
   FlatList,
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -30,22 +37,15 @@ import {
   usePostApiChatsCreate,
   usePostApiChatsSendMessage,
 } from "@/api/endpoints/magicMessenger";
-import {
-  CallingType,
-  MessageDto,
-  MessageStatus,
-  MessageType,
-} from "@/api/models";
+import { CallingType, MessageDto, MessageType } from "@/api/models";
 import { ActionSheetRef, Icon } from "@/components";
+import { INITIAL_PAGE_SIZE, UploadFileResultDto } from "@/constants";
 import {
-  INITIAL_PAGE_SIZE,
-  MESSAGE_STATUS_PRIORITY,
-  MessageDeliveredEvent,
-  MessageReceivedEvent,
-  MessageSeenEvent,
-  UploadFileResultDto,
-} from "@/constants";
-import { useChatStore, useSignalRStore, useUserStore } from "@/store";
+  useChatMessages,
+  useChatStore,
+  useSignalRStore,
+  useUserStore,
+} from "@/store";
 import {
   encrypt,
   MessageWithDate,
@@ -59,21 +59,26 @@ export const useDetail = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
   const queryClient = useQueryClient();
+
+  const {
+    chatId: contactChatId,
+    userName,
+    publicKey,
+    title,
+  } = useLocalSearchParams();
+
   const listRef = useRef<FlatList<MessageWithDate>>(null);
   const actionRef = useRef<ActionSheetRef | null>(null);
-  const chatStore = useChatStore();
-  const messages = useChatStore((state) => state.messages);
-
-  const isFocused = useIsFocused();
+  const appState = useRef(AppState.currentState);
 
   const [isScreenshotEnabled, setIsScreenshotEnabled] =
     useState<boolean>(false);
   const [replyMessage, setReplyMessage] = useState<MessageDto | null>(null);
-  /* const [messages, setMessages] = useState<MessageDto[]>([]); */
-  const [messageStatuses, setMessageStatuses] = useState(new Map());
+
   const [chatId, setChatId] = useState<string | null>(null);
-  console.log("chatId: ", chatId);
+
   const [pagination, setPagination] = useState({
     currentPage: 0,
     pageSize: INITIAL_PAGE_SIZE,
@@ -81,19 +86,15 @@ export const useDetail = () => {
     hasMore: true,
   });
 
-  const updateQueueRef = useRef<Map<string, MessageStatus>>(new Map());
-  const batchTimeoutRef = useRef<NodeJS.Timeout | number | null>(null);
-
   const isLoadingRef = useRef(false);
-  const isMountedRef = useRef(true);
 
   const currentUserName = useUserStore((s) => s.userName);
   const magicHubClient = useSignalRStore((s) => s.magicHubClient);
   const setOnlineUsers = useSignalRStore((s) => s.setOnlineUsers);
-  const receivedMessage = useSignalRStore((s) => s.receivedMessage);
-  const setReceivedMessage = useSignalRStore((s) => s.setReceivedMessage);
 
-  const { chatId: contactChatId, userName, publicKey } = useLocalSearchParams();
+  const chatStore = useChatStore();
+  // Get messages for the current chat from the store
+  const messages = useChatMessages(chatId);
 
   const { mutateAsync: sendApiMessage } = usePostApiChatsSendMessage();
   const { mutateAsync: createApiChat } = usePostApiChatsCreate();
@@ -109,12 +110,10 @@ export const useDetail = () => {
     },
   });
 
-  // React Query for messages with cache
   const {
     data: messagesData,
     isLoading: isMessagesLoading,
     isFetching: isMessagesFetching,
-    refetch: refetchMessages,
   } = useGetApiChatsMessages(
     {
       chatId: chatId as string,
@@ -124,10 +123,6 @@ export const useDetail = () => {
     {
       query: {
         enabled: !!chatId && isFocused,
-        /* staleTime: 5 * 60 * 1000,
-        gcTime: 10 * 60 * 1000,
-        refetchOnWindowFocus: false,
-        refetchOnMount: false, */
       },
     },
   );
@@ -161,27 +156,57 @@ export const useDetail = () => {
     }
 
     const newMessages = data.messages?.data as MessageDto[];
-    console.log("newMessages: ", newMessages);
     const isFirstLoad = pagination.currentPage <= 1;
 
-    if (newMessages.length === 0) {
-      return;
-    }
+    if (!newMessages.length) return;
+
+    // Merge API messages with existing store messages
+    // Keep only pending messages that don't exist in API yet
+    const existingMessages = chatStore.getMessages(chatId as string);
+    const apiMessageIds = new Set(newMessages.map((m) => m.messageId));
+
+    // Helper to check if a store message already exists in API response
+    const isDuplicate = (storeMsg: MessageDto) => {
+      // Direct messageId match
+      if (apiMessageIds.has(storeMsg.messageId)) return true;
+
+      // Check by tempId field
+      if ((storeMsg as any).tempId) {
+        const matchByTempId = newMessages.some(
+          (apiMsg) => apiMsg.messageId === (storeMsg as any).tempId,
+        );
+        if (matchByTempId) return true;
+      }
+
+      // Check by content (encrypted), sender, similar timestamp (within 5 seconds)
+      return newMessages.some?.((apiMsg) => {
+        if (apiMsg.senderUsername !== storeMsg.senderUsername) return false;
+        if (apiMsg.content?.cipherText !== storeMsg.content?.cipherText)
+          return false;
+        if (!apiMsg.createdAt || !storeMsg.createdAt) return false;
+        const timeDiff = Math.abs(
+          new Date(apiMsg.createdAt).getTime() -
+            new Date(storeMsg.createdAt).getTime(),
+        );
+        return timeDiff < 5000;
+      });
+    };
+
+    const pendingMessages = existingMessages.filter((m) => !isDuplicate(m));
 
     const messagesResult = isFirstLoad
-      ? newMessages
-      : [...newMessages, ...messages];
-    /* setMessages(messagesResult); */
+      ? [...newMessages, ...pendingMessages]
+      : [...newMessages, ...messages.filter((m) => !isDuplicate(m))];
 
-    chatStore.setMessages(messagesResult);
+    // Sort by createdAt to maintain order
+    messagesResult.sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
+    });
 
-    // Initialize status for the new messages
-    setMessageStatuses((prevStatuses) => {
-      const newStatuses = new Map(prevStatuses);
-      messagesResult.forEach((messageData) => {
-        newStatuses.set(messageData.messageId, messageData.messageStatus);
-      });
-      return newStatuses;
+    startTransition(() => {
+      chatStore.setMessages(chatId as string, messagesResult);
     });
 
     setPagination((prev) => ({
@@ -221,15 +246,8 @@ export const useDetail = () => {
   }, [isScreenshotEnabled]);
 
   useEffect(() => {
-    initializeScreenshot();
+    initializeScreenshot().then().catch();
   }, [isScreenshotEnabled]);
-
-  useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
 
   // For inverted list, load more when scrolling towards the top (which appears as bottom due to inversion)
   const handleEndReached = useCallback(() => {
@@ -303,26 +321,43 @@ export const useDetail = () => {
               ),
             }
           : null,
-        repliedToMessage: replyMessage?.messageId || null,
+        // Full object for store (to render reply)
+        repliedToMessage: replyMessage
+          ? {
+              messageId: replyMessage.messageId,
+              senderUsername: replyMessage.senderUsername,
+              content: replyMessage.content,
+              file: replyMessage.file,
+              messageType: replyMessage.messageType,
+            }
+          : null,
       };
 
       trackEvent("sendMessage: ", messageInfo);
-      chatStore.sendMessage(messageInfo as MessageDto);
+
+      startTransition(() => {
+        chatStore.sendMessage(messageChatId, messageInfo as MessageDto);
+      });
 
       const response = await sendApiMessage({
         data: {
           ...messageInfo,
+          // API expects only messageId string
+          repliedToMessage: replyMessage?.messageId || null,
         },
+      }).catch(() => {
+        startTransition(() => {
+          chatStore.deleteTempMessage(messageChatId, tempId);
+        });
       });
       if (response?.success) {
-        chatStore.updateMessageId(tempId, response.data?.messageId as string);
-        setMessageStatuses((prevStatuses) => {
-          const newStatuses = new Map(prevStatuses);
-          newStatuses.set(
-            response.data?.messageId,
+        startTransition(() => {
+          chatStore.updateMessageId(
+            messageChatId,
+            tempId,
+            response.data?.messageId as string,
             response.data?.messageStatus,
           );
-          return newStatuses;
         });
 
         trackEvent("message_sent", {
@@ -330,8 +365,9 @@ export const useDetail = () => {
           messageId: response.data,
         });
       } else {
-        trackEvent("messageInfo is undefined", { messageInfo });
-        chatStore.deleteTempMessage(tempId);
+        startTransition(() => {
+          chatStore.deleteTempMessage(messageChatId, tempId);
+        });
       }
 
       return;
@@ -347,230 +383,46 @@ export const useDetail = () => {
     ],
   );
 
-  // Batch processor that applies all queued status updates at once
-  const processBatchUpdates = useCallback(() => {
-    if (updateQueueRef.current.size === 0) return;
-
-    const updates = new Map(updateQueueRef.current);
-    updateQueueRef.current.clear();
-
-    setMessageStatuses((prevStatuses) => {
-      const newStatuses = new Map(prevStatuses);
-
-      // Güncellenecek mesajları createdAt'e göre sırala (eskiden yeniye - ascending)
-      const sortedUpdates = Array.from(updates.entries())
-        .map(([messageId, status]) => {
-          const message = messages.find((m) => m.messageId === messageId);
-          return {
-            messageId,
-            status,
-            createdAt: message?.createdAt
-              ? new Date(message.createdAt).getTime()
-              : 0,
-          };
-        })
-        .sort((a, b) => a.createdAt - b.createdAt); // Eskiden yeniye doğru sırala (ascending)
-
-      // Sıralanmış güncellemeleri uygula (ilk mesajdan son mesaja doğru)
-      sortedUpdates.forEach(({ messageId, status }) => {
-        const currentStatus = prevStatuses.get(messageId);
-        const currentPriority = MESSAGE_STATUS_PRIORITY[currentStatus] || 0;
-        const newPriority = MESSAGE_STATUS_PRIORITY[status];
-
-        // Sadece daha yüksek öncelikli durumları güncelle
-        if (newPriority > currentPriority) {
-          newStatuses.set(messageId, status);
-        }
-      });
-
-      return newStatuses;
-    });
-  }, [messages]);
-
-  // Schedule batch processing
-  const scheduleBatchUpdate = useCallback(() => {
-    if (batchTimeoutRef.current) {
-      clearTimeout(batchTimeoutRef.current);
-    }
-
-    batchTimeoutRef.current = setTimeout(() => {
-      processBatchUpdates();
-      batchTimeoutRef.current = null;
-    }, 250); // Batch updates within 250ms window
-  }, [processBatchUpdates]);
-
-  const handleMessageDelivered = useCallback(
-    (messageDeliveredEvent: MessageDeliveredEvent) => {
-      trackEvent("message_delivered", { messageDeliveredEvent });
-
-      const messageId = messageDeliveredEvent.message?.messageId;
-      const newStatus =
-        MESSAGE_STATUS_PRIORITY[messageDeliveredEvent.message?.messageStatus!];
-
-      if (!messageId || !newStatus) return;
-
-      // Check if this update should override the queued one
-      const existingUpdate = updateQueueRef.current.get(messageId);
-      trackEvent("message_delivered existingUpdate", existingUpdate);
-
-      if (existingUpdate) {
-        const existingPriority = MESSAGE_STATUS_PRIORITY[existingUpdate];
-
-        // Only update queue if new status has higher or equal priority
-        if (newStatus >= existingPriority) {
-          updateQueueRef.current.set(
-            messageId,
-            messageDeliveredEvent.message?.messageStatus!,
-          );
-        }
-      } else {
-        // No existing update, add to queue
-        trackEvent("message_delivered no existing update", {
-          messageId,
-          messageStatus: newStatus,
-        });
-        updateQueueRef.current.set(
-          messageId,
-          messageDeliveredEvent.message?.messageStatus!,
-        );
-      }
-
-      scheduleBatchUpdate();
-    },
-    [scheduleBatchUpdate],
-  );
-
-  const handleMessageSeen = useCallback(
-    (messageSeenEvent: MessageSeenEvent) => {
-      trackEvent("message_seen", { messageSeenEvent });
-
-      const messageId = messageSeenEvent.message?.messageId;
-      const messageStatus = messageSeenEvent.message?.messageStatus;
-
-      if (!messageId || !messageStatus) return;
-
-      // Görülen mesajı bul
-      const seenMessage = messages.find((m) => m.messageId === messageId);
-      if (!seenMessage) return;
-
-      const seenMessageTime = seenMessage.createdAt
-        ? new Date(seenMessage.createdAt).getTime()
-        : 0;
-
-      // Bu mesaj ve öncesindeki tüm mesajları (currentUser tarafından gönderilenleri) "seen" olarak işaretle
-      // Eskiden yeniye doğru sırala ve işle
-      const messagesToUpdate = messages
-        .filter((m) => {
-          const msgTime = m.createdAt ? new Date(m.createdAt).getTime() : 0;
-          // Sadece bu mesaj ve önceki mesajları al
-          // Ve sadece current user tarafından gönderilen mesajları güncelle
-          return (
-            msgTime <= seenMessageTime && m.senderUsername === currentUserName
-          );
-        })
-        .sort((a, b) => {
-          const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-          const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-          return timeA - timeB; // Eskiden yeniye (ascending)
-        });
-
-      trackEvent("message_seen messagesToUpdate", {
-        count: messagesToUpdate.length,
-        messageIds: messagesToUpdate.map((m) => m.messageId),
-      });
-
-      // Tüm mesajları queue'ya ekle
-      messagesToUpdate.forEach((msg) => {
-        const existingUpdate = updateQueueRef.current.get(msg.messageId!);
-        const newPriority = MESSAGE_STATUS_PRIORITY[messageStatus];
-
-        if (existingUpdate) {
-          const existingPriority = MESSAGE_STATUS_PRIORITY[existingUpdate];
-          if (newPriority >= existingPriority) {
-            updateQueueRef.current.set(msg.messageId!, messageStatus);
-          }
-        } else {
-          updateQueueRef.current.set(msg.messageId!, messageStatus);
-        }
-      });
-
-      scheduleBatchUpdate();
-    },
-    [scheduleBatchUpdate, messages, currentUserName],
-  );
-
-  const handleMessageReceived = useCallback(
-    (messageReceivedEvent: MessageReceivedEvent) => {
-      trackEvent("message_received", { messageReceivedEvent });
-
-      const newMessage = messageReceivedEvent.message;
-      if (
-        !newMessage ||
-        (chatId as string) !== messageReceivedEvent?.chat?.chatId
-      )
-        return;
-
-      /* setMessages((prev) => [...prev, newMessage]); */
-
-      chatStore.sendMessage(newMessage);
-
-      // Initialize status for the new message
-      setMessageStatuses((prevStatuses) => {
-        const newStatuses = new Map(prevStatuses);
-        newStatuses.set(newMessage.messageId, newMessage.messageStatus);
-        return newStatuses;
-      });
-
-      // Invalidate messages cache for this chat
-      queryClient.invalidateQueries({
-        queryKey: getGetApiChatsMessagesQueryKey({ chatId: chatId as string }),
-      });
-
-      setReceivedMessage(undefined);
-    },
-    [chatId, queryClient],
-  );
-
-  useEffect(() => {
-    if (receivedMessage) handleMessageReceived(receivedMessage);
-  }, [receivedMessage]);
-
   useEffect(() => {
     if (magicHubClient && chatId) {
-      magicHubClient.joinChat(chatId as string);
-      magicHubClient.on("message_delivered", handleMessageDelivered);
-      magicHubClient.on("message_seen", handleMessageSeen);
+      magicHubClient.joinChat?.(chatId as string);
     }
 
     return () => {
       if (magicHubClient && chatId) {
-        magicHubClient.leaveChat(chatId as string);
-        magicHubClient.off("message_delivered");
-        magicHubClient.off("message_seen");
+        magicHubClient.leaveChat?.(chatId as string);
       }
-
-      // Clear any pending batch updates on unmounting
-      if (batchTimeoutRef.current) {
-        clearTimeout(batchTimeoutRef.current);
-        batchTimeoutRef.current = null;
-      }
-      updateQueueRef.current.clear();
     };
-  }, [
-    magicHubClient,
-    chatId,
-    handleMessageReceived,
-    handleMessageDelivered,
-    handleMessageSeen,
-  ]);
+  }, [magicHubClient, chatId]);
 
-  // Helper function to get message status
-  const getMessageStatus = useCallback(
-    (messageId: string) => {
-      return messageStatuses.get(messageId);
-    },
-    [messageStatuses],
+  useFocusEffect(
+    useCallback(() => {
+      if (chatId) {
+        queryClient.invalidateQueries?.({
+          queryKey: getGetApiChatsMessagesQueryKey({ chatId }),
+        });
+      }
+    }, [chatId]),
   );
+
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (nextState) => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextState === "active"
+      ) {
+        if (chatId) {
+          queryClient.invalidateQueries?.({
+            queryKey: getGetApiChatsMessagesQueryKey({ chatId }),
+          });
+        }
+      }
+
+      appState.current = nextState;
+    });
+
+    return () => sub.remove();
+  }, [chatId]);
 
   const onDelete = () => {
     Alert.alert(
@@ -706,7 +558,7 @@ export const useDetail = () => {
         await handleDeleteChat();
       }
     } catch (error) {
-      console.log("error: ", error);
+      trackEvent("handleBlockContact error: ", error);
     }
   }, [userName, chatId]);
 
@@ -727,10 +579,6 @@ export const useDetail = () => {
         ) : null,
     });
   }, [navigation, chatId]);
-
-  const invertedGroupedMessages = useMemo(() => {
-    return [...messages].reverse();
-  }, [messages]);
 
   useEffect(() => {
     chatStore.clearStore();
@@ -784,14 +632,14 @@ export const useDetail = () => {
 
   return {
     t,
+    title,
     router,
     listRef,
-    loading: isMessagesLoading && messages.length === 0,
+    loading: isMessagesLoading,
     isFetching: isMessagesFetching,
     actionRef,
     chatId: chatId as string,
     messages,
-    groupedMessages: invertedGroupedMessages,
     chatActionOptions,
     userName,
     currentUserName,
@@ -802,7 +650,6 @@ export const useDetail = () => {
     handleScroll,
     handleEndReached,
     handleSendMessage,
-    getMessageStatus,
     onCallingPress,
   };
 };

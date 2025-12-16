@@ -11,14 +11,20 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { AppState } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import Toast from "react-native-toast-message";
 
 import { Colors } from "@/constants";
 import { useScreenProtection } from "@/hooks";
-import { SignalRProvider, TorProvider } from "@/providers";
-import { useUserStore } from "@/store";
+import { initDayjs } from "@/i18n";
+import { ImageViewerProvider, SignalRProvider, TorProvider } from "@/providers";
+import {
+  registerForPushNotificationsAsync,
+  setupNotificationListeners,
+} from "@/services";
+import { useAppStore, useUserStore } from "@/store";
 import { headerImage, toastConfig } from "@/utils";
 
 const queryClient = new QueryClient();
@@ -37,7 +43,8 @@ export default function RootLayout() {
 
   useScreenProtection();
 
-  const { rehydrated } = useUserStore();
+  const rehydrated = useUserStore((state) => state.rehydrated);
+  const language = useAppStore((state) => state.language);
 
   const { t } = useTranslation();
 
@@ -46,15 +53,36 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
       Notifications.setBadgeCountAsync(0);
       Notifications.dismissAllNotificationsAsync();
+
+      registerForPushNotificationsAsync();
+      setupNotificationListeners();
+
+      LogRocket.init(process?.env?.EXPO_PUBLIC_LOG_ROCKET_API as string, {
+        updateId: Application.nativeApplicationVersion,
+        expoChannel: __DEV__ ? "development" : "production",
+        network: {
+          isEnabled: true,
+        },
+      });
     }
-    LogRocket.init(process?.env?.EXPO_PUBLIC_LOG_ROCKET_API as string, {
-      updateId: Application.nativeApplicationVersion,
-      expoChannel: __DEV__ ? "development" : "production",
-      network: {
-        isEnabled: true,
-      },
-    });
   }, [loaded]);
+
+  useEffect(() => {
+    const appStateSubscription = AppState.addEventListener(
+      "change",
+      (nextAppState) => {
+        useAppStore.setState({ appState: nextAppState });
+      },
+    );
+
+    return () => {
+      appStateSubscription.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    initDayjs();
+  }, [language]);
 
   if (!loaded || !rehydrated) {
     return null;
@@ -67,44 +95,49 @@ export default function RootLayout() {
           <KeyboardProvider>
             <TorProvider>
               <SignalRProvider>
-                <Stack
-                  screenOptions={{
-                    headerTransparent: true,
-                    headerTintColor: Colors.white,
-                    headerBackTitle: t("back"),
-                    ...headerImage(),
-                    contentStyle: {
-                      backgroundColor: "transparent",
-                    },
-                    headerTitleAlign: "center",
-                  }}
-                >
-                  <Stack.Screen name="index" options={{ headerShown: false }} />
-                  <Stack.Screen
-                    name="(auth)"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="(tabs)"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="(calling)"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="chatDetail"
-                    options={{ headerShown: true }}
-                  />
-                  <Stack.Screen
-                    name="ticketDetail"
-                    options={{ headerShown: true }}
-                  />
-                  <Stack.Screen name="+not-found" />
-                </Stack>
+                <ImageViewerProvider>
+                  <Stack
+                    screenOptions={{
+                      headerTransparent: true,
+                      headerTintColor: Colors.white,
+                      headerBackTitle: t("back"),
+                      ...headerImage(),
+                      contentStyle: {
+                        backgroundColor: "transparent",
+                      },
+                      headerTitleAlign: "center",
+                    }}
+                  >
+                    <Stack.Screen
+                      name="index"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(auth)"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(tabs)"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(calling)"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="chatDetail"
+                      options={{ headerShown: true }}
+                    />
+                    <Stack.Screen
+                      name="ticketDetail"
+                      options={{ headerShown: true }}
+                    />
+                    <Stack.Screen name="+not-found" />
+                  </Stack>
 
-                <Toast config={toastConfig} />
-                <StatusBar style="light" />
+                  <Toast config={toastConfig} />
+                  <StatusBar style="light" />
+                </ImageViewerProvider>
               </SignalRProvider>
             </TorProvider>
           </KeyboardProvider>

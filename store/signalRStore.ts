@@ -5,11 +5,9 @@ import {
 } from "@microsoft/signalr";
 import { create } from "zustand";
 
-import {
-  createMagicHubClient,
-  MagicHubClient,
-  MessageReceivedEvent,
-} from "@/constants";
+import { MessageDto } from "@/api/models";
+import { createMagicHubClient, MagicHubClient } from "@/constants";
+import { trackEvent } from "@/utils";
 
 type TypingUser = {
   username: string;
@@ -22,8 +20,8 @@ type SignalRStore = {
   isConnected: boolean;
   onlineUsers: string[];
   typingUsers: TypingUser[];
-  receivedMessage?: MessageReceivedEvent;
   currentRoute?: string;
+  lastReceivedMessage?: MessageDto;
 
   startConnection: (token: string) => Promise<void>;
   stopConnection: () => Promise<void>;
@@ -34,7 +32,7 @@ type SignalRStore = {
   stopTyping: (chatId: string, user: string) => void;
 
   setCurrentRoute: (route: string) => void;
-  setReceivedMessage: (messageEvent?: MessageReceivedEvent) => void;
+  setLastReceivedMessage: (message: MessageDto) => void;
 };
 
 export const useSignalRStore = create<SignalRStore>((set, get) => ({
@@ -42,13 +40,16 @@ export const useSignalRStore = create<SignalRStore>((set, get) => ({
   onlineUsers: [],
   typingUsers: [],
   currentRoute: undefined,
-  receivedMessage: undefined,
+  lastReceivedMessage: undefined,
 
   startConnection: async (token: string) => {
     if (get().connection) return;
 
+    const hubUrl = `${process.env.EXPO_PUBLIC_API_URL}/hub/magic-app`;
+    trackEvent("hubUrl: ", hubUrl);
+
     const connection = new HubConnectionBuilder()
-      .withUrl(process.env.EXPO_PUBLIC_API_URL + "/hub/magic-app", {
+      .withUrl(hubUrl, {
         accessTokenFactory: () => token,
       })
       .withAutomaticReconnect()
@@ -114,7 +115,7 @@ export const useSignalRStore = create<SignalRStore>((set, get) => ({
     set({ currentRoute: route });
   },
 
-  setReceivedMessage: (messageEvent?: MessageReceivedEvent) => {
-    set({ receivedMessage: messageEvent ?? undefined });
+  setLastReceivedMessage: (message: MessageDto) => {
+    set({ lastReceivedMessage: message });
   },
 }));

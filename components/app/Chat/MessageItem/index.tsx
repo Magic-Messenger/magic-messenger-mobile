@@ -26,7 +26,6 @@ import { VideoMessage } from "./VideoMessage";
 interface MessageItemProps {
   identifier: string;
   message?: MessageDto;
-  messageStatus: MessageStatus;
   receiverPublicKey: string;
   onReply?: (message: MessageDto) => void;
 }
@@ -41,7 +40,6 @@ const SPRING_CONFIG = {
 function MessageItem({
   identifier,
   message,
-  messageStatus,
   receiverPublicKey,
   onReply,
 }: MessageItemProps) {
@@ -62,24 +60,24 @@ function MessageItem({
     if (
       magicHubClient &&
       !isSentByCurrentUser &&
-      messageStatus !== MessageStatus.Seen &&
+      message?.messageStatus !== MessageStatus.Seen &&
       message?.messageId
     ) {
-      magicHubClient.viewedMessage(identifier, message.messageId);
+      magicHubClient.viewedMessage?.(identifier, message.messageId);
     }
   }, [
     identifier,
     isSentByCurrentUser,
     magicHubClient,
     message?.messageId,
-    messageStatus,
+    message?.messageStatus,
   ]);
 
   const triggerReply = useCallback(() => {
     if (message && onReply && decryptedContent) {
       onReply({
         ...message,
-        content: decryptedContent as string,
+        decryptedContent: decryptedContent as string,
       } as MessageDto);
     }
   }, [message, onReply, decryptedContent]);
@@ -150,7 +148,7 @@ function MessageItem({
       decryptedReplyMessage,
       isSentByCurrentUser,
       createdAt: message.createdAt!,
-      messageStatus,
+      messageStatus: message?.messageStatus,
       isLoading,
       replyMessageType,
     };
@@ -167,13 +165,7 @@ function MessageItem({
       default:
         return null;
     }
-  }, [
-    message,
-    messageStatus,
-    decryptedContent,
-    decryptedReplyMessage,
-    isSentByCurrentUser,
-  ]);
+  }, [message, decryptedContent, decryptedReplyMessage, isSentByCurrentUser]);
 
   // Early return if no content
   if (!decryptedContent || !message) return null;
@@ -209,7 +201,7 @@ function MessageItem({
 export default memo(MessageItem, (prevProps, nextProps) => {
   return (
     prevProps.message?.messageId === nextProps.message?.messageId &&
-    prevProps.messageStatus === nextProps.messageStatus
+    prevProps.message?.messageStatus === nextProps.message?.messageStatus
   );
 });
 const createStyle = (colors: ColorDto) =>
@@ -222,20 +214,19 @@ const createStyle = (colors: ColorDto) =>
     },
     senderContainer: {
       alignSelf: "flex-end",
-      /* backgroundColor: colors.primary, */
       borderRadius: spacingPixel(8),
       borderBottomRightRadius: 0,
       padding: spacingPixel(10),
-      paddingHorizontal: spacingPixel(15),
+      paddingHorizontal: spacingPixel(16),
       marginVertical: spacingPixel(4),
       maxWidth: "80%",
     },
     receiverContainer: {
       alignSelf: "flex-start",
-      /* backgroundColor: colors.secondary, */
       borderRadius: spacingPixel(8),
       borderBottomLeftRadius: 0,
       padding: spacingPixel(10),
+      paddingHorizontal: spacingPixel(16),
       marginVertical: spacingPixel(4),
       maxWidth: "80%",
     },

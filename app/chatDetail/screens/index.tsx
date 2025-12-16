@@ -22,9 +22,9 @@ export default function ChatScreen() {
 
   const {
     loading,
+    title,
     chatId,
     messages,
-    groupedMessages,
     userName,
     listRef,
     usersPublicKey,
@@ -35,7 +35,6 @@ export default function ChatScreen() {
     handleReply,
     handleEndReached,
     onClearReply,
-    getMessageStatus,
     onCallingPress,
   } = useDetail();
 
@@ -44,18 +43,16 @@ export default function ChatScreen() {
       if (isDateSeparator(item)) {
         return <DateSeparator date={item.date} />;
       }
-      const messageStatus = getMessageStatus(item.messageId!);
       return (
         <MessageItem
           identifier={chatId}
           message={item}
-          messageStatus={messageStatus}
           receiverPublicKey={usersPublicKey.receiverPublicKey}
           onReply={handleReply}
         />
       );
     },
-    [chatId, usersPublicKey.receiverPublicKey, handleReply, getMessageStatus],
+    [chatId, usersPublicKey.receiverPublicKey, handleReply],
   );
 
   const keyExtractor = useCallback((item: MessageWithDate, index: number) => {
@@ -79,6 +76,7 @@ export default function ChatScreen() {
             isGroupChat={false}
             userName={userName as string}
             onCallingPress={onCallingPress}
+            title={title as string}
           />
         }
         footer={
@@ -94,7 +92,7 @@ export default function ChatScreen() {
         <LoadingProvider loading={loading}>
           <FlatList
             ref={listRef}
-            data={groupedMessages}
+            data={messages}
             renderItem={renderItem}
             keyExtractor={keyExtractor}
             inverted

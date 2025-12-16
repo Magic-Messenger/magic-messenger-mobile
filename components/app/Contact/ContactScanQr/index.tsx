@@ -10,16 +10,20 @@ import { ThemedText } from "../../ThemedText";
 
 interface Props {
   showScanQr?: boolean;
+  scanQrRoute?: string;
 }
 
-export const ContactScanQr = ({ showScanQr = true }: Props) => {
+export const ContactScanQr = ({
+  showScanQr = true,
+  scanQrRoute = "/scanQr/screens/scanQr",
+}: Props) => {
   const { t } = useTranslation();
   const styles = useThemedStyles();
 
   return (
     <TouchableOpacity
       disabled={!showScanQr}
-      onPress={() => router.push("/scanQr/screens/scanQr")}
+      onPress={() => router.push(scanQrRoute as any)}
     >
       <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap3]}>
         <Image

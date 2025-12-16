@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 import { ThemedText, VideoPreview } from "@/components";
@@ -17,13 +18,14 @@ export function VideoMessage({
   isLoading,
   isReply = false,
 }: MessageContentProps) {
+  const { t } = useTranslation();
   return (
     <>
       {!isReply && <ReplyMessageItem message={decryptedReplyMessage} />}
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#fff" />
-          <ThemedText style={styles.loadingText}>Sending...</ThemedText>
+          <ThemedText style={styles.loadingText}>{t("sending")}</ThemedText>
         </View>
       ) : (
         <VideoPreview source={decryptedContent as string} />

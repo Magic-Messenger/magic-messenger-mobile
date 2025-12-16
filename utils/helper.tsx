@@ -18,9 +18,7 @@ import { heightPixel, widthPixel } from "./pixelHelper";
 
 export const changeLanguage = (language: string) => {
   useAppStore.setState(() => ({
-    settings: {
-      language,
-    },
+    language,
   }));
 
   i18nChangeLanguage(language);
@@ -98,25 +96,7 @@ export const dateFormatter = (dateString: string, format: string) => {
 export const chatDateFormatter = (dateString: string) => {
   if (!dateString) return "";
 
-  const date = dayjs(dateString);
-  const now = dayjs();
-
-  const diffInSeconds = now.diff(date, "second");
-  const diffInMinutes = now.diff(date, "minute");
-  const diffInHours = now.diff(date, "hour");
-  const diffInDays = now.diff(date, "day");
-
-  if (diffInSeconds < 60) {
-    return i18n.t("common.secondsAgo", { count: diffInSeconds });
-  } else if (diffInMinutes < 60) {
-    return i18n.t("common.minutesAgo", { count: diffInMinutes });
-  } else if (diffInHours < 24) {
-    return i18n.t("common.hoursAgo", { count: diffInHours });
-  } else if (diffInDays < 30) {
-    return i18n.t("common.daysAgo", { count: diffInDays });
-  } else {
-    return date.format("DD/MM/YYYY");
-  }
+  return dayjs(dateString).fromNow();
 };
 
 export const trackEvent = (eventName: string, params?: any) => {
@@ -190,4 +170,3 @@ export function uuidv4() {
     return v.toString(16);
   });
 }
-console.log(uuidv4());

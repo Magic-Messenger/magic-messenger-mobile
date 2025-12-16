@@ -71,7 +71,13 @@ export default function CreateChatScreen() {
 
   // List header component
   const renderListHeader = useCallback(
-    () => <ContactHeader setSearchText={handleSearchChange} />,
+    () => (
+      <ContactHeader
+        isShowBlocked={false}
+        setSearchText={handleSearchChange}
+        addContactRoute="/(tabs)/chat/contacts/add"
+      />
+    ),
     [handleSearchChange],
   );
 

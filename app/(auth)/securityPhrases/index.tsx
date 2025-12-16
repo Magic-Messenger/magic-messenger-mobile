@@ -39,7 +39,7 @@ const SecurityPhrasesScreen = () => {
   const handleNext = () => {
     if (securityPhrases && params?.accessToken && params?.userName) {
       login(params.accessToken, params.userName);
-      router.push("/home");
+      router.replace("/chat/home");
     }
   };
 

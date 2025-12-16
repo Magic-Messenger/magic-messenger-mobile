@@ -7,7 +7,7 @@ import { useQrStore } from "@/store";
 import { useThemedStyles } from "@/theme";
 import { heightPixel, widthPixel } from "@/utils";
 
-export const useScanQr = () => {
+export const useScanQr = (redirectRoute?: string) => {
   const { t } = useTranslation();
   const styles = useThemedStyles(createStyle);
   const { setQrCode } = useQrStore();
@@ -16,7 +16,9 @@ export const useScanQr = () => {
   const barcodeScanned = async (barcode: BarcodeScanningResult) => {
     if (barcode?.data) {
       setQrCode(barcode.data);
-      if (goToPage === "contact.add") {
+      if (redirectRoute) {
+        router.replace(redirectRoute as any);
+      } else if (goToPage === "contact.add") {
         router.replace("/(tabs)/settings/contacts/screens/add");
       } else {
         router.back();

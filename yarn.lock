@@ -4534,15 +4534,22 @@ expo-haptics@~15.0.7:
   resolved "https://registry.yarnpkg.com/expo-haptics/-/expo-haptics-15.0.7.tgz#384bb873d7eca7b141f85e4f300b75eab68ebfe9"
   integrity sha512-7flWsYPrwjJxZ8x82RiJtzsnk1Xp9ahnbd9PhCy3NnsemyMApoWIEUr4waPqFr80DtiLZfhD9VMLL1CKa8AImQ==
 
-expo-iap@^3.1.9:
-  version "3.1.36"
-  resolved "https://registry.yarnpkg.com/expo-iap/-/expo-iap-3.1.36.tgz#894f7d4aff2cb647cd8ad9c0b8a131c96b5540df"
-  integrity sha512-Sgm1+Zca0lDoB5uTHOoy4jD/SdoRdxD0a82z0Yqm4U++OLT75C8kybbOyJtPVH0wscsIRR+2ZkP3cLky1OlThg==
+expo-iap@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/expo-iap/-/expo-iap-3.2.0.tgz#1c6e5ac3847208ab00c4c68491e6a53abb2d6137"
+  integrity sha512-cwE+KrIUwxAkGYetdr5d2x05uzsw6Ca5ieRIoxnG2GwnmZahAhlwswR/fF/GUxDgA+6Gm8nlI2ncDDlvBXVqXQ==
 
 expo-image-loader@~6.0.0:
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/expo-image-loader/-/expo-image-loader-6.0.0.tgz#15230442cbb90e101c080a4c81e37d974e43e072"
   integrity sha512-nKs/xnOGw6ACb4g26xceBD57FKLFkSwEUTDXEDF3Gtcu3MqF3ZIYd3YM+sSb1/z9AKV1dYT7rMSGVNgsveXLIQ==
+
+expo-image-manipulator@^14.0.8:
+  version "14.0.8"
+  resolved "https://registry.yarnpkg.com/expo-image-manipulator/-/expo-image-manipulator-14.0.8.tgz#1c457acbd2bcabe987fbd650c0f29120c3366ba6"
+  integrity sha512-sXsXjm7rIxLWZe0j2A41J/Ph53PpFJRdyzJ3EQ/qetxLUvS2m3K1sP5xy37px43qCf0l79N/i6XgFgenFV36/Q==
+  dependencies:
+    expo-image-loader "~6.0.0"
 
 expo-image-picker@~17.0.8:
   version "17.0.8"
@@ -4705,6 +4712,11 @@ expo-updates-interface@~2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/expo-updates-interface/-/expo-updates-interface-2.0.0.tgz#7721cb64c37bcb46b23827b2717ef451a9378749"
   integrity sha512-pTzAIufEZdVPKql6iMi5ylVSPqV1qbEopz9G6TSECQmnNde2nwq42PxdFBaUEd8IZJ/fdJLQnOT3m6+XJ5s7jg==
+
+expo-video-thumbnails@^10.0.8:
+  version "10.0.8"
+  resolved "https://registry.yarnpkg.com/expo-video-thumbnails/-/expo-video-thumbnails-10.0.8.tgz#a6313cea8e58dd0d5041d389a4fe4fa182eab176"
+  integrity sha512-nPUtP7ERLf5DY5V2A6gquRP5rP3Uvq6+FVkDwG9R3KKhFeTYkWZ5Ce1iQ7Yt5qDNQqcUcgEqmRpGCbJmn9ckKA==
 
 expo-video@~3.0.14:
   version "3.0.14"
@@ -7447,6 +7459,11 @@ react-native-capture-protection@^2.3.3:
   version "2.3.5"
   resolved "https://registry.yarnpkg.com/react-native-capture-protection/-/react-native-capture-protection-2.3.5.tgz#47da4f82efd980c33b87f80db57e384e4417f48b"
   integrity sha512-SCj6bswmQXXgINQ+22yeYADlSFAJiqLK+s1pMcYHRrE7oTRMQc0ky2vf91ac8r3LQqfVvB79cgmwqmPaZ5dkOw==
+
+react-native-compressor@^1.13.0:
+  version "1.13.0"
+  resolved "https://registry.yarnpkg.com/react-native-compressor/-/react-native-compressor-1.13.0.tgz#d260621bb7625046a716d5dff56b395267c7e6b0"
+  integrity sha512-vJYbrcjz2S7kgE3Q7444F71CjEDq5Qg6sGn67N9fJ0I1K6EhB/ZxpULdDe3FxJ4h/ncJc0oxOzNWZhxtGTqcQw==
 
 react-native-gesture-handler@~2.28.0:
   version "2.28.0"

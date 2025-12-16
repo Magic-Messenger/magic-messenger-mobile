@@ -6,7 +6,7 @@ import AxiosResponseInterceptorErrorCallback from "./AxiosResponseInterceptorErr
 import { TorHttpClient, TorManager } from "./tor";
 
 export const AxiosBase = axios.create({
-  timeout: 60000,
+  timeout: 10 * 60 * 1000, // 10 minutes × 60 seconds × 1000 ms = 600.000 ms
   baseURL: process.env.EXPO_PUBLIC_API_URL,
 });
 

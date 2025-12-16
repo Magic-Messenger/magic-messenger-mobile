@@ -12,6 +12,7 @@ import { spacingPixel, widthPixel } from "../../../../utils/pixelHelper";
 
 interface ChatHeaderProps {
   chatId: string;
+  title: string;
   userName?: string;
   isGroupChat?: boolean;
   groupAccountCount?: string;
@@ -21,6 +22,7 @@ interface ChatHeaderProps {
 export function ChatHeader({
   chatId,
   userName,
+  title,
   isGroupChat = false,
   groupAccountCount,
   onCallingPress,
@@ -61,7 +63,7 @@ export function ChatHeader({
         <AppImage source={Images.icon} style={styles.avatar} />
         <View>
           <ThemedText type="title" size={16} numberOfLines={1}>
-            {userName}
+            {title ?? userName}
           </ThemedText>
           {isGroupChat ? (
             <ThemedText type="subtitle">

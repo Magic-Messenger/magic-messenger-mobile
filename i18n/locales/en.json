@@ -3,6 +3,7 @@
   "or": "or",
   "back": "Back",
   "loading": "Loading",
+  "sending": "Sending...",
   "image_not_loading": "Image could not load",
   "recently": "Recently",
   "connecting": "Connecting",
@@ -345,6 +346,10 @@
       "areYouSure": "Are you sure you want to start a {{type}} call with {{userName}}?",
       "cancel": "Cancel",
       "confirm": "Start Call"
-    }
+    },
+    "uploadingImage": "Uploading image...",
+    "uploadingVideo": "Uploading video...",
+    "uploadingAudio": "Uploading audio...",
+    "compressingVideo": "Compressing video..."
   }
 }

@@ -4,9 +4,8 @@ import { DEFAULT_LANGUAGE } from "@/constants";
 import { useAppStore, useUserStore } from "@/store";
 
 const AxiosRequestInterceptorConfigCallback = (
-  config: InternalAxiosRequestConfig
+  config: InternalAxiosRequestConfig,
 ) => {
-  // Headers yoksa oluştur
   if (!config.headers) {
     config.headers = {} as any;
   }
@@ -15,7 +14,7 @@ const AxiosRequestInterceptorConfigCallback = (
   if (accessToken) config.headers["Authorization"] = `Bearer ${accessToken}`;
 
   config.headers["Accept-Language"] =
-    useAppStore.getState()?.settings?.language ?? DEFAULT_LANGUAGE;
+    useAppStore.getState()?.language ?? DEFAULT_LANGUAGE;
 
   return config;
 };

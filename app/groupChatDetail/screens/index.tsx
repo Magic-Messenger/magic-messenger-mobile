@@ -22,9 +22,9 @@ export default function GroupChatScreen() {
 
   const {
     loading,
+    title,
     chatId,
     messages,
-    groupedMessages,
     userName,
     listRef,
     actionRef,
@@ -35,7 +35,6 @@ export default function GroupChatScreen() {
     handleReply,
     handleEndReached,
     onClearReply,
-    getMessageStatus,
   } = useDetail();
 
   const renderItem = useCallback(
@@ -43,17 +42,15 @@ export default function GroupChatScreen() {
       if (isDateSeparator(item)) {
         return <DateSeparator date={item.date} />;
       }
-      const messageStatus = getMessageStatus(item.messageId!);
       return (
         <MessageGroupItem
           identifier={chatId}
           message={item}
-          messageStatus={messageStatus}
           onReply={handleReply}
         />
       );
     },
-    [chatId, handleReply, getMessageStatus],
+    [chatId, handleReply],
   );
 
   const keyExtractor = useCallback((item: MessageWithDate, index: number) => {
@@ -77,6 +74,7 @@ export default function GroupChatScreen() {
             isGroupChat={true}
             groupAccountCount={groupAccountCount as string}
             userName={userName as string}
+            title={title as string}
           />
         }
         footer={
@@ -92,10 +90,10 @@ export default function GroupChatScreen() {
         <LoadingProvider loading={loading}>
           <FlatList
             ref={listRef}
-            data={groupedMessages}
+            data={messages}
+            inverted
             renderItem={renderItem}
             keyExtractor={keyExtractor}
-            inverted
             onEndReached={handleEndReached}
             onEndReachedThreshold={0.5}
             contentContainerStyle={styles.contentContainerStyle}

@@ -5,6 +5,7 @@
  * OpenAPI spec version: v1
  */
 import type { ChatDtoContact } from "./chatDtoContact";
+import type { EncryptedGroupKey } from "./encryptedGroupKey";
 
 export interface ChatDto {
   /** @nullable */
@@ -22,6 +23,8 @@ export interface ChatDto {
   groupKey?: string | null;
   /** @nullable */
   groupNonce?: string | null;
+  /** @nullable */
+  encryptedGroupKeys?: EncryptedGroupKey[] | null;
   /** @nullable */
   readonly groupAccountCount?: string | null;
   /** @nullable */
