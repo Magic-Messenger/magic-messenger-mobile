@@ -1,12 +1,14 @@
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { NotificationBehavior } from "expo-notifications";
+import { t } from "i18next";
 import { Platform } from "react-native";
 
 import {
   postApiChatsMessageDelivered,
   postApiChatsMessageRead,
 } from "@/api/endpoints/magicMessenger";
+import { useWebRTCStore } from "@/store";
 
 import { trackEvent } from "../../utils/helper";
 
@@ -63,31 +65,75 @@ export const registerDeliveredListener = () => {
 // --- Opened listener (user tapped) ---
 export const registerOpenedListener = () => {
   Notifications.addNotificationResponseReceivedListener(async (response) => {
-    try {
-      Notifications.setBadgeCountAsync(0);
-      Notifications.dismissAllNotificationsAsync();
+    Notifications.setBadgeCountAsync(0);
+    Notifications.dismissAllNotificationsAsync();
 
-      const messageData = response.notification.request.content.data;
-      if (!messageData) return;
+    const action = response.actionIdentifier;
+    const messageData = response.notification.request.content.data;
+    if (!messageData) return;
 
-      const deliveredMessageNotificationData =
-        messageData as DeliveredMessageNotificationData;
-      if (
-        deliveredMessageNotificationData.ChatId &&
-        deliveredMessageNotificationData.MessageId
-      ) {
-        trackEvent("👆 Message opened:", messageData);
+    trackEvent("👆 Message opened:", messageData);
 
-        await postApiChatsMessageRead({
-          chatId: deliveredMessageNotificationData.ChatId,
-          messageId: deliveredMessageNotificationData.MessageId,
+    if (
+      messageData.callingType === "AudioCalling" ||
+      messageData.callingType === "VideoCalling"
+    ) {
+      // This is calling, so we need to know user accept or reject call.
+
+      if (action === "ACCEPT_CALL") {
+        useWebRTCStore.getState().answerCall?.({
+          callingType:
+            messageData.callingType === "VideoCalling" ? "Video" : "Audio",
+          offer: messageData.offer as string,
+          callerUsername: messageData.callerUsername as string,
+        });
+      } else if (action === "REJECT_CALL") {
+        useWebRTCStore.getState().endCall?.({
+          callerUsername: messageData.callerUsername as string,
+          callingType:
+            messageData.callingType === "VideoCalling" ? "Video" : "Audio",
+          offer: messageData.offer as string,
         });
       }
-    } catch (err) {
-      trackEvent("Opened handler failed:", { err });
+
+      return;
+    }
+
+    const deliveredMessageNotificationData =
+      messageData as DeliveredMessageNotificationData;
+    if (
+      deliveredMessageNotificationData.ChatId &&
+      deliveredMessageNotificationData.MessageId
+    ) {
+      // This is a chat message, so we need to send a message read notification
+
+      await postApiChatsMessageRead({
+        chatId: deliveredMessageNotificationData.ChatId,
+        messageId: deliveredMessageNotificationData.MessageId,
+      });
     }
   });
 };
+
+export async function registerCallNotificationCategory() {
+  await Notifications.setNotificationCategoryAsync("incoming_call", [
+    {
+      identifier: "ACCEPT_CALL",
+      buttonTitle: t("answer"),
+      options: {
+        opensAppToForeground: true,
+      },
+    },
+    {
+      identifier: "REJECT_CALL",
+      buttonTitle: t("reject"),
+      options: {
+        opensAppToForeground: false,
+        isDestructive: true,
+      },
+    },
+  ]);
+}
 
 // --- Initialization helper ---
 export const setupNotificationListeners = () => {

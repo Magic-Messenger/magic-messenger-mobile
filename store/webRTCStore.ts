@@ -1,5 +1,9 @@
 import { create } from "zustand";
 
+import {
+  postApiCallingAnswerCall,
+  postApiCallingRejectCall,
+} from "@/api/endpoints/magicMessenger";
 import { CallingType } from "@/api/models";
 import {
   CallAnsweredEvent,
@@ -44,7 +48,7 @@ type WebRTCStore = {
   answerCall: (incomingCall: IncomingCallEvent) => Promise<void>;
   callAnswered: (callAnswered: CallAnsweredEvent) => Promise<void>;
   iceCandidate: (iceCandidate: IceCandidateEvent) => Promise<void>;
-  endCall: () => void;
+  endCall: (endCall?: IncomingCallEvent) => void;
 };
 
 const initialState = {
@@ -161,6 +165,11 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
         callerUsername,
         answer: JSON.stringify(answer),
       });
+      await postApiCallingAnswerCall({
+        callerUsername,
+        answer: JSON.stringify(answer),
+        answerType: callingType,
+      });
 
       trackEvent("Call answered");
     } catch (error) {
@@ -178,11 +187,16 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     await WebRTCService.addIceCandidate(JSON.parse(candidate));
   },
 
-  endCall: () => {
+  endCall: async (endCall?: IncomingCallEvent) => {
+    const callerUsername =
+      endCall?.callerUsername ?? useWebRTCStore.getState().callerUsername;
     WebRTCService.closeConnection();
     set({
       ...get(),
       ...initialState,
+    });
+    await postApiCallingRejectCall({
+      callerUsername,
     });
   },
 }));
