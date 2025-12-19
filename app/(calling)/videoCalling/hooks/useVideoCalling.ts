@@ -1,3 +1,4 @@
+import { useKeepAwake } from "expo-keep-awake";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -11,6 +12,7 @@ import { heightPixel, spacingPixel, widthPixel } from "@/utils";
 
 export const useVideoCalling = () => {
   const { t } = useTranslation();
+  useKeepAwake();
   const styles = useThemedStyles(createStyle);
 
   const { targetUsername, callingType, mode } = useLocalSearchParams<

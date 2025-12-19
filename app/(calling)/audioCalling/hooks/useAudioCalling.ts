@@ -1,3 +1,4 @@
+import { useKeepAwake } from "expo-keep-awake";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -10,6 +11,7 @@ import { useThemedStyles } from "@/theme";
 
 export const useAudioCalling = () => {
   const { t } = useTranslation();
+  useKeepAwake();
   const styles = useThemedStyles(createStyle);
 
   const { targetUsername, callingType, mode } = useLocalSearchParams<
