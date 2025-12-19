@@ -93,7 +93,6 @@ import type {
   GetApiTicketsListParams,
   GetGroupMessagesQueryResultIDataResult,
   GetMessagesQueryResultIDataResult,
-  GetNotificationCommandRequest,
   IceCandidateCommandRequest,
   IceServer,
   Int32IDataResult,
@@ -120,13 +119,13 @@ import type {
   RegisterCommandRequest,
   RegisterCommandResultIDataResult,
   RegisterDeviceTokenCommandRequest,
+  RejectCallCommandRequest,
   RejectGroupInvitationCommandRequest,
   ResetPasswordCommandRequest,
   ResetPhrasesCommandRequest,
   ResetTwoFactorCommandRequest,
   ResultMessage,
   SendMessageCommandRequest,
-  SendNotificationCommandRequest,
   SetupTwoFactorCommandRequest,
   SetupTwoFactorCommandResultIDataResult,
   StartTypingCommandRequest,
@@ -3775,6 +3774,98 @@ export const usePostApiCallingAnswerCall = <
 };
 
 /**
+ * @summary Reject call
+ */
+export const postApiCallingRejectCall = (
+  rejectCallCommandRequest: RejectCallCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/calling/reject-call`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: rejectCallCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiCallingRejectCallMutationOptions = <
+  TError = ResultMessage[] | void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiCallingRejectCall>>,
+    TError,
+    { data: RejectCallCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiCallingRejectCall>>,
+  TError,
+  { data: RejectCallCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiCallingRejectCall"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiCallingRejectCall>>,
+    { data: RejectCallCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiCallingRejectCall(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiCallingRejectCallMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiCallingRejectCall>>
+>;
+export type PostApiCallingRejectCallMutationBody = RejectCallCommandRequest;
+export type PostApiCallingRejectCallMutationError = ResultMessage[] | void;
+
+/**
+ * @summary Reject call
+ */
+export const usePostApiCallingRejectCall = <
+  TError = ResultMessage[] | void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiCallingRejectCall>>,
+      TError,
+      { data: RejectCallCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiCallingRejectCall>>,
+  TError,
+  { data: RejectCallCommandRequest },
+  TContext
+> => {
+  const mutationOptions = getPostApiCallingRejectCallMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
  * @summary Ice candidate
  */
 export const postApiCallingIceCandidate = (
@@ -7387,182 +7478,6 @@ export const usePostApiInAppPurchaseValidateAppleReceipt = <
 > => {
   const mutationOptions =
     getPostApiInAppPurchaseValidateAppleReceiptMutationOptions(options);
-
-  return useMutation(mutationOptions, queryClient);
-};
-
-export const postApiInAppPurchaseSendTestMessage = (
-  sendNotificationCommandRequest: SendNotificationCommandRequest,
-  options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
-) => {
-  return AxiosInstance<SuccessResult>(
-    {
-      url: `/api/in-app-purchase/send-test-message`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: sendNotificationCommandRequest,
-      signal,
-    },
-    options,
-  );
-};
-
-export const getPostApiInAppPurchaseSendTestMessageMutationOptions = <
-  TError = ResultMessage[],
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postApiInAppPurchaseSendTestMessage>>,
-    TError,
-    { data: SendNotificationCommandRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof AxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof postApiInAppPurchaseSendTestMessage>>,
-  TError,
-  { data: SendNotificationCommandRequest },
-  TContext
-> => {
-  const mutationKey = ["postApiInAppPurchaseSendTestMessage"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postApiInAppPurchaseSendTestMessage>>,
-    { data: SendNotificationCommandRequest }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return postApiInAppPurchaseSendTestMessage(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type PostApiInAppPurchaseSendTestMessageMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postApiInAppPurchaseSendTestMessage>>
->;
-export type PostApiInAppPurchaseSendTestMessageMutationBody =
-  SendNotificationCommandRequest;
-export type PostApiInAppPurchaseSendTestMessageMutationError = ResultMessage[];
-
-export const usePostApiInAppPurchaseSendTestMessage = <
-  TError = ResultMessage[],
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postApiInAppPurchaseSendTestMessage>>,
-      TError,
-      { data: SendNotificationCommandRequest },
-      TContext
-    >;
-    request?: SecondParameter<typeof AxiosInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof postApiInAppPurchaseSendTestMessage>>,
-  TError,
-  { data: SendNotificationCommandRequest },
-  TContext
-> => {
-  const mutationOptions =
-    getPostApiInAppPurchaseSendTestMessageMutationOptions(options);
-
-  return useMutation(mutationOptions, queryClient);
-};
-
-export const postApiInAppPurchaseGetTestMessage = (
-  getNotificationCommandRequest: GetNotificationCommandRequest,
-  options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
-) => {
-  return AxiosInstance<SuccessResult>(
-    {
-      url: `/api/in-app-purchase/get-test-message`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: getNotificationCommandRequest,
-      signal,
-    },
-    options,
-  );
-};
-
-export const getPostApiInAppPurchaseGetTestMessageMutationOptions = <
-  TError = ResultMessage[],
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postApiInAppPurchaseGetTestMessage>>,
-    TError,
-    { data: GetNotificationCommandRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof AxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof postApiInAppPurchaseGetTestMessage>>,
-  TError,
-  { data: GetNotificationCommandRequest },
-  TContext
-> => {
-  const mutationKey = ["postApiInAppPurchaseGetTestMessage"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postApiInAppPurchaseGetTestMessage>>,
-    { data: GetNotificationCommandRequest }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return postApiInAppPurchaseGetTestMessage(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type PostApiInAppPurchaseGetTestMessageMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postApiInAppPurchaseGetTestMessage>>
->;
-export type PostApiInAppPurchaseGetTestMessageMutationBody =
-  GetNotificationCommandRequest;
-export type PostApiInAppPurchaseGetTestMessageMutationError = ResultMessage[];
-
-export const usePostApiInAppPurchaseGetTestMessage = <
-  TError = ResultMessage[],
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postApiInAppPurchaseGetTestMessage>>,
-      TError,
-      { data: GetNotificationCommandRequest },
-      TContext
-    >;
-    request?: SecondParameter<typeof AxiosInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof postApiInAppPurchaseGetTestMessage>>,
-  TError,
-  { data: GetNotificationCommandRequest },
-  TContext
-> => {
-  const mutationOptions =
-    getPostApiInAppPurchaseGetTestMessageMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };

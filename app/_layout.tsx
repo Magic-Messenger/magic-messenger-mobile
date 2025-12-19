@@ -22,6 +22,7 @@ import { useScreenProtection } from "@/hooks";
 import { initDayjs } from "@/i18n";
 import { ImageViewerProvider, SignalRProvider, TorProvider } from "@/providers";
 import {
+  registerCallNotificationCategory,
   registerForPushNotificationsAsync,
   setupNotificationListeners,
 } from "@/services";
@@ -57,6 +58,7 @@ export default function RootLayout() {
 
       registerForPushNotificationsAsync();
       setupNotificationListeners();
+      registerCallNotificationCategory();
 
       LogRocket.init(process?.env?.EXPO_PUBLIC_LOG_ROCKET_API as string, {
         updateId: Application.nativeApplicationVersion,

@@ -4,6 +4,8 @@
   "back": "Back",
   "loading": "Loading",
   "sending": "Sending...",
+  "answer": "Answer",
+  "reject": "Reject",
   "image_not_loading": "Image could not load",
   "recently": "Recently",
   "connecting": "Connecting",

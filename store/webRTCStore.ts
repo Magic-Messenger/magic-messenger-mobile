@@ -1,5 +1,9 @@
 import { create } from "zustand";
 
+import {
+  postApiCallingAnswerCall,
+  postApiCallingRejectCall,
+} from "@/api/endpoints/magicMessenger";
 import { CallingType } from "@/api/models";
 import {
   CallAnsweredEvent,
@@ -57,10 +61,10 @@ type WebRTCStore = {
   answerCall: (incomingCall: IncomingCallEvent) => Promise<void>;
   callAnswered: (callAnswered: CallAnsweredEvent) => Promise<void>;
   iceCandidate: (iceCandidate: IceCandidateEvent) => Promise<void>;
-  endCall: () => void;
   callEnded: () => void;
   callDeclined: () => void;
   onCameraToggled: (data: CameraToggledEvent) => void;
+  endCall: (endCall?: IncomingCallEvent) => void;
 };
 
 const initialState = {
@@ -227,6 +231,11 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
         callerUsername,
         answer: JSON.stringify(answer),
       });
+      await postApiCallingAnswerCall({
+        callerUsername,
+        answer: JSON.stringify(answer),
+        answerType: callingType,
+      });
 
       trackEvent("Call answered");
     } catch (error) {
@@ -244,17 +253,9 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     await WebRTCService.addIceCandidate(JSON.parse(candidate));
   },
 
-  endCall: () => {
-    const { targetUsername, callerUsername, isCaller } = get();
-    // Determine the other party's username
-    const otherParty = isCaller ? targetUsername : callerUsername;
-
-    if (otherParty) {
-      useSignalRStore.getState().magicHubClient?.endCall({
-        targetUsername: otherParty,
-      });
-    }
-
+  endCall: async (endCall?: IncomingCallEvent) => {
+    const callerUsername =
+      endCall?.callerUsername ?? useWebRTCStore.getState().callerUsername;
     WebRTCService.closeConnection();
     set({
       ...initialState,
@@ -262,6 +263,9 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
       callerUsername: undefined,
       targetUsername: undefined,
       isCaller: false,
+    });
+    await postApiCallingRejectCall({
+      callerUsername,
     });
   },
   callEnded: () => {
