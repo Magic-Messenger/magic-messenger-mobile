@@ -167,11 +167,20 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     // 1. Fetch ICE servers first
     await WebRTCService.fetchIceServers();
 
+    // Check if call was cancelled during ICE fetch
+    if (get().targetUsername !== targetUsername) return;
+
     // 2. Get local stream
     const stream = await WebRTCService.getLocalStream({
       isVideoEnabled: callingType === CallingType.Video,
     });
     set({ localStream: stream });
+
+    // Check if call was cancelled during usage of media devices
+    if (get().targetUsername !== targetUsername) {
+      stream.getTracks().forEach((t) => t.stop());
+      return;
+    }
 
     // 3. Create peer connection
     await WebRTCService.createPeerConnection(
@@ -264,9 +273,16 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
       targetUsername: undefined,
       isCaller: false,
     });
-    await postApiCallingRejectCall({
-      callerUsername,
-    });
+
+    if (callerUsername) {
+      try {
+        await postApiCallingRejectCall({
+          callerUsername,
+        });
+      } catch (error) {
+        console.error("Failed to post reject call API:", error);
+      }
+    }
   },
   callEnded: () => {
     WebRTCService.closeConnection();
