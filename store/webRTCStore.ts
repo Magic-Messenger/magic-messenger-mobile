@@ -168,7 +168,7 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     await WebRTCService.fetchIceServers();
 
     // Check if call was cancelled during ICE fetch
-    if (get().targetUsername !== targetUsername) return;
+    /* if (get().targetUsername !== targetUsername) return; */
 
     // 2. Get local stream
     const stream = await WebRTCService.getLocalStream({
@@ -177,10 +177,10 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     set({ localStream: stream });
 
     // Check if call was cancelled during usage of media devices
-    if (get().targetUsername !== targetUsername) {
+    /* if (get().targetUsername !== targetUsername) {
       stream.getTracks().forEach((t) => t.stop());
       return;
-    }
+    } */
 
     // 3. Create peer connection
     await WebRTCService.createPeerConnection(
