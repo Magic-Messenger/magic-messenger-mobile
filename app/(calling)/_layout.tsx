@@ -22,6 +22,14 @@ export default function CallingStacks() {
         name="videoCalling/screens/index"
         options={{
           headerShown: true,
+          title: "",
+        }}
+      />
+      <Stack.Screen
+        name="audioCalling/screens/index"
+        options={{
+          headerShown: true,
+          title: "",
         }}
       />
     </Stack>

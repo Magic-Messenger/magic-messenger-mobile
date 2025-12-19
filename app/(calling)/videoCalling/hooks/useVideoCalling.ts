@@ -1,22 +1,30 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet } from "react-native";
 
+import { CallingType } from "@/api/models";
+import WebRTCService from "@/services/webRTC/webRTCService";
 import { StartCallingType, useWebRTCStore } from "@/store";
-import { useThemedStyles } from "@/theme";
+import { ColorDto, useThemedStyles } from "@/theme";
+import { heightPixel, spacingPixel, widthPixel } from "@/utils";
 
 export const useVideoCalling = () => {
   const { t } = useTranslation();
   const styles = useThemedStyles(createStyle);
 
-  const { targetUsername, callingType } =
-    useLocalSearchParams<StartCallingType>();
+  const { targetUsername, callingType, mode } = useLocalSearchParams<
+    StartCallingType & { mode?: string }
+  >();
 
-  const [loading, isLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [isAudioMuted, setIsAudioMuted] = useState(false);
+  const [isVideoOff, setIsVideoOff] = useState(false);
+  const [isFrontCamera, setIsFrontCamera] = useState(true);
 
   const connectionState = useWebRTCStore((s) => s.connectionState);
   const isIncoming = useWebRTCStore((s) => s.isIncoming);
+  const isRemoteVideoEnabled = useWebRTCStore((s) => s.isRemoteVideoEnabled);
 
   const localStream = useWebRTCStore((s) => s.localStream);
   const remoteStream = useWebRTCStore((s) => s.remoteStream);
@@ -24,14 +32,40 @@ export const useVideoCalling = () => {
   const startCall = useWebRTCStore((s) => s.startCall);
   const endCall = useWebRTCStore((s) => s.endCall);
 
-  const handleCallEnd = () => {
+  const isVideoCall = callingType === CallingType.Video;
+
+  const handleCallEnd = useCallback(() => {
     endCall();
     router.back();
-  };
+  }, [endCall]);
+
+  const toggleMicrophone = useCallback(() => {
+    const newMutedState = !isAudioMuted;
+    WebRTCService.toggleAudio(!newMutedState);
+    setIsAudioMuted(newMutedState);
+  }, [isAudioMuted]);
+
+  const toggleCamera = useCallback(() => {
+    if (!isVideoCall) return;
+    const newVideoOffState = !isVideoOff;
+    WebRTCService.toggleVideo(!newVideoOffState);
+    setIsVideoOff(newVideoOffState);
+  }, [isVideoOff, isVideoCall]);
+
+  const switchCamera = useCallback(async () => {
+    if (!isVideoCall || isVideoOff) return;
+    await WebRTCService.switchCamera();
+    setIsFrontCamera((prev) => !prev);
+  }, [isVideoCall, isVideoOff]);
 
   useEffect(() => {
     if (!targetUsername || !callingType) {
       router.back();
+      return;
+    }
+
+    if (mode === "answer") {
+      setLoading(false);
       return;
     }
 
@@ -40,10 +74,24 @@ export const useVideoCalling = () => {
       callingType: callingType,
     }).finally(() => {
       setTimeout(() => {
-        isLoading(false);
+        setLoading(false);
       }, 500);
     });
-  }, [targetUsername, callingType]);
+  }, [targetUsername, callingType, mode]);
+
+  // Auto end call when connection fails or closes
+  useEffect(() => {
+    if (
+      connectionState === "failed" ||
+      connectionState === "closed" ||
+      connectionState === "disconnected"
+    ) {
+      const timeout = setTimeout(() => {
+        handleCallEnd();
+      }, 1000);
+      return () => clearTimeout(timeout);
+    }
+  }, [connectionState, handleCallEnd]);
 
   return {
     t,
@@ -53,46 +101,148 @@ export const useVideoCalling = () => {
     remoteStream,
     connectionState,
     isIncoming,
+    isVideoCall,
+    isAudioMuted,
+    isVideoOff,
+    isRemoteVideoEnabled,
+    isFrontCamera,
+    targetUsername,
+    callingType,
     startCall,
     handleCallEnd,
+    toggleMicrophone,
+    toggleCamera,
+    switchCamera,
   };
 };
 
-const createStyle = () =>
+const createStyle = (colors: ColorDto) =>
   StyleSheet.create({
-    container: { flex: 1, backgroundColor: "#000" },
-    remoteVideo: { flex: 1 },
+    container: {
+      flex: 1,
+      backgroundColor: colors.black,
+    },
+    remoteVideo: {
+      flex: 1,
+    },
     localVideo: {
-      width: 120,
-      height: 160,
+      width: widthPixel(120),
+      height: heightPixel(160),
       position: "absolute",
       top: 60,
       right: 20,
-      borderRadius: 10,
+      borderRadius: widthPixel(12),
       borderWidth: 2,
       borderColor: "#fff",
+      overflow: "hidden",
+    },
+    localVideoDisabled: {
+      width: widthPixel(120),
+      height: heightPixel(160),
+      position: "absolute",
+      top: 60,
+      right: 20,
+      borderRadius: widthPixel(12),
+      borderWidth: 2,
+      borderColor: colors.background,
+      backgroundColor: "#333",
+      justifyContent: "center",
+      alignItems: "center",
     },
     waitingContainer: {
       flex: 1,
       justifyContent: "center",
       alignItems: "center",
     },
-    waitingText: { color: "#fff", fontSize: 18 },
-    stateText: { color: "#888", fontSize: 14, marginTop: 10 },
+    waitingText: {
+      color: colors.background,
+      fontSize: widthPixel(24),
+      fontWeight: "600",
+    },
+    stateText: {
+      color: colors.background,
+      fontSize: widthPixel(14),
+      marginTop: 10,
+    },
+    targetUsername: {
+      color: colors.background,
+      fontSize: widthPixel(18),
+      marginTop: 8,
+    },
+    callDuration: {
+      color: colors.background,
+      fontSize: widthPixel(16),
+      marginTop: spacingPixel(4),
+    },
     controls: {
       position: "absolute",
-      bottom: 40,
+      bottom: 50,
+      left: 0,
+      right: 0,
+      paddingHorizontal: spacingPixel(30),
+    },
+    controlsRow: {
+      flexDirection: "row",
+      justifyContent: "space-evenly",
+      alignItems: "center",
+    },
+    controlButton: {
+      width: 60,
+      height: 60,
+      borderRadius: 30,
+      backgroundColor: "rgba(255,255,255,0.2)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    controlButtonActive: {
+      backgroundColor: colors.background,
+    },
+    controlButtonDanger: {
+      backgroundColor: colors.danger,
+    },
+    controlButtonDisabled: {
+      opacity: 0.5,
+    },
+    /* TEMP */
+    debugInfo: {
+      position: "absolute",
+      top: 100,
+      left: 20,
+      backgroundColor: "rgba(0,0,0,0.7)",
+      padding: 10,
+      borderRadius: 8,
+    },
+    debugText: {
+      color: "#fff",
+      fontSize: 12,
+    },
+    avatarPlaceholder: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      backgroundColor: "#444",
+      justifyContent: "center",
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    avatarText: {
+      color: colors.background,
+      fontSize: widthPixel(40),
+      fontWeight: "bold",
+    },
+    connectionStatus: {
+      position: "absolute",
+      top: 40,
       left: 0,
       right: 0,
       alignItems: "center",
     },
-    debugInfo: {
-      position: "absolute",
-      top: 40,
-      left: 20,
-      backgroundColor: "rgba(0,0,0,0.7)",
-      padding: 10,
-      borderRadius: 5,
+    connectionStatusText: {
+      color: colors.background,
+      fontSize: widthPixel(14),
+      backgroundColor: "rgba(0,0,0,0.5)",
+      paddingHorizontal: 16,
+      paddingVertical: 6,
+      borderRadius: 20,
     },
-    debugText: { color: "#fff", fontSize: 12 },
   });

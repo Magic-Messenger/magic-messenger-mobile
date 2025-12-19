@@ -613,8 +613,13 @@ export const useDetail = () => {
                 callingType,
               });
 
+              const pathname =
+                callingType === CallingType.Audio
+                  ? "/(calling)/audioCalling/screens"
+                  : "/(calling)/videoCalling/screens";
+
               router.push({
-                pathname: "/(calling)/videoCalling/screens",
+                pathname,
                 params: {
                   targetUsername: userName as string,
                   callingType,

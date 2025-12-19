@@ -14,6 +14,32 @@ import {
   TicketMessageDto,
 } from "@/api/models";
 
+export interface EndCallCommandRequest {
+  targetUsername: string;
+}
+
+export interface DeclineCallCommandRequest {
+  targetUsername: string;
+}
+
+export interface CallEndedEvent {
+  username: string;
+}
+
+export interface CallDeclinedEvent {
+  username: string;
+}
+
+export interface ToggleCameraCommandRequest {
+  targetUsername: string;
+  isVideoEnabled: boolean;
+}
+
+export interface CameraToggledEvent {
+  username: string;
+  isVideoEnabled: boolean;
+}
+
 export const createMagicHubClient = (
   connection: signalR.HubConnection,
 ): MagicHubClient => ({
@@ -44,6 +70,9 @@ export const createMagicHubClient = (
   callUser: (request) => connection.invoke("CallUser", request),
   answerCall: (request) => connection.invoke("AnswerCall", request),
   sendIceCandidate: (request) => connection.invoke("SendIceCandidate", request),
+  endCall: (request) => connection.invoke("EndCall", request),
+  declineCall: (request) => connection.invoke("DeclineCall", request),
+  toggleCamera: (request) => connection.invoke("ToggleCamera", request),
 });
 
 /* Types */
@@ -140,6 +169,9 @@ export interface MagicHubEvents {
   incoming_call: IncomingCallEvent;
   call_answered: CallAnsweredEvent;
   ice_candidate: IceCandidateEvent;
+  call_ended: CallEndedEvent;
+  call_declined: CallDeclinedEvent;
+  camera_toggled: CameraToggledEvent;
 }
 
 export interface MagicHubClient {
@@ -185,4 +217,10 @@ export interface MagicHubClient {
   answerCall(request: AnswerCallCommandRequest): Promise<void>;
 
   sendIceCandidate(request: IceCandidateCommandRequest): Promise<void>;
+
+  endCall(request: EndCallCommandRequest): Promise<void>;
+
+  declineCall(request: DeclineCallCommandRequest): Promise<void>;
+
+  toggleCamera(request: ToggleCameraCommandRequest): Promise<void>;
 }

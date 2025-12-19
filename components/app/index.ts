@@ -17,6 +17,7 @@ export * from "./Contact/ContactItem";
 export * from "./Contact/ContactScanQr";
 export * from "./EmptyList";
 export * from "./ExternalLink";
+export * from "./IncomingCallModal";
 export * from "./Note/NoteItem";
 export * from "./PasswordInput";
 export * from "./ProductItem";

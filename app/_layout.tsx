@@ -16,6 +16,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import Toast from "react-native-toast-message";
 
+import { IncomingCallModal } from "@/components";
 import { Colors } from "@/constants";
 import { useScreenProtection } from "@/hooks";
 import { initDayjs } from "@/i18n";
@@ -135,6 +136,7 @@ export default function RootLayout() {
                     <Stack.Screen name="+not-found" />
                   </Stack>
 
+                  <IncomingCallModal />
                   <Toast config={toastConfig} />
                   <StatusBar style="light" />
                 </ImageViewerProvider>
