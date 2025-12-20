@@ -23,6 +23,8 @@ export const useVideoCalling = () => {
   const [isAudioMuted, setIsAudioMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [isFrontCamera, setIsFrontCamera] = useState(true);
+  const [localVideoKey, setLocalVideoKey] = useState(0);
+  const [isSwitchingCamera, setIsSwitchingCamera] = useState(false);
 
   const connectionState = useWebRTCStore((s) => s.connectionState);
   const isIncoming = useWebRTCStore((s) => s.isIncoming);
@@ -63,17 +65,35 @@ export const useVideoCalling = () => {
   }, [isVideoOff, isVideoCall, setVideoEnabled, targetUsername]);
 
   const switchCamera = useCallback(async () => {
-    if (!isVideoCall || isVideoOff) return;
-    await WebRTCService.switchCamera();
-    setIsFrontCamera((prev) => {
-      const newValue = !prev;
-      trackEvent("Camera switched", {
-        isFrontCamera: newValue,
-        targetUsername,
+    if (!isVideoCall || isVideoOff || isSwitchingCamera) return;
+
+    // Hide RTCView during switch to prevent transparent/blank frame
+    setIsSwitchingCamera(true);
+
+    try {
+      await WebRTCService.switchCamera();
+
+      // Wait for camera to stabilize before showing RTCView again
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      // Update key to force RTCView re-mount with new camera
+      setLocalVideoKey((prev) => prev + 1);
+
+      setIsFrontCamera((prev) => {
+        const newValue = !prev;
+        trackEvent("Camera switched", {
+          isFrontCamera: newValue,
+          targetUsername,
+        });
+        return newValue;
       });
-      return newValue;
-    });
-  }, [isVideoCall, isVideoOff, targetUsername]);
+    } finally {
+      // Small delay before showing to ensure stream is ready
+      setTimeout(() => {
+        setIsSwitchingCamera(false);
+      }, 100);
+    }
+  }, [isVideoCall, isVideoOff, isSwitchingCamera, targetUsername]);
 
   useEffect(() => {
     if (!targetUsername || !callingType) {
@@ -122,6 +142,22 @@ export const useVideoCalling = () => {
     }
   }, [connectionState, handleCallEnd, targetUsername, callingType]);
 
+  // Force RTCView refresh when connection state changes to connected
+  useEffect(() => {
+    if (connectionState === "connected") {
+      // Show loading state while WebRTC stabilizes
+      setIsSwitchingCamera(true);
+
+      // Small delay to let WebRTC stabilize, then refresh RTCView
+      const timer = setTimeout(() => {
+        setLocalVideoKey((prev) => prev + 1);
+        setIsSwitchingCamera(false);
+        trackEvent("RTCView refreshed on connection", { connectionState });
+      }, 600);
+      return () => clearTimeout(timer);
+    }
+  }, [connectionState]);
+
   return {
     t,
     styles,
@@ -131,6 +167,9 @@ export const useVideoCalling = () => {
     isVideoCall,
     isAudioMuted,
     isVideoOff,
+    isFrontCamera,
+    isSwitchingCamera,
+    localVideoKey,
     isRemoteVideoEnabled,
     isRemoteAudioEnabled,
     targetUsername,
@@ -161,6 +200,7 @@ const createStyle = (colors: ColorDto) =>
       borderWidth: 2,
       borderColor: "#fff",
       overflow: "hidden",
+      backgroundColor: "#000",
     },
     localVideoDisabled: {
       width: widthPixel(120),
@@ -172,6 +212,12 @@ const createStyle = (colors: ColorDto) =>
       borderWidth: 2,
       borderColor: colors.background,
       backgroundColor: "#333",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    localVideoSwitching: {
+      flex: 1,
+      backgroundColor: "#222",
       justifyContent: "center",
       alignItems: "center",
     },

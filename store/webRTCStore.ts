@@ -342,6 +342,16 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
   },
 
   onCameraToggle: (data: CameraToggleEvent) => {
+    const currentUsername = useUserStore.getState().userName;
+
+    // Ignore if this is our own toggle event (echoed back from server)
+    if (data.toggledUsername === currentUsername) {
+      trackEvent("Ignoring own camera toggle event", {
+        username: data.toggledUsername,
+      });
+      return;
+    }
+
     trackEvent("Remote camera toggled", {
       username: data.toggledUsername,
       isEnabled: data.isEnabled,
@@ -350,6 +360,16 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
   },
 
   onMicrophoneToggle: (data: MicrophoneToggleEvent) => {
+    const currentUsername = useUserStore.getState().userName;
+
+    // Ignore if this is our own toggle event (echoed back from server)
+    if (data.toggledUsername === currentUsername) {
+      trackEvent("Ignoring own microphone toggle event", {
+        username: data.toggledUsername,
+      });
+      return;
+    }
+
     trackEvent("Remote microphone toggled", {
       username: data.toggledUsername,
       isEnabled: data.isEnabled,

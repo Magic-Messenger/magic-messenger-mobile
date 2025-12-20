@@ -1,3 +1,4 @@
+import { Audio } from "expo-av";
 import { router } from "expo-router";
 import React, { useEffect, useRef } from "react";
 import {
@@ -21,6 +22,57 @@ export const IncomingCallModal = () => {
   const declineIncomingCall = useWebRTCStore((s) => s.declineIncomingCall);
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
+  const soundRef = useRef<Audio.Sound | null>(null);
+
+  // Play ringtone when incoming call
+  useEffect(() => {
+    const playRingtone = async () => {
+      try {
+        // Configure audio mode for ringtone
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: false,
+          playsInSilentModeIOS: true,
+          staysActiveInBackground: true,
+          playThroughEarpieceAndroid: false, // Play through speaker
+        });
+
+        const { sound } = await Audio.Sound.createAsync(
+          require("@/assets/sounds/ringtone.mp3"),
+          {
+            isLooping: true,
+            volume: 1.0,
+          },
+        );
+
+        soundRef.current = sound;
+        await sound.playAsync();
+      } catch (error) {
+        console.error("Failed to play ringtone:", error);
+      }
+    };
+
+    const stopRingtone = async () => {
+      if (soundRef.current) {
+        try {
+          await soundRef.current.stopAsync();
+          await soundRef.current.unloadAsync();
+          soundRef.current = null;
+        } catch (error) {
+          console.error("Failed to stop ringtone:", error);
+        }
+      }
+    };
+
+    if (incomingCallData) {
+      playRingtone();
+    } else {
+      stopRingtone();
+    }
+
+    return () => {
+      stopRingtone();
+    };
+  }, [incomingCallData]);
 
   useEffect(() => {
     if (incomingCallData) {

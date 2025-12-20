@@ -4,6 +4,7 @@ import { RTCView } from "react-native-webrtc";
 
 import { Icon, ThemedText } from "@/components";
 import { useWebRTCStore } from "@/store";
+import { widthPixel } from "@/utils";
 
 import { useVideoCalling } from "../hooks";
 
@@ -16,6 +17,9 @@ export default function VideoCallingScreen() {
     isVideoCall,
     isAudioMuted,
     isVideoOff,
+    isFrontCamera,
+    isSwitchingCamera,
+    localVideoKey,
     isRemoteVideoEnabled,
     isRemoteAudioEnabled,
     targetUsername,
@@ -56,6 +60,7 @@ export default function VideoCallingScreen() {
       {/* Remote Video - Full Screen Background */}
       {isVideoCall && remoteStream && isConnected && isRemoteVideoEnabled ? (
         <RTCView
+          key={`remote-video-${isRemoteVideoEnabled}`}
           streamURL={remoteStream.toURL()}
           style={styles.remoteVideo}
           objectFit="cover"
@@ -113,12 +118,19 @@ export default function VideoCallingScreen() {
       {/* Local Video - Picture in Picture */}
       {isVideoCall && localStream && !isVideoOff && (
         <View style={styles.localVideo}>
-          <RTCView
-            streamURL={localStream.toURL()}
-            style={{ flex: 1 }}
-            objectFit="cover"
-            mirror={true}
-          />
+          {isSwitchingCamera ? (
+            <View style={styles.localVideoSwitching}>
+              <ActivityIndicator color="#fff" size="small" />
+            </View>
+          ) : (
+            <RTCView
+              key={`local-video-${localVideoKey}`}
+              streamURL={localStream.toURL()}
+              style={{ flex: 1, borderRadius: widthPixel(12) }}
+              objectFit="cover"
+              mirror={isFrontCamera}
+            />
+          )}
         </View>
       )}
 
@@ -215,6 +227,14 @@ export default function VideoCallingScreen() {
           <ThemedText style={styles.debugText}>
             Audio: {isAudioMuted ? "Muted" : "On"} | Video:{" "}
             {isVideoOff ? "Off" : "On"}
+          </ThemedText>
+          <ThemedText style={styles.debugText}>
+            Cam: {isFrontCamera ? "Front" : "Back"} | Key: {localVideoKey}{" "}
+            {isSwitchingCamera && "| Switching..."}
+          </ThemedText>
+          <ThemedText style={styles.debugText}>
+            RemoteVid: {isRemoteVideoEnabled ? "On" : "Off"} | RemoteAud:{" "}
+            {isRemoteAudioEnabled ? "On" : "Off"}
           </ThemedText>
         </View>
       )}
