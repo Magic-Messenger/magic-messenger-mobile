@@ -1,11 +1,6 @@
 import { useIsFocused } from "@react-navigation/core";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  useFocusEffect,
-  useLocalSearchParams,
-  useNavigation,
-  useRouter,
-} from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { throttle } from "lodash";
 import {
   startTransition,
@@ -395,15 +390,9 @@ export const useDetail = () => {
     };
   }, [magicHubClient, chatId]);
 
-  useFocusEffect(
-    useCallback(() => {
-      if (chatId) {
-        queryClient.invalidateQueries?.({
-          queryKey: getGetApiChatsMessagesQueryKey({ chatId }),
-        });
-      }
-    }, [chatId]),
-  );
+  // Removed useFocusEffect that was causing infinite refresh
+  // Messages are already fetched when chatId exists via useGetApiChatsMessages
+  // and updated via SignalR events in real-time
 
   useEffect(() => {
     const sub = AppState.addEventListener("change", (nextState) => {

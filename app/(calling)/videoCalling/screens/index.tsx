@@ -3,6 +3,7 @@ import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 import { RTCView } from "react-native-webrtc";
 
 import { Icon, ThemedText } from "@/components";
+import { useWebRTCStore } from "@/store";
 
 import { useVideoCalling } from "../hooks";
 
@@ -10,20 +11,23 @@ export default function VideoCallingScreen() {
   const {
     styles,
     loading,
-    localStream,
-    remoteStream,
     connectionState,
     isIncoming,
     isVideoCall,
     isAudioMuted,
     isVideoOff,
     isRemoteVideoEnabled,
+    isRemoteAudioEnabled,
     targetUsername,
     handleCallEnd,
     toggleMicrophone,
     toggleCamera,
     switchCamera,
   } = useVideoCalling();
+
+  // Get streams directly from store
+  const localStream = useWebRTCStore((s) => s.localStream);
+  const remoteStream = useWebRTCStore((s) => s.remoteStream);
 
   const getConnectionStatusText = () => {
     switch (connectionState) {
@@ -63,6 +67,17 @@ export default function VideoCallingScreen() {
             <ThemedText style={styles.avatarText}>
               {targetUsername?.charAt(0).toUpperCase() || "?"}
             </ThemedText>
+            {/* Camera Off Icon when remote video is disabled */}
+            {isConnected && !isRemoteVideoEnabled && (
+              <View style={styles.cameraOffBadge}>
+                <Icon
+                  name="video-slash"
+                  type="fontawesome5"
+                  color="#fff"
+                  size={32}
+                />
+              </View>
+            )}
           </View>
           <ThemedText style={styles.waitingText}>
             {getConnectionStatusText()}
@@ -70,6 +85,19 @@ export default function VideoCallingScreen() {
           <ThemedText style={styles.targetUsername}>
             {targetUsername}
           </ThemedText>
+        </View>
+      )}
+
+      {/* Remote Audio Muted Indicator */}
+      {isConnected && !isRemoteAudioEnabled && (
+        <View style={styles.remoteMutedIndicator}>
+          <Icon
+            name="microphone-slash"
+            type="fontawesome5"
+            color="#fff"
+            size={20}
+          />
+          <ThemedText style={styles.remoteMutedText}>Muted</ThemedText>
         </View>
       )}
 

@@ -1,15 +1,15 @@
 import { create } from "zustand";
 
-import {
-  postApiCallingAnswerCall,
-  postApiCallingRejectCall,
-} from "@/api/endpoints/magicMessenger";
+import { postApiCallingAnswerCall } from "@/api/endpoints/magicMessenger";
 import { CallingType } from "@/api/models";
 import {
   CallAnsweredEvent,
-  CameraToggledEvent,
+  CallEndedEvent,
+  CallRejectedEvent,
+  CameraToggleEvent,
   IceCandidateEvent,
   IncomingCallEvent,
+  MicrophoneToggleEvent,
 } from "@/constants";
 import { ConnectionStateType, MediaStream } from "@/services/webRTC";
 import WebRTCService from "@/services/webRTC/webRTCService";
@@ -35,6 +35,7 @@ type WebRTCStore = {
   isAudioEnabled: boolean;
   isVideoEnabled: boolean;
   isRemoteVideoEnabled: boolean;
+  isRemoteAudioEnabled: boolean;
   isIncoming?: boolean;
   callerUsername?: string;
   targetUsername?: string;
@@ -61,10 +62,11 @@ type WebRTCStore = {
   answerCall: (incomingCall: IncomingCallEvent) => Promise<void>;
   callAnswered: (callAnswered: CallAnsweredEvent) => Promise<void>;
   iceCandidate: (iceCandidate: IceCandidateEvent) => Promise<void>;
-  callEnded: () => void;
-  callDeclined: () => void;
-  onCameraToggled: (data: CameraToggledEvent) => void;
-  endCall: (endCall?: IncomingCallEvent) => void;
+  callEnded: (data: CallEndedEvent) => void;
+  callRejected: (data: CallRejectedEvent) => void;
+  onCameraToggle: (data: CameraToggleEvent) => void;
+  onMicrophoneToggle: (data: MicrophoneToggleEvent) => void;
+  endCall: () => void;
 };
 
 const initialState = {
@@ -74,8 +76,25 @@ const initialState = {
   isAudioEnabled: false,
   isVideoEnabled: false,
   isRemoteVideoEnabled: true,
+  isRemoteAudioEnabled: true,
   incomingCallData: null as IncomingCallData,
 };
+
+// Helper function to get the other party's username
+const getOtherPartyUsername = (state: WebRTCStore): string | undefined => {
+  const { targetUsername, callerUsername, isCaller } = state;
+  return isCaller ? targetUsername : callerUsername;
+};
+
+// Helper function to reset state to initial
+const resetState = () => ({
+  ...initialState,
+  connectionState: "new" as ConnectionStateType,
+  isIncoming: false,
+  callerUsername: undefined,
+  targetUsername: undefined,
+  isCaller: false,
+});
 
 export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
   ...initialState,
@@ -93,20 +112,31 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
   },
 
   setVideoEnabled: (isEnabled: boolean) => {
-    const { targetUsername, callerUsername, isCaller } = get();
-    // Determine the other party's username
-    const otherParty = isCaller ? targetUsername : callerUsername;
+    const otherParty = getOtherPartyUsername(get());
 
     if (otherParty) {
+      trackEvent("Camera toggled", { isEnabled, targetUsername: otherParty });
       useSignalRStore.getState().magicHubClient?.toggleCamera({
         targetUsername: otherParty,
-        isVideoEnabled: isEnabled,
+        isEnabled,
       });
     }
     set({ isVideoEnabled: isEnabled });
   },
 
   setAudioEnabled: (isEnabled: boolean) => {
+    const otherParty = getOtherPartyUsername(get());
+
+    if (otherParty) {
+      trackEvent("Microphone toggled", {
+        isEnabled,
+        targetUsername: otherParty,
+      });
+      useSignalRStore.getState().magicHubClient?.toggleMicrophone({
+        targetUsername: otherParty,
+        isEnabled,
+      });
+    }
     set({ isAudioEnabled: isEnabled });
   },
 
@@ -153,34 +183,40 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
   },
 
   declineIncomingCall: () => {
-    trackEvent("Incoming call declined");
     const { incomingCallData } = get();
+    trackEvent("Incoming call declined", {
+      callerUsername: incomingCallData?.callerUsername,
+      callingType: incomingCallData?.callingType,
+    });
+
     if (incomingCallData) {
-      useSignalRStore.getState().magicHubClient?.declineCall({
-        targetUsername: incomingCallData.callerUsername,
+      useSignalRStore.getState().magicHubClient?.rejectCall({
+        callerUsername: incomingCallData.callerUsername,
       });
     }
     set({ incomingCallData: null, isIncoming: false });
   },
 
   startCall: async ({ targetUsername, callingType }) => {
+    // Set caller information first
+    const currentUsername = useUserStore.getState().userName;
+    set({
+      targetUsername,
+      callerUsername: currentUsername,
+      isCaller: true,
+      isIncoming: false,
+    });
+
+    trackEvent("Call started", { targetUsername, callingType });
+
     // 1. Fetch ICE servers first
     await WebRTCService.fetchIceServers();
-
-    // Check if call was cancelled during ICE fetch
-    /* if (get().targetUsername !== targetUsername) return; */
 
     // 2. Get local stream
     const stream = await WebRTCService.getLocalStream({
       isVideoEnabled: callingType === CallingType.Video,
     });
     set({ localStream: stream });
-
-    // Check if call was cancelled during usage of media devices
-    /* if (get().targetUsername !== targetUsername) {
-      stream.getTracks().forEach((t) => t.stop());
-      return;
-    } */
 
     // 3. Create peer connection
     await WebRTCService.createPeerConnection(
@@ -192,7 +228,7 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
         });
       },
       (state) => {
-        trackEvent("Connection state:", state);
+        trackEvent("Connection state changed", { state, targetUsername });
         set({ connectionState: state });
       },
     );
@@ -209,7 +245,15 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     const { callerUsername, callingType, offer } = incomingCall;
 
     try {
-      trackEvent("📞 Incoming call from: ", callerUsername);
+      trackEvent("Answering call", { callerUsername, callingType });
+
+      // Set answerer information first
+      set({
+        callerUsername,
+        targetUsername: callerUsername, // For answerer, target is the caller
+        isCaller: false,
+        isIncoming: true,
+      });
 
       // 1. Fetch ICE servers first
       await WebRTCService.fetchIceServers();
@@ -229,7 +273,7 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
           });
         },
         (state) => {
-          trackEvent("Connection state:", state);
+          trackEvent("Connection state changed", { state, callerUsername });
           set({ connectionState: state });
         },
       );
@@ -246,9 +290,9 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
         answerType: callingType,
       });
 
-      trackEvent("Call answered");
+      trackEvent("Call answered successfully", { callerUsername });
     } catch (error) {
-      trackEvent("Handle incoming call error: ", error);
+      trackEvent("Answer call error", { callerUsername, error });
     }
   },
 
@@ -262,51 +306,54 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     await WebRTCService.addIceCandidate(JSON.parse(candidate));
   },
 
-  endCall: async (endCall?: IncomingCallEvent) => {
-    const callerUsername =
-      endCall?.callerUsername ?? useWebRTCStore.getState().callerUsername;
-    WebRTCService.closeConnection();
-    set({
-      ...initialState,
-      isIncoming: false,
-      callerUsername: undefined,
-      targetUsername: undefined,
-      isCaller: false,
-    });
+  endCall: () => {
+    const otherParty = getOtherPartyUsername(get());
 
-    if (callerUsername) {
-      try {
-        await postApiCallingRejectCall({
-          callerUsername,
-        });
-      } catch (error) {
-        console.error("Failed to post reject call API:", error);
-      }
+    if (otherParty) {
+      trackEvent("Ending call", { targetUsername: otherParty });
+      useSignalRStore.getState().magicHubClient?.endCall({
+        targetUsername: otherParty,
+      });
     }
+
+    WebRTCService.closeConnection();
+    set(resetState());
   },
-  callEnded: () => {
+
+  callEnded: (data: CallEndedEvent) => {
+    trackEvent("Call ended", { endedBy: data.endedUsername });
     WebRTCService.closeConnection();
     set({
-      ...initialState,
-      isIncoming: false,
-      callerUsername: undefined,
-      targetUsername: undefined,
-      isCaller: false,
+      ...resetState(),
+      connectionState: "closed",
     });
   },
 
-  callDeclined: () => {
+  callRejected: (data: CallRejectedEvent) => {
+    trackEvent("Call rejected", {
+      rejectedBy: data.rejectedUsername,
+      previousState: get().connectionState,
+    });
     WebRTCService.closeConnection();
     set({
-      ...initialState,
-      isIncoming: false,
-      callerUsername: undefined,
-      targetUsername: undefined,
-      isCaller: false,
+      ...resetState(),
+      connectionState: "closed",
     });
   },
 
-  onCameraToggled: (data: CameraToggledEvent) => {
-    set({ isRemoteVideoEnabled: data.isVideoEnabled });
+  onCameraToggle: (data: CameraToggleEvent) => {
+    trackEvent("Remote camera toggled", {
+      username: data.toggledUsername,
+      isEnabled: data.isEnabled,
+    });
+    set({ isRemoteVideoEnabled: data.isEnabled });
+  },
+
+  onMicrophoneToggle: (data: MicrophoneToggleEvent) => {
+    trackEvent("Remote microphone toggled", {
+      username: data.toggledUsername,
+      isEnabled: data.isEnabled,
+    });
+    set({ isRemoteAudioEnabled: data.isEnabled });
   },
 }));

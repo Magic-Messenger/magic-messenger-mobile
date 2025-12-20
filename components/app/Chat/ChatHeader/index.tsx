@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 import { CallingType } from "@/api/models";
-import { AppImage, Icon, ThemedText, TorBadge } from "@/components";
+import { AppImage, Icon, ThemedText } from "@/components";
 import { Images } from "@/constants";
 import { useSignalRStore } from "@/store";
 import { useThemedStyles } from "@/theme";
@@ -79,20 +79,23 @@ export function ChatHeader({
             </ThemedText>
           )}
         </View>
-        <View style={[styles.flex, styles.flexRow, styles.gap4]}>
-          <TouchableOpacity onPress={() => onCallingPress?.(CallingType.Audio)}>
-            <Icon name="phone" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => onCallingPress?.(CallingType.Video)}>
-            <Icon name="video-call" />
-          </TouchableOpacity>
-        </View>
       </View>
 
       <View
-        style={[styles.flex, styles.justifyContentEnd, styles.alignItemsEnd]}
+        style={[
+          styles.flex,
+          styles.flexRow,
+          styles.justifyContentEnd,
+          styles.alignItemsEnd,
+          styles.gap5,
+        ]}
       >
-        <TorBadge />
+        <TouchableOpacity onPress={() => onCallingPress?.(CallingType.Audio)}>
+          <Icon name="phone" size={25} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => onCallingPress?.(CallingType.Video)}>
+          <Icon name="video-call" size={30} />
+        </TouchableOpacity>
       </View>
     </View>
   );

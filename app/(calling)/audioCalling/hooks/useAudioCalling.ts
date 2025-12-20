@@ -8,6 +8,7 @@ import { CallingType } from "@/api/models";
 import WebRTCService from "@/services/webRTC/webRTCService";
 import { StartCallingType, useWebRTCStore } from "@/store";
 import { useThemedStyles } from "@/theme";
+import { trackEvent } from "@/utils";
 
 export const useAudioCalling = () => {
   const { t } = useTranslation();
@@ -27,26 +28,32 @@ export const useAudioCalling = () => {
 
   const connectionState = useWebRTCStore((s) => s.connectionState);
   const isIncoming = useWebRTCStore((s) => s.isIncoming);
-
-  const localStream = useWebRTCStore((s) => s.localStream);
-  const remoteStream = useWebRTCStore((s) => s.remoteStream);
+  const isRemoteAudioEnabled = useWebRTCStore((s) => s.isRemoteAudioEnabled);
 
   const startCall = useWebRTCStore((s) => s.startCall);
   const endCall = useWebRTCStore((s) => s.endCall);
+  const setAudioEnabled = useWebRTCStore((s) => s.setAudioEnabled);
 
   const handleCallEnd = useCallback(() => {
     if (durationIntervalRef.current) {
       clearInterval(durationIntervalRef.current);
+      durationIntervalRef.current = null;
     }
+    trackEvent("Audio call ended by user", { targetUsername, callDuration });
     endCall();
     router.back();
-  }, [endCall]);
+  }, [endCall, targetUsername, callDuration]);
 
   const toggleMicrophone = useCallback(() => {
     const newMutedState = !isAudioMuted;
     WebRTCService.toggleAudio(!newMutedState);
     setIsAudioMuted(newMutedState);
-  }, [isAudioMuted]);
+    setAudioEnabled(!newMutedState);
+    trackEvent("Audio microphone toggled", {
+      isMuted: newMutedState,
+      targetUsername,
+    });
+  }, [isAudioMuted, setAudioEnabled, targetUsername]);
 
   const toggleSpeaker = useCallback(() => {
     setIsSpeakerOn((prev) => !prev);
@@ -68,24 +75,30 @@ export const useAudioCalling = () => {
 
     if (mode === "answer") {
       setLoading(false);
-      return;
+    } else {
+      startCall({
+        targetUsername: targetUsername,
+        callingType: CallingType.Audio,
+      }).finally(() => {
+        setTimeout(() => {
+          setLoading(false);
+        }, 500);
+      });
     }
 
-    startCall({
-      targetUsername: targetUsername,
-      callingType: CallingType.Audio,
-    }).finally(() => {
-      setTimeout(() => {
-        setLoading(false);
-      }, 500);
-    });
-
+    // Cleanup always runs regardless of mode
     return () => {
+      // Cleanup: End call when component unmounts (back button pressed)
       if (durationIntervalRef.current) {
         clearInterval(durationIntervalRef.current);
       }
+      trackEvent("Audio call cleanup - component unmounting", {
+        targetUsername,
+        mode,
+      });
+      endCall();
     };
-  }, [targetUsername, mode]);
+  }, [targetUsername, mode, endCall]);
 
   // Start call duration timer when connected
   useEffect(() => {
@@ -117,28 +130,28 @@ export const useAudioCalling = () => {
       connectionState === "closed" ||
       connectionState === "disconnected"
     ) {
-      const timeout = setTimeout(() => {
-        handleCallEnd();
-      }, 1000);
-      return () => clearTimeout(timeout);
+      trackEvent("Audio call auto-ending", {
+        connectionState,
+        targetUsername,
+        callDuration,
+      });
+      handleCallEnd();
     }
-  }, [connectionState, handleCallEnd]);
+  }, [connectionState, handleCallEnd, targetUsername, callDuration]);
 
   return {
     t,
     styles,
     loading,
-    localStream,
-    remoteStream,
     connectionState,
     isIncoming,
     isAudioMuted,
+    isRemoteAudioEnabled,
     isSpeakerOn,
     callDuration,
     targetUsername,
     callingType,
     formatDuration,
-    startCall,
     handleCallEnd,
     toggleMicrophone,
     toggleSpeaker,
@@ -255,5 +268,18 @@ const createStyle = () =>
     connectionStatusText: {
       color: "#fff",
       fontSize: 14,
+    },
+    remoteMutedBadge: {
+      position: "absolute",
+      bottom: -10,
+      right: -10,
+      backgroundColor: "#FF3B30",
+      width: 50,
+      height: 50,
+      borderRadius: 25,
+      justifyContent: "center",
+      alignItems: "center",
+      borderWidth: 3,
+      borderColor: "#1a1a2e",
     },
   });

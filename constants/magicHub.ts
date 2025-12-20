@@ -3,12 +3,9 @@ import * as signalR from "@microsoft/signalr";
 import {
   AddMessageToTicketCommandRequest,
   AnswerCallCommandRequest,
-  CallingType,
   CallUserCommandRequest,
   ChangeTicketStatusCommandRequest,
-  ChatDto,
   IceCandidateCommandRequest,
-  MessageDto,
   SendMessageCommandRequest,
   TicketDto,
   TicketMessageDto,
@@ -18,26 +15,36 @@ export interface EndCallCommandRequest {
   targetUsername: string;
 }
 
-export interface DeclineCallCommandRequest {
-  targetUsername: string;
+export interface RejectCallCommandRequest {
+  callerUsername: string; // Changed from targetUsername to callerUsername per spec
 }
 
 export interface CallEndedEvent {
-  username: string;
+  endedUsername: string; // Changed from username
 }
 
-export interface CallDeclinedEvent {
-  username: string;
+export interface CallRejectedEvent {
+  rejectedUsername: string; // Changed from CallDeclinedEvent/username
 }
 
 export interface ToggleCameraCommandRequest {
   targetUsername: string;
-  isVideoEnabled: boolean;
+  isEnabled: boolean; // Changed to isEnabled
 }
 
-export interface CameraToggledEvent {
-  username: string;
-  isVideoEnabled: boolean;
+export interface CameraToggleEvent {
+  toggledUsername: string; // Changed from username
+  isEnabled: boolean;
+}
+
+export interface ToggleMicrophoneCommandRequest {
+  targetUsername: string;
+  isEnabled: boolean;
+}
+
+export interface MicrophoneToggleEvent {
+  toggledUsername: string;
+  isEnabled: boolean;
 }
 
 export const createMagicHubClient = (
@@ -71,8 +78,9 @@ export const createMagicHubClient = (
   answerCall: (request) => connection.invoke("AnswerCall", request),
   sendIceCandidate: (request) => connection.invoke("SendIceCandidate", request),
   endCall: (request) => connection.invoke("EndCall", request),
-  declineCall: (request) => connection.invoke("DeclineCall", request),
+  rejectCall: (request) => connection.invoke("RejectCall", request), // Changed from decreaseCall
   toggleCamera: (request) => connection.invoke("ToggleCamera", request),
+  toggleMicrophone: (request) => connection.invoke("ToggleMicrophone", request),
 });
 
 /* Types */
@@ -170,8 +178,9 @@ export interface MagicHubEvents {
   call_answered: CallAnsweredEvent;
   ice_candidate: IceCandidateEvent;
   call_ended: CallEndedEvent;
-  call_declined: CallDeclinedEvent;
-  camera_toggled: CameraToggledEvent;
+  call_rejected: CallRejectedEvent; // Changed from call_declined
+  camera_toggle: CameraToggleEvent; // Changed from camera_toggled
+  microphone_toggle: MicrophoneToggleEvent; // Added
 }
 
 export interface MagicHubClient {
@@ -220,7 +229,9 @@ export interface MagicHubClient {
 
   endCall(request: EndCallCommandRequest): Promise<void>;
 
-  declineCall(request: DeclineCallCommandRequest): Promise<void>;
+  rejectCall(request: RejectCallCommandRequest): Promise<void>; // Changed from declineCall
 
   toggleCamera(request: ToggleCameraCommandRequest): Promise<void>;
+
+  toggleMicrophone(request: ToggleMicrophoneCommandRequest): Promise<void>;
 }

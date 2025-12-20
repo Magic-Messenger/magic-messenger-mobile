@@ -89,6 +89,7 @@ export default function AudioCallingScreen() {
     connectionState,
     isIncoming,
     isAudioMuted,
+    isRemoteAudioEnabled,
     isSpeakerOn,
     callDuration,
     targetUsername,
@@ -139,6 +140,17 @@ export default function AudioCallingScreen() {
               {targetUsername?.charAt(0).toUpperCase() || "?"}
             </ThemedText>
           </View>
+          {/* Remote Audio Muted Indicator */}
+          {isConnected && !isRemoteAudioEnabled && (
+            <View style={styles.remoteMutedBadge}>
+              <Icon
+                name="microphone-slash"
+                type="fontawesome5"
+                color="#fff"
+                size={28}
+              />
+            </View>
+          )}
         </View>
 
         {/* Caller Info */}
