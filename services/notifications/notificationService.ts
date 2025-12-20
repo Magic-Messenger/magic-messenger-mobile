@@ -81,6 +81,8 @@ export const registerOpenedListener = () => {
       // This is calling, so we need to know user accept or reject call.
 
       if (action === "ACCEPT_CALL") {
+        // Store'a bilgiler yazılır.
+        // Login olduktan sonra bu bilgiler kontrol edilir, bilgiler var ise direk calling açılır. Bilgiler yoksa normal login işlemi devam eder.
         useWebRTCStore.getState().answerCall?.({
           callingType:
             messageData.callingType === "VideoCalling" ? "Video" : "Audio",
@@ -88,12 +90,7 @@ export const registerOpenedListener = () => {
           callerUsername: messageData.callerUsername as string,
         });
       } else if (action === "REJECT_CALL") {
-        useWebRTCStore.getState().endCall?.({
-          callerUsername: messageData.callerUsername as string,
-          callingType:
-            messageData.callingType === "VideoCalling" ? "Video" : "Audio",
-          offer: messageData.offer as string,
-        });
+        useWebRTCStore.getState().endCall?.();
       }
 
       return;

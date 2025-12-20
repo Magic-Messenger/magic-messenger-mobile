@@ -64,6 +64,7 @@ import type {
   DeleteApiLicensesDeleteParams,
   DeleteApiSubscriptionsDeleteParams,
   DeleteApiTicketsDeleteParams,
+  EndCallCommandRequest,
   FaqDtoListPaginatedResult,
   FaqIDataResult,
   GenerateMagicLinkCommandRequest,
@@ -139,6 +140,8 @@ import type {
   SuccessResult,
   TicketDetailDtoIDataResult,
   TicketDtoListPaginatedResult,
+  ToggleCameraCommandRequest,
+  ToggleMicrophoneCommandRequest,
   Translate,
   UnarchiveChatCommandRequest,
   UnblockAccountCommandRequest,
@@ -3774,6 +3777,98 @@ export const usePostApiCallingAnswerCall = <
 };
 
 /**
+ * @summary End call
+ */
+export const postApiCallingEndCall = (
+  endCallCommandRequest: EndCallCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/calling/end-call`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: endCallCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiCallingEndCallMutationOptions = <
+  TError = ResultMessage[] | void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiCallingEndCall>>,
+    TError,
+    { data: EndCallCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiCallingEndCall>>,
+  TError,
+  { data: EndCallCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiCallingEndCall"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiCallingEndCall>>,
+    { data: EndCallCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiCallingEndCall(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiCallingEndCallMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiCallingEndCall>>
+>;
+export type PostApiCallingEndCallMutationBody = EndCallCommandRequest;
+export type PostApiCallingEndCallMutationError = ResultMessage[] | void;
+
+/**
+ * @summary End call
+ */
+export const usePostApiCallingEndCall = <
+  TError = ResultMessage[] | void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiCallingEndCall>>,
+      TError,
+      { data: EndCallCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiCallingEndCall>>,
+  TError,
+  { data: EndCallCommandRequest },
+  TContext
+> => {
+  const mutationOptions = getPostApiCallingEndCallMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
  * @summary Reject call
  */
 export const postApiCallingRejectCall = (
@@ -3953,6 +4048,194 @@ export const usePostApiCallingIceCandidate = <
   TContext
 > => {
   const mutationOptions = getPostApiCallingIceCandidateMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Toggle camera
+ */
+export const postApiCallingToggleCamera = (
+  toggleCameraCommandRequest: ToggleCameraCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/calling/toggle-camera`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: toggleCameraCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiCallingToggleCameraMutationOptions = <
+  TError = ResultMessage[] | void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiCallingToggleCamera>>,
+    TError,
+    { data: ToggleCameraCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiCallingToggleCamera>>,
+  TError,
+  { data: ToggleCameraCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiCallingToggleCamera"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiCallingToggleCamera>>,
+    { data: ToggleCameraCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiCallingToggleCamera(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiCallingToggleCameraMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiCallingToggleCamera>>
+>;
+export type PostApiCallingToggleCameraMutationBody = ToggleCameraCommandRequest;
+export type PostApiCallingToggleCameraMutationError = ResultMessage[] | void;
+
+/**
+ * @summary Toggle camera
+ */
+export const usePostApiCallingToggleCamera = <
+  TError = ResultMessage[] | void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiCallingToggleCamera>>,
+      TError,
+      { data: ToggleCameraCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiCallingToggleCamera>>,
+  TError,
+  { data: ToggleCameraCommandRequest },
+  TContext
+> => {
+  const mutationOptions = getPostApiCallingToggleCameraMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Toggle microphone
+ */
+export const postApiCallingToggleMicrophone = (
+  toggleMicrophoneCommandRequest: ToggleMicrophoneCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal,
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/calling/toggle-microphone`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: toggleMicrophoneCommandRequest,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getPostApiCallingToggleMicrophoneMutationOptions = <
+  TError = ResultMessage[] | void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiCallingToggleMicrophone>>,
+    TError,
+    { data: ToggleMicrophoneCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiCallingToggleMicrophone>>,
+  TError,
+  { data: ToggleMicrophoneCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiCallingToggleMicrophone"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiCallingToggleMicrophone>>,
+    { data: ToggleMicrophoneCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiCallingToggleMicrophone(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiCallingToggleMicrophoneMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiCallingToggleMicrophone>>
+>;
+export type PostApiCallingToggleMicrophoneMutationBody =
+  ToggleMicrophoneCommandRequest;
+export type PostApiCallingToggleMicrophoneMutationError =
+  | ResultMessage[]
+  | void;
+
+/**
+ * @summary Toggle microphone
+ */
+export const usePostApiCallingToggleMicrophone = <
+  TError = ResultMessage[] | void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiCallingToggleMicrophone>>,
+      TError,
+      { data: ToggleMicrophoneCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiCallingToggleMicrophone>>,
+  TError,
+  { data: ToggleMicrophoneCommandRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiCallingToggleMicrophoneMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };

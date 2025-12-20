@@ -202,7 +202,7 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     const currentUsername = useUserStore.getState().userName;
     set({
       targetUsername,
-      callerUsername: currentUsername,
+      callerUsername: currentUsername!,
       isCaller: true,
       isIncoming: false,
     });
