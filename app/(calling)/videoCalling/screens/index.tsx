@@ -1,11 +1,12 @@
 import React from "react";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { RTCView } from "react-native-webrtc";
 
 import { Icon, ThemedText } from "@/components";
 import { useWebRTCStore } from "@/store";
-import { widthPixel } from "@/utils";
 
+import { DraggableLocalVideo } from "../components/DraggableLocalVideo";
 import { useVideoCalling } from "../hooks";
 
 export default function VideoCallingScreen() {
@@ -54,7 +55,7 @@ export default function VideoCallingScreen() {
   const isConnected = connectionState === "connected";
 
   return (
-    <View style={styles.container}>
+    <GestureHandlerRootView style={styles.container}>
       {loading && <ActivityIndicator />}
 
       {/* Remote Video - Full Screen Background */}
@@ -115,23 +116,14 @@ export default function VideoCallingScreen() {
         </View>
       )}
 
-      {/* Local Video - Picture in Picture */}
+      {/* Local Video - Picture in Picture (Draggable) */}
       {isVideoCall && localStream && !isVideoOff && (
-        <View style={styles.localVideo}>
-          {isSwitchingCamera ? (
-            <View style={styles.localVideoSwitching}>
-              <ActivityIndicator color="#fff" size="small" />
-            </View>
-          ) : (
-            <RTCView
-              key={`local-video-${localVideoKey}`}
-              streamURL={localStream.toURL()}
-              style={{ flex: 1, borderRadius: widthPixel(12) }}
-              objectFit="cover"
-              mirror={isFrontCamera}
-            />
-          )}
-        </View>
+        <DraggableLocalVideo
+          localStream={localStream}
+          localVideoKey={localVideoKey}
+          isFrontCamera={isFrontCamera}
+          isSwitchingCamera={isSwitchingCamera}
+        />
       )}
 
       {/* Local Video Disabled Placeholder */}
@@ -238,6 +230,6 @@ export default function VideoCallingScreen() {
           </ThemedText>
         </View>
       )}
-    </View>
+    </GestureHandlerRootView>
   );
 }
