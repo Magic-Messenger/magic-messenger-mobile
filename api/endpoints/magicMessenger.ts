@@ -64,6 +64,7 @@ import type {
   DeleteApiLicensesDeleteParams,
   DeleteApiSubscriptionsDeleteParams,
   DeleteApiTicketsDeleteParams,
+  EndCallCommandRequest,
   FaqDtoListPaginatedResult,
   FaqIDataResult,
   GenerateMagicLinkCommandRequest,
@@ -139,6 +140,8 @@ import type {
   SuccessResult,
   TicketDetailDtoIDataResult,
   TicketDtoListPaginatedResult,
+  ToggleCameraCommandRequest,
+  ToggleMicrophoneCommandRequest,
   Translate,
   UnarchiveChatCommandRequest,
   UnblockAccountCommandRequest,
@@ -164,7 +167,7 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 export const postApiAccountLogin = (
   loginCommandRequest: LoginCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<LoginCommandResultIDataResult>(
     {
@@ -174,13 +177,13 @@ export const postApiAccountLogin = (
       data: loginCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiAccountLoginMutationOptions = <
   TError = ResultMessage[],
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiAccountLogin>>,
@@ -227,7 +230,7 @@ export type PostApiAccountLoginMutationError = ResultMessage[];
  */
 export const usePostApiAccountLogin = <
   TError = ResultMessage[],
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -238,7 +241,7 @@ export const usePostApiAccountLogin = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiAccountLogin>>,
   TError,
@@ -256,7 +259,7 @@ export const usePostApiAccountLogin = <
 export const postApiAccountAdminLogin = (
   adminLoginCommandRequest: AdminLoginCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<AdminLoginCommandResultIDataResult>(
     {
@@ -266,13 +269,13 @@ export const postApiAccountAdminLogin = (
       data: adminLoginCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiAccountAdminLoginMutationOptions = <
   TError = ResultMessage[],
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiAccountAdminLogin>>,
@@ -319,7 +322,7 @@ export type PostApiAccountAdminLoginMutationError = ResultMessage[];
  */
 export const usePostApiAccountAdminLogin = <
   TError = ResultMessage[],
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -330,7 +333,7 @@ export const usePostApiAccountAdminLogin = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiAccountAdminLogin>>,
   TError,
@@ -348,7 +351,7 @@ export const usePostApiAccountAdminLogin = <
 export const postApiAccountSetupTwoFactor = (
   setupTwoFactorCommandRequest: SetupTwoFactorCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<SetupTwoFactorCommandResultIDataResult>(
     {
@@ -358,13 +361,13 @@ export const postApiAccountSetupTwoFactor = (
       data: setupTwoFactorCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiAccountSetupTwoFactorMutationOptions = <
   TError = ResultMessage[],
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiAccountSetupTwoFactor>>,
@@ -412,7 +415,7 @@ export type PostApiAccountSetupTwoFactorMutationError = ResultMessage[];
  */
 export const usePostApiAccountSetupTwoFactor = <
   TError = ResultMessage[],
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -423,7 +426,7 @@ export const usePostApiAccountSetupTwoFactor = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiAccountSetupTwoFactor>>,
   TError,
@@ -442,7 +445,7 @@ export const usePostApiAccountSetupTwoFactor = <
 export const postApiAccountVerifyTwoFactor = (
   verifyTwoFactorCommandRequest: VerifyTwoFactorCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<LoginCommandResultIDataResult>(
     {
@@ -452,13 +455,13 @@ export const postApiAccountVerifyTwoFactor = (
       data: verifyTwoFactorCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiAccountVerifyTwoFactorMutationOptions = <
   TError = ResultMessage[],
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiAccountVerifyTwoFactor>>,
@@ -506,7 +509,7 @@ export type PostApiAccountVerifyTwoFactorMutationError = ResultMessage[];
  */
 export const usePostApiAccountVerifyTwoFactor = <
   TError = ResultMessage[],
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -517,7 +520,7 @@ export const usePostApiAccountVerifyTwoFactor = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiAccountVerifyTwoFactor>>,
   TError,
@@ -536,7 +539,7 @@ export const usePostApiAccountVerifyTwoFactor = <
 export const postApiAccountRefreshToken = (
   refreshTokenCommandRequest: RefreshTokenCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<RefreshTokenCommandResultIDataResult>(
     {
@@ -546,13 +549,13 @@ export const postApiAccountRefreshToken = (
       data: refreshTokenCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiAccountRefreshTokenMutationOptions = <
   TError = ResultMessage[],
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiAccountRefreshToken>>,
@@ -599,7 +602,7 @@ export type PostApiAccountRefreshTokenMutationError = ResultMessage[];
  */
 export const usePostApiAccountRefreshToken = <
   TError = ResultMessage[],
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -610,7 +613,7 @@ export const usePostApiAccountRefreshToken = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiAccountRefreshToken>>,
   TError,
@@ -628,7 +631,7 @@ export const usePostApiAccountRefreshToken = <
 export const postApiAccountCreateAccount = (
   createAccountCommandRequest: CreateAccountCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<CreateAccountCommandResultIDataResult>(
     {
@@ -638,13 +641,13 @@ export const postApiAccountCreateAccount = (
       data: createAccountCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiAccountCreateAccountMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiAccountCreateAccount>>,
@@ -692,7 +695,7 @@ export type PostApiAccountCreateAccountMutationError = ResultMessage[] | void;
  */
 export const usePostApiAccountCreateAccount = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -703,7 +706,7 @@ export const usePostApiAccountCreateAccount = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiAccountCreateAccount>>,
   TError,
@@ -722,7 +725,7 @@ export const usePostApiAccountCreateAccount = <
 export const postApiAccountRegister = (
   registerCommandRequest: RegisterCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<RegisterCommandResultIDataResult>(
     {
@@ -732,13 +735,13 @@ export const postApiAccountRegister = (
       data: registerCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiAccountRegisterMutationOptions = <
   TError = ResultMessage[],
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiAccountRegister>>,
@@ -785,7 +788,7 @@ export type PostApiAccountRegisterMutationError = ResultMessage[];
  */
 export const usePostApiAccountRegister = <
   TError = ResultMessage[],
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -796,7 +799,7 @@ export const usePostApiAccountRegister = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiAccountRegister>>,
   TError,
@@ -814,23 +817,23 @@ export const usePostApiAccountRegister = <
 export const getApiAccountList = (
   params?: GetApiAccountListParams,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<AccountDtoListPaginatedResult>(
     { url: `/api/account/list`, method: "GET", params, signal },
-    options,
+    options
   );
 };
 
 export const getGetApiAccountListQueryKey = (
-  params?: GetApiAccountListParams,
+  params?: GetApiAccountListParams
 ) => {
   return [`/api/account/list`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetApiAccountListQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiAccountList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiAccountListParams,
   options?: {
@@ -842,7 +845,7 @@ export const getGetApiAccountListQueryOptions = <
       >
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -873,7 +876,7 @@ export type GetApiAccountListQueryError = ResultMessage[] | void;
 
 export function useGetApiAccountList<
   TData = Awaited<ReturnType<typeof getApiAccountList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params: undefined | GetApiAccountListParams,
   options: {
@@ -894,13 +897,13 @@ export function useGetApiAccountList<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiAccountList<
   TData = Awaited<ReturnType<typeof getApiAccountList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiAccountListParams,
   options?: {
@@ -921,13 +924,13 @@ export function useGetApiAccountList<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiAccountList<
   TData = Awaited<ReturnType<typeof getApiAccountList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiAccountListParams,
   options?: {
@@ -940,7 +943,7 @@ export function useGetApiAccountList<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -950,7 +953,7 @@ export function useGetApiAccountList<
 
 export function useGetApiAccountList<
   TData = Awaited<ReturnType<typeof getApiAccountList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiAccountListParams,
   options?: {
@@ -963,7 +966,7 @@ export function useGetApiAccountList<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
@@ -985,23 +988,23 @@ export function useGetApiAccountList<
 export const getApiAccountGet = (
   params?: GetApiAccountGetParams,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<AccountDetailDtoIDataResult>(
     { url: `/api/account/get`, method: "GET", params, signal },
-    options,
+    options
   );
 };
 
 export const getGetApiAccountGetQueryKey = (
-  params?: GetApiAccountGetParams,
+  params?: GetApiAccountGetParams
 ) => {
   return [`/api/account/get`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetApiAccountGetQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiAccountGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiAccountGetParams,
   options?: {
@@ -1013,7 +1016,7 @@ export const getGetApiAccountGetQueryOptions = <
       >
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -1044,7 +1047,7 @@ export type GetApiAccountGetQueryError = ResultMessage[] | void;
 
 export function useGetApiAccountGet<
   TData = Awaited<ReturnType<typeof getApiAccountGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params: undefined | GetApiAccountGetParams,
   options: {
@@ -1065,13 +1068,13 @@ export function useGetApiAccountGet<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiAccountGet<
   TData = Awaited<ReturnType<typeof getApiAccountGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiAccountGetParams,
   options?: {
@@ -1092,13 +1095,13 @@ export function useGetApiAccountGet<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiAccountGet<
   TData = Awaited<ReturnType<typeof getApiAccountGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiAccountGetParams,
   options?: {
@@ -1111,7 +1114,7 @@ export function useGetApiAccountGet<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -1121,7 +1124,7 @@ export function useGetApiAccountGet<
 
 export function useGetApiAccountGet<
   TData = Awaited<ReturnType<typeof getApiAccountGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiAccountGetParams,
   options?: {
@@ -1134,7 +1137,7 @@ export function useGetApiAccountGet<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
@@ -1153,7 +1156,7 @@ export function useGetApiAccountGet<
 export const getApiAccountGetAccountForContact = (
   params?: GetApiAccountGetAccountForContactParams,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<AccountContactDtoIDataResult>(
     {
@@ -1162,12 +1165,12 @@ export const getApiAccountGetAccountForContact = (
       params,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getGetApiAccountGetAccountForContactQueryKey = (
-  params?: GetApiAccountGetAccountForContactParams,
+  params?: GetApiAccountGetAccountForContactParams
 ) => {
   return [
     `/api/account/get-account-for-contact`,
@@ -1177,7 +1180,7 @@ export const getGetApiAccountGetAccountForContactQueryKey = (
 
 export const getGetApiAccountGetAccountForContactQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiAccountGetAccountForContact>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiAccountGetAccountForContactParams,
   options?: {
@@ -1189,7 +1192,7 @@ export const getGetApiAccountGetAccountForContactQueryOptions = <
       >
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -1224,7 +1227,7 @@ export type GetApiAccountGetAccountForContactQueryError =
 
 export function useGetApiAccountGetAccountForContact<
   TData = Awaited<ReturnType<typeof getApiAccountGetAccountForContact>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params: undefined | GetApiAccountGetAccountForContactParams,
   options: {
@@ -1245,13 +1248,13 @@ export function useGetApiAccountGetAccountForContact<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiAccountGetAccountForContact<
   TData = Awaited<ReturnType<typeof getApiAccountGetAccountForContact>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiAccountGetAccountForContactParams,
   options?: {
@@ -1272,13 +1275,13 @@ export function useGetApiAccountGetAccountForContact<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiAccountGetAccountForContact<
   TData = Awaited<ReturnType<typeof getApiAccountGetAccountForContact>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiAccountGetAccountForContactParams,
   options?: {
@@ -1291,14 +1294,14 @@ export function useGetApiAccountGetAccountForContact<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 
 export function useGetApiAccountGetAccountForContact<
   TData = Awaited<ReturnType<typeof getApiAccountGetAccountForContact>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiAccountGetAccountForContactParams,
   options?: {
@@ -1311,13 +1314,13 @@ export function useGetApiAccountGetAccountForContact<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetApiAccountGetAccountForContactQueryOptions(
     params,
-    options,
+    options
   );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
@@ -1336,7 +1339,7 @@ export function useGetApiAccountGetAccountForContact<
 export const postApiAccountBuyLicense = (
   buyLicenseCommandRequest: BuyLicenseCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<BuyLicenseCommandResultIDataResult>(
     {
@@ -1346,13 +1349,13 @@ export const postApiAccountBuyLicense = (
       data: buyLicenseCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiAccountBuyLicenseMutationOptions = <
   TError = ResultMessage[],
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiAccountBuyLicense>>,
@@ -1399,7 +1402,7 @@ export type PostApiAccountBuyLicenseMutationError = ResultMessage[];
  */
 export const usePostApiAccountBuyLicense = <
   TError = ResultMessage[],
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -1410,7 +1413,7 @@ export const usePostApiAccountBuyLicense = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiAccountBuyLicense>>,
   TError,
@@ -1428,7 +1431,7 @@ export const usePostApiAccountBuyLicense = <
 export const postApiAccountChangeStatus = (
   changeAccountStatusCommandRequest: ChangeAccountStatusCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -1438,13 +1441,13 @@ export const postApiAccountChangeStatus = (
       data: changeAccountStatusCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiAccountChangeStatusMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiAccountChangeStatus>>,
@@ -1492,7 +1495,7 @@ export type PostApiAccountChangeStatusMutationError = ResultMessage[] | void;
  */
 export const usePostApiAccountChangeStatus = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -1503,7 +1506,7 @@ export const usePostApiAccountChangeStatus = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiAccountChangeStatus>>,
   TError,
@@ -1521,7 +1524,7 @@ export const usePostApiAccountChangeStatus = <
 export const postApiAccountChangeLanguage = (
   changeLanguageCommandRequest: ChangeLanguageCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -1531,13 +1534,13 @@ export const postApiAccountChangeLanguage = (
       data: changeLanguageCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiAccountChangeLanguageMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiAccountChangeLanguage>>,
@@ -1585,7 +1588,7 @@ export type PostApiAccountChangeLanguageMutationError = ResultMessage[] | void;
  */
 export const usePostApiAccountChangeLanguage = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -1596,7 +1599,7 @@ export const usePostApiAccountChangeLanguage = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiAccountChangeLanguage>>,
   TError,
@@ -1615,7 +1618,7 @@ export const usePostApiAccountChangeLanguage = <
 export const postApiAccountRegisterDeviceToken = (
   registerDeviceTokenCommandRequest: RegisterDeviceTokenCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -1625,13 +1628,13 @@ export const postApiAccountRegisterDeviceToken = (
       data: registerDeviceTokenCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiAccountRegisterDeviceTokenMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiAccountRegisterDeviceToken>>,
@@ -1681,7 +1684,7 @@ export type PostApiAccountRegisterDeviceTokenMutationError =
  */
 export const usePostApiAccountRegisterDeviceToken = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -1692,7 +1695,7 @@ export const usePostApiAccountRegisterDeviceToken = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiAccountRegisterDeviceToken>>,
   TError,
@@ -1711,7 +1714,7 @@ export const usePostApiAccountRegisterDeviceToken = <
 export const postApiAccountUpdatePublicKey = (
   updatePublicKeyCommandRequest: UpdatePublicKeyCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -1721,13 +1724,13 @@ export const postApiAccountUpdatePublicKey = (
       data: updatePublicKeyCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiAccountUpdatePublicKeyMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiAccountUpdatePublicKey>>,
@@ -1775,7 +1778,7 @@ export type PostApiAccountUpdatePublicKeyMutationError = ResultMessage[] | void;
  */
 export const usePostApiAccountUpdatePublicKey = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -1786,7 +1789,7 @@ export const usePostApiAccountUpdatePublicKey = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiAccountUpdatePublicKey>>,
   TError,
@@ -1805,7 +1808,7 @@ export const usePostApiAccountUpdatePublicKey = <
 export const postApiAccountUpdateDeviceInformation = (
   updateDeviceInformationCommandRequest: UpdateDeviceInformationCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -1815,13 +1818,13 @@ export const postApiAccountUpdateDeviceInformation = (
       data: updateDeviceInformationCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiAccountUpdateDeviceInformationMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiAccountUpdateDeviceInformation>>,
@@ -1871,7 +1874,7 @@ export type PostApiAccountUpdateDeviceInformationMutationError =
  */
 export const usePostApiAccountUpdateDeviceInformation = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -1882,7 +1885,7 @@ export const usePostApiAccountUpdateDeviceInformation = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiAccountUpdateDeviceInformation>>,
   TError,
@@ -1901,7 +1904,7 @@ export const usePostApiAccountUpdateDeviceInformation = <
 export const postApiAccountBlockAccount = (
   blockAccountCommandRequest: BlockAccountCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -1911,13 +1914,13 @@ export const postApiAccountBlockAccount = (
       data: blockAccountCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiAccountBlockAccountMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiAccountBlockAccount>>,
@@ -1964,7 +1967,7 @@ export type PostApiAccountBlockAccountMutationError = ResultMessage[] | void;
  */
 export const usePostApiAccountBlockAccount = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -1975,7 +1978,7 @@ export const usePostApiAccountBlockAccount = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiAccountBlockAccount>>,
   TError,
@@ -1993,7 +1996,7 @@ export const usePostApiAccountBlockAccount = <
 export const postApiAccountUnblockAccount = (
   unblockAccountCommandRequest: UnblockAccountCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -2003,13 +2006,13 @@ export const postApiAccountUnblockAccount = (
       data: unblockAccountCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiAccountUnblockAccountMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiAccountUnblockAccount>>,
@@ -2057,7 +2060,7 @@ export type PostApiAccountUnblockAccountMutationError = ResultMessage[] | void;
  */
 export const usePostApiAccountUnblockAccount = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -2068,7 +2071,7 @@ export const usePostApiAccountUnblockAccount = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiAccountUnblockAccount>>,
   TError,
@@ -2087,7 +2090,7 @@ export const usePostApiAccountUnblockAccount = <
 export const postApiAccountRecoverPassword = (
   recoverPasswordCommandRequest: RecoverPasswordCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -2097,13 +2100,13 @@ export const postApiAccountRecoverPassword = (
       data: recoverPasswordCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiAccountRecoverPasswordMutationOptions = <
   TError = ResultMessage[],
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiAccountRecoverPassword>>,
@@ -2151,7 +2154,7 @@ export type PostApiAccountRecoverPasswordMutationError = ResultMessage[];
  */
 export const usePostApiAccountRecoverPassword = <
   TError = ResultMessage[],
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -2162,7 +2165,7 @@ export const usePostApiAccountRecoverPassword = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiAccountRecoverPassword>>,
   TError,
@@ -2181,7 +2184,7 @@ export const usePostApiAccountRecoverPassword = <
 export const postApiAccountResetPassword = (
   resetPasswordCommandRequest: ResetPasswordCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -2191,13 +2194,13 @@ export const postApiAccountResetPassword = (
       data: resetPasswordCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiAccountResetPasswordMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiAccountResetPassword>>,
@@ -2245,7 +2248,7 @@ export type PostApiAccountResetPasswordMutationError = ResultMessage[] | void;
  */
 export const usePostApiAccountResetPassword = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -2256,7 +2259,7 @@ export const usePostApiAccountResetPassword = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiAccountResetPassword>>,
   TError,
@@ -2275,7 +2278,7 @@ export const usePostApiAccountResetPassword = <
 export const postApiAccountChangePassword = (
   changePasswordCommandRequest: ChangePasswordCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -2285,13 +2288,13 @@ export const postApiAccountChangePassword = (
       data: changePasswordCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiAccountChangePasswordMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiAccountChangePassword>>,
@@ -2339,7 +2342,7 @@ export type PostApiAccountChangePasswordMutationError = ResultMessage[] | void;
  */
 export const usePostApiAccountChangePassword = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -2350,7 +2353,7 @@ export const usePostApiAccountChangePassword = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiAccountChangePassword>>,
   TError,
@@ -2369,7 +2372,7 @@ export const usePostApiAccountChangePassword = <
 export const postApiAccountResetPhrases = (
   resetPhrasesCommandRequest: ResetPhrasesCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<StringListIDataResult>(
     {
@@ -2379,13 +2382,13 @@ export const postApiAccountResetPhrases = (
       data: resetPhrasesCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiAccountResetPhrasesMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiAccountResetPhrases>>,
@@ -2432,7 +2435,7 @@ export type PostApiAccountResetPhrasesMutationError = ResultMessage[] | void;
  */
 export const usePostApiAccountResetPhrases = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -2443,7 +2446,7 @@ export const usePostApiAccountResetPhrases = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiAccountResetPhrases>>,
   TError,
@@ -2461,7 +2464,7 @@ export const usePostApiAccountResetPhrases = <
 export const postApiAccountResetTwoFactor = (
   resetTwoFactorCommandRequest: ResetTwoFactorCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<StringListIDataResult>(
     {
@@ -2471,13 +2474,13 @@ export const postApiAccountResetTwoFactor = (
       data: resetTwoFactorCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiAccountResetTwoFactorMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiAccountResetTwoFactor>>,
@@ -2525,7 +2528,7 @@ export type PostApiAccountResetTwoFactorMutationError = ResultMessage[] | void;
  */
 export const usePostApiAccountResetTwoFactor = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -2536,7 +2539,7 @@ export const usePostApiAccountResetTwoFactor = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiAccountResetTwoFactor>>,
   TError,
@@ -2554,11 +2557,11 @@ export const usePostApiAccountResetTwoFactor = <
  */
 export const getApiAccountGetProfile = (
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<AccountProfileDtoIDataResult>(
     { url: `/api/account/get-profile`, method: "GET", signal },
-    options,
+    options
   );
 };
 
@@ -2568,7 +2571,7 @@ export const getGetApiAccountGetProfileQueryKey = () => {
 
 export const getGetApiAccountGetProfileQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiAccountGetProfile>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(options?: {
   query?: Partial<
     UseQueryOptions<
@@ -2608,7 +2611,7 @@ export type GetApiAccountGetProfileQueryError = ResultMessage[] | void;
 
 export function useGetApiAccountGetProfile<
   TData = Awaited<ReturnType<typeof getApiAccountGetProfile>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   options: {
     query: Partial<
@@ -2628,13 +2631,13 @@ export function useGetApiAccountGetProfile<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiAccountGetProfile<
   TData = Awaited<ReturnType<typeof getApiAccountGetProfile>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   options?: {
     query?: Partial<
@@ -2654,13 +2657,13 @@ export function useGetApiAccountGetProfile<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiAccountGetProfile<
   TData = Awaited<ReturnType<typeof getApiAccountGetProfile>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   options?: {
     query?: Partial<
@@ -2672,7 +2675,7 @@ export function useGetApiAccountGetProfile<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -2682,7 +2685,7 @@ export function useGetApiAccountGetProfile<
 
 export function useGetApiAccountGetProfile<
   TData = Awaited<ReturnType<typeof getApiAccountGetProfile>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   options?: {
     query?: Partial<
@@ -2694,7 +2697,7 @@ export function useGetApiAccountGetProfile<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
@@ -2715,11 +2718,11 @@ export function useGetApiAccountGetProfile<
  */
 export const getApiAccountGetOnlineUsers = (
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<StringListIDataResult>(
     { url: `/api/account/get-online-users`, method: "GET", signal },
-    options,
+    options
   );
 };
 
@@ -2729,7 +2732,7 @@ export const getGetApiAccountGetOnlineUsersQueryKey = () => {
 
 export const getGetApiAccountGetOnlineUsersQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiAccountGetOnlineUsers>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(options?: {
   query?: Partial<
     UseQueryOptions<
@@ -2769,7 +2772,7 @@ export type GetApiAccountGetOnlineUsersQueryError = ResultMessage[] | void;
 
 export function useGetApiAccountGetOnlineUsers<
   TData = Awaited<ReturnType<typeof getApiAccountGetOnlineUsers>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   options: {
     query: Partial<
@@ -2789,13 +2792,13 @@ export function useGetApiAccountGetOnlineUsers<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiAccountGetOnlineUsers<
   TData = Awaited<ReturnType<typeof getApiAccountGetOnlineUsers>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   options?: {
     query?: Partial<
@@ -2815,13 +2818,13 @@ export function useGetApiAccountGetOnlineUsers<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiAccountGetOnlineUsers<
   TData = Awaited<ReturnType<typeof getApiAccountGetOnlineUsers>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   options?: {
     query?: Partial<
@@ -2833,7 +2836,7 @@ export function useGetApiAccountGetOnlineUsers<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -2843,7 +2846,7 @@ export function useGetApiAccountGetOnlineUsers<
 
 export function useGetApiAccountGetOnlineUsers<
   TData = Awaited<ReturnType<typeof getApiAccountGetOnlineUsers>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   options?: {
     query?: Partial<
@@ -2855,7 +2858,7 @@ export function useGetApiAccountGetOnlineUsers<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
@@ -2877,7 +2880,7 @@ export function useGetApiAccountGetOnlineUsers<
 export const postApiAccountChangeAccountSettings = (
   accountSettingsCommandRequest: AccountSettingsCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<AccountDtoIDataResult>(
     {
@@ -2887,13 +2890,13 @@ export const postApiAccountChangeAccountSettings = (
       data: accountSettingsCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiAccountChangeAccountSettingsMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiAccountChangeAccountSettings>>,
@@ -2943,7 +2946,7 @@ export type PostApiAccountChangeAccountSettingsMutationError =
  */
 export const usePostApiAccountChangeAccountSettings = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -2954,7 +2957,7 @@ export const usePostApiAccountChangeAccountSettings = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiAccountChangeAccountSettings>>,
   TError,
@@ -2973,7 +2976,7 @@ export const usePostApiAccountChangeAccountSettings = <
 export const postApiAccountVerifyPassword = (
   verifyPasswordCommandRequest: VerifyPasswordCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -2983,13 +2986,13 @@ export const postApiAccountVerifyPassword = (
       data: verifyPasswordCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiAccountVerifyPasswordMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiAccountVerifyPassword>>,
@@ -3037,7 +3040,7 @@ export type PostApiAccountVerifyPasswordMutationError = ResultMessage[] | void;
  */
 export const usePostApiAccountVerifyPassword = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -3048,7 +3051,7 @@ export const usePostApiAccountVerifyPassword = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiAccountVerifyPassword>>,
   TError,
@@ -3067,7 +3070,7 @@ export const usePostApiAccountVerifyPassword = <
 export const postApiAccountVerifyPhrases = (
   verifyPhrasesCommandRequest: VerifyPhrasesCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -3077,13 +3080,13 @@ export const postApiAccountVerifyPhrases = (
       data: verifyPhrasesCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiAccountVerifyPhrasesMutationOptions = <
   TError = ResultMessage[],
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiAccountVerifyPhrases>>,
@@ -3131,7 +3134,7 @@ export type PostApiAccountVerifyPhrasesMutationError = ResultMessage[];
  */
 export const usePostApiAccountVerifyPhrases = <
   TError = ResultMessage[],
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -3142,7 +3145,7 @@ export const usePostApiAccountVerifyPhrases = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiAccountVerifyPhrases>>,
   TError,
@@ -3160,17 +3163,17 @@ export const usePostApiAccountVerifyPhrases = <
  */
 export const deleteApiAccountDeleteAccount = (
   params?: DeleteApiAccountDeleteAccountParams,
-  options?: SecondParameter<typeof AxiosInstance>,
+  options?: SecondParameter<typeof AxiosInstance>
 ) => {
   return AxiosInstance<SuccessResult>(
     { url: `/api/account/delete-account`, method: "DELETE", params },
-    options,
+    options
   );
 };
 
 export const getDeleteApiAccountDeleteAccountMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deleteApiAccountDeleteAccount>>,
@@ -3217,7 +3220,7 @@ export type DeleteApiAccountDeleteAccountMutationError = ResultMessage[] | void;
  */
 export const useDeleteApiAccountDeleteAccount = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -3228,7 +3231,7 @@ export const useDeleteApiAccountDeleteAccount = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof deleteApiAccountDeleteAccount>>,
   TError,
@@ -3246,17 +3249,17 @@ export const useDeleteApiAccountDeleteAccount = <
  */
 export const deleteApiAccountDeleteProfile = (
   params?: DeleteApiAccountDeleteProfileParams,
-  options?: SecondParameter<typeof AxiosInstance>,
+  options?: SecondParameter<typeof AxiosInstance>
 ) => {
   return AxiosInstance<IResult>(
     { url: `/api/account/delete-profile`, method: "DELETE", params },
-    options,
+    options
   );
 };
 
 export const getDeleteApiAccountDeleteProfileMutationOptions = <
   TError = ResultMessage[],
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deleteApiAccountDeleteProfile>>,
@@ -3303,7 +3306,7 @@ export type DeleteApiAccountDeleteProfileMutationError = ResultMessage[];
  */
 export const useDeleteApiAccountDeleteProfile = <
   TError = ResultMessage[],
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -3314,7 +3317,7 @@ export const useDeleteApiAccountDeleteProfile = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof deleteApiAccountDeleteProfile>>,
   TError,
@@ -3333,7 +3336,7 @@ export const useDeleteApiAccountDeleteProfile = <
 export const postApiAccountUploadProfilePicture = (
   postApiAccountUploadProfilePictureBody: PostApiAccountUploadProfilePictureBody,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   const formData = new FormData();
   if (postApiAccountUploadProfilePictureBody.file !== undefined) {
@@ -3348,13 +3351,13 @@ export const postApiAccountUploadProfilePicture = (
       data: formData,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiAccountUploadProfilePictureMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiAccountUploadProfilePicture>>,
@@ -3404,7 +3407,7 @@ export type PostApiAccountUploadProfilePictureMutationError =
  */
 export const usePostApiAccountUploadProfilePicture = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -3415,7 +3418,7 @@ export const usePostApiAccountUploadProfilePicture = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiAccountUploadProfilePicture>>,
   TError,
@@ -3433,11 +3436,11 @@ export const usePostApiAccountUploadProfilePicture = <
  */
 export const getApiCallingGetIceServers = (
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IceServer[]>(
     { url: `/api/calling/get-ice-servers`, method: "GET", signal },
-    options,
+    options
   );
 };
 
@@ -3447,7 +3450,7 @@ export const getGetApiCallingGetIceServersQueryKey = () => {
 
 export const getGetApiCallingGetIceServersQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiCallingGetIceServers>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(options?: {
   query?: Partial<
     UseQueryOptions<
@@ -3487,7 +3490,7 @@ export type GetApiCallingGetIceServersQueryError = ResultMessage[] | void;
 
 export function useGetApiCallingGetIceServers<
   TData = Awaited<ReturnType<typeof getApiCallingGetIceServers>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   options: {
     query: Partial<
@@ -3507,13 +3510,13 @@ export function useGetApiCallingGetIceServers<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiCallingGetIceServers<
   TData = Awaited<ReturnType<typeof getApiCallingGetIceServers>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   options?: {
     query?: Partial<
@@ -3533,13 +3536,13 @@ export function useGetApiCallingGetIceServers<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiCallingGetIceServers<
   TData = Awaited<ReturnType<typeof getApiCallingGetIceServers>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   options?: {
     query?: Partial<
@@ -3551,7 +3554,7 @@ export function useGetApiCallingGetIceServers<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -3561,7 +3564,7 @@ export function useGetApiCallingGetIceServers<
 
 export function useGetApiCallingGetIceServers<
   TData = Awaited<ReturnType<typeof getApiCallingGetIceServers>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   options?: {
     query?: Partial<
@@ -3573,7 +3576,7 @@ export function useGetApiCallingGetIceServers<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
@@ -3595,7 +3598,7 @@ export function useGetApiCallingGetIceServers<
 export const postApiCallingCallUser = (
   callUserCommandRequest: CallUserCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -3605,13 +3608,13 @@ export const postApiCallingCallUser = (
       data: callUserCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiCallingCallUserMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiCallingCallUser>>,
@@ -3658,7 +3661,7 @@ export type PostApiCallingCallUserMutationError = ResultMessage[] | void;
  */
 export const usePostApiCallingCallUser = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -3669,7 +3672,7 @@ export const usePostApiCallingCallUser = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiCallingCallUser>>,
   TError,
@@ -3687,7 +3690,7 @@ export const usePostApiCallingCallUser = <
 export const postApiCallingAnswerCall = (
   answerCallCommandRequest: AnswerCallCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -3697,13 +3700,13 @@ export const postApiCallingAnswerCall = (
       data: answerCallCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiCallingAnswerCallMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiCallingAnswerCall>>,
@@ -3750,7 +3753,7 @@ export type PostApiCallingAnswerCallMutationError = ResultMessage[] | void;
  */
 export const usePostApiCallingAnswerCall = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -3761,7 +3764,7 @@ export const usePostApiCallingAnswerCall = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiCallingAnswerCall>>,
   TError,
@@ -3774,12 +3777,104 @@ export const usePostApiCallingAnswerCall = <
 };
 
 /**
+ * @summary End call
+ */
+export const postApiCallingEndCall = (
+  endCallCommandRequest: EndCallCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/calling/end-call`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: endCallCommandRequest,
+      signal,
+    },
+    options
+  );
+};
+
+export const getPostApiCallingEndCallMutationOptions = <
+  TError = ResultMessage[] | void,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiCallingEndCall>>,
+    TError,
+    { data: EndCallCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiCallingEndCall>>,
+  TError,
+  { data: EndCallCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiCallingEndCall"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiCallingEndCall>>,
+    { data: EndCallCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiCallingEndCall(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiCallingEndCallMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiCallingEndCall>>
+>;
+export type PostApiCallingEndCallMutationBody = EndCallCommandRequest;
+export type PostApiCallingEndCallMutationError = ResultMessage[] | void;
+
+/**
+ * @summary End call
+ */
+export const usePostApiCallingEndCall = <
+  TError = ResultMessage[] | void,
+  TContext = unknown
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiCallingEndCall>>,
+      TError,
+      { data: EndCallCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiCallingEndCall>>,
+  TError,
+  { data: EndCallCommandRequest },
+  TContext
+> => {
+  const mutationOptions = getPostApiCallingEndCallMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
  * @summary Reject call
  */
 export const postApiCallingRejectCall = (
   rejectCallCommandRequest: RejectCallCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -3789,13 +3884,13 @@ export const postApiCallingRejectCall = (
       data: rejectCallCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiCallingRejectCallMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiCallingRejectCall>>,
@@ -3842,7 +3937,7 @@ export type PostApiCallingRejectCallMutationError = ResultMessage[] | void;
  */
 export const usePostApiCallingRejectCall = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -3853,7 +3948,7 @@ export const usePostApiCallingRejectCall = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiCallingRejectCall>>,
   TError,
@@ -3871,7 +3966,7 @@ export const usePostApiCallingRejectCall = <
 export const postApiCallingIceCandidate = (
   iceCandidateCommandRequest: IceCandidateCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -3881,13 +3976,13 @@ export const postApiCallingIceCandidate = (
       data: iceCandidateCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiCallingIceCandidateMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiCallingIceCandidate>>,
@@ -3934,7 +4029,7 @@ export type PostApiCallingIceCandidateMutationError = ResultMessage[] | void;
  */
 export const usePostApiCallingIceCandidate = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -3945,7 +4040,7 @@ export const usePostApiCallingIceCandidate = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiCallingIceCandidate>>,
   TError,
@@ -3958,12 +4053,200 @@ export const usePostApiCallingIceCandidate = <
 };
 
 /**
+ * @summary Toggle camera
+ */
+export const postApiCallingToggleCamera = (
+  toggleCameraCommandRequest: ToggleCameraCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/calling/toggle-camera`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: toggleCameraCommandRequest,
+      signal,
+    },
+    options
+  );
+};
+
+export const getPostApiCallingToggleCameraMutationOptions = <
+  TError = ResultMessage[] | void,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiCallingToggleCamera>>,
+    TError,
+    { data: ToggleCameraCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiCallingToggleCamera>>,
+  TError,
+  { data: ToggleCameraCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiCallingToggleCamera"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiCallingToggleCamera>>,
+    { data: ToggleCameraCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiCallingToggleCamera(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiCallingToggleCameraMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiCallingToggleCamera>>
+>;
+export type PostApiCallingToggleCameraMutationBody = ToggleCameraCommandRequest;
+export type PostApiCallingToggleCameraMutationError = ResultMessage[] | void;
+
+/**
+ * @summary Toggle camera
+ */
+export const usePostApiCallingToggleCamera = <
+  TError = ResultMessage[] | void,
+  TContext = unknown
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiCallingToggleCamera>>,
+      TError,
+      { data: ToggleCameraCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiCallingToggleCamera>>,
+  TError,
+  { data: ToggleCameraCommandRequest },
+  TContext
+> => {
+  const mutationOptions = getPostApiCallingToggleCameraMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Toggle microphone
+ */
+export const postApiCallingToggleMicrophone = (
+  toggleMicrophoneCommandRequest: ToggleMicrophoneCommandRequest,
+  options?: SecondParameter<typeof AxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return AxiosInstance<IResult>(
+    {
+      url: `/api/calling/toggle-microphone`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: toggleMicrophoneCommandRequest,
+      signal,
+    },
+    options
+  );
+};
+
+export const getPostApiCallingToggleMicrophoneMutationOptions = <
+  TError = ResultMessage[] | void,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postApiCallingToggleMicrophone>>,
+    TError,
+    { data: ToggleMicrophoneCommandRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof AxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postApiCallingToggleMicrophone>>,
+  TError,
+  { data: ToggleMicrophoneCommandRequest },
+  TContext
+> => {
+  const mutationKey = ["postApiCallingToggleMicrophone"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postApiCallingToggleMicrophone>>,
+    { data: ToggleMicrophoneCommandRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return postApiCallingToggleMicrophone(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostApiCallingToggleMicrophoneMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postApiCallingToggleMicrophone>>
+>;
+export type PostApiCallingToggleMicrophoneMutationBody =
+  ToggleMicrophoneCommandRequest;
+export type PostApiCallingToggleMicrophoneMutationError =
+  | ResultMessage[]
+  | void;
+
+/**
+ * @summary Toggle microphone
+ */
+export const usePostApiCallingToggleMicrophone = <
+  TError = ResultMessage[] | void,
+  TContext = unknown
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof postApiCallingToggleMicrophone>>,
+      TError,
+      { data: ToggleMicrophoneCommandRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof AxiosInstance>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof postApiCallingToggleMicrophone>>,
+  TError,
+  { data: ToggleMicrophoneCommandRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getPostApiCallingToggleMicrophoneMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
  * @summary Create a chat
  */
 export const postApiChatsCreate = (
   createChatCommandRequest: CreateChatCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<StringIDataResult>(
     {
@@ -3973,13 +4256,13 @@ export const postApiChatsCreate = (
       data: createChatCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiChatsCreateMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiChatsCreate>>,
@@ -4026,7 +4309,7 @@ export type PostApiChatsCreateMutationError = ResultMessage[] | void;
  */
 export const usePostApiChatsCreate = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -4037,7 +4320,7 @@ export const usePostApiChatsCreate = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiChatsCreate>>,
   TError,
@@ -4055,7 +4338,7 @@ export const usePostApiChatsCreate = <
 export const postApiChatsUpdate = (
   updateChatCommandRequest: UpdateChatCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<SuccessResult>(
     {
@@ -4065,13 +4348,13 @@ export const postApiChatsUpdate = (
       data: updateChatCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiChatsUpdateMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiChatsUpdate>>,
@@ -4118,7 +4401,7 @@ export type PostApiChatsUpdateMutationError = ResultMessage[] | void;
  */
 export const usePostApiChatsUpdate = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -4129,7 +4412,7 @@ export const usePostApiChatsUpdate = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiChatsUpdate>>,
   TError,
@@ -4147,17 +4430,17 @@ export const usePostApiChatsUpdate = <
 export const postApiChatsClear = (
   params?: PostApiChatsClearParams,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<SuccessResult>(
     { url: `/api/chats/clear`, method: "POST", params, signal },
-    options,
+    options
   );
 };
 
 export const getPostApiChatsClearMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiChatsClear>>,
@@ -4204,7 +4487,7 @@ export type PostApiChatsClearMutationError = ResultMessage[] | void;
  */
 export const usePostApiChatsClear = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -4215,7 +4498,7 @@ export const usePostApiChatsClear = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiChatsClear>>,
   TError,
@@ -4232,17 +4515,17 @@ export const usePostApiChatsClear = <
  */
 export const deleteApiChatsDelete = (
   params?: DeleteApiChatsDeleteParams,
-  options?: SecondParameter<typeof AxiosInstance>,
+  options?: SecondParameter<typeof AxiosInstance>
 ) => {
   return AxiosInstance<SuccessResult>(
     { url: `/api/chats/delete`, method: "DELETE", params },
-    options,
+    options
   );
 };
 
 export const getDeleteApiChatsDeleteMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deleteApiChatsDelete>>,
@@ -4289,7 +4572,7 @@ export type DeleteApiChatsDeleteMutationError = ResultMessage[] | void;
  */
 export const useDeleteApiChatsDelete = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -4300,7 +4583,7 @@ export const useDeleteApiChatsDelete = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof deleteApiChatsDelete>>,
   TError,
@@ -4318,7 +4601,7 @@ export const useDeleteApiChatsDelete = <
 export const postApiChatsSendMessage = (
   sendMessageCommandRequest: SendMessageCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<MessageDtoIDataResult>(
     {
@@ -4328,13 +4611,13 @@ export const postApiChatsSendMessage = (
       data: sendMessageCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiChatsSendMessageMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiChatsSendMessage>>,
@@ -4381,7 +4664,7 @@ export type PostApiChatsSendMessageMutationError = ResultMessage[] | void;
  */
 export const usePostApiChatsSendMessage = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -4392,7 +4675,7 @@ export const usePostApiChatsSendMessage = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiChatsSendMessage>>,
   TError,
@@ -4410,11 +4693,11 @@ export const usePostApiChatsSendMessage = <
 export const getApiChatsList = (
   params?: GetApiChatsListParams,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<ChatDtoListPaginatedResultIDataResult>(
     { url: `/api/chats/list`, method: "GET", params, signal },
-    options,
+    options
   );
 };
 
@@ -4424,7 +4707,7 @@ export const getGetApiChatsListQueryKey = (params?: GetApiChatsListParams) => {
 
 export const getGetApiChatsListQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiChatsList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiChatsListParams,
   options?: {
@@ -4436,7 +4719,7 @@ export const getGetApiChatsListQueryOptions = <
       >
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -4466,7 +4749,7 @@ export type GetApiChatsListQueryError = ResultMessage[] | void;
 
 export function useGetApiChatsList<
   TData = Awaited<ReturnType<typeof getApiChatsList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params: undefined | GetApiChatsListParams,
   options: {
@@ -4487,13 +4770,13 @@ export function useGetApiChatsList<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiChatsList<
   TData = Awaited<ReturnType<typeof getApiChatsList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiChatsListParams,
   options?: {
@@ -4514,13 +4797,13 @@ export function useGetApiChatsList<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiChatsList<
   TData = Awaited<ReturnType<typeof getApiChatsList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiChatsListParams,
   options?: {
@@ -4533,7 +4816,7 @@ export function useGetApiChatsList<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -4543,7 +4826,7 @@ export function useGetApiChatsList<
 
 export function useGetApiChatsList<
   TData = Awaited<ReturnType<typeof getApiChatsList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiChatsListParams,
   options?: {
@@ -4556,7 +4839,7 @@ export function useGetApiChatsList<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
@@ -4578,23 +4861,23 @@ export function useGetApiChatsList<
 export const getApiChatsMessages = (
   params?: GetApiChatsMessagesParams,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<GetMessagesQueryResultIDataResult>(
     { url: `/api/chats/messages`, method: "GET", params, signal },
-    options,
+    options
   );
 };
 
 export const getGetApiChatsMessagesQueryKey = (
-  params?: GetApiChatsMessagesParams,
+  params?: GetApiChatsMessagesParams
 ) => {
   return [`/api/chats/messages`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetApiChatsMessagesQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiChatsMessages>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiChatsMessagesParams,
   options?: {
@@ -4606,7 +4889,7 @@ export const getGetApiChatsMessagesQueryOptions = <
       >
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -4637,7 +4920,7 @@ export type GetApiChatsMessagesQueryError = ResultMessage[] | void;
 
 export function useGetApiChatsMessages<
   TData = Awaited<ReturnType<typeof getApiChatsMessages>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params: undefined | GetApiChatsMessagesParams,
   options: {
@@ -4658,13 +4941,13 @@ export function useGetApiChatsMessages<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiChatsMessages<
   TData = Awaited<ReturnType<typeof getApiChatsMessages>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiChatsMessagesParams,
   options?: {
@@ -4685,13 +4968,13 @@ export function useGetApiChatsMessages<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiChatsMessages<
   TData = Awaited<ReturnType<typeof getApiChatsMessages>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiChatsMessagesParams,
   options?: {
@@ -4704,7 +4987,7 @@ export function useGetApiChatsMessages<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -4714,7 +4997,7 @@ export function useGetApiChatsMessages<
 
 export function useGetApiChatsMessages<
   TData = Awaited<ReturnType<typeof getApiChatsMessages>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiChatsMessagesParams,
   options?: {
@@ -4727,7 +5010,7 @@ export function useGetApiChatsMessages<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
@@ -4749,23 +5032,23 @@ export function useGetApiChatsMessages<
 export const getApiChatsGroupMessages = (
   params?: GetApiChatsGroupMessagesParams,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<GetGroupMessagesQueryResultIDataResult>(
     { url: `/api/chats/group-messages`, method: "GET", params, signal },
-    options,
+    options
   );
 };
 
 export const getGetApiChatsGroupMessagesQueryKey = (
-  params?: GetApiChatsGroupMessagesParams,
+  params?: GetApiChatsGroupMessagesParams
 ) => {
   return [`/api/chats/group-messages`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetApiChatsGroupMessagesQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiChatsGroupMessages>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiChatsGroupMessagesParams,
   options?: {
@@ -4777,7 +5060,7 @@ export const getGetApiChatsGroupMessagesQueryOptions = <
       >
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -4808,7 +5091,7 @@ export type GetApiChatsGroupMessagesQueryError = ResultMessage[] | void;
 
 export function useGetApiChatsGroupMessages<
   TData = Awaited<ReturnType<typeof getApiChatsGroupMessages>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params: undefined | GetApiChatsGroupMessagesParams,
   options: {
@@ -4829,13 +5112,13 @@ export function useGetApiChatsGroupMessages<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiChatsGroupMessages<
   TData = Awaited<ReturnType<typeof getApiChatsGroupMessages>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiChatsGroupMessagesParams,
   options?: {
@@ -4856,13 +5139,13 @@ export function useGetApiChatsGroupMessages<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiChatsGroupMessages<
   TData = Awaited<ReturnType<typeof getApiChatsGroupMessages>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiChatsGroupMessagesParams,
   options?: {
@@ -4875,7 +5158,7 @@ export function useGetApiChatsGroupMessages<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -4885,7 +5168,7 @@ export function useGetApiChatsGroupMessages<
 
 export function useGetApiChatsGroupMessages<
   TData = Awaited<ReturnType<typeof getApiChatsGroupMessages>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiChatsGroupMessagesParams,
   options?: {
@@ -4898,7 +5181,7 @@ export function useGetApiChatsGroupMessages<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
@@ -4920,7 +5203,7 @@ export function useGetApiChatsGroupMessages<
 export const postApiChatsMessageDelivered = (
   messageDeliveredCommandRequest: MessageDeliveredCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -4930,13 +5213,13 @@ export const postApiChatsMessageDelivered = (
       data: messageDeliveredCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiChatsMessageDeliveredMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiChatsMessageDelivered>>,
@@ -4984,7 +5267,7 @@ export type PostApiChatsMessageDeliveredMutationError = ResultMessage[] | void;
  */
 export const usePostApiChatsMessageDelivered = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -4995,7 +5278,7 @@ export const usePostApiChatsMessageDelivered = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiChatsMessageDelivered>>,
   TError,
@@ -5014,7 +5297,7 @@ export const usePostApiChatsMessageDelivered = <
 export const postApiChatsMessageRead = (
   messageSeenCommandRequest: MessageSeenCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -5024,13 +5307,13 @@ export const postApiChatsMessageRead = (
       data: messageSeenCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiChatsMessageReadMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiChatsMessageRead>>,
@@ -5077,7 +5360,7 @@ export type PostApiChatsMessageReadMutationError = ResultMessage[] | void;
  */
 export const usePostApiChatsMessageRead = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -5088,7 +5371,7 @@ export const usePostApiChatsMessageRead = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiChatsMessageRead>>,
   TError,
@@ -5106,7 +5389,7 @@ export const usePostApiChatsMessageRead = <
 export const postApiChatsGenerateMagicLink = (
   generateMagicLinkCommandRequest: GenerateMagicLinkCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -5116,13 +5399,13 @@ export const postApiChatsGenerateMagicLink = (
       data: generateMagicLinkCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiChatsGenerateMagicLinkMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiChatsGenerateMagicLink>>,
@@ -5170,7 +5453,7 @@ export type PostApiChatsGenerateMagicLinkMutationError = ResultMessage[] | void;
  */
 export const usePostApiChatsGenerateMagicLink = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -5181,7 +5464,7 @@ export const usePostApiChatsGenerateMagicLink = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiChatsGenerateMagicLink>>,
   TError,
@@ -5200,16 +5483,16 @@ export const usePostApiChatsGenerateMagicLink = <
 export const getApiChatsValidateMagicLink = (
   params?: GetApiChatsValidateMagicLinkParams,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<GetGroupMessagesQueryResultIDataResult>(
     { url: `/api/chats/validate-magic-link`, method: "GET", params, signal },
-    options,
+    options
   );
 };
 
 export const getGetApiChatsValidateMagicLinkQueryKey = (
-  params?: GetApiChatsValidateMagicLinkParams,
+  params?: GetApiChatsValidateMagicLinkParams
 ) => {
   return [
     `/api/chats/validate-magic-link`,
@@ -5219,7 +5502,7 @@ export const getGetApiChatsValidateMagicLinkQueryKey = (
 
 export const getGetApiChatsValidateMagicLinkQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiChatsValidateMagicLink>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiChatsValidateMagicLinkParams,
   options?: {
@@ -5231,7 +5514,7 @@ export const getGetApiChatsValidateMagicLinkQueryOptions = <
       >
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -5263,7 +5546,7 @@ export type GetApiChatsValidateMagicLinkQueryError = ResultMessage[] | void;
 
 export function useGetApiChatsValidateMagicLink<
   TData = Awaited<ReturnType<typeof getApiChatsValidateMagicLink>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params: undefined | GetApiChatsValidateMagicLinkParams,
   options: {
@@ -5284,13 +5567,13 @@ export function useGetApiChatsValidateMagicLink<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiChatsValidateMagicLink<
   TData = Awaited<ReturnType<typeof getApiChatsValidateMagicLink>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiChatsValidateMagicLinkParams,
   options?: {
@@ -5311,13 +5594,13 @@ export function useGetApiChatsValidateMagicLink<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiChatsValidateMagicLink<
   TData = Awaited<ReturnType<typeof getApiChatsValidateMagicLink>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiChatsValidateMagicLinkParams,
   options?: {
@@ -5330,7 +5613,7 @@ export function useGetApiChatsValidateMagicLink<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -5340,7 +5623,7 @@ export function useGetApiChatsValidateMagicLink<
 
 export function useGetApiChatsValidateMagicLink<
   TData = Awaited<ReturnType<typeof getApiChatsValidateMagicLink>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiChatsValidateMagicLinkParams,
   options?: {
@@ -5353,13 +5636,13 @@ export function useGetApiChatsValidateMagicLink<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetApiChatsValidateMagicLinkQueryOptions(
     params,
-    options,
+    options
   );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
@@ -5378,7 +5661,7 @@ export function useGetApiChatsValidateMagicLink<
 export const postApiChatsInviteToGroup = (
   inviteToGroupCommandRequest: InviteToGroupCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -5388,13 +5671,13 @@ export const postApiChatsInviteToGroup = (
       data: inviteToGroupCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiChatsInviteToGroupMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiChatsInviteToGroup>>,
@@ -5441,7 +5724,7 @@ export type PostApiChatsInviteToGroupMutationError = ResultMessage[] | void;
  */
 export const usePostApiChatsInviteToGroup = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -5452,7 +5735,7 @@ export const usePostApiChatsInviteToGroup = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiChatsInviteToGroup>>,
   TError,
@@ -5470,7 +5753,7 @@ export const usePostApiChatsInviteToGroup = <
 export const postApiChatsAcceptGroupInvitation = (
   acceptGroupInvitationCommandRequest: AcceptGroupInvitationCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -5480,13 +5763,13 @@ export const postApiChatsAcceptGroupInvitation = (
       data: acceptGroupInvitationCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiChatsAcceptGroupInvitationMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiChatsAcceptGroupInvitation>>,
@@ -5536,7 +5819,7 @@ export type PostApiChatsAcceptGroupInvitationMutationError =
  */
 export const usePostApiChatsAcceptGroupInvitation = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -5547,7 +5830,7 @@ export const usePostApiChatsAcceptGroupInvitation = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiChatsAcceptGroupInvitation>>,
   TError,
@@ -5566,7 +5849,7 @@ export const usePostApiChatsAcceptGroupInvitation = <
 export const postApiChatsRejectGroupInvitation = (
   rejectGroupInvitationCommandRequest: RejectGroupInvitationCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -5576,13 +5859,13 @@ export const postApiChatsRejectGroupInvitation = (
       data: rejectGroupInvitationCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiChatsRejectGroupInvitationMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiChatsRejectGroupInvitation>>,
@@ -5632,7 +5915,7 @@ export type PostApiChatsRejectGroupInvitationMutationError =
  */
 export const usePostApiChatsRejectGroupInvitation = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -5643,7 +5926,7 @@ export const usePostApiChatsRejectGroupInvitation = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiChatsRejectGroupInvitation>>,
   TError,
@@ -5662,7 +5945,7 @@ export const usePostApiChatsRejectGroupInvitation = <
 export const postApiChatsArchive = (
   archiveChatCommandRequest: ArchiveChatCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -5672,13 +5955,13 @@ export const postApiChatsArchive = (
       data: archiveChatCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiChatsArchiveMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiChatsArchive>>,
@@ -5725,7 +6008,7 @@ export type PostApiChatsArchiveMutationError = ResultMessage[] | void;
  */
 export const usePostApiChatsArchive = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -5736,7 +6019,7 @@ export const usePostApiChatsArchive = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiChatsArchive>>,
   TError,
@@ -5754,7 +6037,7 @@ export const usePostApiChatsArchive = <
 export const postApiChatsUnarchive = (
   unarchiveChatCommandRequest: UnarchiveChatCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -5764,13 +6047,13 @@ export const postApiChatsUnarchive = (
       data: unarchiveChatCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiChatsUnarchiveMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiChatsUnarchive>>,
@@ -5817,7 +6100,7 @@ export type PostApiChatsUnarchiveMutationError = ResultMessage[] | void;
  */
 export const usePostApiChatsUnarchive = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -5828,7 +6111,7 @@ export const usePostApiChatsUnarchive = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiChatsUnarchive>>,
   TError,
@@ -5846,7 +6129,7 @@ export const usePostApiChatsUnarchive = <
 export const postApiChatsStartTyping = (
   startTypingCommandRequest: StartTypingCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -5856,13 +6139,13 @@ export const postApiChatsStartTyping = (
       data: startTypingCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiChatsStartTypingMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiChatsStartTyping>>,
@@ -5909,7 +6192,7 @@ export type PostApiChatsStartTypingMutationError = ResultMessage[] | void;
  */
 export const usePostApiChatsStartTyping = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -5920,7 +6203,7 @@ export const usePostApiChatsStartTyping = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiChatsStartTyping>>,
   TError,
@@ -5938,7 +6221,7 @@ export const usePostApiChatsStartTyping = <
 export const postApiChatsStopTyping = (
   stopTypingCommandRequest: StopTypingCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<IResult>(
     {
@@ -5948,13 +6231,13 @@ export const postApiChatsStopTyping = (
       data: stopTypingCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiChatsStopTypingMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiChatsStopTyping>>,
@@ -6001,7 +6284,7 @@ export type PostApiChatsStopTypingMutationError = ResultMessage[] | void;
  */
 export const usePostApiChatsStopTyping = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -6012,7 +6295,7 @@ export const usePostApiChatsStopTyping = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiChatsStopTyping>>,
   TError,
@@ -6030,7 +6313,7 @@ export const usePostApiChatsStopTyping = <
 export const postApiChatsUpload = (
   postApiChatsUploadBody: PostApiChatsUploadBody,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   const formData = new FormData();
   if (postApiChatsUploadBody.file !== undefined) {
@@ -6045,13 +6328,13 @@ export const postApiChatsUpload = (
       data: formData,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiChatsUploadMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiChatsUpload>>,
@@ -6098,7 +6381,7 @@ export type PostApiChatsUploadMutationError = ResultMessage[] | void;
  */
 export const usePostApiChatsUpload = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -6109,7 +6392,7 @@ export const usePostApiChatsUpload = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiChatsUpload>>,
   TError,
@@ -6127,23 +6410,23 @@ export const usePostApiChatsUpload = <
 export const getApiChatsGetUnreadCounts = (
   params?: GetApiChatsGetUnreadCountsParams,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<Int32IDataResult>(
     { url: `/api/chats/get-unread-counts`, method: "GET", params, signal },
-    options,
+    options
   );
 };
 
 export const getGetApiChatsGetUnreadCountsQueryKey = (
-  params?: GetApiChatsGetUnreadCountsParams,
+  params?: GetApiChatsGetUnreadCountsParams
 ) => {
   return [`/api/chats/get-unread-counts`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetApiChatsGetUnreadCountsQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiChatsGetUnreadCounts>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiChatsGetUnreadCountsParams,
   options?: {
@@ -6155,7 +6438,7 @@ export const getGetApiChatsGetUnreadCountsQueryOptions = <
       >
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -6187,7 +6470,7 @@ export type GetApiChatsGetUnreadCountsQueryError = ResultMessage[] | void;
 
 export function useGetApiChatsGetUnreadCounts<
   TData = Awaited<ReturnType<typeof getApiChatsGetUnreadCounts>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params: undefined | GetApiChatsGetUnreadCountsParams,
   options: {
@@ -6208,13 +6491,13 @@ export function useGetApiChatsGetUnreadCounts<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiChatsGetUnreadCounts<
   TData = Awaited<ReturnType<typeof getApiChatsGetUnreadCounts>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiChatsGetUnreadCountsParams,
   options?: {
@@ -6235,13 +6518,13 @@ export function useGetApiChatsGetUnreadCounts<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiChatsGetUnreadCounts<
   TData = Awaited<ReturnType<typeof getApiChatsGetUnreadCounts>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiChatsGetUnreadCountsParams,
   options?: {
@@ -6254,7 +6537,7 @@ export function useGetApiChatsGetUnreadCounts<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -6264,7 +6547,7 @@ export function useGetApiChatsGetUnreadCounts<
 
 export function useGetApiChatsGetUnreadCounts<
   TData = Awaited<ReturnType<typeof getApiChatsGetUnreadCounts>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiChatsGetUnreadCountsParams,
   options?: {
@@ -6277,13 +6560,13 @@ export function useGetApiChatsGetUnreadCounts<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetApiChatsGetUnreadCountsQueryOptions(
     params,
-    options,
+    options
   );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
@@ -6302,7 +6585,7 @@ export function useGetApiChatsGetUnreadCounts<
 export const postApiContactsCreate = (
   createContactCommandRequest: CreateContactCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<SuccessResult>(
     {
@@ -6312,13 +6595,13 @@ export const postApiContactsCreate = (
       data: createContactCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiContactsCreateMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiContactsCreate>>,
@@ -6365,7 +6648,7 @@ export type PostApiContactsCreateMutationError = ResultMessage[] | void;
  */
 export const usePostApiContactsCreate = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -6376,7 +6659,7 @@ export const usePostApiContactsCreate = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiContactsCreate>>,
   TError,
@@ -6394,7 +6677,7 @@ export const usePostApiContactsCreate = <
 export const postApiContactsUpdate = (
   updateContactCommandRequest: UpdateContactCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<SuccessResult>(
     {
@@ -6404,13 +6687,13 @@ export const postApiContactsUpdate = (
       data: updateContactCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiContactsUpdateMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiContactsUpdate>>,
@@ -6457,7 +6740,7 @@ export type PostApiContactsUpdateMutationError = ResultMessage[] | void;
  */
 export const usePostApiContactsUpdate = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -6468,7 +6751,7 @@ export const usePostApiContactsUpdate = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiContactsUpdate>>,
   TError,
@@ -6485,17 +6768,17 @@ export const usePostApiContactsUpdate = <
  */
 export const deleteApiContactsDelete = (
   params?: DeleteApiContactsDeleteParams,
-  options?: SecondParameter<typeof AxiosInstance>,
+  options?: SecondParameter<typeof AxiosInstance>
 ) => {
   return AxiosInstance<SuccessResult>(
     { url: `/api/contacts/delete`, method: "DELETE", params },
-    options,
+    options
   );
 };
 
 export const getDeleteApiContactsDeleteMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deleteApiContactsDelete>>,
@@ -6542,7 +6825,7 @@ export type DeleteApiContactsDeleteMutationError = ResultMessage[] | void;
  */
 export const useDeleteApiContactsDelete = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -6553,7 +6836,7 @@ export const useDeleteApiContactsDelete = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof deleteApiContactsDelete>>,
   TError,
@@ -6570,11 +6853,11 @@ export const useDeleteApiContactsDelete = <
  */
 export const getApiContactsList = (
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<ContactDtoListIDataResult>(
     { url: `/api/contacts/list`, method: "GET", signal },
-    options,
+    options
   );
 };
 
@@ -6584,7 +6867,7 @@ export const getGetApiContactsListQueryKey = () => {
 
 export const getGetApiContactsListQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiContactsList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(options?: {
   query?: Partial<
     UseQueryOptions<
@@ -6623,7 +6906,7 @@ export type GetApiContactsListQueryError = ResultMessage[] | void;
 
 export function useGetApiContactsList<
   TData = Awaited<ReturnType<typeof getApiContactsList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   options: {
     query: Partial<
@@ -6643,13 +6926,13 @@ export function useGetApiContactsList<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiContactsList<
   TData = Awaited<ReturnType<typeof getApiContactsList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   options?: {
     query?: Partial<
@@ -6669,13 +6952,13 @@ export function useGetApiContactsList<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiContactsList<
   TData = Awaited<ReturnType<typeof getApiContactsList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   options?: {
     query?: Partial<
@@ -6687,7 +6970,7 @@ export function useGetApiContactsList<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -6697,7 +6980,7 @@ export function useGetApiContactsList<
 
 export function useGetApiContactsList<
   TData = Awaited<ReturnType<typeof getApiContactsList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   options?: {
     query?: Partial<
@@ -6709,7 +6992,7 @@ export function useGetApiContactsList<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
@@ -6731,7 +7014,7 @@ export function useGetApiContactsList<
 export const postApiFaqsCreate = (
   createFaqCommandRequest: CreateFaqCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<SuccessResult>(
     {
@@ -6741,13 +7024,13 @@ export const postApiFaqsCreate = (
       data: createFaqCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiFaqsCreateMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiFaqsCreate>>,
@@ -6794,7 +7077,7 @@ export type PostApiFaqsCreateMutationError = ResultMessage[] | void;
  */
 export const usePostApiFaqsCreate = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -6805,7 +7088,7 @@ export const usePostApiFaqsCreate = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiFaqsCreate>>,
   TError,
@@ -6823,7 +7106,7 @@ export const usePostApiFaqsCreate = <
 export const postApiFaqsUpdate = (
   updateFaqCommandRequest: UpdateFaqCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<SuccessResult>(
     {
@@ -6833,13 +7116,13 @@ export const postApiFaqsUpdate = (
       data: updateFaqCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiFaqsUpdateMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiFaqsUpdate>>,
@@ -6886,7 +7169,7 @@ export type PostApiFaqsUpdateMutationError = ResultMessage[] | void;
  */
 export const usePostApiFaqsUpdate = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -6897,7 +7180,7 @@ export const usePostApiFaqsUpdate = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiFaqsUpdate>>,
   TError,
@@ -6914,17 +7197,17 @@ export const usePostApiFaqsUpdate = <
  */
 export const deleteApiFaqsDelete = (
   params?: DeleteApiFaqsDeleteParams,
-  options?: SecondParameter<typeof AxiosInstance>,
+  options?: SecondParameter<typeof AxiosInstance>
 ) => {
   return AxiosInstance<SuccessResult>(
     { url: `/api/faqs/delete`, method: "DELETE", params },
-    options,
+    options
   );
 };
 
 export const getDeleteApiFaqsDeleteMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deleteApiFaqsDelete>>,
@@ -6971,7 +7254,7 @@ export type DeleteApiFaqsDeleteMutationError = ResultMessage[] | void;
  */
 export const useDeleteApiFaqsDelete = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -6982,7 +7265,7 @@ export const useDeleteApiFaqsDelete = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof deleteApiFaqsDelete>>,
   TError,
@@ -7000,11 +7283,11 @@ export const useDeleteApiFaqsDelete = <
 export const getApiFaqsGet = (
   params?: GetApiFaqsGetParams,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<FaqIDataResult>(
     { url: `/api/faqs/get`, method: "GET", params, signal },
-    options,
+    options
   );
 };
 
@@ -7014,7 +7297,7 @@ export const getGetApiFaqsGetQueryKey = (params?: GetApiFaqsGetParams) => {
 
 export const getGetApiFaqsGetQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiFaqsGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiFaqsGetParams,
   options?: {
@@ -7022,7 +7305,7 @@ export const getGetApiFaqsGetQueryOptions = <
       UseQueryOptions<Awaited<ReturnType<typeof getApiFaqsGet>>, TError, TData>
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -7052,7 +7335,7 @@ export type GetApiFaqsGetQueryError = ResultMessage[] | void;
 
 export function useGetApiFaqsGet<
   TData = Awaited<ReturnType<typeof getApiFaqsGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params: undefined | GetApiFaqsGetParams,
   options: {
@@ -7069,13 +7352,13 @@ export function useGetApiFaqsGet<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiFaqsGet<
   TData = Awaited<ReturnType<typeof getApiFaqsGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiFaqsGetParams,
   options?: {
@@ -7092,13 +7375,13 @@ export function useGetApiFaqsGet<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiFaqsGet<
   TData = Awaited<ReturnType<typeof getApiFaqsGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiFaqsGetParams,
   options?: {
@@ -7107,7 +7390,7 @@ export function useGetApiFaqsGet<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -7117,7 +7400,7 @@ export function useGetApiFaqsGet<
 
 export function useGetApiFaqsGet<
   TData = Awaited<ReturnType<typeof getApiFaqsGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiFaqsGetParams,
   options?: {
@@ -7126,7 +7409,7 @@ export function useGetApiFaqsGet<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
@@ -7148,11 +7431,11 @@ export function useGetApiFaqsGet<
 export const getApiFaqsList = (
   params?: GetApiFaqsListParams,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<FaqDtoListPaginatedResult>(
     { url: `/api/faqs/list`, method: "GET", params, signal },
-    options,
+    options
   );
 };
 
@@ -7162,7 +7445,7 @@ export const getGetApiFaqsListQueryKey = (params?: GetApiFaqsListParams) => {
 
 export const getGetApiFaqsListQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiFaqsList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiFaqsListParams,
   options?: {
@@ -7170,7 +7453,7 @@ export const getGetApiFaqsListQueryOptions = <
       UseQueryOptions<Awaited<ReturnType<typeof getApiFaqsList>>, TError, TData>
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -7200,7 +7483,7 @@ export type GetApiFaqsListQueryError = ResultMessage[] | void;
 
 export function useGetApiFaqsList<
   TData = Awaited<ReturnType<typeof getApiFaqsList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params: undefined | GetApiFaqsListParams,
   options: {
@@ -7217,13 +7500,13 @@ export function useGetApiFaqsList<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiFaqsList<
   TData = Awaited<ReturnType<typeof getApiFaqsList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiFaqsListParams,
   options?: {
@@ -7240,13 +7523,13 @@ export function useGetApiFaqsList<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiFaqsList<
   TData = Awaited<ReturnType<typeof getApiFaqsList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiFaqsListParams,
   options?: {
@@ -7255,7 +7538,7 @@ export function useGetApiFaqsList<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -7265,7 +7548,7 @@ export function useGetApiFaqsList<
 
 export function useGetApiFaqsList<
   TData = Awaited<ReturnType<typeof getApiFaqsList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiFaqsListParams,
   options?: {
@@ -7274,7 +7557,7 @@ export function useGetApiFaqsList<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
@@ -7296,7 +7579,7 @@ export function useGetApiFaqsList<
 export const postApiInAppPurchaseValidateGoogleReceipt = (
   validateGoogleReceiptCommandRequest: ValidateGoogleReceiptCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<SuccessResult>(
     {
@@ -7306,13 +7589,13 @@ export const postApiInAppPurchaseValidateGoogleReceipt = (
       data: validateGoogleReceiptCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiInAppPurchaseValidateGoogleReceiptMutationOptions = <
   TError = ResultMessage[],
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiInAppPurchaseValidateGoogleReceipt>>,
@@ -7362,7 +7645,7 @@ export type PostApiInAppPurchaseValidateGoogleReceiptMutationError =
  */
 export const usePostApiInAppPurchaseValidateGoogleReceipt = <
   TError = ResultMessage[],
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -7373,7 +7656,7 @@ export const usePostApiInAppPurchaseValidateGoogleReceipt = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiInAppPurchaseValidateGoogleReceipt>>,
   TError,
@@ -7392,7 +7675,7 @@ export const usePostApiInAppPurchaseValidateGoogleReceipt = <
 export const postApiInAppPurchaseValidateAppleReceipt = (
   validateAppleReceiptCommandRequest: ValidateAppleReceiptCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<SuccessResult>(
     {
@@ -7402,13 +7685,13 @@ export const postApiInAppPurchaseValidateAppleReceipt = (
       data: validateAppleReceiptCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiInAppPurchaseValidateAppleReceiptMutationOptions = <
   TError = ResultMessage[],
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiInAppPurchaseValidateAppleReceipt>>,
@@ -7458,7 +7741,7 @@ export type PostApiInAppPurchaseValidateAppleReceiptMutationError =
  */
 export const usePostApiInAppPurchaseValidateAppleReceipt = <
   TError = ResultMessage[],
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -7469,7 +7752,7 @@ export const usePostApiInAppPurchaseValidateAppleReceipt = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiInAppPurchaseValidateAppleReceipt>>,
   TError,
@@ -7488,7 +7771,7 @@ export const usePostApiInAppPurchaseValidateAppleReceipt = <
 export const getApiInvoicesGetPdf = (
   params?: GetApiInvoicesGetPdfParams,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<Blob>(
     {
@@ -7498,19 +7781,19 @@ export const getApiInvoicesGetPdf = (
       responseType: "blob",
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getGetApiInvoicesGetPdfQueryKey = (
-  params?: GetApiInvoicesGetPdfParams,
+  params?: GetApiInvoicesGetPdfParams
 ) => {
   return [`/api/invoices/get-pdf`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetApiInvoicesGetPdfQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiInvoicesGetPdf>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiInvoicesGetPdfParams,
   options?: {
@@ -7522,7 +7805,7 @@ export const getGetApiInvoicesGetPdfQueryOptions = <
       >
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -7553,7 +7836,7 @@ export type GetApiInvoicesGetPdfQueryError = ResultMessage[] | void;
 
 export function useGetApiInvoicesGetPdf<
   TData = Awaited<ReturnType<typeof getApiInvoicesGetPdf>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params: undefined | GetApiInvoicesGetPdfParams,
   options: {
@@ -7574,13 +7857,13 @@ export function useGetApiInvoicesGetPdf<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiInvoicesGetPdf<
   TData = Awaited<ReturnType<typeof getApiInvoicesGetPdf>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiInvoicesGetPdfParams,
   options?: {
@@ -7601,13 +7884,13 @@ export function useGetApiInvoicesGetPdf<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiInvoicesGetPdf<
   TData = Awaited<ReturnType<typeof getApiInvoicesGetPdf>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiInvoicesGetPdfParams,
   options?: {
@@ -7620,7 +7903,7 @@ export function useGetApiInvoicesGetPdf<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -7630,7 +7913,7 @@ export function useGetApiInvoicesGetPdf<
 
 export function useGetApiInvoicesGetPdf<
   TData = Awaited<ReturnType<typeof getApiInvoicesGetPdf>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiInvoicesGetPdfParams,
   options?: {
@@ -7643,7 +7926,7 @@ export function useGetApiInvoicesGetPdf<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
@@ -7665,23 +7948,23 @@ export function useGetApiInvoicesGetPdf<
 export const getApiInvoicesGet = (
   params?: GetApiInvoicesGetParams,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<InvoiceDetailDtoIDataResult>(
     { url: `/api/invoices/get`, method: "GET", params, signal },
-    options,
+    options
   );
 };
 
 export const getGetApiInvoicesGetQueryKey = (
-  params?: GetApiInvoicesGetParams,
+  params?: GetApiInvoicesGetParams
 ) => {
   return [`/api/invoices/get`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetApiInvoicesGetQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiInvoicesGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiInvoicesGetParams,
   options?: {
@@ -7693,7 +7976,7 @@ export const getGetApiInvoicesGetQueryOptions = <
       >
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -7724,7 +8007,7 @@ export type GetApiInvoicesGetQueryError = ResultMessage[] | void;
 
 export function useGetApiInvoicesGet<
   TData = Awaited<ReturnType<typeof getApiInvoicesGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params: undefined | GetApiInvoicesGetParams,
   options: {
@@ -7745,13 +8028,13 @@ export function useGetApiInvoicesGet<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiInvoicesGet<
   TData = Awaited<ReturnType<typeof getApiInvoicesGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiInvoicesGetParams,
   options?: {
@@ -7772,13 +8055,13 @@ export function useGetApiInvoicesGet<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiInvoicesGet<
   TData = Awaited<ReturnType<typeof getApiInvoicesGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiInvoicesGetParams,
   options?: {
@@ -7791,7 +8074,7 @@ export function useGetApiInvoicesGet<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -7801,7 +8084,7 @@ export function useGetApiInvoicesGet<
 
 export function useGetApiInvoicesGet<
   TData = Awaited<ReturnType<typeof getApiInvoicesGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiInvoicesGetParams,
   options?: {
@@ -7814,7 +8097,7 @@ export function useGetApiInvoicesGet<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
@@ -7836,7 +8119,7 @@ export function useGetApiInvoicesGet<
 export const postApiInvoicesChangeStatus = (
   changeInvoiceStatusCommandRequest: ChangeInvoiceStatusCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<SuccessResult>(
     {
@@ -7846,13 +8129,13 @@ export const postApiInvoicesChangeStatus = (
       data: changeInvoiceStatusCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiInvoicesChangeStatusMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiInvoicesChangeStatus>>,
@@ -7900,7 +8183,7 @@ export type PostApiInvoicesChangeStatusMutationError = ResultMessage[] | void;
  */
 export const usePostApiInvoicesChangeStatus = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -7911,7 +8194,7 @@ export const usePostApiInvoicesChangeStatus = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiInvoicesChangeStatus>>,
   TError,
@@ -7930,23 +8213,23 @@ export const usePostApiInvoicesChangeStatus = <
 export const getApiInvoicesList = (
   params?: GetApiInvoicesListParams,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<InvoiceDtoListPaginatedResult>(
     { url: `/api/invoices/list`, method: "GET", params, signal },
-    options,
+    options
   );
 };
 
 export const getGetApiInvoicesListQueryKey = (
-  params?: GetApiInvoicesListParams,
+  params?: GetApiInvoicesListParams
 ) => {
   return [`/api/invoices/list`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetApiInvoicesListQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiInvoicesList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiInvoicesListParams,
   options?: {
@@ -7958,7 +8241,7 @@ export const getGetApiInvoicesListQueryOptions = <
       >
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -7989,7 +8272,7 @@ export type GetApiInvoicesListQueryError = ResultMessage[] | void;
 
 export function useGetApiInvoicesList<
   TData = Awaited<ReturnType<typeof getApiInvoicesList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params: undefined | GetApiInvoicesListParams,
   options: {
@@ -8010,13 +8293,13 @@ export function useGetApiInvoicesList<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiInvoicesList<
   TData = Awaited<ReturnType<typeof getApiInvoicesList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiInvoicesListParams,
   options?: {
@@ -8037,13 +8320,13 @@ export function useGetApiInvoicesList<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiInvoicesList<
   TData = Awaited<ReturnType<typeof getApiInvoicesList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiInvoicesListParams,
   options?: {
@@ -8056,7 +8339,7 @@ export function useGetApiInvoicesList<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -8066,7 +8349,7 @@ export function useGetApiInvoicesList<
 
 export function useGetApiInvoicesList<
   TData = Awaited<ReturnType<typeof getApiInvoicesList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiInvoicesListParams,
   options?: {
@@ -8079,7 +8362,7 @@ export function useGetApiInvoicesList<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
@@ -8101,7 +8384,7 @@ export function useGetApiInvoicesList<
 export const postApiLicensesCreate = (
   createLicenseCommandRequest: CreateLicenseCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<SuccessResult>(
     {
@@ -8111,13 +8394,13 @@ export const postApiLicensesCreate = (
       data: createLicenseCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiLicensesCreateMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiLicensesCreate>>,
@@ -8164,7 +8447,7 @@ export type PostApiLicensesCreateMutationError = ResultMessage[] | void;
  */
 export const usePostApiLicensesCreate = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -8175,7 +8458,7 @@ export const usePostApiLicensesCreate = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiLicensesCreate>>,
   TError,
@@ -8193,7 +8476,7 @@ export const usePostApiLicensesCreate = <
 export const postApiLicensesAddTransaction = (
   addTransactionToLicenseCommandRequest: AddTransactionToLicenseCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<SuccessResult>(
     {
@@ -8203,13 +8486,13 @@ export const postApiLicensesAddTransaction = (
       data: addTransactionToLicenseCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiLicensesAddTransactionMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiLicensesAddTransaction>>,
@@ -8257,7 +8540,7 @@ export type PostApiLicensesAddTransactionMutationError = ResultMessage[] | void;
  */
 export const usePostApiLicensesAddTransaction = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -8268,7 +8551,7 @@ export const usePostApiLicensesAddTransaction = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiLicensesAddTransaction>>,
   TError,
@@ -8287,7 +8570,7 @@ export const usePostApiLicensesAddTransaction = <
 export const getApiLicensesGetInvoicePdf = (
   params?: GetApiLicensesGetInvoicePdfParams,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<Blob>(
     {
@@ -8297,12 +8580,12 @@ export const getApiLicensesGetInvoicePdf = (
       responseType: "blob",
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getGetApiLicensesGetInvoicePdfQueryKey = (
-  params?: GetApiLicensesGetInvoicePdfParams,
+  params?: GetApiLicensesGetInvoicePdfParams
 ) => {
   return [
     `/api/licenses/get-invoice-pdf`,
@@ -8312,7 +8595,7 @@ export const getGetApiLicensesGetInvoicePdfQueryKey = (
 
 export const getGetApiLicensesGetInvoicePdfQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiLicensesGetInvoicePdf>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiLicensesGetInvoicePdfParams,
   options?: {
@@ -8324,7 +8607,7 @@ export const getGetApiLicensesGetInvoicePdfQueryOptions = <
       >
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -8356,7 +8639,7 @@ export type GetApiLicensesGetInvoicePdfQueryError = ResultMessage[] | void;
 
 export function useGetApiLicensesGetInvoicePdf<
   TData = Awaited<ReturnType<typeof getApiLicensesGetInvoicePdf>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params: undefined | GetApiLicensesGetInvoicePdfParams,
   options: {
@@ -8377,13 +8660,13 @@ export function useGetApiLicensesGetInvoicePdf<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiLicensesGetInvoicePdf<
   TData = Awaited<ReturnType<typeof getApiLicensesGetInvoicePdf>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiLicensesGetInvoicePdfParams,
   options?: {
@@ -8404,13 +8687,13 @@ export function useGetApiLicensesGetInvoicePdf<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiLicensesGetInvoicePdf<
   TData = Awaited<ReturnType<typeof getApiLicensesGetInvoicePdf>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiLicensesGetInvoicePdfParams,
   options?: {
@@ -8423,7 +8706,7 @@ export function useGetApiLicensesGetInvoicePdf<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -8433,7 +8716,7 @@ export function useGetApiLicensesGetInvoicePdf<
 
 export function useGetApiLicensesGetInvoicePdf<
   TData = Awaited<ReturnType<typeof getApiLicensesGetInvoicePdf>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiLicensesGetInvoicePdfParams,
   options?: {
@@ -8446,13 +8729,13 @@ export function useGetApiLicensesGetInvoicePdf<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetApiLicensesGetInvoicePdfQueryOptions(
     params,
-    options,
+    options
   );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
@@ -8471,16 +8754,16 @@ export function useGetApiLicensesGetInvoicePdf<
 export const getApiLicensesGetInvoiceDetails = (
   params?: GetApiLicensesGetInvoiceDetailsParams,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<InvoiceIDataResult>(
     { url: `/api/licenses/get-invoice-details`, method: "GET", params, signal },
-    options,
+    options
   );
 };
 
 export const getGetApiLicensesGetInvoiceDetailsQueryKey = (
-  params?: GetApiLicensesGetInvoiceDetailsParams,
+  params?: GetApiLicensesGetInvoiceDetailsParams
 ) => {
   return [
     `/api/licenses/get-invoice-details`,
@@ -8490,7 +8773,7 @@ export const getGetApiLicensesGetInvoiceDetailsQueryKey = (
 
 export const getGetApiLicensesGetInvoiceDetailsQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiLicensesGetInvoiceDetails>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiLicensesGetInvoiceDetailsParams,
   options?: {
@@ -8502,7 +8785,7 @@ export const getGetApiLicensesGetInvoiceDetailsQueryOptions = <
       >
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -8535,7 +8818,7 @@ export type GetApiLicensesGetInvoiceDetailsQueryError = ResultMessage[] | void;
 
 export function useGetApiLicensesGetInvoiceDetails<
   TData = Awaited<ReturnType<typeof getApiLicensesGetInvoiceDetails>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params: undefined | GetApiLicensesGetInvoiceDetailsParams,
   options: {
@@ -8556,13 +8839,13 @@ export function useGetApiLicensesGetInvoiceDetails<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiLicensesGetInvoiceDetails<
   TData = Awaited<ReturnType<typeof getApiLicensesGetInvoiceDetails>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiLicensesGetInvoiceDetailsParams,
   options?: {
@@ -8583,13 +8866,13 @@ export function useGetApiLicensesGetInvoiceDetails<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiLicensesGetInvoiceDetails<
   TData = Awaited<ReturnType<typeof getApiLicensesGetInvoiceDetails>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiLicensesGetInvoiceDetailsParams,
   options?: {
@@ -8602,7 +8885,7 @@ export function useGetApiLicensesGetInvoiceDetails<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -8612,7 +8895,7 @@ export function useGetApiLicensesGetInvoiceDetails<
 
 export function useGetApiLicensesGetInvoiceDetails<
   TData = Awaited<ReturnType<typeof getApiLicensesGetInvoiceDetails>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiLicensesGetInvoiceDetailsParams,
   options?: {
@@ -8625,13 +8908,13 @@ export function useGetApiLicensesGetInvoiceDetails<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetApiLicensesGetInvoiceDetailsQueryOptions(
     params,
-    options,
+    options
   );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
@@ -8650,7 +8933,7 @@ export function useGetApiLicensesGetInvoiceDetails<
 export const postApiLicensesChangeStatus = (
   changeLicenseStatusCommandRequest: ChangeLicenseStatusCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<SuccessResult>(
     {
@@ -8660,13 +8943,13 @@ export const postApiLicensesChangeStatus = (
       data: changeLicenseStatusCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiLicensesChangeStatusMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiLicensesChangeStatus>>,
@@ -8714,7 +8997,7 @@ export type PostApiLicensesChangeStatusMutationError = ResultMessage[] | void;
  */
 export const usePostApiLicensesChangeStatus = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -8725,7 +9008,7 @@ export const usePostApiLicensesChangeStatus = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiLicensesChangeStatus>>,
   TError,
@@ -8743,17 +9026,17 @@ export const usePostApiLicensesChangeStatus = <
  */
 export const deleteApiLicensesDelete = (
   params?: DeleteApiLicensesDeleteParams,
-  options?: SecondParameter<typeof AxiosInstance>,
+  options?: SecondParameter<typeof AxiosInstance>
 ) => {
   return AxiosInstance<SuccessResult>(
     { url: `/api/licenses/delete`, method: "DELETE", params },
-    options,
+    options
   );
 };
 
 export const getDeleteApiLicensesDeleteMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deleteApiLicensesDelete>>,
@@ -8800,7 +9083,7 @@ export type DeleteApiLicensesDeleteMutationError = ResultMessage[] | void;
  */
 export const useDeleteApiLicensesDelete = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -8811,7 +9094,7 @@ export const useDeleteApiLicensesDelete = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof deleteApiLicensesDelete>>,
   TError,
@@ -8829,23 +9112,23 @@ export const useDeleteApiLicensesDelete = <
 export const getApiLicensesList = (
   params?: GetApiLicensesListParams,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<LicenseDtoListPaginatedResult>(
     { url: `/api/licenses/list`, method: "GET", params, signal },
-    options,
+    options
   );
 };
 
 export const getGetApiLicensesListQueryKey = (
-  params?: GetApiLicensesListParams,
+  params?: GetApiLicensesListParams
 ) => {
   return [`/api/licenses/list`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetApiLicensesListQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiLicensesList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiLicensesListParams,
   options?: {
@@ -8857,7 +9140,7 @@ export const getGetApiLicensesListQueryOptions = <
       >
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -8888,7 +9171,7 @@ export type GetApiLicensesListQueryError = ResultMessage[] | void;
 
 export function useGetApiLicensesList<
   TData = Awaited<ReturnType<typeof getApiLicensesList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params: undefined | GetApiLicensesListParams,
   options: {
@@ -8909,13 +9192,13 @@ export function useGetApiLicensesList<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiLicensesList<
   TData = Awaited<ReturnType<typeof getApiLicensesList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiLicensesListParams,
   options?: {
@@ -8936,13 +9219,13 @@ export function useGetApiLicensesList<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiLicensesList<
   TData = Awaited<ReturnType<typeof getApiLicensesList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiLicensesListParams,
   options?: {
@@ -8955,7 +9238,7 @@ export function useGetApiLicensesList<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -8965,7 +9248,7 @@ export function useGetApiLicensesList<
 
 export function useGetApiLicensesList<
   TData = Awaited<ReturnType<typeof getApiLicensesList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiLicensesListParams,
   options?: {
@@ -8978,7 +9261,7 @@ export function useGetApiLicensesList<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
@@ -9000,23 +9283,23 @@ export function useGetApiLicensesList<
 export const getApiLicensesGet = (
   params?: GetApiLicensesGetParams,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<LicenseDetailDtoIDataResult>(
     { url: `/api/licenses/get`, method: "GET", params, signal },
-    options,
+    options
   );
 };
 
 export const getGetApiLicensesGetQueryKey = (
-  params?: GetApiLicensesGetParams,
+  params?: GetApiLicensesGetParams
 ) => {
   return [`/api/licenses/get`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetApiLicensesGetQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiLicensesGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiLicensesGetParams,
   options?: {
@@ -9028,7 +9311,7 @@ export const getGetApiLicensesGetQueryOptions = <
       >
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -9059,7 +9342,7 @@ export type GetApiLicensesGetQueryError = ResultMessage[] | void;
 
 export function useGetApiLicensesGet<
   TData = Awaited<ReturnType<typeof getApiLicensesGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params: undefined | GetApiLicensesGetParams,
   options: {
@@ -9080,13 +9363,13 @@ export function useGetApiLicensesGet<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiLicensesGet<
   TData = Awaited<ReturnType<typeof getApiLicensesGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiLicensesGetParams,
   options?: {
@@ -9107,13 +9390,13 @@ export function useGetApiLicensesGet<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiLicensesGet<
   TData = Awaited<ReturnType<typeof getApiLicensesGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiLicensesGetParams,
   options?: {
@@ -9126,7 +9409,7 @@ export function useGetApiLicensesGet<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -9136,7 +9419,7 @@ export function useGetApiLicensesGet<
 
 export function useGetApiLicensesGet<
   TData = Awaited<ReturnType<typeof getApiLicensesGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiLicensesGetParams,
   options?: {
@@ -9149,7 +9432,7 @@ export function useGetApiLicensesGet<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
@@ -9170,11 +9453,11 @@ export function useGetApiLicensesGet<
  */
 export const getApiLogs = (
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<LogDto[]>(
     { url: `/api/logs`, method: "GET", signal },
-    options,
+    options
   );
 };
 
@@ -9184,7 +9467,7 @@ export const getGetApiLogsQueryKey = () => {
 
 export const getGetApiLogsQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiLogs>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(options?: {
   query?: Partial<
     UseQueryOptions<Awaited<ReturnType<typeof getApiLogs>>, TError, TData>
@@ -9219,7 +9502,7 @@ export type GetApiLogsQueryError = ResultMessage[] | void;
 
 export function useGetApiLogs<
   TData = Awaited<ReturnType<typeof getApiLogs>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   options: {
     query: Partial<
@@ -9235,13 +9518,13 @@ export function useGetApiLogs<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiLogs<
   TData = Awaited<ReturnType<typeof getApiLogs>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   options?: {
     query?: Partial<
@@ -9257,13 +9540,13 @@ export function useGetApiLogs<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiLogs<
   TData = Awaited<ReturnType<typeof getApiLogs>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   options?: {
     query?: Partial<
@@ -9271,7 +9554,7 @@ export function useGetApiLogs<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -9281,7 +9564,7 @@ export function useGetApiLogs<
 
 export function useGetApiLogs<
   TData = Awaited<ReturnType<typeof getApiLogs>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   options?: {
     query?: Partial<
@@ -9289,7 +9572,7 @@ export function useGetApiLogs<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
@@ -9311,16 +9594,16 @@ export function useGetApiLogs<
 export const getApiStatisticsGetTotalIncome = (
   params?: GetApiStatisticsGetTotalIncomeParams,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<StatisticsDecimalResultIDataResult>(
     { url: `/api/statistics/get-total-income`, method: "GET", params, signal },
-    options,
+    options
   );
 };
 
 export const getGetApiStatisticsGetTotalIncomeQueryKey = (
-  params?: GetApiStatisticsGetTotalIncomeParams,
+  params?: GetApiStatisticsGetTotalIncomeParams
 ) => {
   return [
     `/api/statistics/get-total-income`,
@@ -9330,7 +9613,7 @@ export const getGetApiStatisticsGetTotalIncomeQueryKey = (
 
 export const getGetApiStatisticsGetTotalIncomeQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalIncome>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiStatisticsGetTotalIncomeParams,
   options?: {
@@ -9342,7 +9625,7 @@ export const getGetApiStatisticsGetTotalIncomeQueryOptions = <
       >
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -9374,7 +9657,7 @@ export type GetApiStatisticsGetTotalIncomeQueryError = ResultMessage[] | void;
 
 export function useGetApiStatisticsGetTotalIncome<
   TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalIncome>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params: undefined | GetApiStatisticsGetTotalIncomeParams,
   options: {
@@ -9395,13 +9678,13 @@ export function useGetApiStatisticsGetTotalIncome<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiStatisticsGetTotalIncome<
   TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalIncome>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiStatisticsGetTotalIncomeParams,
   options?: {
@@ -9422,13 +9705,13 @@ export function useGetApiStatisticsGetTotalIncome<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiStatisticsGetTotalIncome<
   TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalIncome>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiStatisticsGetTotalIncomeParams,
   options?: {
@@ -9441,7 +9724,7 @@ export function useGetApiStatisticsGetTotalIncome<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -9451,7 +9734,7 @@ export function useGetApiStatisticsGetTotalIncome<
 
 export function useGetApiStatisticsGetTotalIncome<
   TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalIncome>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiStatisticsGetTotalIncomeParams,
   options?: {
@@ -9464,13 +9747,13 @@ export function useGetApiStatisticsGetTotalIncome<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetApiStatisticsGetTotalIncomeQueryOptions(
     params,
-    options,
+    options
   );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
@@ -9489,7 +9772,7 @@ export function useGetApiStatisticsGetTotalIncome<
 export const getApiStatisticsGetTotalActiveLicenses = (
   params?: GetApiStatisticsGetTotalActiveLicensesParams,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<StatisticsResultIDataResult>(
     {
@@ -9498,12 +9781,12 @@ export const getApiStatisticsGetTotalActiveLicenses = (
       params,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getGetApiStatisticsGetTotalActiveLicensesQueryKey = (
-  params?: GetApiStatisticsGetTotalActiveLicensesParams,
+  params?: GetApiStatisticsGetTotalActiveLicensesParams
 ) => {
   return [
     `/api/statistics/get-total-active-licenses`,
@@ -9513,7 +9796,7 @@ export const getGetApiStatisticsGetTotalActiveLicensesQueryKey = (
 
 export const getGetApiStatisticsGetTotalActiveLicensesQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveLicenses>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiStatisticsGetTotalActiveLicensesParams,
   options?: {
@@ -9525,7 +9808,7 @@ export const getGetApiStatisticsGetTotalActiveLicensesQueryOptions = <
       >
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -9560,7 +9843,7 @@ export type GetApiStatisticsGetTotalActiveLicensesQueryError =
 
 export function useGetApiStatisticsGetTotalActiveLicenses<
   TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveLicenses>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params: undefined | GetApiStatisticsGetTotalActiveLicensesParams,
   options: {
@@ -9581,13 +9864,13 @@ export function useGetApiStatisticsGetTotalActiveLicenses<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiStatisticsGetTotalActiveLicenses<
   TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveLicenses>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiStatisticsGetTotalActiveLicensesParams,
   options?: {
@@ -9608,13 +9891,13 @@ export function useGetApiStatisticsGetTotalActiveLicenses<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiStatisticsGetTotalActiveLicenses<
   TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveLicenses>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiStatisticsGetTotalActiveLicensesParams,
   options?: {
@@ -9627,7 +9910,7 @@ export function useGetApiStatisticsGetTotalActiveLicenses<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -9637,7 +9920,7 @@ export function useGetApiStatisticsGetTotalActiveLicenses<
 
 export function useGetApiStatisticsGetTotalActiveLicenses<
   TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveLicenses>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiStatisticsGetTotalActiveLicensesParams,
   options?: {
@@ -9650,13 +9933,13 @@ export function useGetApiStatisticsGetTotalActiveLicenses<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetApiStatisticsGetTotalActiveLicensesQueryOptions(
     params,
-    options,
+    options
   );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
@@ -9675,7 +9958,7 @@ export function useGetApiStatisticsGetTotalActiveLicenses<
 export const getApiStatisticsGetTotalActiveAccounts = (
   params?: GetApiStatisticsGetTotalActiveAccountsParams,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<StatisticsResultIDataResult>(
     {
@@ -9684,12 +9967,12 @@ export const getApiStatisticsGetTotalActiveAccounts = (
       params,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getGetApiStatisticsGetTotalActiveAccountsQueryKey = (
-  params?: GetApiStatisticsGetTotalActiveAccountsParams,
+  params?: GetApiStatisticsGetTotalActiveAccountsParams
 ) => {
   return [
     `/api/statistics/get-total-active-accounts`,
@@ -9699,7 +9982,7 @@ export const getGetApiStatisticsGetTotalActiveAccountsQueryKey = (
 
 export const getGetApiStatisticsGetTotalActiveAccountsQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveAccounts>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiStatisticsGetTotalActiveAccountsParams,
   options?: {
@@ -9711,7 +9994,7 @@ export const getGetApiStatisticsGetTotalActiveAccountsQueryOptions = <
       >
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -9746,7 +10029,7 @@ export type GetApiStatisticsGetTotalActiveAccountsQueryError =
 
 export function useGetApiStatisticsGetTotalActiveAccounts<
   TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveAccounts>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params: undefined | GetApiStatisticsGetTotalActiveAccountsParams,
   options: {
@@ -9767,13 +10050,13 @@ export function useGetApiStatisticsGetTotalActiveAccounts<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiStatisticsGetTotalActiveAccounts<
   TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveAccounts>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiStatisticsGetTotalActiveAccountsParams,
   options?: {
@@ -9794,13 +10077,13 @@ export function useGetApiStatisticsGetTotalActiveAccounts<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiStatisticsGetTotalActiveAccounts<
   TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveAccounts>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiStatisticsGetTotalActiveAccountsParams,
   options?: {
@@ -9813,7 +10096,7 @@ export function useGetApiStatisticsGetTotalActiveAccounts<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -9823,7 +10106,7 @@ export function useGetApiStatisticsGetTotalActiveAccounts<
 
 export function useGetApiStatisticsGetTotalActiveAccounts<
   TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalActiveAccounts>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiStatisticsGetTotalActiveAccountsParams,
   options?: {
@@ -9836,13 +10119,13 @@ export function useGetApiStatisticsGetTotalActiveAccounts<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetApiStatisticsGetTotalActiveAccountsQueryOptions(
     params,
-    options,
+    options
   );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
@@ -9861,16 +10144,16 @@ export function useGetApiStatisticsGetTotalActiveAccounts<
 export const getApiStatisticsGetTotalChats = (
   params?: GetApiStatisticsGetTotalChatsParams,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<StatisticsResultIDataResult>(
     { url: `/api/statistics/get-total-chats`, method: "GET", params, signal },
-    options,
+    options
   );
 };
 
 export const getGetApiStatisticsGetTotalChatsQueryKey = (
-  params?: GetApiStatisticsGetTotalChatsParams,
+  params?: GetApiStatisticsGetTotalChatsParams
 ) => {
   return [
     `/api/statistics/get-total-chats`,
@@ -9880,7 +10163,7 @@ export const getGetApiStatisticsGetTotalChatsQueryKey = (
 
 export const getGetApiStatisticsGetTotalChatsQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalChats>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiStatisticsGetTotalChatsParams,
   options?: {
@@ -9892,7 +10175,7 @@ export const getGetApiStatisticsGetTotalChatsQueryOptions = <
       >
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -9924,7 +10207,7 @@ export type GetApiStatisticsGetTotalChatsQueryError = ResultMessage[] | void;
 
 export function useGetApiStatisticsGetTotalChats<
   TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalChats>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params: undefined | GetApiStatisticsGetTotalChatsParams,
   options: {
@@ -9945,13 +10228,13 @@ export function useGetApiStatisticsGetTotalChats<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiStatisticsGetTotalChats<
   TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalChats>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiStatisticsGetTotalChatsParams,
   options?: {
@@ -9972,13 +10255,13 @@ export function useGetApiStatisticsGetTotalChats<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiStatisticsGetTotalChats<
   TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalChats>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiStatisticsGetTotalChatsParams,
   options?: {
@@ -9991,7 +10274,7 @@ export function useGetApiStatisticsGetTotalChats<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -10001,7 +10284,7 @@ export function useGetApiStatisticsGetTotalChats<
 
 export function useGetApiStatisticsGetTotalChats<
   TData = Awaited<ReturnType<typeof getApiStatisticsGetTotalChats>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiStatisticsGetTotalChatsParams,
   options?: {
@@ -10014,13 +10297,13 @@ export function useGetApiStatisticsGetTotalChats<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetApiStatisticsGetTotalChatsQueryOptions(
     params,
-    options,
+    options
   );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
@@ -10039,7 +10322,7 @@ export function useGetApiStatisticsGetTotalChats<
 export const postApiSubscriptionsCreate = (
   createSubscriptionCommandRequest: CreateSubscriptionCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<SuccessResult>(
     {
@@ -10049,13 +10332,13 @@ export const postApiSubscriptionsCreate = (
       data: createSubscriptionCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiSubscriptionsCreateMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiSubscriptionsCreate>>,
@@ -10103,7 +10386,7 @@ export type PostApiSubscriptionsCreateMutationError = ResultMessage[] | void;
  */
 export const usePostApiSubscriptionsCreate = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -10114,7 +10397,7 @@ export const usePostApiSubscriptionsCreate = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiSubscriptionsCreate>>,
   TError,
@@ -10132,7 +10415,7 @@ export const usePostApiSubscriptionsCreate = <
 export const postApiSubscriptionsUpdate = (
   updateSubscriptionCommandRequest: UpdateSubscriptionCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<SuccessResult>(
     {
@@ -10142,13 +10425,13 @@ export const postApiSubscriptionsUpdate = (
       data: updateSubscriptionCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiSubscriptionsUpdateMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiSubscriptionsUpdate>>,
@@ -10196,7 +10479,7 @@ export type PostApiSubscriptionsUpdateMutationError = ResultMessage[] | void;
  */
 export const usePostApiSubscriptionsUpdate = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -10207,7 +10490,7 @@ export const usePostApiSubscriptionsUpdate = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiSubscriptionsUpdate>>,
   TError,
@@ -10224,17 +10507,17 @@ export const usePostApiSubscriptionsUpdate = <
  */
 export const deleteApiSubscriptionsDelete = (
   params?: DeleteApiSubscriptionsDeleteParams,
-  options?: SecondParameter<typeof AxiosInstance>,
+  options?: SecondParameter<typeof AxiosInstance>
 ) => {
   return AxiosInstance<SuccessResult>(
     { url: `/api/subscriptions/delete`, method: "DELETE", params },
-    options,
+    options
   );
 };
 
 export const getDeleteApiSubscriptionsDeleteMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deleteApiSubscriptionsDelete>>,
@@ -10281,7 +10564,7 @@ export type DeleteApiSubscriptionsDeleteMutationError = ResultMessage[] | void;
  */
 export const useDeleteApiSubscriptionsDelete = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -10292,7 +10575,7 @@ export const useDeleteApiSubscriptionsDelete = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof deleteApiSubscriptionsDelete>>,
   TError,
@@ -10311,23 +10594,23 @@ export const useDeleteApiSubscriptionsDelete = <
 export const getApiSubscriptionsGet = (
   params?: GetApiSubscriptionsGetParams,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<SubscriptionIDataResult>(
     { url: `/api/subscriptions/get`, method: "GET", params, signal },
-    options,
+    options
   );
 };
 
 export const getGetApiSubscriptionsGetQueryKey = (
-  params?: GetApiSubscriptionsGetParams,
+  params?: GetApiSubscriptionsGetParams
 ) => {
   return [`/api/subscriptions/get`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetApiSubscriptionsGetQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiSubscriptionsGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiSubscriptionsGetParams,
   options?: {
@@ -10339,7 +10622,7 @@ export const getGetApiSubscriptionsGetQueryOptions = <
       >
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -10370,7 +10653,7 @@ export type GetApiSubscriptionsGetQueryError = ResultMessage[] | void;
 
 export function useGetApiSubscriptionsGet<
   TData = Awaited<ReturnType<typeof getApiSubscriptionsGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params: undefined | GetApiSubscriptionsGetParams,
   options: {
@@ -10391,13 +10674,13 @@ export function useGetApiSubscriptionsGet<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiSubscriptionsGet<
   TData = Awaited<ReturnType<typeof getApiSubscriptionsGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiSubscriptionsGetParams,
   options?: {
@@ -10418,13 +10701,13 @@ export function useGetApiSubscriptionsGet<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiSubscriptionsGet<
   TData = Awaited<ReturnType<typeof getApiSubscriptionsGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiSubscriptionsGetParams,
   options?: {
@@ -10437,7 +10720,7 @@ export function useGetApiSubscriptionsGet<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -10447,7 +10730,7 @@ export function useGetApiSubscriptionsGet<
 
 export function useGetApiSubscriptionsGet<
   TData = Awaited<ReturnType<typeof getApiSubscriptionsGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiSubscriptionsGetParams,
   options?: {
@@ -10460,7 +10743,7 @@ export function useGetApiSubscriptionsGet<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
@@ -10481,11 +10764,11 @@ export function useGetApiSubscriptionsGet<
  */
 export const getApiSubscriptionsList = (
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<SubscriptionDtoListIDataResult>(
     { url: `/api/subscriptions/list`, method: "GET", signal },
-    options,
+    options
   );
 };
 
@@ -10495,7 +10778,7 @@ export const getGetApiSubscriptionsListQueryKey = () => {
 
 export const getGetApiSubscriptionsListQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiSubscriptionsList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(options?: {
   query?: Partial<
     UseQueryOptions<
@@ -10535,7 +10818,7 @@ export type GetApiSubscriptionsListQueryError = ResultMessage[] | void;
 
 export function useGetApiSubscriptionsList<
   TData = Awaited<ReturnType<typeof getApiSubscriptionsList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   options: {
     query: Partial<
@@ -10555,13 +10838,13 @@ export function useGetApiSubscriptionsList<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiSubscriptionsList<
   TData = Awaited<ReturnType<typeof getApiSubscriptionsList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   options?: {
     query?: Partial<
@@ -10581,13 +10864,13 @@ export function useGetApiSubscriptionsList<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiSubscriptionsList<
   TData = Awaited<ReturnType<typeof getApiSubscriptionsList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   options?: {
     query?: Partial<
@@ -10599,7 +10882,7 @@ export function useGetApiSubscriptionsList<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -10609,7 +10892,7 @@ export function useGetApiSubscriptionsList<
 
 export function useGetApiSubscriptionsList<
   TData = Awaited<ReturnType<typeof getApiSubscriptionsList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   options?: {
     query?: Partial<
@@ -10621,7 +10904,7 @@ export function useGetApiSubscriptionsList<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
@@ -10643,7 +10926,7 @@ export function useGetApiSubscriptionsList<
 export const postApiTicketsCreate = (
   createTicketCommandRequest: CreateTicketCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<SuccessResult>(
     {
@@ -10653,13 +10936,13 @@ export const postApiTicketsCreate = (
       data: createTicketCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiTicketsCreateMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiTicketsCreate>>,
@@ -10706,7 +10989,7 @@ export type PostApiTicketsCreateMutationError = ResultMessage[] | void;
  */
 export const usePostApiTicketsCreate = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -10717,7 +11000,7 @@ export const usePostApiTicketsCreate = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiTicketsCreate>>,
   TError,
@@ -10735,7 +11018,7 @@ export const usePostApiTicketsCreate = <
 export const postApiTicketsAddMessage = (
   addMessageToTicketCommandRequest: AddMessageToTicketCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<SuccessResult>(
     {
@@ -10745,13 +11028,13 @@ export const postApiTicketsAddMessage = (
       data: addMessageToTicketCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiTicketsAddMessageMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiTicketsAddMessage>>,
@@ -10799,7 +11082,7 @@ export type PostApiTicketsAddMessageMutationError = ResultMessage[] | void;
  */
 export const usePostApiTicketsAddMessage = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -10810,7 +11093,7 @@ export const usePostApiTicketsAddMessage = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiTicketsAddMessage>>,
   TError,
@@ -10828,7 +11111,7 @@ export const usePostApiTicketsAddMessage = <
 export const postApiTicketsChangeStatus = (
   changeTicketStatusCommandRequest: ChangeTicketStatusCommandRequest,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<SuccessResult>(
     {
@@ -10838,13 +11121,13 @@ export const postApiTicketsChangeStatus = (
       data: changeTicketStatusCommandRequest,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiTicketsChangeStatusMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiTicketsChangeStatus>>,
@@ -10892,7 +11175,7 @@ export type PostApiTicketsChangeStatusMutationError = ResultMessage[] | void;
  */
 export const usePostApiTicketsChangeStatus = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -10903,7 +11186,7 @@ export const usePostApiTicketsChangeStatus = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiTicketsChangeStatus>>,
   TError,
@@ -10920,17 +11203,17 @@ export const usePostApiTicketsChangeStatus = <
  */
 export const deleteApiTicketsDelete = (
   params?: DeleteApiTicketsDeleteParams,
-  options?: SecondParameter<typeof AxiosInstance>,
+  options?: SecondParameter<typeof AxiosInstance>
 ) => {
   return AxiosInstance<SuccessResult>(
     { url: `/api/tickets/delete`, method: "DELETE", params },
-    options,
+    options
   );
 };
 
 export const getDeleteApiTicketsDeleteMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deleteApiTicketsDelete>>,
@@ -10977,7 +11260,7 @@ export type DeleteApiTicketsDeleteMutationError = ResultMessage[] | void;
  */
 export const useDeleteApiTicketsDelete = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -10988,7 +11271,7 @@ export const useDeleteApiTicketsDelete = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof deleteApiTicketsDelete>>,
   TError,
@@ -11006,23 +11289,23 @@ export const useDeleteApiTicketsDelete = <
 export const getApiTicketsList = (
   params?: GetApiTicketsListParams,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<TicketDtoListPaginatedResult>(
     { url: `/api/tickets/list`, method: "GET", params, signal },
-    options,
+    options
   );
 };
 
 export const getGetApiTicketsListQueryKey = (
-  params?: GetApiTicketsListParams,
+  params?: GetApiTicketsListParams
 ) => {
   return [`/api/tickets/list`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetApiTicketsListQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiTicketsList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiTicketsListParams,
   options?: {
@@ -11034,7 +11317,7 @@ export const getGetApiTicketsListQueryOptions = <
       >
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -11065,7 +11348,7 @@ export type GetApiTicketsListQueryError = ResultMessage[] | void;
 
 export function useGetApiTicketsList<
   TData = Awaited<ReturnType<typeof getApiTicketsList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params: undefined | GetApiTicketsListParams,
   options: {
@@ -11086,13 +11369,13 @@ export function useGetApiTicketsList<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiTicketsList<
   TData = Awaited<ReturnType<typeof getApiTicketsList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiTicketsListParams,
   options?: {
@@ -11113,13 +11396,13 @@ export function useGetApiTicketsList<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiTicketsList<
   TData = Awaited<ReturnType<typeof getApiTicketsList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiTicketsListParams,
   options?: {
@@ -11132,7 +11415,7 @@ export function useGetApiTicketsList<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -11142,7 +11425,7 @@ export function useGetApiTicketsList<
 
 export function useGetApiTicketsList<
   TData = Awaited<ReturnType<typeof getApiTicketsList>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiTicketsListParams,
   options?: {
@@ -11155,7 +11438,7 @@ export function useGetApiTicketsList<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
@@ -11177,23 +11460,23 @@ export function useGetApiTicketsList<
 export const getApiTicketsGet = (
   params?: GetApiTicketsGetParams,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<TicketDetailDtoIDataResult>(
     { url: `/api/tickets/get`, method: "GET", params, signal },
-    options,
+    options
   );
 };
 
 export const getGetApiTicketsGetQueryKey = (
-  params?: GetApiTicketsGetParams,
+  params?: GetApiTicketsGetParams
 ) => {
   return [`/api/tickets/get`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetApiTicketsGetQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiTicketsGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiTicketsGetParams,
   options?: {
@@ -11205,7 +11488,7 @@ export const getGetApiTicketsGetQueryOptions = <
       >
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -11236,7 +11519,7 @@ export type GetApiTicketsGetQueryError = ResultMessage[] | void;
 
 export function useGetApiTicketsGet<
   TData = Awaited<ReturnType<typeof getApiTicketsGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params: undefined | GetApiTicketsGetParams,
   options: {
@@ -11257,13 +11540,13 @@ export function useGetApiTicketsGet<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiTicketsGet<
   TData = Awaited<ReturnType<typeof getApiTicketsGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiTicketsGetParams,
   options?: {
@@ -11284,13 +11567,13 @@ export function useGetApiTicketsGet<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiTicketsGet<
   TData = Awaited<ReturnType<typeof getApiTicketsGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiTicketsGetParams,
   options?: {
@@ -11303,7 +11586,7 @@ export function useGetApiTicketsGet<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -11313,7 +11596,7 @@ export function useGetApiTicketsGet<
 
 export function useGetApiTicketsGet<
   TData = Awaited<ReturnType<typeof getApiTicketsGet>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   params?: GetApiTicketsGetParams,
   options?: {
@@ -11326,7 +11609,7 @@ export function useGetApiTicketsGet<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
@@ -11348,23 +11631,23 @@ export function useGetApiTicketsGet<
 export const getApiTranslatesLanguagesLanguage = (
   language: string,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<Translate[]>(
     { url: `/api/translates/languages/${language}`, method: "GET", signal },
-    options,
+    options
   );
 };
 
 export const getGetApiTranslatesLanguagesLanguageQueryKey = (
-  language?: string,
+  language?: string
 ) => {
   return [`/api/translates/languages/${language}`] as const;
 };
 
 export const getGetApiTranslatesLanguagesLanguageQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiTranslatesLanguagesLanguage>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   language: string,
   options?: {
@@ -11376,7 +11659,7 @@ export const getGetApiTranslatesLanguagesLanguageQueryOptions = <
       >
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -11412,7 +11695,7 @@ export type GetApiTranslatesLanguagesLanguageQueryError =
 
 export function useGetApiTranslatesLanguagesLanguage<
   TData = Awaited<ReturnType<typeof getApiTranslatesLanguagesLanguage>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   language: string,
   options: {
@@ -11433,13 +11716,13 @@ export function useGetApiTranslatesLanguagesLanguage<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiTranslatesLanguagesLanguage<
   TData = Awaited<ReturnType<typeof getApiTranslatesLanguagesLanguage>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   language: string,
   options?: {
@@ -11460,13 +11743,13 @@ export function useGetApiTranslatesLanguagesLanguage<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiTranslatesLanguagesLanguage<
   TData = Awaited<ReturnType<typeof getApiTranslatesLanguagesLanguage>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   language: string,
   options?: {
@@ -11479,7 +11762,7 @@ export function useGetApiTranslatesLanguagesLanguage<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -11489,7 +11772,7 @@ export function useGetApiTranslatesLanguagesLanguage<
 
 export function useGetApiTranslatesLanguagesLanguage<
   TData = Awaited<ReturnType<typeof getApiTranslatesLanguagesLanguage>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   language: string,
   options?: {
@@ -11502,13 +11785,13 @@ export function useGetApiTranslatesLanguagesLanguage<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetApiTranslatesLanguagesLanguageQueryOptions(
     language,
-    options,
+    options
   );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
@@ -11528,11 +11811,11 @@ export function useGetApiTranslatesLanguagesLanguage<
 export const getApiTranslatesId = (
   id: ObjectId,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<Translate>(
     { url: `/api/translates/${id}`, method: "GET", signal },
-    options,
+    options
   );
 };
 
@@ -11542,7 +11825,7 @@ export const getGetApiTranslatesIdQueryKey = (id?: ObjectId) => {
 
 export const getGetApiTranslatesIdQueryOptions = <
   TData = Awaited<ReturnType<typeof getApiTranslatesId>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   id: ObjectId,
   options?: {
@@ -11554,7 +11837,7 @@ export const getGetApiTranslatesIdQueryOptions = <
       >
     >;
     request?: SecondParameter<typeof AxiosInstance>;
-  },
+  }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
@@ -11585,7 +11868,7 @@ export type GetApiTranslatesIdQueryError = ResultMessage[] | void;
 
 export function useGetApiTranslatesId<
   TData = Awaited<ReturnType<typeof getApiTranslatesId>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   id: ObjectId,
   options: {
@@ -11606,13 +11889,13 @@ export function useGetApiTranslatesId<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiTranslatesId<
   TData = Awaited<ReturnType<typeof getApiTranslatesId>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   id: ObjectId,
   options?: {
@@ -11633,13 +11916,13 @@ export function useGetApiTranslatesId<
       >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiTranslatesId<
   TData = Awaited<ReturnType<typeof getApiTranslatesId>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   id: ObjectId,
   options?: {
@@ -11652,7 +11935,7 @@ export function useGetApiTranslatesId<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 };
@@ -11662,7 +11945,7 @@ export function useGetApiTranslatesId<
 
 export function useGetApiTranslatesId<
   TData = Awaited<ReturnType<typeof getApiTranslatesId>>,
-  TError = ResultMessage[] | void,
+  TError = ResultMessage[] | void
 >(
   id: ObjectId,
   options?: {
@@ -11675,7 +11958,7 @@ export function useGetApiTranslatesId<
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
@@ -11696,17 +11979,17 @@ export function useGetApiTranslatesId<
  */
 export const deleteApiTranslatesId = (
   id: string,
-  options?: SecondParameter<typeof AxiosInstance>,
+  options?: SecondParameter<typeof AxiosInstance>
 ) => {
   return AxiosInstance<string>(
     { url: `/api/translates/${id}`, method: "DELETE" },
-    options,
+    options
   );
 };
 
 export const getDeleteApiTranslatesIdMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deleteApiTranslatesId>>,
@@ -11753,7 +12036,7 @@ export type DeleteApiTranslatesIdMutationError = ResultMessage[] | void;
  */
 export const useDeleteApiTranslatesId = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -11764,7 +12047,7 @@ export const useDeleteApiTranslatesId = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof deleteApiTranslatesId>>,
   TError,
@@ -11782,7 +12065,7 @@ export const useDeleteApiTranslatesId = <
 export const postApiTranslatesAdd = (
   createTranslateCommand: CreateTranslateCommand,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<string>(
     {
@@ -11792,13 +12075,13 @@ export const postApiTranslatesAdd = (
       data: createTranslateCommand,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiTranslatesAddMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiTranslatesAdd>>,
@@ -11845,7 +12128,7 @@ export type PostApiTranslatesAddMutationError = ResultMessage[] | void;
  */
 export const usePostApiTranslatesAdd = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -11856,7 +12139,7 @@ export const usePostApiTranslatesAdd = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiTranslatesAdd>>,
   TError,
@@ -11874,7 +12157,7 @@ export const usePostApiTranslatesAdd = <
 export const postApiTranslatesUpdate = (
   updateTranslateCommand: UpdateTranslateCommand,
   options?: SecondParameter<typeof AxiosInstance>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ) => {
   return AxiosInstance<string>(
     {
@@ -11884,13 +12167,13 @@ export const postApiTranslatesUpdate = (
       data: updateTranslateCommand,
       signal,
     },
-    options,
+    options
   );
 };
 
 export const getPostApiTranslatesUpdateMutationOptions = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postApiTranslatesUpdate>>,
@@ -11937,7 +12220,7 @@ export type PostApiTranslatesUpdateMutationError = ResultMessage[] | void;
  */
 export const usePostApiTranslatesUpdate = <
   TError = ResultMessage[] | void,
-  TContext = unknown,
+  TContext = unknown
 >(
   options?: {
     mutation?: UseMutationOptions<
@@ -11948,7 +12231,7 @@ export const usePostApiTranslatesUpdate = <
     >;
     request?: SecondParameter<typeof AxiosInstance>;
   },
-  queryClient?: QueryClient,
+  queryClient?: QueryClient
 ): UseMutationResult<
   Awaited<ReturnType<typeof postApiTranslatesUpdate>>,
   TError,

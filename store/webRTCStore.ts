@@ -202,7 +202,7 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     const currentUsername = useUserStore.getState().userName;
     set({
       targetUsername,
-      callerUsername: currentUsername,
+      callerUsername: currentUsername!,
       isCaller: true,
       isIncoming: false,
     });
@@ -230,7 +230,7 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
       (state) => {
         trackEvent("Connection state changed", { state, targetUsername });
         set({ connectionState: state });
-      },
+      }
     );
 
     const offer = await WebRTCService.createOffer();
@@ -275,7 +275,7 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
         (state) => {
           trackEvent("Connection state changed", { state, callerUsername });
           set({ connectionState: state });
-        },
+        }
       );
 
       await WebRTCService.setRemoteDescription(JSON.parse(offer));
