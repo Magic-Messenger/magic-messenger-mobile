@@ -14,7 +14,12 @@ import {
 } from "@/api/endpoints/magicMessenger";
 import { flexBox, spacing } from "@/constants";
 import { registerForPushNotificationsAsync } from "@/services";
-import { useTorStore, useUserStore } from "@/store";
+import {
+  useCallingStore,
+  useTorStore,
+  useUserStore,
+  useWebRTCStore,
+} from "@/store";
 import { useThemedStyles } from "@/theme";
 import {
   fontPixel,
@@ -98,7 +103,7 @@ export const useLogin = () => {
       trackEvent("login_success");
       login(
         data?.accessToken?.token as string,
-        data?.account?.username as string,
+        data?.account?.username as string
       );
       getApiAccountGetProfile().then((profileResponse) => {
         if (profileResponse.success) {
@@ -129,8 +134,26 @@ export const useLogin = () => {
 
       setIsLoading(false);
 
+      // Pending call kontrolü - persist edilen callingStore'dan oku
+      const pendingCall = useCallingStore.getState().pendingCall;
+      trackEvent("Checking pending call from store", { pendingCall });
+
+      if (pendingCall) {
+        trackEvent(
+          "Found pending call, showing incoming call modal",
+          pendingCall
+        );
+
+        // Store'dan sil (artık işlendi)
+        useCallingStore.getState().clearPendingCall();
+
+        // incomingCallData olarak set et - IncomingCallModal otomatik açılacak
+        useWebRTCStore.getState().setIncomingCallData(pendingCall);
+        useWebRTCStore.getState().setIsIncoming(true);
+      }
+
+      // Her durumda ana sayfaya git
       router.replace("/chat/home");
-      /* router.replace("/(calling)/videoCalling/screens"); */
     } catch {
       setIsLoading(false);
     }
@@ -145,7 +168,7 @@ export const useLogin = () => {
     if (!password) {
       Alert.alert(
         t("login.deleteAccountAlertTitle"),
-        t("login.deleteAccountPasswordRequired"),
+        t("login.deleteAccountPasswordRequired")
       );
       return;
     }
@@ -174,7 +197,7 @@ export const useLogin = () => {
           style: "destructive",
           onPress: onChangeAccount,
         },
-      ],
+      ]
     );
   };
 
@@ -192,7 +215,7 @@ export const useLogin = () => {
           style: "destructive",
           onPress: onDeleteAccount,
         },
-      ],
+      ]
     );
   };
 

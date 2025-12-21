@@ -22,6 +22,7 @@ import { useScreenProtection } from "@/hooks";
 import { initDayjs } from "@/i18n";
 import { ImageViewerProvider, SignalRProvider, TorProvider } from "@/providers";
 import {
+  checkInitialNotification,
   registerCallNotificationCategory,
   registerForPushNotificationsAsync,
   setupNotificationListeners,
@@ -60,6 +61,9 @@ export default function RootLayout() {
       setupNotificationListeners();
       registerCallNotificationCategory();
 
+      // Cold start durumunda bildirime tıklanarak açıldıysa kontrol et
+      checkInitialNotification();
+
       LogRocket.init(process?.env?.EXPO_PUBLIC_LOG_ROCKET_API as string, {
         updateId: Application.nativeApplicationVersion,
         expoChannel: __DEV__ ? "development" : "production",
@@ -75,7 +79,7 @@ export default function RootLayout() {
       "change",
       (nextAppState) => {
         useAppStore.setState({ appState: nextAppState });
-      },
+      }
     );
 
     return () => {

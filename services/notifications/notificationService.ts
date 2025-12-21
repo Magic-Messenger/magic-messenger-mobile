@@ -8,7 +8,8 @@ import {
   postApiChatsMessageDelivered,
   postApiChatsMessageRead,
 } from "@/api/endpoints/magicMessenger";
-import { useWebRTCStore } from "@/store";
+import { CallingType } from "@/api/models";
+import { PendingCallData, useCallingStore, useWebRTCStore } from "@/store";
 
 import { trackEvent } from "../../utils/helper";
 
@@ -62,54 +63,79 @@ export const registerDeliveredListener = () => {
   });
 };
 
-// --- Opened listener (user tapped) ---
+// --- Handle notification response (shared logic) ---
+const handleNotificationResponse = async (
+  response: Notifications.NotificationResponse
+) => {
+  Notifications.setBadgeCountAsync(0);
+  Notifications.dismissAllNotificationsAsync();
+
+  const action = response.actionIdentifier;
+  const messageData = response.notification.request.content.data;
+  if (!messageData) return;
+
+  trackEvent("👆 Message opened:", { action, messageData });
+
+  if (
+    messageData.callingType === "AudioCalling" ||
+    messageData.callingType === "VideoCalling"
+  ) {
+    // This is calling, so we need to know user accept or reject call.
+
+    // ACCEPT_CALL butonu veya direkt bildirime tıklama (default action)
+    if (
+      action === "ACCEPT_CALL" ||
+      action === Notifications.DEFAULT_ACTION_IDENTIFIER
+    ) {
+      // Pending call bilgisini oluştur
+      const pendingCallData: PendingCallData = {
+        callingType:
+          messageData.callingType === "VideoCalling"
+            ? CallingType.Video
+            : CallingType.Audio,
+        offer: messageData.offer as string,
+        callerUsername: messageData.callerUsername as string,
+      };
+
+      // Persist edilen callingStore'a kaydet
+      trackEvent("Saving pending call to store", pendingCallData);
+      useCallingStore.getState().setPendingCall(pendingCallData);
+    } else if (action === "REJECT_CALL") {
+      useWebRTCStore.getState().endCall?.();
+    }
+
+    return;
+  }
+
+  const deliveredMessageNotificationData =
+    messageData as DeliveredMessageNotificationData;
+  if (
+    deliveredMessageNotificationData.ChatId &&
+    deliveredMessageNotificationData.MessageId
+  ) {
+    // This is a chat message, so we need to send a message read notification
+
+    await postApiChatsMessageRead({
+      chatId: deliveredMessageNotificationData.ChatId,
+      messageId: deliveredMessageNotificationData.MessageId,
+    });
+  }
+};
+
+// --- Opened listener (user tapped - works when app is in foreground/background) ---
 export const registerOpenedListener = () => {
-  Notifications.addNotificationResponseReceivedListener(async (response) => {
-    Notifications.setBadgeCountAsync(0);
-    Notifications.dismissAllNotificationsAsync();
+  Notifications.addNotificationResponseReceivedListener(
+    handleNotificationResponse
+  );
+};
 
-    const action = response.actionIdentifier;
-    const messageData = response.notification.request.content.data;
-    if (!messageData) return;
-
-    trackEvent("👆 Message opened:", messageData);
-
-    if (
-      messageData.callingType === "AudioCalling" ||
-      messageData.callingType === "VideoCalling"
-    ) {
-      // This is calling, so we need to know user accept or reject call.
-
-      if (action === "ACCEPT_CALL") {
-        // Store'a bilgiler yazılır.
-        // Login olduktan sonra bu bilgiler kontrol edilir, bilgiler var ise direk calling açılır. Bilgiler yoksa normal login işlemi devam eder.
-        useWebRTCStore.getState().answerCall?.({
-          callingType:
-            messageData.callingType === "VideoCalling" ? "Video" : "Audio",
-          offer: messageData.offer as string,
-          callerUsername: messageData.callerUsername as string,
-        });
-      } else if (action === "REJECT_CALL") {
-        useWebRTCStore.getState().endCall?.();
-      }
-
-      return;
-    }
-
-    const deliveredMessageNotificationData =
-      messageData as DeliveredMessageNotificationData;
-    if (
-      deliveredMessageNotificationData.ChatId &&
-      deliveredMessageNotificationData.MessageId
-    ) {
-      // This is a chat message, so we need to send a message read notification
-
-      await postApiChatsMessageRead({
-        chatId: deliveredMessageNotificationData.ChatId,
-        messageId: deliveredMessageNotificationData.MessageId,
-      });
-    }
-  });
+// --- Check initial notification (for cold start - app was killed) ---
+export const checkInitialNotification = async () => {
+  const response = await Notifications.getLastNotificationResponseAsync();
+  if (response) {
+    trackEvent("📱 Initial notification found (cold start):", response);
+    await handleNotificationResponse(response);
+  }
 };
 
 export async function registerCallNotificationCategory() {
