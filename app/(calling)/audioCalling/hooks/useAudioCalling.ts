@@ -1,9 +1,9 @@
-import { Audio } from "expo-av";
 import { useKeepAwake } from "expo-keep-awake";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Platform, StyleSheet } from "react-native";
+import InCallManager from "react-native-incall-manager";
 
 import { CallingType } from "@/api/models";
 import WebRTCService from "@/services/webRTC/webRTCService";
@@ -56,19 +56,11 @@ export const useAudioCalling = () => {
     });
   }, [isAudioMuted, setAudioEnabled, targetUsername]);
 
-  const toggleSpeaker = useCallback(async () => {
+  const toggleSpeaker = useCallback(() => {
     const newSpeakerState = !isSpeakerOn;
 
     try {
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-        staysActiveInBackground: true,
-        // iOS: Use speaker when true
-        playThroughEarpieceAndroid: !newSpeakerState,
-        // Android: false = speaker, true = earpiece
-      });
-
+      InCallManager.setSpeakerphoneOn(newSpeakerState);
       setIsSpeakerOn(newSpeakerState);
       trackEvent("Speaker toggled", {
         isSpeakerOn: newSpeakerState,
@@ -83,35 +75,22 @@ export const useAudioCalling = () => {
   const formatDuration = useCallback((seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    return `${mins.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
   }, []);
 
-  // Setup audio mode for calls
+  // Setup audio mode for calls using InCallManager
   useEffect(() => {
-    const setupAudioMode = async () => {
-      try {
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
-          playsInSilentModeIOS: true,
-          staysActiveInBackground: true,
-          playThroughEarpieceAndroid: true, // Start with earpiece (not speaker)
-        });
-        trackEvent("Audio mode initialized for call");
-      } catch (error) {
-        console.error("Failed to setup audio mode:", error);
-      }
-    };
-
-    setupAudioMode();
+    // Start InCallManager for audio calls (media: false = voice call mode)
+    InCallManager.start({ media: "audio" });
+    // Default to earpiece for audio calls
+    InCallManager.setSpeakerphoneOn(false);
+    trackEvent("Audio mode initialized for call with InCallManager");
 
     return () => {
-      // Reset audio mode on cleanup
-      Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
-        playsInSilentModeIOS: false,
-        staysActiveInBackground: false,
-        playThroughEarpieceAndroid: false,
-      }).catch(console.error);
+      // Stop InCallManager on cleanup
+      InCallManager.stop();
     };
   }, []);
 

@@ -3,6 +3,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet } from "react-native";
+import InCallManager from "react-native-incall-manager";
 
 import { CallingType } from "@/api/models";
 import WebRTCService from "@/services/webRTC/webRTCService";
@@ -94,6 +95,19 @@ export const useVideoCalling = () => {
       }, 100);
     }
   }, [isVideoCall, isVideoOff, isSwitchingCamera, targetUsername]);
+
+  // Setup audio mode for video calls - always use speaker
+  useEffect(() => {
+    // Start InCallManager for video calls with speaker on
+    InCallManager.start({ media: "video" });
+    // Video calls always use speaker - not toggleable
+    InCallManager.setSpeakerphoneOn(true);
+    trackEvent("Video call audio mode initialized with speaker on");
+
+    return () => {
+      InCallManager.stop();
+    };
+  }, []);
 
   useEffect(() => {
     if (!targetUsername || !callingType) {
