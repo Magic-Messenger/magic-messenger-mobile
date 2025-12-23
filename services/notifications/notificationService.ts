@@ -1,6 +1,13 @@
+import notifee, {
+  AndroidImportance,
+  Event,
+  EventType,
+} from "@notifee/react-native";
+import messaging, {
+  AuthorizationStatus,
+  FirebaseMessagingTypes,
+} from "@react-native-firebase/messaging";
 import * as Device from "expo-device";
-import * as Notifications from "expo-notifications";
-import { NotificationBehavior } from "expo-notifications";
 import { t } from "i18next";
 import { Platform } from "react-native";
 
@@ -13,40 +20,16 @@ import { PendingCallData, useCallingStore, useWebRTCStore } from "@/store";
 
 import { trackEvent } from "../../utils/helper";
 
-export type RegisterPushNotificationTokenType = {
-  token: string;
-  firebaseToken: string;
-};
-
 type DeliveredMessageNotificationData = {
   ChatId: string;
   MessageId: string;
 };
 
-Notifications.setNotificationHandler({
-  handleNotification: async () =>
-    ({
-      shouldShowBanner: false,
-      shouldShowList: false,
-      shouldPlaySound: false,
-      shouldSetBadge: false,
-    }) as NotificationBehavior,
-});
-
-if (Platform.OS === "android")
-  Notifications.setNotificationChannelAsync("default", {
-    name: "Default",
-    importance: Notifications.AndroidImportance.MAX,
-    sound: "default",
-    vibrationPattern: [0, 250, 250, 250],
-    lightColor: "#FF231F7C",
-  });
-
 // --- Delivered listener (foreground + background) ---
 export const registerDeliveredListener = () => {
-  Notifications.addNotificationReceivedListener(async (notification) => {
+  messaging().onMessage(async (notification) => {
     try {
-      const messageData = notification.request.content.data;
+      const messageData = notification.data;
       if (!messageData) return;
 
       const deliveredMessageNotificationData =
@@ -70,53 +53,14 @@ export const registerDeliveredListener = () => {
 
 // --- Handle notification response (shared logic) ---
 const handleNotificationResponse = async (
-  response: Notifications.NotificationResponse,
+  response: FirebaseMessagingTypes.RemoteMessage,
 ) => {
-  Notifications.setBadgeCountAsync(0);
-  Notifications.dismissAllNotificationsAsync();
+  clearAllNotifications();
 
-  const action = response.actionIdentifier;
-  const messageData = response.notification.request.content.data;
+  const messageData = response.data;
   if (!messageData) return;
 
-  trackEvent("👆 Message opened:", { action, messageData });
-
-  if (
-    messageData.callingType === "AudioCalling" ||
-    messageData.callingType === "VideoCalling"
-  ) {
-    // This is calling, so we need to know user accept or reject call.
-
-    const callingMessageData = messageData as PendingCallData;
-
-    // ACCEPT_CALL butonu veya direkt bildirime tıklama (default action)
-    if (
-      action === "ACCEPT_CALL" ||
-      action === Notifications.DEFAULT_ACTION_IDENTIFIER
-    ) {
-      // Pending call bilgisini oluştur
-      const pendingCallData: PendingCallData = {
-        callId: callingMessageData?.callId as string,
-        callerNickname: callingMessageData?.callerNickname as string,
-        offer: callingMessageData?.offer as string,
-        callerUsername: callingMessageData?.callerUsername as string,
-        callingType:
-          messageData.callingType === "VideoCalling"
-            ? CallingType.Video
-            : CallingType.Audio,
-      };
-
-      trackEvent("Saving pending call to store", pendingCallData);
-      useCallingStore.getState().setPendingCall(pendingCallData);
-    } else if (action === "REJECT_CALL") {
-      useWebRTCStore.getState().endCall?.({
-        callId: callingMessageData?.callId as string,
-        targetUsername: callingMessageData?.callerUsername as string,
-      });
-    }
-
-    return;
-  }
+  trackEvent("👆 Message opened:", messageData);
 
   const deliveredMessageNotificationData =
     messageData as DeliveredMessageNotificationData;
@@ -135,36 +79,90 @@ const handleNotificationResponse = async (
 
 // --- Opened listener (user tapped - works when app is in foreground/background) ---
 export const registerOpenedListener = () => {
-  Notifications.addNotificationResponseReceivedListener(
-    handleNotificationResponse,
-  );
+  messaging().onNotificationOpenedApp(handleNotificationResponse);
 };
+
+const callActionIdentifier = ({ type, detail }: Event) => {
+  if (type !== EventType.ACTION_PRESS) return;
+
+  const { pressAction, notification } = detail;
+
+  if (
+    notification?.data?.callingType === "AudioCalling" ||
+    notification?.data?.callingType === "VideoCalling"
+  ) {
+    // This is calling, so we need to know user accept or reject call.
+
+    const callingMessageData = notification?.data as PendingCallData;
+
+    // ACCEPT_CALL butonu veya direkt bildirime tıklama (default action)
+    if (pressAction?.id === "ACCEPT_CALL") {
+      // Pending call bilgisini oluştur
+      const pendingCallData: PendingCallData = {
+        callId: callingMessageData?.callId as string,
+        callerNickname: callingMessageData?.callerNickname as string,
+        offer: callingMessageData?.offer as string,
+        callerUsername: callingMessageData?.callerUsername as string,
+        callingType:
+          notification?.data?.callingType === "VideoCalling"
+            ? CallingType.Video
+            : CallingType.Audio,
+      };
+
+      trackEvent("Saving pending call to store", pendingCallData);
+      useCallingStore.getState().setPendingCall(pendingCallData);
+    } else if (pressAction?.id === "REJECT_CALL") {
+      useWebRTCStore.getState().endCall?.({
+        callId: callingMessageData?.callId as string,
+        targetUsername: callingMessageData?.callerUsername as string,
+      });
+    }
+  }
+};
+
+export function registerCallActionListeners() {
+  if (Platform.OS === "android") {
+    notifee.createChannel({
+      id: "default",
+      name: "Default",
+      importance: AndroidImportance.HIGH,
+      sound: "default",
+      vibration: true,
+    });
+  }
+
+  notifee.onForegroundEvent(callActionIdentifier);
+  notifee.onBackgroundEvent(async (backgroundEvent) =>
+    callActionIdentifier(backgroundEvent),
+  );
+}
 
 // --- Check initial notification (for cold start - app was killed) ---
 export const checkInitialNotification = async () => {
-  const response = await Notifications.getLastNotificationResponseAsync();
+  const response = await messaging().getInitialNotification();
   if (response) {
     trackEvent("📱 Initial notification found (cold start):", response);
     await handleNotificationResponse(response);
   }
 };
 
-export async function registerCallNotificationCategory() {
-  await Notifications.setNotificationCategoryAsync("incoming_call", [
+function registerCallNotificationCategory() {
+  notifee.setNotificationCategories([
     {
-      identifier: "ACCEPT_CALL",
-      buttonTitle: t("answer"),
-      options: {
-        opensAppToForeground: true,
-      },
-    },
-    {
-      identifier: "REJECT_CALL",
-      buttonTitle: t("reject"),
-      options: {
-        opensAppToForeground: false,
-        isDestructive: true,
-      },
+      id: "incoming_call",
+      actions: [
+        {
+          id: "ACCEPT_CALL",
+          title: t("answer"),
+          foreground: true,
+        },
+        {
+          id: "REJECT_CALL",
+          title: t("reject"),
+          destructive: true,
+          foreground: false,
+        },
+      ],
     },
   ]);
 }
@@ -173,35 +171,50 @@ export async function registerCallNotificationCategory() {
 export const setupNotificationListeners = () => {
   registerDeliveredListener();
   registerOpenedListener();
+  registerCallNotificationCategory();
+  registerCallActionListeners();
 };
 
-export async function registerForPushNotificationsAsync(): Promise<RegisterPushNotificationTokenType | null> {
+export function clearAllNotifications() {
+  notifee.setBadgeCount(0);
+  notifee.cancelAllNotifications();
+}
+
+export async function registerForPushNotificationsAsync(): Promise<
+  string | null
+> {
   if (!Device.isDevice) {
     trackEvent("Must use physical device for push notifications");
     return null;
   }
 
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
-  let finalStatus = existingStatus;
+  const permissonStatus = await messaging().hasPermission();
+  let finalStatus = permissonStatus;
 
-  if (existingStatus !== "granted") {
-    const { status } = await Notifications.requestPermissionsAsync();
-    finalStatus = status;
+  if (
+    permissonStatus !== AuthorizationStatus.AUTHORIZED &&
+    permissonStatus !== AuthorizationStatus.PROVISIONAL
+  ) {
+    finalStatus = await messaging().requestPermission();
   }
 
-  if (finalStatus !== "granted") {
+  if (
+    finalStatus !== AuthorizationStatus.AUTHORIZED &&
+    finalStatus !== AuthorizationStatus.PROVISIONAL
+  ) {
     trackEvent("Failed to get push token");
     return null;
   }
 
-  const tokenData = await Notifications.getExpoPushTokenAsync();
-  const firebaseTokenData = await Notifications.getDevicePushTokenAsync();
+  trackEvent(
+    "✅ Firebase Is Device Registered For Remote Messages:",
+    messaging().isDeviceRegisteredForRemoteMessages,
+  );
+  if (!messaging().isDeviceRegisteredForRemoteMessages)
+    await messaging().registerDeviceForRemoteMessages();
 
-  const tokens = {
-    token: tokenData?.data as string,
-    firebaseToken: firebaseTokenData?.data as string,
-  };
+  const firebaseTokenData = await messaging().getToken();
 
-  trackEvent("✅ Expo Push Token:", tokens);
-  return tokens;
+  trackEvent("✅ Firebase Push Token:", firebaseTokenData);
+  return firebaseTokenData;
 }

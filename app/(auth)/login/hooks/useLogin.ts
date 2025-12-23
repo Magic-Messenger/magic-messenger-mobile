@@ -120,23 +120,15 @@ export const useLogin = () => {
         }
       });
 
-      registerForPushNotificationsAsync().then(
-        async (pushNotificationTokens) => {
-          if (pushNotificationTokens) {
-            registerDeviceToken({
-              data: { deviceToken: pushNotificationTokens.token },
-            })
-              .then()
-              .catch();
-
-            registerFirebaseToken({
-              data: { firebaseToken: pushNotificationTokens.firebaseToken },
-            })
-              .then()
-              .catch();
-          }
-        },
-      );
+      registerForPushNotificationsAsync().then(async (token) => {
+        if (token) {
+          registerFirebaseToken({
+            data: { firebaseToken: token },
+          })
+            .then()
+            .catch();
+        }
+      });
 
       updatePublicKeyApi({
         data: {

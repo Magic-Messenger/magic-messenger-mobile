@@ -5,7 +5,6 @@ import LogRocket from "@logrocket/react-native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as Application from "expo-application";
 import { useFonts } from "expo-font";
-import * as Notifications from "expo-notifications";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -23,7 +22,7 @@ import { initDayjs } from "@/i18n";
 import { ImageViewerProvider, SignalRProvider, TorProvider } from "@/providers";
 import {
   checkInitialNotification,
-  registerCallNotificationCategory,
+  clearAllNotifications,
   registerForPushNotificationsAsync,
   setupNotificationListeners,
 } from "@/services";
@@ -54,14 +53,10 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
-      Notifications.setBadgeCountAsync(0);
-      Notifications.dismissAllNotificationsAsync();
+      clearAllNotifications();
 
       registerForPushNotificationsAsync();
       setupNotificationListeners();
-      registerCallNotificationCategory();
-
-      // Cold start durumunda bildirime tıklanarak açıldıysa kontrol et
       checkInitialNotification();
 
       LogRocket.init(process?.env?.EXPO_PUBLIC_LOG_ROCKET_API as string, {
@@ -79,7 +74,7 @@ export default function RootLayout() {
       "change",
       (nextAppState) => {
         useAppStore.setState({ appState: nextAppState });
-      }
+      },
     );
 
     return () => {

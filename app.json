@@ -76,17 +76,12 @@
           "recordAudioAndroid": true
         }
       ],
-      [
-        "expo-notifications",
-        {
-          "enableBackgroundRemoteNotifications": true
-        }
-      ],
       "expo-localization",
       "expo-iap",
       "expo-secure-store",
       "./plugins/trust-local-certs.js",
       "./plugins/override-read-media-permission.js",
+      "./plugins/with-firebase.js",
       "@logrocket/react-native",
       [
         "expo-av",
