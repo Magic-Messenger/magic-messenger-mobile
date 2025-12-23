@@ -5,9 +5,7 @@
  * OpenAPI spec version: v1
  */
 
-export interface EndCallCommandRequest {
+export interface RegisterFirebaseTokenCommandRequest {
   /** @nullable */
-  targetUsername?: string | null;
-  /** @nullable */
-  callId?: string | null;
+  firebaseToken?: string | null;
 }

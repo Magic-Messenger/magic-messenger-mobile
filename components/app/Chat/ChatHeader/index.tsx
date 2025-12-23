@@ -91,10 +91,10 @@ export function ChatHeader({
         ]}
       >
         <TouchableOpacity onPress={() => onCallingPress?.(CallingType.Audio)}>
-          <Icon name="phone" size={25} />
+          <Icon type="feather" name="phone-call" size={26} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => onCallingPress?.(CallingType.Video)}>
-          <Icon name="video-call" size={30} />
+          <Icon type="feather" name="video" size={26} />
         </TouchableOpacity>
       </View>
     </View>

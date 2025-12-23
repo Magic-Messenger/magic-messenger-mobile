@@ -30,7 +30,9 @@ const SecureStoreStorage = {
 };
 
 export type PendingCallData = {
+  callId: string;
   callerUsername: string;
+  callerNickname: string;
   callingType: CallingType;
   offer: string;
 } | null;
@@ -63,6 +65,6 @@ export const useCallingStore = create<CallingStore>()(
       onRehydrateStorage: () => () => {
         useCallingStore.setState({ rehydrated: true });
       },
-    }
-  )
+    },
+  ),
 );

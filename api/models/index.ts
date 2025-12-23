@@ -198,6 +198,7 @@ export * from "./registerCommandResultAccount";
 export * from "./registerCommandResultIDataResult";
 export * from "./registerCommandResultIDataResultData";
 export * from "./registerDeviceTokenCommandRequest";
+export * from "./registerFirebaseTokenCommandRequest";
 export * from "./rejectCallCommandRequest";
 export * from "./rejectGroupInvitationCommandRequest";
 export * from "./replyMessageDto";

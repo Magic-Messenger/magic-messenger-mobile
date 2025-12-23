@@ -17,5 +17,7 @@ export interface RegisterCommandRequest {
   /** @nullable */
   deviceToken?: string | null;
   /** @nullable */
+  firebaseToken?: string | null;
+  /** @nullable */
   publicKey?: string | null;
 }

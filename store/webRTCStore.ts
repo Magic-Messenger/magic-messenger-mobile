@@ -7,6 +7,7 @@ import {
   CallEndedEvent,
   CallRejectedEvent,
   CameraToggleEvent,
+  EndCallCommandRequest,
   IceCandidateEvent,
   IncomingCallEvent,
   MicrophoneToggleEvent,
@@ -23,6 +24,8 @@ export type StartCallingType = {
 };
 
 export type IncomingCallData = {
+  callId: string;
+  callerNickname: string;
   callerUsername: string;
   callingType: CallingType;
   offer: string;
@@ -37,6 +40,7 @@ type WebRTCStore = {
   isRemoteVideoEnabled: boolean;
   isRemoteAudioEnabled: boolean;
   isIncoming?: boolean;
+  callId?: string;
   callerUsername?: string;
   targetUsername?: string;
   isCaller?: boolean;
@@ -48,6 +52,7 @@ type WebRTCStore = {
   setAudioEnabled: (isEnabled: boolean) => void;
   setVideoEnabled: (isEnabled: boolean) => void;
   setIsIncoming: (isIncoming: boolean) => void;
+  setCallId: (callId: string) => void;
   setCallerUsername: (username: string) => void;
   setTargetUsername: (username: string) => void;
   setIncomingCallData: (data: IncomingCallData) => void;
@@ -66,7 +71,7 @@ type WebRTCStore = {
   callRejected: (data: CallRejectedEvent) => void;
   onCameraToggle: (data: CameraToggleEvent) => void;
   onMicrophoneToggle: (data: MicrophoneToggleEvent) => void;
-  endCall: () => void;
+  endCall: (data?: EndCallCommandRequest) => void;
 };
 
 const initialState = {
@@ -151,6 +156,10 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     });
   },
 
+  setCallId: (callId: string) => {
+    set({ callId: callId });
+  },
+
   setTargetUsername: (username: string) => {
     set({ targetUsername: username });
   },
@@ -166,9 +175,7 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     trackEvent("Incoming call received:", incomingCall);
     set({
       incomingCallData: {
-        callerUsername: incomingCall.callerUsername,
-        callingType: incomingCall.callingType,
-        offer: incomingCall.offer,
+        ...incomingCall,
       },
       isIncoming: true,
     });
@@ -192,6 +199,7 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     if (incomingCallData) {
       useSignalRStore.getState().magicHubClient?.rejectCall({
         callerUsername: incomingCallData.callerUsername,
+        callId: incomingCallData.callId,
       });
     }
     set({ incomingCallData: null, isIncoming: false });
@@ -230,7 +238,7 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
       (state) => {
         trackEvent("Connection state changed", { state, targetUsername });
         set({ connectionState: state });
-      }
+      },
     );
 
     const offer = await WebRTCService.createOffer();
@@ -275,7 +283,7 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
         (state) => {
           trackEvent("Connection state changed", { state, callerUsername });
           set({ connectionState: state });
-        }
+        },
       );
 
       await WebRTCService.setRemoteDescription(JSON.parse(offer));
@@ -306,15 +314,16 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     await WebRTCService.addIceCandidate(JSON.parse(candidate));
   },
 
-  endCall: () => {
+  endCall: (data?: EndCallCommandRequest) => {
+    const { incomingCallData } = get();
     const otherParty = getOtherPartyUsername(get());
 
-    if (otherParty) {
-      trackEvent("Ending call", { targetUsername: otherParty });
-      useSignalRStore.getState().magicHubClient?.endCall({
-        targetUsername: otherParty,
-      });
-    }
+    trackEvent("Ending call", { targetUsername: otherParty });
+
+    useSignalRStore.getState().magicHubClient?.endCall({
+      targetUsername: (data?.targetUsername ?? otherParty) as string,
+      callId: (data?.callId ?? incomingCallData?.callId) as string,
+    });
 
     WebRTCService.closeConnection();
     set(resetState());

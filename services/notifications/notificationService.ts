@@ -13,6 +13,11 @@ import { PendingCallData, useCallingStore, useWebRTCStore } from "@/store";
 
 import { trackEvent } from "../../utils/helper";
 
+export type RegisterPushNotificationTokenType = {
+  token: string;
+  firebaseToken: string;
+};
+
 type DeliveredMessageNotificationData = {
   ChatId: string;
   MessageId: string;
@@ -25,7 +30,7 @@ Notifications.setNotificationHandler({
       shouldShowList: false,
       shouldPlaySound: false,
       shouldSetBadge: false,
-    } as NotificationBehavior),
+    }) as NotificationBehavior,
 });
 
 if (Platform.OS === "android")
@@ -65,7 +70,7 @@ export const registerDeliveredListener = () => {
 
 // --- Handle notification response (shared logic) ---
 const handleNotificationResponse = async (
-  response: Notifications.NotificationResponse
+  response: Notifications.NotificationResponse,
 ) => {
   Notifications.setBadgeCountAsync(0);
   Notifications.dismissAllNotificationsAsync();
@@ -82,6 +87,8 @@ const handleNotificationResponse = async (
   ) {
     // This is calling, so we need to know user accept or reject call.
 
+    const callingMessageData = messageData as PendingCallData;
+
     // ACCEPT_CALL butonu veya direkt bildirime tıklama (default action)
     if (
       action === "ACCEPT_CALL" ||
@@ -89,19 +96,23 @@ const handleNotificationResponse = async (
     ) {
       // Pending call bilgisini oluştur
       const pendingCallData: PendingCallData = {
+        callId: callingMessageData?.callId as string,
+        callerNickname: callingMessageData?.callerNickname as string,
+        offer: callingMessageData?.offer as string,
+        callerUsername: callingMessageData?.callerUsername as string,
         callingType:
           messageData.callingType === "VideoCalling"
             ? CallingType.Video
             : CallingType.Audio,
-        offer: messageData.offer as string,
-        callerUsername: messageData.callerUsername as string,
       };
 
-      // Persist edilen callingStore'a kaydet
       trackEvent("Saving pending call to store", pendingCallData);
       useCallingStore.getState().setPendingCall(pendingCallData);
     } else if (action === "REJECT_CALL") {
-      useWebRTCStore.getState().endCall?.();
+      useWebRTCStore.getState().endCall?.({
+        callId: callingMessageData?.callId as string,
+        targetUsername: callingMessageData?.callerUsername as string,
+      });
     }
 
     return;
@@ -125,7 +136,7 @@ const handleNotificationResponse = async (
 // --- Opened listener (user tapped - works when app is in foreground/background) ---
 export const registerOpenedListener = () => {
   Notifications.addNotificationResponseReceivedListener(
-    handleNotificationResponse
+    handleNotificationResponse,
   );
 };
 
@@ -164,9 +175,7 @@ export const setupNotificationListeners = () => {
   registerOpenedListener();
 };
 
-export async function registerForPushNotificationsAsync(): Promise<
-  string | null
-> {
+export async function registerForPushNotificationsAsync(): Promise<RegisterPushNotificationTokenType | null> {
   if (!Device.isDevice) {
     trackEvent("Must use physical device for push notifications");
     return null;
@@ -186,6 +195,13 @@ export async function registerForPushNotificationsAsync(): Promise<
   }
 
   const tokenData = await Notifications.getExpoPushTokenAsync();
-  trackEvent("✅ Expo Push Token:", { token: tokenData?.data });
-  return tokenData?.data;
+  const firebaseTokenData = await Notifications.getDevicePushTokenAsync();
+
+  const tokens = {
+    token: tokenData?.data as string,
+    firebaseToken: firebaseTokenData?.data as string,
+  };
+
+  trackEvent("✅ Expo Push Token:", tokens);
+  return tokens;
 }

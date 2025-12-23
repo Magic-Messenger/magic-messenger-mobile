@@ -8,4 +8,6 @@
 export interface RejectCallCommandRequest {
   /** @nullable */
   callerUsername?: string | null;
+  /** @nullable */
+  callId?: string | null;
 }

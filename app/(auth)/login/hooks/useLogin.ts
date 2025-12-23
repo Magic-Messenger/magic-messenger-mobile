@@ -10,6 +10,7 @@ import {
   useDeleteApiAccountDeleteProfile,
   usePostApiAccountLogin,
   usePostApiAccountRegisterDeviceToken,
+  usePostApiAccountRegisterFirebaseToken,
   usePostApiAccountUpdatePublicKey,
 } from "@/api/endpoints/magicMessenger";
 import { flexBox, spacing } from "@/constants";
@@ -53,6 +54,8 @@ export const useLogin = () => {
     usePostApiAccountUpdatePublicKey();
   const { mutateAsync: registerDeviceToken } =
     usePostApiAccountRegisterDeviceToken();
+  const { mutateAsync: registerFirebaseToken } =
+    usePostApiAccountRegisterFirebaseToken();
   const { mutateAsync: deleteAccount, isPending: isDeleteAccountLoading } =
     useDeleteApiAccountDeleteProfile();
 
@@ -69,7 +72,7 @@ export const useLogin = () => {
   } = useForm<RegisterFormData>({
     defaultValues: {
       username: userName ?? (__DEV__ ? "omer-test" : undefined),
-      password: __DEV__ ? "Kadir123*+" : undefined,
+      password: __DEV__ ? "Omer123*+" : undefined,
     },
   });
 
@@ -79,7 +82,7 @@ export const useLogin = () => {
     if (__DEV__) {
       reset({
         username: userName ?? (__DEV__ ? "omer-test" : undefined),
-        password: __DEV__ ? "Kadir123*+" : undefined,
+        password: __DEV__ ? "Omer123*+" : undefined,
       });
     }
   }, [__DEV__]);
@@ -103,7 +106,7 @@ export const useLogin = () => {
       trackEvent("login_success");
       login(
         data?.accessToken?.token as string,
-        data?.account?.username as string
+        data?.account?.username as string,
       );
       getApiAccountGetProfile().then((profileResponse) => {
         if (profileResponse.success) {
@@ -117,12 +120,23 @@ export const useLogin = () => {
         }
       });
 
-      registerForPushNotificationsAsync().then(async (token) => {
-        token &&
-          registerDeviceToken({ data: { deviceToken: token } })
-            .then()
-            .catch();
-      });
+      registerForPushNotificationsAsync().then(
+        async (pushNotificationTokens) => {
+          if (pushNotificationTokens) {
+            registerDeviceToken({
+              data: { deviceToken: pushNotificationTokens.token },
+            })
+              .then()
+              .catch();
+
+            registerFirebaseToken({
+              data: { firebaseToken: pushNotificationTokens.firebaseToken },
+            })
+              .then()
+              .catch();
+          }
+        },
+      );
 
       updatePublicKeyApi({
         data: {
@@ -141,7 +155,7 @@ export const useLogin = () => {
       if (pendingCall) {
         trackEvent(
           "Found pending call, showing incoming call modal",
-          pendingCall
+          pendingCall,
         );
 
         // Store'dan sil (artık işlendi)
@@ -168,7 +182,7 @@ export const useLogin = () => {
     if (!password) {
       Alert.alert(
         t("login.deleteAccountAlertTitle"),
-        t("login.deleteAccountPasswordRequired")
+        t("login.deleteAccountPasswordRequired"),
       );
       return;
     }
@@ -197,7 +211,7 @@ export const useLogin = () => {
           style: "destructive",
           onPress: onChangeAccount,
         },
-      ]
+      ],
     );
   };
 
@@ -215,7 +229,7 @@ export const useLogin = () => {
           style: "destructive",
           onPress: onDeleteAccount,
         },
-      ]
+      ],
     );
   };
 

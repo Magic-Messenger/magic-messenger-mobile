@@ -3,9 +3,12 @@ import * as signalR from "@microsoft/signalr";
 import {
   AddMessageToTicketCommandRequest,
   AnswerCallCommandRequest,
+  CallingType,
   CallUserCommandRequest,
   ChangeTicketStatusCommandRequest,
+  ChatDto,
   IceCandidateCommandRequest,
+  MessageDto,
   SendMessageCommandRequest,
   TicketDto,
   TicketMessageDto,
@@ -13,10 +16,12 @@ import {
 
 export interface EndCallCommandRequest {
   targetUsername: string;
+  callId: string;
 }
 
 export interface RejectCallCommandRequest {
   callerUsername: string; // Changed from targetUsername to callerUsername per spec
+  callId: string;
 }
 
 export interface CallEndedEvent {
@@ -142,7 +147,9 @@ export interface MessageReceivedEvent {
 }
 
 export interface IncomingCallEvent {
+  callId: string;
   callerUsername: string;
+  callerNickname: string;
   callingType: CallingType;
   offer: string;
 }
