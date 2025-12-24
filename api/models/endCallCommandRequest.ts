@@ -7,7 +7,7 @@
 
 export interface EndCallCommandRequest {
   /** @nullable */
-  targetUsername?: string | null;
-  /** @nullable */
   callId?: string | null;
+  /** @nullable */
+  targetUsername?: string | null;
 }

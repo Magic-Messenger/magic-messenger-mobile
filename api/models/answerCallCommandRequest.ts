@@ -8,6 +8,8 @@ import type { CallingType } from "./callingType";
 
 export interface AnswerCallCommandRequest {
   /** @nullable */
+  callId?: string | null;
+  /** @nullable */
   callerUsername?: string | null;
   answerType?: CallingType;
   /** @nullable */
