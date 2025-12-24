@@ -15,8 +15,7 @@ import {
   postApiChatsMessageDelivered,
   postApiChatsMessageRead,
 } from "@/api/endpoints/magicMessenger";
-import { CallingType } from "@/api/models";
-import { PendingCallData, useCallingStore, useWebRTCStore } from "@/store";
+import { useWebRTCStore } from "@/store";
 
 import { trackEvent } from "../../utils/helper";
 
@@ -93,24 +92,11 @@ const callActionIdentifier = ({ type, detail }: Event) => {
   ) {
     // This is calling, so we need to know user accept or reject call.
 
-    const callingMessageData = notification?.data as PendingCallData;
+    const callingMessageData = notification?.data;
 
     // ACCEPT_CALL butonu veya direkt bildirime tıklama (default action)
     if (pressAction?.id === "ACCEPT_CALL") {
-      // Pending call bilgisini oluştur
-      const pendingCallData: PendingCallData = {
-        callId: callingMessageData?.callId as string,
-        callerNickname: callingMessageData?.callerNickname as string,
-        offer: callingMessageData?.offer as string,
-        callerUsername: callingMessageData?.callerUsername as string,
-        callingType:
-          notification?.data?.callingType === "VideoCalling"
-            ? CallingType.Video
-            : CallingType.Audio,
-      };
-
-      trackEvent("Saving pending call to store", pendingCallData);
-      useCallingStore.getState().setPendingCall(pendingCallData);
+      /* not needed */
     } else if (pressAction?.id === "REJECT_CALL") {
       useWebRTCStore.getState().endCall?.({
         callId: callingMessageData?.callId as string,

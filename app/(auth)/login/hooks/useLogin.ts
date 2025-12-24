@@ -7,6 +7,7 @@ import { Alert, StyleSheet } from "react-native";
 
 import {
   getApiAccountGetProfile,
+  getApiCallingGetWaitingCalling,
   useDeleteApiAccountDeleteProfile,
   usePostApiAccountLogin,
   usePostApiAccountRegisterDeviceToken,
@@ -15,12 +16,7 @@ import {
 } from "@/api/endpoints/magicMessenger";
 import { flexBox, spacing } from "@/constants";
 import { registerForPushNotificationsAsync } from "@/services";
-import {
-  useCallingStore,
-  useTorStore,
-  useUserStore,
-  useWebRTCStore,
-} from "@/store";
+import { useTorStore, useUserStore, useWebRTCStore } from "@/store";
 import { useThemedStyles } from "@/theme";
 import {
   fontPixel,
@@ -72,7 +68,7 @@ export const useLogin = () => {
   } = useForm<RegisterFormData>({
     defaultValues: {
       username: userName ?? (__DEV__ ? "omer-test" : undefined),
-      password: __DEV__ ? "Omer123*+" : undefined,
+      password: __DEV__ ? "Kadir123*+" : undefined,
     },
   });
 
@@ -82,7 +78,7 @@ export const useLogin = () => {
     if (__DEV__) {
       reset({
         username: userName ?? (__DEV__ ? "omer-test" : undefined),
-        password: __DEV__ ? "Omer123*+" : undefined,
+        password: __DEV__ ? "Kadir123*+" : undefined,
       });
     }
   }, [__DEV__]);
@@ -140,25 +136,26 @@ export const useLogin = () => {
 
       setIsLoading(false);
 
-      // Pending call kontrolü - persist edilen callingStore'dan oku
-      const pendingCall = useCallingStore.getState().pendingCall;
-      trackEvent("Checking pending call from store", { pendingCall });
-
-      if (pendingCall) {
-        trackEvent(
-          "Found pending call, showing incoming call modal",
-          pendingCall,
-        );
-
-        // Store'dan sil (artık işlendi)
-        useCallingStore.getState().clearPendingCall();
-
-        // incomingCallData olarak set et - IncomingCallModal otomatik açılacak
-        useWebRTCStore.getState().setIncomingCallData(pendingCall);
-        useWebRTCStore.getState().setIsIncoming(true);
+      const response = await getApiCallingGetWaitingCalling({
+        headers: {
+          Bearer: data?.accessToken?.token as string,
+        },
+      });
+      if (response?.success) {
+        trackEvent("Waiting call found", { response });
+        useWebRTCStore.getState().setIncomingCallData({
+          ...response?.data,
+          callId: response?.data?.callingId as string,
+          callerNickname: response?.data?.caller as string,
+          callerUsername: response?.data?.caller as string,
+          callingType: response?.data?.callingType as never,
+          offer: response?.data?.offer as string,
+        });
+        setTimeout(() => {
+          useWebRTCStore.getState().setIsIncoming(true);
+        }, 500);
       }
 
-      // Her durumda ana sayfaya git
       router.replace("/chat/home");
     } catch {
       setIsLoading(false);
