@@ -242,11 +242,16 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     );
 
     const offer = await WebRTCService.createOffer();
-    useSignalRStore.getState().magicHubClient?.callUser({
+
+    const callUserData = {
       targetUsername,
       callingType,
       offer: JSON.stringify(offer),
-    });
+    };
+
+    trackEvent("Call user data", callUserData);
+
+    useSignalRStore.getState().magicHubClient?.callUser(callUserData);
   },
 
   answerCall: async (incomingCall: IncomingCallEvent) => {
