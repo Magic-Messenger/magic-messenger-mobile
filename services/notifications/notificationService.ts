@@ -29,6 +29,8 @@ type DeliveredMessageNotificationData = {
 export const registerDeliveredListener = () => {
   messaging().onMessage(async (notification) => {
     try {
+      trackEvent("📩 Message delivered:", notification);
+
       const messageData = notification.data;
       if (!messageData) return;
 
@@ -38,8 +40,6 @@ export const registerDeliveredListener = () => {
         deliveredMessageNotificationData.ChatId &&
         deliveredMessageNotificationData.MessageId
       ) {
-        trackEvent("📩 Message delivered:", messageData);
-
         await postApiChatsMessageDelivered({
           chatId: deliveredMessageNotificationData.ChatId,
           messageId: deliveredMessageNotificationData.MessageId,

@@ -82,6 +82,7 @@
       "./plugins/trust-local-certs.js",
       "./plugins/override-read-media-permission.js",
       "./plugins/with-firebase.js",
+      "./plugins/with-notifee.js",
       "@logrocket/react-native",
       [
         "expo-av",
@@ -103,6 +104,8 @@
           "captureType": "fullMediaCapture"
         }
       ],
+      "expo-font",
+      "expo-web-browser",
       [
         "expo-build-properties",
         {
@@ -112,9 +115,7 @@
             "minSdkVersion": 25
           }
         }
-      ],
-      "expo-font",
-      "expo-web-browser"
+      ]
     ],
     "experiments": {
       "typedRoutes": true
