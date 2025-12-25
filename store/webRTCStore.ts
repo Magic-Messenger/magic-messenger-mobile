@@ -82,6 +82,12 @@ const initialState = {
   isVideoEnabled: false,
   isRemoteVideoEnabled: true,
   isRemoteAudioEnabled: true,
+  isIncoming: false,
+  callId: undefined,
+  callerUsername: undefined,
+  targetUsername: undefined,
+  isCaller: false,
+  incomingCallData: undefined,
 };
 
 // Helper function to get the other party's username
@@ -93,11 +99,6 @@ const getOtherPartyUsername = (state: WebRTCStore): string | undefined => {
 // Helper function to reset state to initial
 const resetState = () => ({
   ...initialState,
-  connectionState: "new" as ConnectionStateType,
-  isIncoming: false,
-  callerUsername: undefined,
-  targetUsername: undefined,
-  isCaller: false,
 });
 
 export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
@@ -117,12 +118,13 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
 
   setVideoEnabled: (isEnabled: boolean) => {
     const otherParty = getOtherPartyUsername(get());
-
     if (otherParty) {
       trackEvent("Camera toggled", { isEnabled, targetUsername: otherParty });
-      useSignalRStore.getState().magicHubClient?.toggleCamera({
-        targetUsername: otherParty,
-        isEnabled,
+      startTransition(() => {
+        useSignalRStore.getState().magicHubClient?.toggleCamera({
+          targetUsername: otherParty,
+          isEnabled,
+        });
       });
     }
     set({ isVideoEnabled: isEnabled });
@@ -130,17 +132,19 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
 
   setAudioEnabled: (isEnabled: boolean) => {
     const otherParty = getOtherPartyUsername(get());
-
     if (otherParty) {
       trackEvent("Microphone toggled", {
         isEnabled,
         targetUsername: otherParty,
       });
-      useSignalRStore.getState().magicHubClient?.toggleMicrophone({
-        targetUsername: otherParty,
-        isEnabled,
+      startTransition(() => {
+        useSignalRStore.getState().magicHubClient?.toggleMicrophone({
+          targetUsername: otherParty,
+          isEnabled,
+        });
       });
     }
+
     set({ isAudioEnabled: isEnabled });
   },
 
@@ -185,20 +189,26 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     if (!incomingCallData) return;
 
     await answerCall(incomingCallData);
-    set({ incomingCallData: null });
+
+    startTransition(() => {
+      set({ incomingCallData: null });
+    });
   },
 
   declineIncomingCall: () => {
     const { incomingCallData } = get();
     trackEvent("Incoming call declined", incomingCallData);
-
-    if (incomingCallData) {
+    startTransition(() => {
       useSignalRStore.getState().magicHubClient?.rejectCall({
-        callerUsername: incomingCallData.callerUsername,
-        callId: incomingCallData.callId,
+        callerUsername: incomingCallData?.callerUsername!,
+        callId: incomingCallData?.callId!,
       });
-    }
-    set({ incomingCallData: null, isIncoming: false });
+      set({
+        ...resetState(),
+        incomingCallData: null,
+        isIncoming: false,
+      });
+    });
   },
 
   startCall: async ({ targetUsername, callingType }) => {
@@ -230,9 +240,11 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     await WebRTCService.createPeerConnection(
       (remoteStream) => set({ remoteStream }),
       (candidate) => {
-        useSignalRStore.getState().magicHubClient?.sendIceCandidate({
-          targetUsername,
-          candidate: JSON.stringify(candidate),
+        startTransition(() => {
+          useSignalRStore.getState().magicHubClient?.sendIceCandidate({
+            targetUsername,
+            candidate: JSON.stringify(candidate),
+          });
         });
       },
       (state) => {
@@ -251,12 +263,14 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
 
     trackEvent("Call user data", callUserData);
 
-    const callId = await useSignalRStore
-      .getState()
-      .magicHubClient?.callUser?.(callUserData);
-    callId && get().setCallId(callId);
+    startTransition(async () => {
+      const callId = await useSignalRStore
+        .getState()
+        .magicHubClient?.callUser?.(callUserData);
+      get().setCallId(callId!);
 
-    trackEvent("Call started on socket", { callId });
+      trackEvent("Call started on socket", { callId });
+    });
   },
 
   answerCall: async (incomingCall: IncomingCallEvent) => {
@@ -285,9 +299,11 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
       await WebRTCService.createPeerConnection(
         (remoteStream) => set({ remoteStream }),
         (candidate) => {
-          useSignalRStore.getState().magicHubClient?.sendIceCandidate({
-            targetUsername: callerUsername,
-            candidate: JSON.stringify(candidate),
+          startTransition(() => {
+            useSignalRStore.getState().magicHubClient?.sendIceCandidate({
+              targetUsername: callerUsername,
+              candidate: JSON.stringify(candidate),
+            });
           });
         },
         (state) => {
@@ -298,11 +314,14 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
 
       await WebRTCService.setRemoteDescription(JSON.parse(offer));
       const answer = await WebRTCService.createAnswer();
-      await useSignalRStore.getState().magicHubClient?.answerCall({
-        callerUsername,
-        answer: JSON.stringify(answer),
-        answerType: callingType,
-        callId,
+
+      startTransition(() => {
+        useSignalRStore.getState().magicHubClient?.answerCall({
+          callerUsername,
+          answer: JSON.stringify(answer),
+          answerType: callingType,
+          callId,
+        });
       });
 
       trackEvent("Call answered successfully", { callerUsername });
@@ -327,13 +346,19 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
 
     trackEvent("Ending call", { targetUsername: otherParty });
 
-    useSignalRStore.getState().magicHubClient?.endCall({
-      targetUsername: (data?.targetUsername ?? otherParty) as string,
-      callId: (data?.callId ?? incomingCallData?.callId ?? callId) as string,
-    });
-
     WebRTCService.closeConnection();
-    set(resetState());
+
+    startTransition(() => {
+      useSignalRStore.getState().magicHubClient?.endCall({
+        targetUsername: (data?.targetUsername ?? otherParty) as string,
+        callId: (data?.callId ?? incomingCallData?.callId ?? callId) as string,
+      });
+
+      set({
+        ...resetState(),
+        connectionState: "closed",
+      });
+    });
   },
 
   callEnded: (data: CallEndedEvent) => {
