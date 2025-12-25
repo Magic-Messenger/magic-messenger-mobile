@@ -82,6 +82,8 @@ export const registerOpenedListener = () => {
 };
 
 const callActionIdentifier = ({ type, detail }: Event) => {
+  trackEvent("callActionIdentifier", { type, detail });
+
   if (type !== EventType.ACTION_PRESS) return;
 
   const { pressAction, notification } = detail;
@@ -94,9 +96,7 @@ const callActionIdentifier = ({ type, detail }: Event) => {
 
     const callingMessageData = notification?.data;
 
-    // ACCEPT_CALL butonu veya direkt bildirime tıklama (default action)
     if (pressAction?.id === "ACCEPT_CALL") {
-      /* not needed */
     } else if (pressAction?.id === "REJECT_CALL") {
       useWebRTCStore.getState().endCall?.({
         callId: callingMessageData?.callId as string,

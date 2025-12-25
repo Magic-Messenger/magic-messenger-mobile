@@ -1,6 +1,7 @@
+import { startTransition } from "react";
 import { create } from "zustand";
 
-import { postApiCallingAnswerCall } from "@/api/endpoints/magicMessenger";
+import { getApiCallingGetWaitingCalling } from "@/api/endpoints/magicMessenger";
 import { CallingType } from "@/api/models";
 import {
   CallAnsweredEvent,
@@ -44,7 +45,7 @@ type WebRTCStore = {
   callerUsername?: string;
   targetUsername?: string;
   isCaller?: boolean;
-  incomingCallData: IncomingCallData;
+  incomingCallData?: IncomingCallData;
 
   setConnectionState: (connectionState: ConnectionStateType) => void;
   setLocalStream: (stream?: MediaStream) => void;
@@ -72,17 +73,15 @@ type WebRTCStore = {
   onCameraToggle: (data: CameraToggleEvent) => void;
   onMicrophoneToggle: (data: MicrophoneToggleEvent) => void;
   endCall: (data?: EndCallCommandRequest) => void;
+  checkWaitingCalling: () => void | Promise<void>;
 };
 
 const initialState = {
   connectionState: "new" as ConnectionStateType,
-  localStream: undefined,
-  remoteStream: undefined,
   isAudioEnabled: false,
   isVideoEnabled: false,
   isRemoteVideoEnabled: true,
   isRemoteAudioEnabled: true,
-  incomingCallData: null as IncomingCallData,
 };
 
 // Helper function to get the other party's username
@@ -191,10 +190,7 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
 
   declineIncomingCall: () => {
     const { incomingCallData } = get();
-    trackEvent("Incoming call declined", {
-      callerUsername: incomingCallData?.callerUsername,
-      callingType: incomingCallData?.callingType,
-    });
+    trackEvent("Incoming call declined", incomingCallData);
 
     if (incomingCallData) {
       useSignalRStore.getState().magicHubClient?.rejectCall({
@@ -215,7 +211,11 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
       isIncoming: false,
     });
 
-    trackEvent("Call started", { targetUsername, callingType });
+    trackEvent("Call is starting", {
+      callerUsername: currentUsername!,
+      targetUsername,
+      callingType,
+    });
 
     // 1. Fetch ICE servers first
     await WebRTCService.fetchIceServers();
@@ -251,11 +251,16 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
 
     trackEvent("Call user data", callUserData);
 
-    useSignalRStore.getState().magicHubClient?.callUser(callUserData);
+    const callId = await useSignalRStore
+      .getState()
+      .magicHubClient?.callUser?.(callUserData);
+    callId && get().setCallId(callId);
+
+    trackEvent("Call started on socket", { callId });
   },
 
   answerCall: async (incomingCall: IncomingCallEvent) => {
-    const { callerUsername, callingType, offer } = incomingCall;
+    const { callerUsername, callingType, offer, callId } = incomingCall;
 
     try {
       trackEvent("Answering call", { callerUsername, callingType });
@@ -296,11 +301,8 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
       await useSignalRStore.getState().magicHubClient?.answerCall({
         callerUsername,
         answer: JSON.stringify(answer),
-      });
-      await postApiCallingAnswerCall({
-        callerUsername,
-        answer: JSON.stringify(answer),
         answerType: callingType,
+        callId,
       });
 
       trackEvent("Call answered successfully", { callerUsername });
@@ -320,14 +322,14 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
   },
 
   endCall: (data?: EndCallCommandRequest) => {
-    const { incomingCallData } = get();
+    const { incomingCallData, callId } = get();
     const otherParty = getOtherPartyUsername(get());
 
     trackEvent("Ending call", { targetUsername: otherParty });
 
     useSignalRStore.getState().magicHubClient?.endCall({
       targetUsername: (data?.targetUsername ?? otherParty) as string,
-      callId: (data?.callId ?? incomingCallData?.callId) as string,
+      callId: (data?.callId ?? incomingCallData?.callId ?? callId) as string,
     });
 
     WebRTCService.closeConnection();
@@ -353,6 +355,31 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
       ...resetState(),
       connectionState: "closed",
     });
+  },
+
+  checkWaitingCalling: () => {
+    getApiCallingGetWaitingCalling()
+      .then((waitingCalling) => {
+        if (waitingCalling?.success && waitingCalling?.data) {
+          trackEvent("Waiting call found", waitingCalling?.data);
+          startTransition(() => {
+            get().setIncomingCallData({
+              ...waitingCalling?.data,
+              callId: waitingCalling?.data?.callingId as string,
+              callerNickname: waitingCalling?.data?.caller as string,
+              callerUsername: waitingCalling?.data?.caller as string,
+              callingType: waitingCalling?.data?.callingType as never,
+              offer: waitingCalling?.data?.offer as string,
+            });
+          });
+          startTransition(() => {
+            setTimeout(() => {
+              get().setIsIncoming(true);
+            }, 500);
+          });
+        }
+      })
+      .catch();
   },
 
   onCameraToggle: (data: CameraToggleEvent) => {

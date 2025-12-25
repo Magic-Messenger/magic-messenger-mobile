@@ -9,7 +9,6 @@ import {
 } from "@/api/endpoints/magicMessenger";
 import { ChatDto } from "@/api/models";
 import {
-  Colors,
   MessageDeliveredEvent,
   MessageReceivedEvent,
   MessageSeenEvent,
@@ -71,41 +70,39 @@ export const useSignalREvents = () => {
     }
   };
 
-  const navigateToChat = useCallback(
-    (chat: ChatDto) => {
-      if (chat?.isGroupChat) {
-        const { groupKey, nonce: groupNonce } = chat?.encryptedGroupKeys?.find(
-          (egk) => egk.username === currentUserName,
-        ) as never;
+  const navigateToChat = (chat: ChatDto) => {
+    const currentUserName = useUserStore.getState().userName;
+    if (chat?.isGroupChat) {
+      const { groupKey, nonce: groupNonce } = chat?.encryptedGroupKeys?.find(
+        (egk) => egk.username === currentUserName,
+      ) as never;
 
-        router.push({
-          pathname: "/groupChatDetail/screens",
-          params: {
-            chatId: chat?.chatId,
-            groupKey,
-            groupNonce,
-            userName: currentUserName,
-            title: chat?.groupName,
-            groupAccountCount: chat?.groupAccountCount,
-            groupAdminAccount: chat?.groupAdminAccount,
-            isGroupChat: (chat?.isGroupChat as never) ?? false,
-            groupAdminUsername: "test-i17",
-          },
-        });
-      } else {
-        router.navigate({
-          pathname: "/chatDetail/screens",
-          params: {
-            chatId: chat?.chatId,
-            publicKey: chat?.contact?.publicKey,
-            userName: chat?.contact?.nickname,
-            isGroupChat: (chat?.isGroupChat as never) ?? false,
-          },
-        });
-      }
-    },
-    [router, currentUserName],
-  );
+      router.push({
+        pathname: "/groupChatDetail/screens",
+        params: {
+          chatId: chat?.chatId,
+          groupKey,
+          groupNonce,
+          userName: currentUserName,
+          title: chat?.groupName,
+          groupAccountCount: chat?.groupAccountCount,
+          groupAdminAccount: chat?.groupAdminAccount,
+          isGroupChat: (chat?.isGroupChat as never) ?? false,
+          groupAdminUsername: "test-i17",
+        },
+      });
+    } else {
+      router.navigate({
+        pathname: "/chatDetail/screens",
+        params: {
+          chatId: chat?.chatId,
+          publicKey: chat?.contact?.publicKey,
+          userName: chat?.contact?.nickname,
+          isGroupChat: (chat?.isGroupChat as never) ?? false,
+        },
+      });
+    }
+  };
 
   const handleMessageDelivered = useCallback(
     (messageDeliveredEvent: MessageDeliveredEvent) => {
@@ -208,7 +205,7 @@ export const useSignalREvents = () => {
   );
 
   const handleMessageReceived = useCallback(
-    (messageReceivedEvent: MessageReceivedEvent) => {
+    async (messageReceivedEvent: MessageReceivedEvent) => {
       trackEvent("message_received", { messageReceivedEvent });
 
       const newMessage = messageReceivedEvent?.message;
@@ -234,20 +231,17 @@ export const useSignalREvents = () => {
       if (isInChatScreen(pathnameRef.current)) return;
 
       showToast({
-        type: "success",
+        type: "notification",
         text1: t("common.newMessageReceived"),
         text2: t("common.newMessageReceivedDesc", {
           title: messageReceivedEvent.chat?.isGroupChat
             ? messageReceivedEvent.chat?.groupName
             : messageReceivedEvent.chat?.contact?.nickname,
         }),
-        text2Style: {
-          color: Colors.text,
-        },
         onPress: () => navigateToChat(messageReceivedEvent.chat),
       });
     },
-    [queryClient, navigateToChat, sendMessage, setLastReceivedMessage, t],
+    [queryClient, sendMessage, navigateToChat, setLastReceivedMessage, t],
   );
 
   // Keep ref in sync with pathname

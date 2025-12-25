@@ -26,7 +26,7 @@ import {
   registerForPushNotificationsAsync,
   setupNotificationListeners,
 } from "@/services";
-import { useAppStore, useUserStore } from "@/store";
+import { useAppStore, useUserStore, useWebRTCStore } from "@/store";
 import { headerImage, toastConfig } from "@/utils";
 
 const queryClient = new QueryClient();
@@ -47,6 +47,7 @@ export default function RootLayout() {
 
   const rehydrated = useUserStore((state) => state.rehydrated);
   const language = useAppStore((state) => state.language);
+  const isLogin = useUserStore((state) => state.isLogin);
 
   const { t } = useTranslation();
 
@@ -73,6 +74,14 @@ export default function RootLayout() {
     const appStateSubscription = AppState.addEventListener(
       "change",
       (nextAppState) => {
+        if (
+          isLogin &&
+          useAppStore.getState().appState?.match?.(/inactive|background/) &&
+          nextAppState === "active"
+        ) {
+          useWebRTCStore.getState().checkWaitingCalling();
+        }
+
         useAppStore.setState({ appState: nextAppState });
       },
     );
@@ -80,7 +89,7 @@ export default function RootLayout() {
     return () => {
       appStateSubscription.remove();
     };
-  }, []);
+  }, [isLogin]);
 
   useEffect(() => {
     initDayjs();

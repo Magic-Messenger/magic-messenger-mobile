@@ -7,10 +7,8 @@ import { Alert, StyleSheet } from "react-native";
 
 import {
   getApiAccountGetProfile,
-  getApiCallingGetWaitingCalling,
   useDeleteApiAccountDeleteProfile,
   usePostApiAccountLogin,
-  usePostApiAccountRegisterDeviceToken,
   usePostApiAccountRegisterFirebaseToken,
   usePostApiAccountUpdatePublicKey,
 } from "@/api/endpoints/magicMessenger";
@@ -48,8 +46,6 @@ export const useLogin = () => {
   const { mutateAsync: loginApi } = usePostApiAccountLogin();
   const { mutateAsync: updatePublicKeyApi } =
     usePostApiAccountUpdatePublicKey();
-  const { mutateAsync: registerDeviceToken } =
-    usePostApiAccountRegisterDeviceToken();
   const { mutateAsync: registerFirebaseToken } =
     usePostApiAccountRegisterFirebaseToken();
   const { mutateAsync: deleteAccount, isPending: isDeleteAccountLoading } =
@@ -68,7 +64,7 @@ export const useLogin = () => {
   } = useForm<RegisterFormData>({
     defaultValues: {
       username: userName ?? (__DEV__ ? "omer-test" : undefined),
-      password: __DEV__ ? "Kadir123*+" : undefined,
+      password: __DEV__ ? "Omer123*+" : undefined,
     },
   });
 
@@ -78,7 +74,7 @@ export const useLogin = () => {
     if (__DEV__) {
       reset({
         username: userName ?? (__DEV__ ? "omer-test" : undefined),
-        password: __DEV__ ? "Kadir123*+" : undefined,
+        password: __DEV__ ? "Omer123*+" : undefined,
       });
     }
   }, [__DEV__]);
@@ -134,27 +130,9 @@ export const useLogin = () => {
         .then()
         .catch();
 
-      setIsLoading(false);
+      useWebRTCStore.getState().checkWaitingCalling();
 
-      const response = await getApiCallingGetWaitingCalling({
-        headers: {
-          Bearer: data?.accessToken?.token as string,
-        },
-      });
-      if (response?.success) {
-        trackEvent("Waiting call found", { response });
-        useWebRTCStore.getState().setIncomingCallData({
-          ...response?.data,
-          callId: response?.data?.callingId as string,
-          callerNickname: response?.data?.caller as string,
-          callerUsername: response?.data?.caller as string,
-          callingType: response?.data?.callingType as never,
-          offer: response?.data?.offer as string,
-        });
-        setTimeout(() => {
-          useWebRTCStore.getState().setIsIncoming(true);
-        }, 500);
-      }
+      setIsLoading(false);
 
       router.replace("/chat/home");
     } catch {

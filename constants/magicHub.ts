@@ -228,7 +228,7 @@ export interface MagicHubClient {
 
   onlineUsers(): Promise<number>;
 
-  callUser(request: CallUserCommandRequest): Promise<void>;
+  callUser(request: CallUserCommandRequest): Promise<string>;
 
   answerCall(request: AnswerCallCommandRequest): Promise<void>;
 

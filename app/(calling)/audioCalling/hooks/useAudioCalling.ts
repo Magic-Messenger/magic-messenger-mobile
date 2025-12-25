@@ -26,6 +26,7 @@ export const useAudioCalling = () => {
   const [callDuration, setCallDuration] = useState(0);
 
   const durationIntervalRef = useRef<NodeJS.Timeout | number | null>(null);
+  const isCallActiveRef = useRef(true); // ✅ Call activity tracker
 
   const connectionState = useWebRTCStore((s) => s.connectionState);
   const isIncoming = useWebRTCStore((s) => s.isIncoming);
@@ -36,10 +37,13 @@ export const useAudioCalling = () => {
   const setAudioEnabled = useWebRTCStore((s) => s.setAudioEnabled);
 
   const handleCallEnd = useCallback(() => {
+    isCallActiveRef.current = false; // ✅ Mark call as inactive
+
     if (durationIntervalRef.current) {
       clearInterval(durationIntervalRef.current);
       durationIntervalRef.current = null;
     }
+
     trackEvent("Audio call ended by user", { targetUsername, callDuration });
     endCall();
     router.back();
@@ -100,6 +104,8 @@ export const useAudioCalling = () => {
       return;
     }
 
+    isCallActiveRef.current = true; // ✅ Mark call as active
+
     if (mode === "answer") {
       setLoading(false);
     } else {
@@ -107,25 +113,27 @@ export const useAudioCalling = () => {
         targetUsername: targetUsername,
         callingType: CallingType.Audio,
       }).finally(() => {
-        setTimeout(() => {
-          setLoading(false);
-        }, 500);
+        // ✅ Only update state if call is still active
+        if (isCallActiveRef.current) {
+          setTimeout(() => {
+            setLoading(false);
+          }, 500);
+        }
       });
     }
 
-    // Cleanup always runs regardless of mode
+    // ✅ Cleanup only clears intervals, doesn't call endCall
     return () => {
-      // Cleanup: End call when component unmounts (back button pressed)
       if (durationIntervalRef.current) {
         clearInterval(durationIntervalRef.current);
+        durationIntervalRef.current = null;
       }
       trackEvent("Audio call cleanup - component unmounting", {
         targetUsername,
         mode,
       });
-      endCall();
     };
-  }, [targetUsername, mode, endCall]);
+  }, [targetUsername, mode]);
 
   // Start call duration timer when connected
   useEffect(() => {
@@ -140,12 +148,14 @@ export const useAudioCalling = () => {
     ) {
       if (durationIntervalRef.current) {
         clearInterval(durationIntervalRef.current);
+        durationIntervalRef.current = null;
       }
     }
 
     return () => {
       if (durationIntervalRef.current) {
         clearInterval(durationIntervalRef.current);
+        durationIntervalRef.current = null;
       }
     };
   }, [connectionState]);
@@ -157,12 +167,15 @@ export const useAudioCalling = () => {
       connectionState === "closed" ||
       connectionState === "disconnected"
     ) {
-      trackEvent("Audio call auto-ending", {
-        connectionState,
-        targetUsername,
-        callDuration,
-      });
-      handleCallEnd();
+      // ✅ Only proceed if call is still active
+      if (isCallActiveRef.current) {
+        trackEvent("Audio call auto-ending", {
+          connectionState,
+          targetUsername,
+          callDuration,
+        });
+        handleCallEnd();
+      }
     }
   }, [connectionState, handleCallEnd, targetUsername, callDuration]);
 

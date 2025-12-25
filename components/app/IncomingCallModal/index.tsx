@@ -1,6 +1,12 @@
 import { Audio } from "expo-av";
 import { router } from "expo-router";
-import React, { useEffect, useRef } from "react";
+import React, {
+  startTransition,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import {
   Animated,
   Easing,
@@ -23,17 +29,28 @@ export const IncomingCallModal = () => {
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const soundRef = useRef<Audio.Sound | null>(null);
+  const pulseAnimRef = useRef<Animated.CompositeAnimation | null>(null);
+
+  // Memoize call data calculations
+  const isVideoCall = useMemo(
+    () => incomingCallData?.callingType === CallingType.Video,
+    [incomingCallData?.callingType],
+  );
+
+  const callerInitial = useMemo(
+    () => incomingCallData?.callerUsername?.charAt(0)?.toUpperCase?.() ?? "",
+    [incomingCallData?.callerUsername],
+  );
 
   // Play ringtone when incoming call
   useEffect(() => {
     const playRingtone = async () => {
       try {
-        // Configure audio mode for ringtone
         await Audio.setAudioModeAsync({
           allowsRecordingIOS: false,
           playsInSilentModeIOS: true,
           staysActiveInBackground: true,
-          playThroughEarpieceAndroid: false, // Play through speaker
+          playThroughEarpieceAndroid: false,
         });
 
         const { sound } = await Audio.Sound.createAsync(
@@ -74,8 +91,13 @@ export const IncomingCallModal = () => {
     };
   }, [incomingCallData]);
 
+  // Separate pulse animation effect
   useEffect(() => {
     if (incomingCallData) {
+      if (pulseAnimRef.current) {
+        pulseAnimRef.current.stop();
+      }
+
       const pulse = Animated.loop(
         Animated.sequence([
           Animated.timing(pulseAnim, {
@@ -92,12 +114,18 @@ export const IncomingCallModal = () => {
           }),
         ]),
       );
+
+      pulseAnimRef.current = pulse;
       pulse.start();
-      return () => pulse.stop();
+
+      return () => {
+        pulse.stop();
+        pulseAnimRef.current = null;
+      };
     }
   }, [incomingCallData, pulseAnim]);
 
-  const handleAccept = async () => {
+  const handleAccept = useCallback(async () => {
     if (!incomingCallData) return;
 
     const { callerUsername, callingType } = incomingCallData;
@@ -109,23 +137,23 @@ export const IncomingCallModal = () => {
         ? "/(calling)/audioCalling/screens"
         : "/(calling)/videoCalling/screens";
 
-    router.push({
-      pathname,
-      params: {
-        targetUsername: callerUsername,
-        callingType,
-        mode: "answer",
-      },
+    startTransition(() => {
+      router.push({
+        pathname,
+        params: {
+          targetUsername: callerUsername,
+          callingType,
+          mode: "answer",
+        },
+      });
     });
-  };
+  }, [incomingCallData, acceptIncomingCall]);
 
-  const handleDecline = () => {
+  const handleDecline = useCallback(() => {
     declineIncomingCall();
-  };
+  }, [declineIncomingCall]);
 
   if (!incomingCallData) return null;
-
-  const isVideoCall = incomingCallData.callingType === CallingType.Video;
 
   return (
     <Modal
@@ -144,9 +172,7 @@ export const IncomingCallModal = () => {
             ]}
           >
             <View style={styles.avatar}>
-              <ThemedText style={styles.avatarText}>
-                {incomingCallData.callerUsername.charAt(0).toUpperCase()}
-              </ThemedText>
+              <ThemedText style={styles.avatarText}>{callerInitial}</ThemedText>
             </View>
           </Animated.View>
 

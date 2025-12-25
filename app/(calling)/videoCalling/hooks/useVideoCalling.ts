@@ -1,6 +1,6 @@
 import { useKeepAwake } from "expo-keep-awake";
 import { router, useLocalSearchParams } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet } from "react-native";
 import InCallManager from "react-native-incall-manager";
@@ -39,7 +39,12 @@ export const useVideoCalling = () => {
 
   const isVideoCall = callingType === CallingType.Video;
 
+  // ✅ Call activity tracker
+  const isCallActiveRef = useRef(true);
+
   const handleCallEnd = useCallback(() => {
+    isCallActiveRef.current = false; // ✅ Mark call as inactive
+
     trackEvent("Video call ended by user", { targetUsername, callingType });
     endCall();
     router.back();
@@ -115,6 +120,8 @@ export const useVideoCalling = () => {
       return;
     }
 
+    isCallActiveRef.current = true; // ✅ Mark call as active
+
     if (mode === "answer") {
       setLoading(false);
     } else {
@@ -122,23 +129,24 @@ export const useVideoCalling = () => {
         targetUsername: targetUsername,
         callingType: callingType,
       }).finally(() => {
-        setTimeout(() => {
-          setLoading(false);
-        }, 500);
+        // ✅ Only update state if call is still active
+        if (isCallActiveRef.current) {
+          setTimeout(() => {
+            setLoading(false);
+          }, 500);
+        }
       });
     }
 
-    // Cleanup always runs regardless of mode
+    // ✅ Cleanup only clears state, doesn't call endCall
     return () => {
-      // Cleanup: End call when component unmounts (back button pressed)
       trackEvent("Video call cleanup - component unmounting", {
         targetUsername,
         callingType,
         mode,
       });
-      endCall();
     };
-  }, [targetUsername, callingType, mode, endCall]);
+  }, [targetUsername, callingType, mode]);
 
   // Auto end call when connection fails or closes
   useEffect(() => {
@@ -147,26 +155,31 @@ export const useVideoCalling = () => {
       connectionState === "closed" ||
       connectionState === "disconnected"
     ) {
-      trackEvent("Video call auto-ending", {
-        connectionState,
-        targetUsername,
-        callingType,
-      });
-      handleCallEnd();
+      // ✅ Only proceed if call is still active
+      if (isCallActiveRef.current) {
+        trackEvent("Video call auto-ending", {
+          connectionState,
+          targetUsername,
+          callingType,
+        });
+        handleCallEnd();
+      }
     }
-  }, [connectionState, handleCallEnd, targetUsername, callingType]);
+  }, [connectionState, targetUsername, callingType]);
 
   // Force RTCView refresh when connection state changes to connected
   useEffect(() => {
-    if (connectionState === "connected") {
+    if (connectionState === "connected" && isCallActiveRef.current) {
       // Show loading state while WebRTC stabilizes
       setIsSwitchingCamera(true);
 
       // Small delay to let WebRTC stabilize, then refresh RTCView
       const timer = setTimeout(() => {
-        setLocalVideoKey((prev) => prev + 1);
-        setIsSwitchingCamera(false);
-        trackEvent("RTCView refreshed on connection", { connectionState });
+        if (isCallActiveRef.current) {
+          setLocalVideoKey((prev) => prev + 1);
+          setIsSwitchingCamera(false);
+          trackEvent("RTCView refreshed on connection", { connectionState });
+        }
       }, 600);
       return () => clearTimeout(timer);
     }
