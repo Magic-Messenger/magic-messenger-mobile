@@ -32,7 +32,7 @@
         "foregroundImage": "./assets/images/icon-foreground.png",
         "backgroundColor": "#24003D"
       },
-      "softwareKeyboardLayoutMode": "pan",
+      "softwareKeyboardLayoutMode": "adjustResize",
       "googleServicesFile": "./google-services.json",
       "edgeToEdgeEnabled": true,
       "package": "com.magicmessenger.app",

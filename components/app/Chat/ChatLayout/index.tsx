@@ -1,6 +1,9 @@
 import React from "react";
 import { ImageBackground, StyleSheet, View } from "react-native";
-import { useReanimatedKeyboardAnimation } from "react-native-keyboard-controller";
+import {
+  KeyboardControllerView,
+  useReanimatedKeyboardAnimation,
+} from "react-native-keyboard-controller";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -22,38 +25,49 @@ export function ChatLayout({ header, footer, children }: ChatLayoutProps) {
   const styles = useThemedStyles(createStyle);
   const { height } = useReanimatedKeyboardAnimation();
 
-  const animatedStyle = useAnimatedStyle(() => ({
+  const footerAnimatedStyle = useAnimatedStyle(() => ({
     paddingBottom: -height.value,
   }));
 
   return (
-    <GradientBackground
-      colors={Colors.backgroundColor as never}
-      style={styles.gradient}
+    <KeyboardControllerView
+      style={styles.keyboardController}
+      statusBarTranslucent
+      preserveEdgeToEdge
     >
-      <ImageBackground
-        source={Images.backgroundImage}
-        style={styles.imageBackground}
-        resizeMode="cover"
-      />
-      <SafeAreaView
-        edges={["top", "left", "right"]}
-        style={[styles.container, { paddingTop: HEADER_PADDING }]}
+      <GradientBackground
+        colors={Colors.backgroundColor as never}
+        style={styles.gradient}
       >
-        <View style={styles.headerContainer}>{header}</View>
+        <ImageBackground
+          source={Images.backgroundImage}
+          style={styles.imageBackground}
+          resizeMode="cover"
+        />
+        <SafeAreaView
+          edges={["top", "left", "right"]}
+          style={[styles.container, { paddingTop: HEADER_PADDING }]}
+        >
+          <View style={styles.headerContainer}>{header}</View>
 
-        <View style={styles.contentContainer}>{children}</View>
+          <Animated.View style={styles.contentContainer}>
+            {children}
+          </Animated.View>
 
-        <Animated.View style={[styles.footerContainer, animatedStyle]}>
-          {footer}
-        </Animated.View>
-      </SafeAreaView>
-    </GradientBackground>
+          <Animated.View style={[styles.footerContainer, footerAnimatedStyle]}>
+            {footer}
+          </Animated.View>
+        </SafeAreaView>
+      </GradientBackground>
+    </KeyboardControllerView>
   );
 }
 
 const createStyle = () =>
   StyleSheet.create({
+    keyboardController: {
+      flex: 1,
+    },
     gradient: {
       flex: 1,
     },
@@ -70,8 +84,10 @@ const createStyle = () =>
     },
     contentContainer: {
       flex: 1,
+      overflow: "hidden",
     },
     footerContainer: {
       backgroundColor: "transparent",
+      overflow: "hidden",
     },
   });
