@@ -341,7 +341,14 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
 
     WebRTCService.closeConnection();
 
+    if (!callId || !targetUsername) return;
+
     trackEvent("Ending call", {
+      targetUsername,
+      callId,
+    });
+
+    await useSignalRStore.getState().magicHubClient?.endCall?.({
       targetUsername,
       callId,
     });
@@ -349,11 +356,6 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     set({
       ...resetState(),
       connectionState: "closed",
-    });
-
-    await useSignalRStore.getState().magicHubClient?.endCall({
-      targetUsername,
-      callId,
     });
   },
 

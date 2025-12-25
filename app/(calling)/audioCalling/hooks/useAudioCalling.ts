@@ -11,6 +11,14 @@ import { StartCallingType, useWebRTCStore } from "@/store";
 import { useThemedStyles } from "@/theme";
 import { trackEvent } from "@/utils";
 
+const formatDuration = (seconds: number): string => {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins.toString().padStart(2, "0")}:${secs
+    .toString()
+    .padStart(2, "0")}`;
+};
+
 export const useAudioCalling = () => {
   const { t } = useTranslation();
   useKeepAwake();
@@ -24,9 +32,10 @@ export const useAudioCalling = () => {
   const [isAudioMuted, setIsAudioMuted] = useState(false);
   const [isSpeakerOn, setIsSpeakerOn] = useState(false);
   const [callDuration, setCallDuration] = useState(0);
+  const [formattedDuration, setFormattedDuration] = useState("00:00");
 
   const durationIntervalRef = useRef<NodeJS.Timeout | number | null>(null);
-  const isCallActiveRef = useRef(true); // ✅ Call activity tracker
+  const isCallActiveRef = useRef(true);
 
   const connectionState = useWebRTCStore((s) => s.connectionState);
   const isIncoming = useWebRTCStore((s) => s.isIncoming);
@@ -37,7 +46,7 @@ export const useAudioCalling = () => {
   const setAudioEnabled = useWebRTCStore((s) => s.setAudioEnabled);
 
   const handleCallEnd = useCallback(() => {
-    isCallActiveRef.current = false; // ✅ Mark call as inactive
+    isCallActiveRef.current = false;
 
     if (durationIntervalRef.current) {
       clearInterval(durationIntervalRef.current);
@@ -76,24 +85,18 @@ export const useAudioCalling = () => {
     }
   }, [isSpeakerOn]);
 
-  const formatDuration = useCallback((seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs
-      .toString()
-      .padStart(2, "0")}`;
-  }, []);
+  // ✅ Update formatted duration whenever callDuration changes
+  useEffect(() => {
+    setFormattedDuration(formatDuration(callDuration));
+  }, [callDuration]);
 
   // Setup audio mode for calls using InCallManager
   useEffect(() => {
-    // Start InCallManager for audio calls (media: false = voice call mode)
     InCallManager.start({ media: "audio" });
-    // Default to earpiece for audio calls
     InCallManager.setSpeakerphoneOn(false);
     trackEvent("Audio mode initialized for call with InCallManager");
 
     return () => {
-      // Stop InCallManager on cleanup
       InCallManager.stop();
     };
   }, []);
@@ -104,7 +107,7 @@ export const useAudioCalling = () => {
       return;
     }
 
-    isCallActiveRef.current = true; // ✅ Mark call as active
+    isCallActiveRef.current = true;
 
     if (mode === "answer") {
       setLoading(false);
@@ -113,7 +116,6 @@ export const useAudioCalling = () => {
         targetUsername: targetUsername,
         callingType: CallingType.Audio,
       }).finally(() => {
-        // ✅ Only update state if call is still active
         if (isCallActiveRef.current) {
           setTimeout(() => {
             setLoading(false);
@@ -122,7 +124,6 @@ export const useAudioCalling = () => {
       });
     }
 
-    // ✅ Cleanup only clears intervals, doesn't call endCall
     return () => {
       if (durationIntervalRef.current) {
         clearInterval(durationIntervalRef.current);
@@ -133,14 +134,31 @@ export const useAudioCalling = () => {
         mode,
       });
     };
-  }, [targetUsername, mode]);
+  }, [targetUsername, mode, startCall]);
 
-  // Start call duration timer when connected
+  // ✅ Optimized: Use requestAnimationFrame for smoother updates on Android
   useEffect(() => {
     if (connectionState === "connected") {
-      durationIntervalRef.current = setInterval(() => {
-        setCallDuration((prev) => prev + 1);
-      }, 1000);
+      let lastUpdateTime = Date.now();
+      let frameId: number;
+
+      const updateDuration = () => {
+        const now = Date.now();
+        // Only update every 1000ms to avoid excessive re-renders
+        if (now - lastUpdateTime >= 1000) {
+          setCallDuration((prev) => prev + 1);
+          lastUpdateTime = now;
+        }
+        frameId = requestAnimationFrame(updateDuration);
+      };
+
+      frameId = requestAnimationFrame(updateDuration);
+
+      return () => {
+        if (frameId) {
+          cancelAnimationFrame(frameId);
+        }
+      };
     } else if (
       connectionState === "disconnected" ||
       connectionState === "failed" ||
@@ -151,13 +169,6 @@ export const useAudioCalling = () => {
         durationIntervalRef.current = null;
       }
     }
-
-    return () => {
-      if (durationIntervalRef.current) {
-        clearInterval(durationIntervalRef.current);
-        durationIntervalRef.current = null;
-      }
-    };
   }, [connectionState]);
 
   // Auto end call when connection fails or closes
@@ -167,7 +178,6 @@ export const useAudioCalling = () => {
       connectionState === "closed" ||
       connectionState === "disconnected"
     ) {
-      // ✅ Only proceed if call is still active
       if (isCallActiveRef.current) {
         trackEvent("Audio call auto-ending", {
           connectionState,
@@ -189,9 +199,9 @@ export const useAudioCalling = () => {
     isRemoteAudioEnabled,
     isSpeakerOn,
     callDuration,
+    formattedDuration,
     targetUsername,
     callingType,
-    formatDuration,
     handleCallEnd,
     toggleMicrophone,
     toggleSpeaker,

@@ -91,9 +91,8 @@ export default function AudioCallingScreen() {
     isAudioMuted,
     isRemoteAudioEnabled,
     isSpeakerOn,
-    callDuration,
     targetUsername,
-    formatDuration,
+    formattedDuration,
     handleCallEnd,
     toggleMicrophone,
     toggleSpeaker,
@@ -161,7 +160,7 @@ export default function AudioCallingScreen() {
           </ThemedText>
           {isConnected && (
             <ThemedText style={styles.callDuration}>
-              {formatDuration(callDuration)}
+              {formattedDuration}
             </ThemedText>
           )}
         </View>
