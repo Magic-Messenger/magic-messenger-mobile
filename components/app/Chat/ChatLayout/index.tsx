@@ -1,11 +1,17 @@
 import React from "react";
-import { ImageBackground, StyleSheet, View } from "react-native";
+import {
+  ImageBackground,
+  Platform,
+  StatusBar,
+  StyleSheet,
+  View,
+} from "react-native";
 import {
   KeyboardControllerView,
   useReanimatedKeyboardAnimation,
 } from "react-native-keyboard-controller";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Colors, Images } from "@/constants";
 import { useThemedStyles } from "@/theme";
@@ -20,10 +26,17 @@ interface ChatLayoutProps {
 }
 
 const HEADER_PADDING = spacingPixel(50);
+const ANDROID_STATUS_BAR_HEIGHT = StatusBar.currentHeight ?? 24;
 
 export function ChatLayout({ header, footer, children }: ChatLayoutProps) {
   const styles = useThemedStyles(createStyle);
   const { height } = useReanimatedKeyboardAnimation();
+  const insets = useSafeAreaInsets();
+
+  const topInset =
+    Platform.OS === "android"
+      ? Math.max(insets.top, ANDROID_STATUS_BAR_HEIGHT)
+      : insets.top;
 
   const footerAnimatedStyle = useAnimatedStyle(() => ({
     paddingBottom: -height.value,
@@ -44,9 +57,15 @@ export function ChatLayout({ header, footer, children }: ChatLayoutProps) {
           style={styles.imageBackground}
           resizeMode="cover"
         />
-        <SafeAreaView
-          edges={["top", "left", "right"]}
-          style={[styles.container, { paddingTop: HEADER_PADDING }]}
+        <View
+          style={[
+            styles.container,
+            {
+              paddingTop: topInset + HEADER_PADDING,
+              paddingLeft: insets.left,
+              paddingRight: insets.right,
+            },
+          ]}
         >
           <View style={styles.headerContainer}>{header}</View>
 
@@ -57,7 +76,7 @@ export function ChatLayout({ header, footer, children }: ChatLayoutProps) {
           <Animated.View style={[styles.footerContainer, footerAnimatedStyle]}>
             {footer}
           </Animated.View>
-        </SafeAreaView>
+        </View>
       </GradientBackground>
     </KeyboardControllerView>
   );

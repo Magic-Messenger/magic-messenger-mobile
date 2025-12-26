@@ -137,7 +137,11 @@ export default function RootLayout() {
                     />
                     <Stack.Screen
                       name="chatDetail"
-                      options={{ headerShown: true }}
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="groupChatDetail"
+                      options={{ headerShown: false }}
                     />
                     <Stack.Screen
                       name="ticketDetail"
