@@ -6,7 +6,7 @@ import { AppLayout, Button, SectionHeader, ThemedText } from "@/components";
 import { Colors } from "@/constants";
 import { useUserStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
-import { copyToClipboard, spacingPixel } from "@/utils";
+import { copyToClipboard, logDeviceInformation, spacingPixel } from "@/utils";
 
 type RouteParams = {
   accessToken: string;
@@ -36,10 +36,11 @@ const SecurityPhrasesScreen = () => {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (securityPhrases && params?.accessToken && params?.userName) {
       login(params.accessToken, params.userName);
       router.replace("/chat/home");
+      await logDeviceInformation();
     }
   };
 

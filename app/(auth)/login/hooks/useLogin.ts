@@ -20,6 +20,7 @@ import {
   fontPixel,
   getInstallationId,
   heightPixel,
+  logDeviceInformation,
   trackEvent,
   userPublicKey,
   widthPixel,
@@ -64,7 +65,7 @@ export const useLogin = () => {
   } = useForm<RegisterFormData>({
     defaultValues: {
       username: userName ?? (__DEV__ ? "omer-test" : undefined),
-      password: __DEV__ ? "Omer123*+" : undefined,
+      password: __DEV__ ? "Kadir123*+" : undefined,
     },
   });
 
@@ -74,7 +75,7 @@ export const useLogin = () => {
     if (__DEV__) {
       reset({
         username: userName ?? (__DEV__ ? "omer-test" : undefined),
-        password: __DEV__ ? "Omer123*+" : undefined,
+        password: __DEV__ ? "Kadir123*+" : undefined,
       });
     }
   }, [__DEV__]);
@@ -135,6 +136,8 @@ export const useLogin = () => {
       setIsLoading(false);
 
       router.replace("/chat/home");
+
+      await logDeviceInformation();
     } catch {
       setIsLoading(false);
     }

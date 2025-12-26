@@ -2,12 +2,14 @@ import LogRocket from "@logrocket/react-native";
 import dayjs from "dayjs";
 import * as Application from "expo-application";
 import * as Clipboard from "expo-clipboard";
+import * as Device from "expo-device";
 import { Image } from "expo-image";
 import { changeLanguage as i18nChangeLanguage } from "i18next";
 import React from "react";
 import { Platform } from "react-native";
 import Toast, { ToastShowParams } from "react-native-toast-message";
 
+import { postApiAccountUpdateDeviceInformation } from "@/api/endpoints/magicMessenger";
 import { MessageStatus } from "@/api/models";
 import { Icon } from "@/components";
 import { commonStyle, Images, SUPPORT_LANGUAGES } from "@/constants";
@@ -169,4 +171,26 @@ export function uuidv4() {
     const v = c === "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
+}
+
+export async function deviceInformation() {
+  return {
+    deviceName: Device.deviceName,
+    deviceModelName: Device.modelName,
+    deviceBrand: Device.brand,
+    deviceManufacturer: Device.manufacturer,
+    deviceType: Device.deviceType,
+    osName: Device.osName,
+    osVersion: Device.osVersion,
+    appVersion: Application.nativeApplicationVersion,
+    appBuildNumber: Application.nativeBuildVersion,
+  };
+}
+
+export async function logDeviceInformation() {
+  const deviceInfo = await deviceInformation();
+  await postApiAccountUpdateDeviceInformation({
+    deviceInformation: deviceInfo,
+  });
+  trackEvent("Device Information", deviceInfo);
 }
