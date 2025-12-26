@@ -15,9 +15,10 @@ import {
   postApiChatsMessageDelivered,
   postApiChatsMessageRead,
 } from "@/api/endpoints/magicMessenger";
+import { UNANSWERED_CALL } from "@/constants";
 import { useWebRTCStore } from "@/store";
 
-import { trackEvent } from "../../utils/helper";
+import { showToast, trackEvent } from "../../utils/helper";
 
 type DeliveredMessageNotificationData = {
   ChatId: string;
@@ -32,6 +33,16 @@ export const registerDeliveredListener = () => {
 
       const messageData = notification.data;
       if (!messageData) return;
+
+      if (messageData?.type === UNANSWERED_CALL) {
+        showToast({
+          type: "notification",
+          text1: notification.notification?.title,
+          text2: notification.notification?.body,
+          visibilityTime: 5000,
+        });
+        return;
+      }
 
       const deliveredMessageNotificationData =
         messageData as DeliveredMessageNotificationData;

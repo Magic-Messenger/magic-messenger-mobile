@@ -6,6 +6,8 @@ export const LICENSE_EXPIRED = "LicenseExpired";
 export const TWO_FACTOR_NOT_SETUP = "TwoFactorNotSetup";
 export const TWO_FACTOR_VERIFY_REQUIRED = "TwoFactorVerifyRequired";
 
+export const UNANSWERED_CALL = "UnansweredCall";
+
 export const INITIAL_PAGE_SIZE = 20;
 export const SCROLL_THRESHOLD = 100;
 

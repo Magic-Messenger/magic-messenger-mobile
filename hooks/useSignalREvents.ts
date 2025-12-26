@@ -238,6 +238,7 @@ export const useSignalREvents = () => {
             ? messageReceivedEvent.chat?.groupName
             : messageReceivedEvent.chat?.contact?.nickname,
         }),
+        visibilityTime: 5000,
         onPress: () => navigateToChat(messageReceivedEvent.chat),
       });
     },
