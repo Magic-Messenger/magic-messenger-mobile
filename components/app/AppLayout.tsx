@@ -102,9 +102,16 @@ function AppLayout({
     styles.content,
     styles.contentPadding,
     safeAreaPadding,
-    shouldApplyBottomSafeArea,
-    insets.bottom,
   ]);
+
+  // Memoize edges array to prevent SafeAreaView re-renders
+  const safeAreaEdges = useMemo(
+    () =>
+      shouldApplyBottomSafeArea || !!footer
+        ? (["top", "left", "right", "bottom"] as const)
+        : (["top", "left", "right"] as const),
+    [shouldApplyBottomSafeArea, footer],
+  );
 
   return (
     <View style={styles.wrapper}>
@@ -117,14 +124,7 @@ function AppLayout({
           style={styles.imageBackground}
           resizeMode="cover"
         />
-        <SafeAreaView
-          style={styles.safeArea}
-          edges={
-            shouldApplyBottomSafeArea || !!footer
-              ? ["top", "left", "right", "bottom"]
-              : ["top", "left", "right"]
-          }
-        >
+        <SafeAreaView style={styles.safeArea} edges={safeAreaEdges}>
           <Container {...containerProps}>
             <Animated.View
               pointerEvents={showBadge ? "auto" : "none"}
