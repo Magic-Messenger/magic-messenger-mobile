@@ -179,7 +179,7 @@ export async function deviceInformation() {
     deviceModelName: Device.modelName,
     deviceBrand: Device.brand,
     deviceManufacturer: Device.manufacturer,
-    deviceType: Device.deviceType,
+    deviceType: Device.deviceType?.toString(),
     osName: Device.osName,
     osVersion: Device.osVersion,
     appVersion: Application.nativeApplicationVersion,
