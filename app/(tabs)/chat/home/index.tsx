@@ -60,8 +60,11 @@ export default function ChatScreen() {
 
   // Handle refresh
   const handleRefresh = useCallback(() => {
+    queryClient.invalidateQueries?.({
+      queryKey: getGetApiChatsListQueryKey(),
+    });
     refetch();
-  }, [refetch]);
+  }, []);
 
   // Refresh control component
   const refreshControl = useMemo(
@@ -87,7 +90,7 @@ export default function ChatScreen() {
         )}
       </>
     ),
-    [t, styles.mt10, isLoading],
+    [isLoading],
   );
 
   // Header title with new chat button
@@ -105,11 +108,11 @@ export default function ChatScreen() {
         />
       </View>
     ),
-    [t, styles.newChatButton, handleCreateChat],
+    [],
   );
 
   useEffect(() => {
-    if (isFocused && receivedMessage) refetch();
+    if (isFocused && receivedMessage) handleRefresh();
   }, [receivedMessage, isFocused]);
 
   useEffect(() => {
@@ -117,13 +120,8 @@ export default function ChatScreen() {
       if (
         appState.current.match(/inactive|background/) &&
         nextState === "active"
-      ) {
-        queryClient.invalidateQueries?.({
-          queryKey: getGetApiChatsListQueryKey(),
-        });
-
-        refetch();
-      }
+      )
+        handleRefresh();
 
       appState.current = nextState;
     });
@@ -134,8 +132,8 @@ export default function ChatScreen() {
   // Refetch on screen focus
   useFocusEffect(
     useCallback(() => {
-      refetch();
-    }, [refetch]),
+      handleRefresh();
+    }, []),
   );
 
   return (

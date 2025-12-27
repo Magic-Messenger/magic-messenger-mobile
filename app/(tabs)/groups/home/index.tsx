@@ -6,7 +6,10 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { AppState, RefreshControl, StyleSheet, View } from "react-native";
 
-import { useGetApiChatsList } from "@/api/endpoints/magicMessenger";
+import {
+  getGetApiChatsListQueryKey,
+  useGetApiChatsList,
+} from "@/api/endpoints/magicMessenger";
 import { ChatDto } from "@/api/models";
 import { AppLayout, Button, ChatItem, EmptyList, Icon } from "@/components";
 import { useSignalRStore } from "@/store";
@@ -33,7 +36,7 @@ export default function ChatScreen() {
   // Memoized group chat list data
   const groupChatList = useMemo(
     () => data?.data?.data ?? [],
-    [data?.data?.data, receivedMessage, appState, isFocused],
+    [data?.data?.data],
   );
 
   // Render group chat item
@@ -66,8 +69,11 @@ export default function ChatScreen() {
 
   // Handle refresh
   const handleRefresh = useCallback(() => {
+    queryClient.invalidateQueries?.({
+      queryKey: getGetApiChatsListQueryKey(),
+    });
     refetch();
-  }, [refetch]);
+  }, []);
 
   // Refresh control component
   const refreshControl = useMemo(
@@ -93,7 +99,7 @@ export default function ChatScreen() {
         )}
       </>
     ),
-    [t, styles.mt10, isLoading],
+    [isLoading],
   );
 
   // Header title with new group button
@@ -111,11 +117,11 @@ export default function ChatScreen() {
         />
       </View>
     ),
-    [t, styles.newChatButton, handleCreateGroup],
+    [],
   );
 
   useEffect(() => {
-    if (isFocused && receivedMessage) refetch();
+    if (isFocused && receivedMessage) handleRefresh();
   }, [receivedMessage, isFocused]);
 
   useEffect(() => {
@@ -123,13 +129,8 @@ export default function ChatScreen() {
       if (
         appState.current.match(/inactive|background/) &&
         nextState === "active"
-      ) {
-        /* queryClient.invalidateQueries?.({
-          queryKey: getGetApiChatsListQueryKey(),
-        }); */
-
-        refetch();
-      }
+      )
+        handleRefresh();
 
       appState.current = nextState;
     });
@@ -140,8 +141,8 @@ export default function ChatScreen() {
   // Refetch on screen focus
   useFocusEffect(
     useCallback(() => {
-      refetch();
-    }, [refetch]),
+      handleRefresh();
+    }, []),
   );
 
   return (
