@@ -8,10 +8,7 @@ import {
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Animated from "react-native-reanimated";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Colors, Images, spacing } from "@/constants";
 import { useThemedStyles } from "@/theme";
@@ -34,6 +31,137 @@ interface AppLayoutProps {
   keyboardAvoiding?: boolean;
 }
 
+// Header Component
+interface BackgroundProps {
+  children: React.ReactNode;
+}
+
+// Background Component
+const Background = memo(({ children }: BackgroundProps) => {
+  const styles = useThemedStyles(createStyle);
+
+  return (
+    <GradientBackground
+      colors={Colors.backgroundColor as never}
+      style={styles.gradient}
+    >
+      <ImageBackground
+        source={Images.backgroundImage}
+        style={styles.imageBackground}
+        resizeMode="cover"
+      />
+      {children}
+    </GradientBackground>
+  );
+});
+
+// Header Component
+interface HeaderProps {
+  title?: string | React.ReactNode;
+  showBadge: boolean;
+  container: boolean;
+}
+
+const Header = memo(({ title, showBadge, container }: HeaderProps) => {
+  const styles = useThemedStyles(createStyle);
+
+  return (
+    <Animated.View
+      pointerEvents={showBadge ? "auto" : "none"}
+      style={[
+        styles.header,
+        !showBadge && styles.headerHidden,
+        !container && styles.container,
+      ]}
+    >
+      {typeof title === "string" ? (
+        <ThemedText type="title" weight="semiBold">
+          {title}
+        </ThemedText>
+      ) : (
+        title
+      )}
+
+      <View style={styles.headerRight}>
+        <TorBadge />
+      </View>
+    </Animated.View>
+  );
+});
+
+// Footer Component
+interface FooterProps {
+  footer: React.ReactNode;
+  shouldApplyBottomSafeArea: boolean;
+}
+
+const Footer = memo(({ footer, shouldApplyBottomSafeArea }: FooterProps) => {
+  return (
+    <View
+      style={{
+        paddingTop: spacingPixel(16),
+        paddingBottom: shouldApplyBottomSafeArea ? spacingPixel(16) : 0,
+      }}
+    >
+      {footer}
+    </View>
+  );
+});
+
+// Loading Overlay Component
+const LoadingOverlay = memo(() => {
+  const styles = useThemedStyles(createStyle);
+
+  return (
+    <View style={styles.loadingOverlay}>
+      <ActivityIndicator size="large" />
+    </View>
+  );
+});
+
+// Content Wrapper Component
+interface ContentWrapperProps {
+  children: React.ReactNode;
+  Container: React.ElementType;
+  containerProps: any;
+  title?: string | React.ReactNode;
+  showBadge: boolean;
+  container: boolean;
+  footer?: React.ReactNode;
+  shouldApplyBottomSafeArea: boolean;
+}
+
+const ContentWrapper = memo(
+  ({
+    children,
+    Container,
+    containerProps,
+    title,
+    showBadge,
+    container,
+    footer,
+    shouldApplyBottomSafeArea,
+  }: ContentWrapperProps) => {
+    const styles = useThemedStyles(createStyle);
+
+    return (
+      <View style={styles.safeArea}>
+        <Container {...containerProps}>
+          <Header title={title} showBadge={showBadge} container={container} />
+          {children}
+        </Container>
+
+        {footer && (
+          <Footer
+            footer={footer}
+            shouldApplyBottomSafeArea={shouldApplyBottomSafeArea}
+          />
+        )}
+      </View>
+    );
+  },
+);
+
 function AppLayout({
   children,
   loading = false,
@@ -47,7 +175,6 @@ function AppLayout({
   keyboardAvoiding = false,
 }: AppLayoutProps) {
   const insets = useSafeAreaInsets();
-
   const styles = useThemedStyles(createStyle);
 
   const shouldApplyBottomSafeArea = useMemo(() => {
@@ -57,17 +184,16 @@ function AppLayout({
     return needsBottomSafeArea() || insets.bottom > 0;
   }, [safeAreaBottom, insets.bottom]);
 
-  // Memoize container type to prevent unnecessary re-renders
   const Container: React.ElementType = useMemo(() => {
     if (keyboardAvoiding) return KeyboardAwareScrollView;
     if (scrollable) return ScrollView;
     return View;
   }, [keyboardAvoiding, scrollable]);
 
-  // Memoize container props to prevent unnecessary re-renders
   const containerProps = useMemo(() => {
     const baseContentStyle = [
       styles.content,
+      container && styles.container,
       safeAreaPadding ? styles.contentPadding : undefined,
     ];
 
@@ -104,70 +230,41 @@ function AppLayout({
     safeAreaPadding,
   ]);
 
-  // Memoize edges array to prevent SafeAreaView re-renders
-  const safeAreaEdges = useMemo(
-    () =>
-      shouldApplyBottomSafeArea || !!footer
-        ? (["top", "left", "right", "bottom"] as const)
-        : (["top", "left", "right"] as const),
-    [shouldApplyBottomSafeArea, footer],
+  const safeAreaStyle = useMemo(
+    () => ({
+      paddingTop: insets.top,
+      paddingLeft: insets.left,
+      paddingRight: insets.right,
+      paddingBottom: shouldApplyBottomSafeArea ? insets.bottom : 0,
+    }),
+    [
+      insets.top,
+      insets.left,
+      insets.right,
+      insets.bottom,
+      shouldApplyBottomSafeArea,
+    ],
   );
 
   return (
     <View style={styles.wrapper}>
-      <GradientBackground
-        colors={Colors.backgroundColor as never}
-        style={[styles.gradient, container ? styles.container : undefined]}
-      >
-        <ImageBackground
-          source={Images.backgroundImage}
-          style={styles.imageBackground}
-          resizeMode="cover"
-        />
-        <SafeAreaView style={styles.safeArea} edges={safeAreaEdges}>
-          <Container {...containerProps}>
-            <Animated.View
-              pointerEvents={showBadge ? "auto" : "none"}
-              style={[
-                styles.header,
-                !showBadge && styles.headerHidden,
-                !container && styles.container,
-              ]}
-            >
-              {typeof title === "string" ? (
-                <ThemedText type="title" weight="semiBold">
-                  {title}
-                </ThemedText>
-              ) : (
-                title
-              )}
-
-              <View style={styles.headerRight}>
-                <TorBadge />
-              </View>
-            </Animated.View>
-
+      <Background>
+        <View style={[styles.safeAreaContainer, safeAreaStyle]}>
+          <ContentWrapper
+            Container={Container}
+            containerProps={containerProps}
+            title={title}
+            showBadge={showBadge}
+            container={container}
+            footer={footer}
+            shouldApplyBottomSafeArea={shouldApplyBottomSafeArea}
+          >
             {children}
-          </Container>
-
-          {footer && (
-            <View
-              style={{
-                paddingTop: spacingPixel(16),
-                paddingBottom: shouldApplyBottomSafeArea ? spacingPixel(16) : 0,
-              }}
-            >
-              {footer}
-            </View>
-          )}
-        </SafeAreaView>
-      </GradientBackground>
-
-      {loading && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" />
+          </ContentWrapper>
         </View>
-      )}
+      </Background>
+
+      {loading && <LoadingOverlay />}
     </View>
   );
 }
@@ -189,6 +286,9 @@ const createStyle = () =>
       right: 0,
       opacity: 0.1,
       height: "60%",
+    },
+    safeAreaContainer: {
+      flex: 1,
     },
     safeArea: {
       flex: 1,
