@@ -48,6 +48,8 @@ export default function RootLayout() {
   const rehydrated = useUserStore((state) => state.rehydrated);
   const language = useAppStore((state) => state.language);
   const isLogin = useUserStore((state) => state.isLogin);
+  const previousAppState = useAppStore((state) => state.previousAppState);
+  const currentAppState = useAppStore((state) => state.currentAppState);
 
   const { t } = useTranslation();
 
@@ -74,22 +76,29 @@ export default function RootLayout() {
     const appStateSubscription = AppState.addEventListener(
       "change",
       (nextAppState) => {
-        if (
-          isLogin &&
-          useAppStore.getState().appState?.match?.(/inactive|background/) &&
-          nextAppState === "active"
-        ) {
-          useWebRTCStore.getState().checkWaitingCalling();
-        }
+        const prevAppState = useAppStore.getState().currentAppState;
+        if (prevAppState === nextAppState) return;
 
-        useAppStore.setState({ appState: nextAppState });
+        useAppStore.setState({
+          previousAppState: prevAppState,
+          currentAppState: nextAppState,
+        });
       },
     );
-
     return () => {
       appStateSubscription.remove();
     };
-  }, [isLogin]);
+  }, []);
+
+  useEffect(() => {
+    if (
+      isLogin &&
+      previousAppState?.match?.(/inactive|background/) &&
+      currentAppState === "active"
+    ) {
+      useWebRTCStore.getState().checkWaitingCalling();
+    }
+  }, [isLogin, previousAppState, currentAppState]);
 
   useEffect(() => {
     initDayjs();

@@ -31,7 +31,8 @@ const SecureStoreStorage = {
 interface AppStore {
   language?: string;
   appVersion: string;
-  appState: AppStateStatus;
+  previousAppState: AppStateStatus;
+  currentAppState: AppStateStatus;
   rehydrated: boolean;
   changeLanguage: (language: string) => void;
 }
@@ -41,7 +42,8 @@ export const useAppStore = create<AppStore>()(
     (set) => ({
       language: "en",
       appVersion: "",
-      appState: AppState.currentState,
+      previousAppState: AppState.currentState,
+      currentAppState: AppState.currentState,
       rehydrated: false,
       changeLanguage: (language: string) => {
         set({

@@ -1,5 +1,4 @@
 import { useIsFocused } from "@react-navigation/core";
-import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { throttle } from "lodash";
 import {
@@ -14,7 +13,6 @@ import {
 import { useTranslation } from "react-i18next";
 import {
   Alert,
-  AppState,
   FlatList,
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -23,7 +21,6 @@ import {
 import { CaptureProtection } from "react-native-capture-protection";
 
 import {
-  getGetApiChatsMessagesQueryKey,
   useDeleteApiChatsDelete,
   useGetApiAccountGetOnlineUsers,
   useGetApiChatsMessages,
@@ -55,7 +52,6 @@ export const useDetail = () => {
   const router = useRouter();
   const navigation = useNavigation();
   const isFocused = useIsFocused();
-  const queryClient = useQueryClient();
 
   const {
     chatId: contactChatId,
@@ -66,13 +62,13 @@ export const useDetail = () => {
 
   const listRef = useRef<FlatList<MessageWithDate>>(null);
   const actionRef = useRef<ActionSheetRef | null>(null);
-  const appState = useRef(AppState.currentState);
 
   const [isScreenshotEnabled, setIsScreenshotEnabled] =
     useState<boolean>(false);
   const [replyMessage, setReplyMessage] = useState<MessageDto | null>(null);
 
   const [chatId, setChatId] = useState<string | null>(null);
+  const [showEncryptionInfo, setShowEncryptionInfo] = useState<boolean>(false);
 
   const [pagination, setPagination] = useState({
     currentPage: 0,
@@ -118,6 +114,8 @@ export const useDetail = () => {
     {
       query: {
         enabled: !!chatId && isFocused,
+        refetchOnWindowFocus: true,
+        refetchOnReconnect: true,
       },
     },
   );
@@ -390,29 +388,6 @@ export const useDetail = () => {
     };
   }, [magicHubClient, chatId]);
 
-  // Removed useFocusEffect that was causing infinite refresh
-  // Messages are already fetched when chatId exists via useGetApiChatsMessages
-  // and updated via SignalR events in real-time
-
-  useEffect(() => {
-    const sub = AppState.addEventListener("change", (nextState) => {
-      if (
-        appState.current.match(/inactive|background/) &&
-        nextState === "active"
-      ) {
-        if (chatId) {
-          queryClient.invalidateQueries?.({
-            queryKey: getGetApiChatsMessagesQueryKey({ chatId }),
-          });
-        }
-      }
-
-      appState.current = nextState;
-    });
-
-    return () => sub.remove();
-  }, [chatId]);
-
   const onDelete = () => {
     Alert.alert(
       t("chatDetail.delete.title"),
@@ -624,6 +599,17 @@ export const useDetail = () => {
   );
   //#endregion
 
+  useEffect(() => {
+    if (!isMessagesLoading && messages?.length === 0) {
+      const t = setTimeout(() => {
+        setShowEncryptionInfo(true);
+      }, 250);
+
+      return () => clearTimeout(t);
+    }
+    setShowEncryptionInfo(false);
+  }, [isMessagesLoading, messages?.length]);
+
   return {
     t,
     title,
@@ -631,6 +617,7 @@ export const useDetail = () => {
     listRef,
     loading: isMessagesLoading,
     isFetching: isMessagesFetching,
+    showEncryptionInfo,
     actionRef,
     chatId: chatId as string,
     messages,

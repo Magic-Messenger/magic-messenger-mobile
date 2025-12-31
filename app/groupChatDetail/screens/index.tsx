@@ -22,11 +22,11 @@ export default function GroupChatScreen() {
 
   const {
     loading,
-    isFetching,
     title,
     chatId,
     messages,
     userName,
+    showEncryptionInfo,
     listRef,
     actionRef,
     chatActionOptions,
@@ -87,10 +87,8 @@ export default function GroupChatScreen() {
           />
         }
       >
-        <LoadingProvider loading={loading || isFetching}>
-          {messages.length === 0 && !loading && !isFetching && (
-            <EncryptionInfo />
-          )}
+        {showEncryptionInfo && <EncryptionInfo />}
+        <LoadingProvider loading={loading}>
           <FlatList
             ref={listRef}
             data={messages}

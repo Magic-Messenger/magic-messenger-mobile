@@ -43,12 +43,10 @@ export const useVideoCalling = () => {
   const isCallActiveRef = useRef(true);
 
   const handleCallEnd = useCallback(() => {
-    isCallActiveRef.current = false; // ✅ Mark call as inactive
-
-    trackEvent("Video call ended by user", { targetUsername, callingType });
+    isCallActiveRef.current = false;
     endCall();
     router.back();
-  }, [endCall, targetUsername, callingType]);
+  }, []);
 
   const toggleMicrophone = useCallback(() => {
     const newMutedState = !isAudioMuted;
@@ -115,7 +113,7 @@ export const useVideoCalling = () => {
   }, []);
 
   useEffect(() => {
-    if (!targetUsername || !callingType) {
+    if (!targetUsername) {
       router.back();
       return;
     }
@@ -127,7 +125,7 @@ export const useVideoCalling = () => {
     } else {
       startCall({
         targetUsername: targetUsername,
-        callingType: callingType,
+        callingType: CallingType.Video,
       }).finally(() => {
         // ✅ Only update state if call is still active
         if (isCallActiveRef.current) {
@@ -137,16 +135,7 @@ export const useVideoCalling = () => {
         }
       });
     }
-
-    // ✅ Cleanup only clears state, doesn't call endCall
-    return () => {
-      trackEvent("Video call cleanup - component unmounting", {
-        targetUsername,
-        callingType,
-        mode,
-      });
-    };
-  }, [targetUsername, callingType, mode]);
+  }, [targetUsername, mode]);
 
   // Auto end call when connection fails or closes
   useEffect(() => {
@@ -157,15 +146,10 @@ export const useVideoCalling = () => {
     ) {
       // ✅ Only proceed if call is still active
       if (isCallActiveRef.current) {
-        trackEvent("Video call auto-ending", {
-          connectionState,
-          targetUsername,
-          callingType,
-        });
         handleCallEnd();
       }
     }
-  }, [connectionState, targetUsername, callingType]);
+  }, [connectionState]);
 
   // Force RTCView refresh when connection state changes to connected
   useEffect(() => {

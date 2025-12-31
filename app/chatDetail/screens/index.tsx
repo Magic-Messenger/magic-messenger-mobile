@@ -22,9 +22,9 @@ export default function ChatScreen() {
 
   const {
     loading,
-    isFetching,
     title,
     chatId,
+    showEncryptionInfo,
     messages,
     userName,
     listRef,
@@ -89,10 +89,8 @@ export default function ChatScreen() {
           />
         }
       >
-        <LoadingProvider loading={loading || isFetching}>
-          {messages.length === 0 && !loading && !isFetching && (
-            <EncryptionInfo />
-          )}
+        {showEncryptionInfo && <EncryptionInfo />}
+        <LoadingProvider loading={loading}>
           <FlatList
             ref={listRef}
             data={messages}

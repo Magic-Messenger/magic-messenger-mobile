@@ -1,31 +1,35 @@
 import * as ScreenCapture from "expo-screen-capture";
 import { useEffect } from "react";
-import { AppState, Platform } from "react-native";
+import { Platform } from "react-native";
+
+import { useAppStore } from "@/store";
 
 export function useScreenProtection() {
-  useEffect(() => {
-    let isActive = true;
+  const previousAppState = useAppStore((state) => state.previousAppState);
+  const currentAppState = useAppStore((state) => state.currentAppState);
 
+  let isActive = true;
+
+  const initialize = async () => {
     if (Platform.OS === "ios") ScreenCapture.enableAppSwitcherProtectionAsync();
 
-    const sub = AppState.addEventListener("change", async (state) => {
-      if (state === "active" && !isActive) {
-        isActive = true;
+    if (currentAppState === "active" && !isActive) {
+      isActive = true;
+      if (Platform.OS === "ios")
+        await ScreenCapture.disableAppSwitcherProtectionAsync();
+      if (Platform.OS === "ios")
+        await ScreenCapture.enableAppSwitcherProtectionAsync();
+    } else if (currentAppState.match(/inactive|background/)) {
+      isActive = false;
+    }
+  };
 
-        if (Platform.OS === "ios")
-          await ScreenCapture.disableAppSwitcherProtectionAsync();
-        await new Promise((res) => setTimeout(res, 100)); // küçük gecikme
-        if (Platform.OS === "ios")
-          await ScreenCapture.enableAppSwitcherProtectionAsync();
-      } else if (state.match(/inactive|background/)) {
-        isActive = false;
-      }
-    });
+  useEffect(() => {
+    initialize();
 
     return () => {
-      sub.remove();
       if (Platform.OS === "ios")
         ScreenCapture.disableAppSwitcherProtectionAsync();
     };
-  }, []);
+  }, [previousAppState, currentAppState]);
 }

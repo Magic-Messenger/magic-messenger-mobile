@@ -52,11 +52,9 @@ export const useAudioCalling = () => {
       clearInterval(durationIntervalRef.current);
       durationIntervalRef.current = null;
     }
-
-    trackEvent("Audio call ended by user", { targetUsername, callDuration });
     endCall();
     router.back();
-  }, [endCall, targetUsername, callDuration]);
+  }, []);
 
   const toggleMicrophone = useCallback(() => {
     const newMutedState = !isAudioMuted;
@@ -129,12 +127,8 @@ export const useAudioCalling = () => {
         clearInterval(durationIntervalRef.current);
         durationIntervalRef.current = null;
       }
-      trackEvent("Audio call cleanup - component unmounting", {
-        targetUsername,
-        mode,
-      });
     };
-  }, [targetUsername, mode, startCall]);
+  }, [targetUsername, mode]);
 
   // ✅ Optimized: Use requestAnimationFrame for smoother updates on Android
   useEffect(() => {
@@ -179,15 +173,10 @@ export const useAudioCalling = () => {
       connectionState === "disconnected"
     ) {
       if (isCallActiveRef.current) {
-        trackEvent("Audio call auto-ending", {
-          connectionState,
-          targetUsername,
-          callDuration,
-        });
         handleCallEnd();
       }
     }
-  }, [connectionState, handleCallEnd, targetUsername, callDuration]);
+  }, [connectionState]);
 
   return {
     t,

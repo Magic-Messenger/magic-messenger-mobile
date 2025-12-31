@@ -1,10 +1,10 @@
 import { useIsFocused } from "@react-navigation/core";
 import { FlashList, type ListRenderItemInfo } from "@shopify/flash-list";
 import { useQueryClient } from "@tanstack/react-query";
-import { router, useFocusEffect } from "expo-router";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { router } from "expo-router";
+import { useCallback, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { AppState, RefreshControl, StyleSheet, View } from "react-native";
+import { RefreshControl, StyleSheet, View } from "react-native";
 
 import {
   getGetApiChatsListQueryKey,
@@ -25,13 +25,20 @@ export default function ChatScreen() {
 
   const receivedMessage = useSignalRStore((s) => s.lastReceivedMessage);
 
-  const appState = useRef(AppState.currentState);
-
-  const { data, isLoading, refetch } = useGetApiChatsList({
-    pageNumber: 1,
-    pageSize: 150,
-    isGroupChat: true,
-  });
+  const { data, isLoading } = useGetApiChatsList(
+    {
+      pageNumber: 1,
+      pageSize: 150,
+      isGroupChat: true,
+    },
+    {
+      query: {
+        enabled: isFocused,
+        refetchOnWindowFocus: true,
+        refetchOnReconnect: true,
+      },
+    },
+  );
 
   // Memoized group chat list data
   const groupChatList = useMemo(
@@ -72,7 +79,6 @@ export default function ChatScreen() {
     queryClient.invalidateQueries?.({
       queryKey: getGetApiChatsListQueryKey(),
     });
-    refetch();
   }, []);
 
   // Refresh control component
@@ -123,27 +129,6 @@ export default function ChatScreen() {
   useEffect(() => {
     if (isFocused && receivedMessage) handleRefresh();
   }, [receivedMessage, isFocused]);
-
-  useEffect(() => {
-    const sub = AppState.addEventListener("change", (nextState) => {
-      if (
-        appState.current.match(/inactive|background/) &&
-        nextState === "active"
-      )
-        handleRefresh();
-
-      appState.current = nextState;
-    });
-
-    return () => sub.remove();
-  }, []);
-
-  // Refetch on screen focus
-  useFocusEffect(
-    useCallback(() => {
-      handleRefresh();
-    }, []),
-  );
 
   return (
     <AppLayout container loading={isLoading} title={headerTitle}>

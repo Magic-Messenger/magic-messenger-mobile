@@ -92,21 +92,28 @@ const Header = memo(({ title, showBadge, container }: HeaderProps) => {
 // Footer Component
 interface FooterProps {
   footer: React.ReactNode;
+  container: boolean;
   shouldApplyBottomSafeArea: boolean;
 }
 
-const Footer = memo(({ footer, shouldApplyBottomSafeArea }: FooterProps) => {
-  return (
-    <View
-      style={{
-        paddingTop: spacingPixel(16),
-        paddingBottom: shouldApplyBottomSafeArea ? spacingPixel(16) : 0,
-      }}
-    >
-      {footer}
-    </View>
-  );
-});
+const Footer = memo(
+  ({ footer, container, shouldApplyBottomSafeArea }: FooterProps) => {
+    const styles = useThemedStyles(createStyle);
+    return (
+      <View
+        style={[
+          {
+            paddingTop: spacingPixel(16),
+            paddingBottom: shouldApplyBottomSafeArea ? spacingPixel(16) : 0,
+          },
+          container ? styles.container : {},
+        ]}
+      >
+        {footer}
+      </View>
+    );
+  },
+);
 
 // Loading Overlay Component
 const LoadingOverlay = memo(() => {
@@ -154,6 +161,7 @@ const ContentWrapper = memo(
         {footer && (
           <Footer
             footer={footer}
+            container={container}
             shouldApplyBottomSafeArea={shouldApplyBottomSafeArea}
           />
         )}

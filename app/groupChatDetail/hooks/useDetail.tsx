@@ -19,7 +19,6 @@ import {
 import { useTranslation } from "react-i18next";
 import {
   Alert,
-  AppState,
   FlatList,
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -62,7 +61,6 @@ export const useDetail = () => {
 
   const listRef = useRef<FlatList<MessageWithDate>>(null);
   const actionRef = useRef<ActionSheetRef | null>(null);
-  const appState = useRef(AppState.currentState);
 
   const {
     chatId,
@@ -76,6 +74,7 @@ export const useDetail = () => {
     groupAdminUsername,
   } = useLocalSearchParams();
 
+  const [showEncryptionInfo, setShowEncryptionInfo] = useState<boolean>(false);
   const [replyMessage, setReplyMessage] = useState<MessageDto | null>(null);
   const [pagination, setPagination] = useState({
     currentPage: 0,
@@ -104,6 +103,8 @@ export const useDetail = () => {
     {
       query: {
         enabled: !!chatId && isFocused,
+        refetchOnWindowFocus: true,
+        refetchOnReconnect: true,
       },
     },
   );
@@ -380,27 +381,6 @@ export const useDetail = () => {
     }, [chatId]),
   );
 
-  useEffect(() => {
-    const sub = AppState.addEventListener("change", (nextState) => {
-      if (
-        appState.current.match(/inactive|background/) &&
-        nextState === "active"
-      ) {
-        if (chatId) {
-          queryClient.invalidateQueries?.({
-            queryKey: getGetApiChatsGroupMessagesQueryKey({
-              chatId: chatId as string,
-            }),
-          });
-        }
-      }
-
-      appState.current = nextState;
-    });
-
-    return () => sub.remove();
-  }, [chatId]);
-
   const handleDeleteChat = useCallback(async () => {
     try {
       const response = await deleteChat({
@@ -471,6 +451,17 @@ export const useDetail = () => {
     }
   }, [navigation, chatId, isCreatedByCurrentUser]);
 
+  useEffect(() => {
+    if (!isMessagesLoading && messages?.length === 0) {
+      const t = setTimeout(() => {
+        setShowEncryptionInfo(true);
+      }, 250);
+
+      return () => clearTimeout(t);
+    }
+    setShowEncryptionInfo(false);
+  }, [isMessagesLoading, messages?.length]);
+
   return {
     t,
     title,
@@ -478,6 +469,7 @@ export const useDetail = () => {
     listRef,
     loading: isMessagesLoading,
     isFetching: isMessagesFetching,
+    showEncryptionInfo,
     actionRef,
     chatId: chatId as string,
     messages,
