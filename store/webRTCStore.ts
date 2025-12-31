@@ -74,6 +74,7 @@ type WebRTCStore = {
   onMicrophoneToggle: (data: MicrophoneToggleEvent) => void;
   endCall: (data?: EndCallCommandRequest) => void;
   checkWaitingCalling: () => void | Promise<void>;
+  resetForNewCall: () => void;
 };
 
 const initialState = {
@@ -210,9 +211,11 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
   },
 
   startCall: async ({ targetUsername, callingType }) => {
-    // Set caller information first
+    // Reset connection state and set caller information
+    // connectionState: "new" prevents immediate endCall trigger from previous "closed" state
     const currentUsername = useUserStore.getState().userName;
     set({
+      connectionState: "new",
       targetUsername,
       callerUsername: currentUsername!,
       isCaller: true,
@@ -277,8 +280,10 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     try {
       trackEvent("Answering call", incomingCall);
 
-      // Set answerer information first
+      // Reset connection state and set answerer information
+      // connectionState: "new" prevents immediate endCall trigger from previous "closed" state
       set({
+        connectionState: "new",
         callId,
         callerUsername,
         targetUsername: callerUsername, // For answerer, target is the caller
@@ -436,6 +441,16 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     trackEvent("Remote microphone toggled", {
       username: data.toggledUsername,
       isEnabled: data.isEnabled,
+    });
+  },
+
+  resetForNewCall: () => {
+    trackEvent("Resetting WebRTC store for new call");
+    // Close any existing WebRTC connection
+    WebRTCService.closeConnection();
+    // Reset store to initial state
+    set({
+      ...resetState(),
     });
   },
 }));

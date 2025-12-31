@@ -112,13 +112,19 @@ export const useVideoCalling = () => {
     };
   }, []);
 
+  // Reset call active ref on mount - important for Expo Router screen caching
+  useEffect(() => {
+    isCallActiveRef.current = true;
+    return () => {
+      isCallActiveRef.current = false;
+    };
+  }, []);
+
   useEffect(() => {
     if (!targetUsername) {
       router.back();
       return;
     }
-
-    isCallActiveRef.current = true; // ✅ Mark call as active
 
     if (mode === "answer") {
       setLoading(false);

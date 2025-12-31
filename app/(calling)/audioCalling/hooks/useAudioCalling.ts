@@ -99,13 +99,19 @@ export const useAudioCalling = () => {
     };
   }, []);
 
+  // Reset call active ref on mount - important for Expo Router screen caching
+  useEffect(() => {
+    isCallActiveRef.current = true;
+    return () => {
+      isCallActiveRef.current = false;
+    };
+  }, []);
+
   useEffect(() => {
     if (!targetUsername) {
       router.back();
       return;
     }
-
-    isCallActiveRef.current = true;
 
     if (mode === "answer") {
       setLoading(false);

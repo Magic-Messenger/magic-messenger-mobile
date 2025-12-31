@@ -37,6 +37,7 @@ import {
   useChatStore,
   useSignalRStore,
   useUserStore,
+  useWebRTCStore,
 } from "@/store";
 import {
   encrypt,
@@ -553,6 +554,8 @@ export const useDetail = () => {
   }, []);
 
   //#region Calling Handlers
+  const resetForNewCall = useWebRTCStore((s) => s.resetForNewCall);
+
   const onCallingPress = useCallback(
     (callingType: CallingType) => {
       Alert.alert(
@@ -572,6 +575,10 @@ export const useDetail = () => {
             text: t("chatDetail.calling.confirm"),
             style: "default",
             onPress: () => {
+              // Reset WebRTC store before starting new call
+              // This ensures clean state and prevents stale connectionState issues
+              resetForNewCall();
+
               trackEvent("calling_initiated", {
                 chatId,
                 callingType,
@@ -595,7 +602,7 @@ export const useDetail = () => {
         { cancelable: true },
       );
     },
-    [chatId, userName, router],
+    [chatId, userName, router, resetForNewCall],
   );
   //#endregion
 
