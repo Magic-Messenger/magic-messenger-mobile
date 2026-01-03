@@ -137,9 +137,7 @@ export const useInAppPurchase = () => {
   useEffect(() => {
     if (connected) {
       // Fetch your products
-      fetchProducts({ skus: productIds, type: "in-app" })
-        .then()
-        .catch(console.error);
+      fetchProducts({ skus: productIds, type: "in-app" });
     }
   }, [connected]);
 
