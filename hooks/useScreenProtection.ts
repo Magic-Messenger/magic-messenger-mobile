@@ -1,35 +1,81 @@
 import * as ScreenCapture from "expo-screen-capture";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { Platform } from "react-native";
 
 import { useAppStore } from "@/store";
 
-export function useScreenProtection() {
-  const previousAppState = useAppStore((state) => state.previousAppState);
+type UseSecureScreenOptions = {
+  enabled?: boolean;
+};
+
+export function useScreenProtection({
+  enabled = true,
+}: UseSecureScreenOptions = {}) {
   const currentAppState = useAppStore((state) => state.currentAppState);
 
-  let isActive = true;
+  const protectionEnabled = useCallback(async () => {
+    if (!enabled) return;
 
-  const initialize = async () => {
-    if (Platform.OS === "ios") ScreenCapture.enableAppSwitcherProtectionAsync();
-
-    if (currentAppState === "active" && !isActive) {
-      isActive = true;
-      if (Platform.OS === "ios")
-        await ScreenCapture.disableAppSwitcherProtectionAsync();
-      if (Platform.OS === "ios")
+    try {
+      if (Platform.OS === "ios") {
+        // iOS: App Switcher snapshot protection
         await ScreenCapture.enableAppSwitcherProtectionAsync();
-    } else if (currentAppState.match(/inactive|background/)) {
-      isActive = false;
-    }
-  };
+      }
 
+      if (Platform.OS === "android") {
+        // Android: FLAG_SECURE (screenshot + recording + recent apps)
+        await ScreenCapture.preventScreenCaptureAsync();
+      }
+    } catch (e) {
+      console.warn("Screen protection enable error:", e);
+    }
+  }, [enabled]);
+
+  const protectionDisabled = useCallback(async () => {
+    if (!enabled) return;
+
+    try {
+      if (Platform.OS === "ios") {
+        await ScreenCapture.disableAppSwitcherProtectionAsync();
+      }
+
+      if (Platform.OS === "android") {
+        await ScreenCapture.allowScreenCaptureAsync();
+      }
+    } catch (e) {
+      console.warn("Screen protection disable error:", e);
+    }
+  }, [enabled]);
+
+  /**
+   * AppState based protection
+   */
   useEffect(() => {
-    initialize();
+    if (!enabled) return;
+
+    // iOS logic:
+    // active → protection OFF
+    // inactive/bg → protection ON (snapshot taken here)
+    if (Platform.OS === "ios") {
+      if (currentAppState === "active") {
+        protectionDisabled();
+      } else {
+        protectionEnabled();
+      }
+    }
+
+    // Android logic:
+    // active → protection ON
+    // a background → no need to toggle (safe)
+    if (Platform.OS === "android") {
+      if (currentAppState === "active") {
+        protectionEnabled();
+      }
+    }
 
     return () => {
-      if (Platform.OS === "ios")
-        ScreenCapture.disableAppSwitcherProtectionAsync();
+      // Cleanup: avoid FLAG_SECURE leak
+      protectionDisabled();
     };
-  }, [previousAppState, currentAppState]);
+  }, [enabled, currentAppState, protectionEnabled, protectionDisabled]);
 }
