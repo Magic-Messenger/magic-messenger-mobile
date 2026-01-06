@@ -3,7 +3,7 @@ import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { RTCView } from "react-native-webrtc";
 
-import { Icon, ThemedText } from "@/components";
+import { Icon, PermissionDeniedModal, ThemedText } from "@/components";
 import { useWebRTCStore } from "@/store";
 
 import { DraggableLocalVideo } from "../components/DraggableLocalVideo";
@@ -28,6 +28,11 @@ export default function VideoCallingScreen() {
     toggleMicrophone,
     toggleCamera,
     switchCamera,
+    // Permission handling
+    permissionDenied,
+    deniedPermissionType,
+    handlePermissionModalClose,
+    handleOpenSettings,
   } = useVideoCalling();
 
   // Get streams directly from store
@@ -56,6 +61,14 @@ export default function VideoCallingScreen() {
 
   return (
     <GestureHandlerRootView style={styles.container}>
+      {/* Permission Denied Modal */}
+      <PermissionDeniedModal
+        visible={permissionDenied}
+        permissionType={deniedPermissionType}
+        onOpenSettings={handleOpenSettings}
+        onClose={handlePermissionModalClose}
+      />
+
       {loading && <ActivityIndicator />}
 
       {/* Remote Video - Full Screen Background */}

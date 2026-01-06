@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 
-import { Icon, ThemedText } from "@/components";
+import { Icon, PermissionDeniedModal, ThemedText } from "@/components";
 
 import { useAudioCalling } from "../hooks";
 
@@ -96,6 +96,11 @@ export default function AudioCallingScreen() {
     handleCallEnd,
     toggleMicrophone,
     toggleSpeaker,
+    // Permission handling
+    permissionDenied,
+    deniedPermissionType,
+    handlePermissionModalClose,
+    handleOpenSettings,
   } = useAudioCalling();
 
   const getConnectionStatusText = () => {
@@ -120,6 +125,14 @@ export default function AudioCallingScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Permission Denied Modal */}
+      <PermissionDeniedModal
+        visible={permissionDenied}
+        permissionType={deniedPermissionType}
+        onOpenSettings={handleOpenSettings}
+        onClose={handlePermissionModalClose}
+      />
+
       {loading && <ActivityIndicator />}
       {/* Connection Status */}
       <View style={styles.connectionStatus}>

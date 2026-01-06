@@ -20,6 +20,7 @@ export * from "./ExternalLink";
 export * from "./IncomingCallModal";
 export * from "./Note/NoteItem";
 export * from "./PasswordInput";
+export * from "./PermissionDeniedModal";
 export * from "./ProductItem";
 export * from "./ProtectedRoute";
 export * from "./SectionHeader";

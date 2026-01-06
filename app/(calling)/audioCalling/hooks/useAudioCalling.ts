@@ -6,6 +6,7 @@ import { Platform, StyleSheet } from "react-native";
 import InCallManager from "react-native-incall-manager";
 
 import { CallingType } from "@/api/models";
+import { useMediaPermissions } from "@/hooks/useMediaPermissions";
 import WebRTCService from "@/services/webRTC/webRTCService";
 import { StartCallingType, useWebRTCStore } from "@/store";
 import { useThemedStyles } from "@/theme";
@@ -36,6 +37,15 @@ export const useAudioCalling = () => {
 
   const durationIntervalRef = useRef<NodeJS.Timeout | number | null>(null);
   const isCallActiveRef = useRef(true);
+
+  // Permission handling
+  const {
+    permissionDenied,
+    deniedPermissionType,
+    checkAndRequestPermissions,
+    openSettings,
+    resetPermissionDenied,
+  } = useMediaPermissions();
 
   const connectionState = useWebRTCStore((s) => s.connectionState);
   const isIncoming = useWebRTCStore((s) => s.isIncoming);
@@ -107,26 +117,52 @@ export const useAudioCalling = () => {
     };
   }, []);
 
+  // Handle permission denied - close modal and go back
+  const handlePermissionModalClose = useCallback(() => {
+    resetPermissionDenied();
+    router.back();
+  }, [resetPermissionDenied]);
+
+  // Handle open settings from permission modal
+  const handleOpenSettings = useCallback(() => {
+    openSettings();
+    resetPermissionDenied();
+    router.back();
+  }, [openSettings, resetPermissionDenied]);
+
   useEffect(() => {
     if (!targetUsername) {
       router.back();
       return;
     }
 
-    if (mode === "answer") {
-      setLoading(false);
-    } else {
-      startCall({
-        targetUsername: targetUsername,
-        callingType: CallingType.Audio,
-      }).finally(() => {
-        if (isCallActiveRef.current) {
-          setTimeout(() => {
-            setLoading(false);
-          }, 500);
-        }
-      });
-    }
+    const initializeCall = async () => {
+      // Check permissions before starting or answering call
+      const hasPermission = await checkAndRequestPermissions("microphone");
+
+      if (!hasPermission) {
+        trackEvent("Audio call permission denied", { targetUsername });
+        setLoading(false);
+        return;
+      }
+
+      if (mode === "answer") {
+        setLoading(false);
+      } else {
+        startCall({
+          targetUsername: targetUsername,
+          callingType: CallingType.Audio,
+        }).finally(() => {
+          if (isCallActiveRef.current) {
+            setTimeout(() => {
+              setLoading(false);
+            }, 500);
+          }
+        });
+      }
+    };
+
+    initializeCall();
 
     return () => {
       if (durationIntervalRef.current) {
@@ -134,7 +170,7 @@ export const useAudioCalling = () => {
         durationIntervalRef.current = null;
       }
     };
-  }, [targetUsername, mode]);
+  }, [targetUsername, mode, checkAndRequestPermissions]);
 
   // ✅ Optimized: Use requestAnimationFrame for smoother updates on Android
   useEffect(() => {
@@ -200,6 +236,11 @@ export const useAudioCalling = () => {
     handleCallEnd,
     toggleMicrophone,
     toggleSpeaker,
+    // Permission handling
+    permissionDenied,
+    deniedPermissionType,
+    handlePermissionModalClose,
+    handleOpenSettings,
   };
 };
 

@@ -6,6 +6,7 @@ import { StyleSheet } from "react-native";
 import InCallManager from "react-native-incall-manager";
 
 import { CallingType } from "@/api/models";
+import { useMediaPermissions } from "@/hooks/useMediaPermissions";
 import WebRTCService from "@/services/webRTC/webRTCService";
 import { StartCallingType, useWebRTCStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
@@ -26,6 +27,15 @@ export const useVideoCalling = () => {
   const [isFrontCamera, setIsFrontCamera] = useState(true);
   const [localVideoKey, setLocalVideoKey] = useState(0);
   const [isSwitchingCamera, setIsSwitchingCamera] = useState(false);
+
+  // Permission handling
+  const {
+    permissionDenied,
+    deniedPermissionType,
+    checkAndRequestPermissions,
+    openSettings,
+    resetPermissionDenied,
+  } = useMediaPermissions();
 
   const connectionState = useWebRTCStore((s) => s.connectionState);
   const isIncoming = useWebRTCStore((s) => s.isIncoming);
@@ -120,28 +130,54 @@ export const useVideoCalling = () => {
     };
   }, []);
 
+  // Handle permission denied - close modal and go back
+  const handlePermissionModalClose = useCallback(() => {
+    resetPermissionDenied();
+    router.back();
+  }, [resetPermissionDenied]);
+
+  // Handle open settings from permission modal
+  const handleOpenSettings = useCallback(() => {
+    openSettings();
+    resetPermissionDenied();
+    router.back();
+  }, [openSettings, resetPermissionDenied]);
+
   useEffect(() => {
     if (!targetUsername) {
       router.back();
       return;
     }
 
-    if (mode === "answer") {
-      setLoading(false);
-    } else {
-      startCall({
-        targetUsername: targetUsername,
-        callingType: CallingType.Video,
-      }).finally(() => {
-        // ✅ Only update state if call is still active
-        if (isCallActiveRef.current) {
-          setTimeout(() => {
-            setLoading(false);
-          }, 500);
-        }
-      });
-    }
-  }, [targetUsername, mode]);
+    const initializeCall = async () => {
+      // Check permissions before starting or answering call
+      const hasPermission = await checkAndRequestPermissions("both");
+
+      if (!hasPermission) {
+        trackEvent("Video call permission denied", { targetUsername });
+        setLoading(false);
+        return;
+      }
+
+      if (mode === "answer") {
+        setLoading(false);
+      } else {
+        startCall({
+          targetUsername: targetUsername,
+          callingType: CallingType.Video,
+        }).finally(() => {
+          // ✅ Only update state if call is still active
+          if (isCallActiveRef.current) {
+            setTimeout(() => {
+              setLoading(false);
+            }, 500);
+          }
+        });
+      }
+    };
+
+    initializeCall();
+  }, [targetUsername, mode, checkAndRequestPermissions]);
 
   // Auto end call when connection fails or closes
   useEffect(() => {
@@ -195,6 +231,11 @@ export const useVideoCalling = () => {
     toggleMicrophone,
     toggleCamera,
     switchCamera,
+    // Permission handling
+    permissionDenied,
+    deniedPermissionType,
+    handlePermissionModalClose,
+    handleOpenSettings,
   };
 };
 

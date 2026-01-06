@@ -313,6 +313,15 @@
     "lockNoteDescription": "Please enter your password to view your notes.",
     "lockNoteButton": "View Notes"
   },
+  "permissions": {
+    "cameraRequired": "Camera Permission Required",
+    "microphoneRequired": "Microphone Permission Required",
+    "cameraAndMicrophoneRequired": "Camera & Microphone Required",
+    "cameraDescription": "To make video calls, you need to grant camera permission. Please go to Settings and enable camera access for this app.",
+    "microphoneDescription": "To make audio calls, you need to grant microphone permission. Please go to Settings and enable microphone access for this app.",
+    "cameraAndMicrophoneDescription": "To make video calls, you need to grant camera and microphone permissions. Please go to Settings and enable access for this app.",
+    "openSettings": "Open Settings"
+  },
   "chatDetail": {
     "writeMessage": "Write a message...",
     "replyingTo": "Replying to: {{senderName}}",
