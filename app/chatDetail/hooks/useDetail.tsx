@@ -32,6 +32,7 @@ import {
 import { CallingType, MessageDto, MessageType } from "@/api/models";
 import { ActionSheetRef, Icon } from "@/components";
 import { INITIAL_PAGE_SIZE, UploadFileResultDto } from "@/constants";
+import { useMediaPermissions } from "@/hooks/useMediaPermissions";
 import {
   useChatMessages,
   useChatStore,
@@ -555,6 +556,7 @@ export const useDetail = () => {
 
   //#region Calling Handlers
   const resetForNewCall = useWebRTCStore((s) => s.resetForNewCall);
+  const { checkAndRequestPermissions, openSettings } = useMediaPermissions();
 
   const onCallingPress = useCallback(
     (callingType: CallingType) => {
@@ -574,7 +576,48 @@ export const useDetail = () => {
           {
             text: t("chatDetail.calling.confirm"),
             style: "default",
-            onPress: () => {
+            onPress: async () => {
+              // Check permissions BEFORE navigating to call screen
+              const permissionType =
+                callingType === CallingType.Audio ? "microphone" : "both";
+              const hasPermission =
+                await checkAndRequestPermissions(permissionType);
+
+              if (!hasPermission) {
+                // Show permission denied alert instead of navigating
+                const permissionName =
+                  callingType === CallingType.Audio
+                    ? t("permissions.microphone", "Microphone")
+                    : t(
+                        "permissions.cameraAndMicrophone",
+                        "Camera & Microphone",
+                      );
+
+                Alert.alert(
+                  t("permissions.denied.title", "Permission Required"),
+                  t("permissions.denied.message", {
+                    defaultValue: `${permissionName} permission is required to make calls. Please enable it in settings.`,
+                    permission: permissionName,
+                  }),
+                  [
+                    {
+                      text: t("permissions.denied.cancel", "Cancel"),
+                      style: "cancel",
+                    },
+                    {
+                      text: t(
+                        "permissions.denied.openSettings",
+                        "Open Settings",
+                      ),
+                      style: "default",
+                      onPress: () => openSettings(),
+                    },
+                  ],
+                  { cancelable: true },
+                );
+                return;
+              }
+
               // Reset WebRTC store before starting new call
               // This ensures clean state and prevents stale connectionState issues
               resetForNewCall();
@@ -602,7 +645,15 @@ export const useDetail = () => {
         { cancelable: true },
       );
     },
-    [chatId, userName, router, resetForNewCall],
+    [
+      chatId,
+      userName,
+      router,
+      resetForNewCall,
+      checkAndRequestPermissions,
+      openSettings,
+      t,
+    ],
   );
   //#endregion
 

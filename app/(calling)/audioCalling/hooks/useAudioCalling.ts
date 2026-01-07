@@ -64,7 +64,13 @@ export const useAudioCalling = () => {
       durationIntervalRef.current = null;
     }
     endCall();
-    router.back();
+
+    // Safe navigation: try to go back, if not possible navigate to home
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/");
+    }
   }, []);
 
   const toggleMicrophone = useCallback(() => {
@@ -118,22 +124,32 @@ export const useAudioCalling = () => {
     };
   }, []);
 
+  // Safe navigation helper
+  const safeGoBack = useCallback(() => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      // Fallback to home screen when back is not possible (e.g., after call switching)
+      router.replace("/");
+    }
+  }, []);
+
   // Handle permission denied - close modal and go back
   const handlePermissionModalClose = useCallback(() => {
     resetPermissionDenied();
-    router.back();
-  }, [resetPermissionDenied]);
+    safeGoBack();
+  }, [resetPermissionDenied, safeGoBack]);
 
   // Handle open settings from permission modal
   const handleOpenSettings = useCallback(() => {
     openSettings();
     resetPermissionDenied();
-    router.back();
-  }, [openSettings, resetPermissionDenied]);
+    safeGoBack();
+  }, [openSettings, resetPermissionDenied, safeGoBack]);
 
   useEffect(() => {
     if (!targetUsername) {
-      router.back();
+      safeGoBack();
       return;
     }
 
@@ -194,7 +210,7 @@ export const useAudioCalling = () => {
         durationIntervalRef.current = null;
       }
     };
-  }, [targetUsername, mode, switching, checkAndRequestPermissions]);
+  }, [targetUsername, mode, switching, checkAndRequestPermissions, safeGoBack]);
 
   // ✅ Optimized: Use requestAnimationFrame for smoother updates on Android
   useEffect(() => {

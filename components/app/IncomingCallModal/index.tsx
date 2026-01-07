@@ -31,18 +31,22 @@ export const IncomingCallModal = () => {
   const incomingCallData = useWebRTCStore((s) => s.incomingCallData);
   const connectionState = useWebRTCStore((s) => s.connectionState);
   const isSwitchingCall = useWebRTCStore((s) => s.isSwitchingCall);
+  const isCaller = useWebRTCStore((s) => s.isCaller);
+  const isIncoming = useWebRTCStore((s) => s.isIncoming);
   const acceptIncomingCall = useWebRTCStore((s) => s.acceptIncomingCall);
   const declineIncomingCall = useWebRTCStore((s) => s.declineIncomingCall);
   const endCall = useWebRTCStore((s) => s.endCall);
   const setIsSwitchingCall = useWebRTCStore((s) => s.setIsSwitchingCall);
 
   // Check if user is in an active call
+  // - "connected" or "connecting" means call is in progress
+  // - "new" with isCaller/isIncoming means call just started (before WebRTC connects)
   const isInActiveCall = useMemo(
     () =>
       connectionState === "connected" ||
       connectionState === "connecting" ||
-      connectionState === "new",
-    [connectionState],
+      (connectionState === "new" && (isCaller || isIncoming)),
+    [connectionState, isCaller, isIncoming],
   );
 
   const pulseAnim = useRef(new Animated.Value(1)).current;

@@ -56,7 +56,13 @@ export const useVideoCalling = () => {
   const handleCallEnd = useCallback(() => {
     isCallActiveRef.current = false;
     endCall();
-    router.back();
+
+    // Safe navigation: try to go back, if not possible navigate to home
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/");
+    }
   }, []);
 
   const toggleMicrophone = useCallback(() => {
@@ -131,22 +137,31 @@ export const useVideoCalling = () => {
     };
   }, []);
 
+  // Safe navigation helper
+  const safeGoBack = useCallback(() => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/");
+    }
+  }, []);
+
   // Handle permission denied - close modal and go back
   const handlePermissionModalClose = useCallback(() => {
     resetPermissionDenied();
-    router.back();
-  }, [resetPermissionDenied]);
+    safeGoBack();
+  }, [resetPermissionDenied, safeGoBack]);
 
   // Handle open settings from permission modal
   const handleOpenSettings = useCallback(() => {
     openSettings();
     resetPermissionDenied();
-    router.back();
-  }, [openSettings, resetPermissionDenied]);
+    safeGoBack();
+  }, [openSettings, resetPermissionDenied, safeGoBack]);
 
   useEffect(() => {
     if (!targetUsername) {
-      router.back();
+      safeGoBack();
       return;
     }
 
@@ -201,7 +216,7 @@ export const useVideoCalling = () => {
     };
 
     initializeCall();
-  }, [targetUsername, mode, switching, checkAndRequestPermissions]);
+  }, [targetUsername, mode, switching, checkAndRequestPermissions, safeGoBack]);
 
   // Auto end call when connection fails or closes
   useEffect(() => {
