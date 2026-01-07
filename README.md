@@ -1,50 +1,166 @@
-# Welcome to your Expo app 👋
+# Magic Privacy Messenger 📲🌐
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Welcome to **Magic Privacy Messenger** — a privacy-first messaging application designed to keep your conversations secure, fast, and verifiable. ✨  
+🟣 End-to-end encrypted 🟣 iOS & Android 🟣 VPN integration 🟣 No phone number or email required
 
-## Get started
+---
 
-1. Install dependencies
+## 🛡️ Security & Trust
 
-   ```bash
-   npm install
-   ```
+<p align="left">
+  <img src="https://img.shields.io/badge/End--to--End%20Encryption-Enabled-brightgreen" />
+  <img src="https://img.shields.io/badge/Source--Available-Yes-blue" />
+  <img src="https://img.shields.io/badge/Open%20Source-No-lightgrey" />
+  <img src="https://img.shields.io/badge/Security%20Audit-Planned-yellow" />
+  <img src="https://img.shields.io/badge/Responsible%20Disclosure-SECURITY.md-informational" />
+  <img src="https://img.shields.io/badge/No%20Phone%20Number-Required-success" />
+</p>
 
-2. Start the app
+Trust is built through transparency — and enforced through clear boundaries.
 
-   ```bash
-   npx expo start
-   ```
+---
 
-In the output, you'll find options to open the app in a
+## ⚠️ Source-Available Project
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+This repository is **source-available**, not open source.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+You are welcome to **inspect and audit** the code.  
+You are **not permitted** to modify, redistribute, or deploy it.
 
-## Get a fresh project
+See [LICENSE](./LICENSE) for full terms.
 
-When you're ready, run:
+---
 
-```bash
-npm run reset-project
-```
+## 🔍 Why Source-Available?
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+We believe privacy software must be **verifiable**, but not **exploitable**.
 
-## Learn more
+Making our source code available allows:
 
-To learn more about developing your project with Expo, look at the following resources:
+- Independent security researchers to audit cryptographic design
+- Users to verify our privacy claims
+- Transparency around data handling and architecture
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+At the same time, unrestricted open-source licensing would allow:
 
-## Join the community
+- Cloning of the product
+- Deployment of modified versions
+- Abuse of infrastructure, trust signals, and user expectations
 
-Join our community of developers creating universal apps.
+> **Source-available strikes the balance**: transparency without sacrificing  
+> user safety, brand integrity, or long-term sustainability.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+---
+
+## ✉️ Why Magic Privacy Messenger?
+
+In a world full of noise, **Magic Privacy Messenger** stands out by offering:
+
+- 🛡️ **Strong Privacy Guarantees** — end-to-end encryption by default
+- ⚡ **Fast & Reliable Messaging**
+- 🌍 **Global Connectivity without identity leakage**
+
+---
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Magic-Messenger/.github/main/profile/logo.png" alt="Magic Messenger Logo" width="300px">
+</p>
+
+---
+
+## 🎯 Key Features
+
+- 🔒 Secure end-to-end encrypted messaging
+- 📁 Media sharing (photos, videos, documents)
+- 💬 Group chats with secure membership handling
+- 🔔 Custom notification controls
+
+---
+
+## 🚀 Getting Started
+
+We are currently in a pre-launch phase.
+
+1. **Download the App**
+
+- APK: https://magicmessenger.app/download/
+- App Store: https://apps.apple.com/nl/app/magic-privacy-messenger/id6474205809
+- Play Store: https://play.google.com/store/apps/details?id=com.magicmessenger.app
+
+2. **Purchase a License**
+
+- No phone number
+- No email
+- No identity correlation  
+  👉 https://magicmessenger.app/purchase/
+
+3. **Start Chatting**
+
+---
+
+## 🔐 Security Documentation
+
+- 📘 [Security Policy & Disclosure](./SECURITY.md)
+- 🔍 [Security Audit Status](./SECURITY_AUDIT.md)
+- 📄 [Privacy Whitepaper](./PRIVACY_WHITEPAPER.md)
+- 🔑 [Cryptography Overview (Non-Code)](./CRYPTOGRAPHY_OVERVIEW.md)
+- 🎯 [Threat Model](./THREAT_MODEL.md)
+
+---
+
+## ❓ Security FAQ
+
+### Is Magic Privacy Messenger secure?
+
+Magic uses modern cryptographic design and end-to-end encryption.  
+Security is continuously reviewed, not assumed.
+
+### Can I audit the code?
+
+Yes. The full source is available for inspection.
+
+### Is Magic audited?
+
+Not yet.  
+Third-party security audits are planned. Until then, no audit claims are made.
+
+---
+
+## ⚖️ Legal FAQ
+
+### Can I fork this repository?
+
+**No.**  
+Forking, modifying, or redistributing the code is prohibited.
+
+### Can I run my own server?
+
+No. Server deployment is not permitted.
+
+### Can I use this code commercially?
+
+No. Commercial or competing use is forbidden.
+
+See [LICENSE](./LICENSE) for details.
+
+---
+
+## ™ Trademark Notice
+
+All names, logos, and branding are protected.  
+See [TRADEMARK.md](./TRADEMARK.md).
+
+---
+
+## 👥 Community & Socials
+
+- Snapchat: https://www.snapchat.com/add/magicmessenger
+- Instagram: https://www.instagram.com/magicprivacymessenger/
+- TikTok: https://www.tiktok.com/@magicprivacymessenger
+- X: https://x.com/Magicprivacy
+- Website: https://magicmessenger.app/
+
+---
+
+**Magic Privacy Messenger**  
+Transparency by design. Privacy by default. ✨

@@ -1,0 +1,40 @@
+Magic Privacy Messenger – Source-Available License
+
+Copyright (c) 2026 Magic Privacy Messenger
+All rights reserved.
+
+NOTICE:
+This software is source-available, NOT open source.
+
+Permission is granted solely to view, inspect, and review the source code
+for the purposes of transparency, education, and independent security
+analysis.
+
+The following actions are strictly prohibited unless explicit prior
+written permission is obtained from the copyright holder:
+
+1. Modifying, adapting, or altering the Software
+2. Creating derivative works or forks
+3. Redistributing, sublicensing, or publishing the Software
+4. Using the Software in whole or in part in any commercial product
+5. Deploying the Software or any part of it in production environments
+6. Offering the Software as a hosted service or SaaS
+7. Reverse engineering for the purpose of creating a competing product
+8. Using the Software to build, benchmark, or train competing systems
+9. Using the Software, its architecture, protocols, or design patterns
+   to create a similar or competing messaging or privacy-focused product
+
+This license does NOT grant:
+- Patent rights
+- Trademark rights
+- Branding or naming rights
+- Rights to use logos, icons, or visual assets
+
+Any violation of these terms automatically terminates this license and
+may result in legal action.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR
+OTHER LIABILITY ARISING FROM THE USE OF THE SOFTWARE.
