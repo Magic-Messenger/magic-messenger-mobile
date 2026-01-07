@@ -1,14 +1,9 @@
-import notifee, {
-  AndroidImportance,
-  Event,
-  EventType,
-} from "@notifee/react-native";
+import notifee, { AndroidImportance } from "@notifee/react-native";
 import messaging, {
   AuthorizationStatus,
   FirebaseMessagingTypes,
 } from "@react-native-firebase/messaging";
 import * as Device from "expo-device";
-import { t } from "i18next";
 import { Platform } from "react-native";
 
 import {
@@ -16,7 +11,6 @@ import {
   postApiChatsMessageRead,
 } from "@/api/endpoints/magicMessenger";
 import { UNANSWERED_CALL } from "@/constants";
-import { useWebRTCStore } from "@/store";
 
 import { showToast, trackEvent } from "../../utils/helper";
 
@@ -25,16 +19,30 @@ type DeliveredMessageNotificationData = {
   MessageId: string;
 };
 
+if (Platform.OS === "android") {
+  notifee.createChannel({
+    id: "default",
+    name: "Default",
+    importance: AndroidImportance.HIGH,
+    sound: "default",
+    vibration: true,
+  });
+}
+
 // --- Delivered listener (foreground + background) ---
 export const registerDeliveredListener = () => {
   messaging().onMessage(async (notification) => {
     try {
       trackEvent("📩 Message delivered:", notification);
 
-      const messageData = notification.data;
-      if (!messageData) return;
+      const notificationData = notification.data;
+      if (!notificationData) return;
 
-      if (messageData?.type === UNANSWERED_CALL) {
+      const notificationMessageData = JSON.parse(
+        (notificationData?.data as string) || "{}",
+      ) as { type: string };
+
+      if (notificationMessageData?.type === UNANSWERED_CALL) {
         showToast({
           type: "notification",
           text1: notification.notification?.title,
@@ -45,7 +53,7 @@ export const registerDeliveredListener = () => {
       }
 
       const deliveredMessageNotificationData =
-        messageData as DeliveredMessageNotificationData;
+        notificationData as DeliveredMessageNotificationData;
       if (
         deliveredMessageNotificationData.ChatId &&
         deliveredMessageNotificationData.MessageId
@@ -67,13 +75,17 @@ const handleNotificationResponse = async (
 ) => {
   clearAllNotifications();
 
-  const messageData = response.data;
-  if (!messageData) return;
+  const notificationData = response.data;
+  if (!notificationData) return;
 
-  trackEvent("👆 Message opened:", messageData);
+  trackEvent("👆 Message opened:", notificationData);
+
+  const notificationMessageData = JSON.parse(
+    (notificationData?.data as string) || "{}",
+  );
 
   const deliveredMessageNotificationData =
-    messageData as DeliveredMessageNotificationData;
+    notificationMessageData as DeliveredMessageNotificationData;
   if (
     deliveredMessageNotificationData.ChatId &&
     deliveredMessageNotificationData.MessageId
@@ -92,48 +104,6 @@ export const registerOpenedListener = () => {
   messaging().onNotificationOpenedApp(handleNotificationResponse);
 };
 
-const callActionIdentifier = ({ type, detail }: Event) => {
-  trackEvent("callActionIdentifier", { type, detail });
-
-  if (type !== EventType.ACTION_PRESS) return;
-
-  const { pressAction, notification } = detail;
-
-  if (
-    notification?.data?.callingType === "AudioCalling" ||
-    notification?.data?.callingType === "VideoCalling"
-  ) {
-    // This is calling, so we need to know user accept or reject call.
-
-    const callingMessageData = notification?.data;
-
-    if (pressAction?.id === "ACCEPT_CALL") {
-    } else if (pressAction?.id === "REJECT_CALL") {
-      useWebRTCStore.getState().endCall?.({
-        callId: callingMessageData?.callId as string,
-        targetUsername: callingMessageData?.callerUsername as string,
-      });
-    }
-  }
-};
-
-export function registerCallActionListeners() {
-  if (Platform.OS === "android") {
-    notifee.createChannel({
-      id: "default",
-      name: "Default",
-      importance: AndroidImportance.HIGH,
-      sound: "default",
-      vibration: true,
-    });
-  }
-
-  notifee.onForegroundEvent(callActionIdentifier);
-  notifee.onBackgroundEvent(async (backgroundEvent) =>
-    callActionIdentifier(backgroundEvent),
-  );
-}
-
 // --- Check initial notification (for cold start - app was killed) ---
 export const checkInitialNotification = async () => {
   const response = await messaging().getInitialNotification();
@@ -143,33 +113,10 @@ export const checkInitialNotification = async () => {
   }
 };
 
-function registerCallNotificationCategory() {
-  notifee.setNotificationCategories([
-    {
-      id: "incoming_call",
-      actions: [
-        {
-          id: "ACCEPT_CALL",
-          title: t("answer"),
-          foreground: true,
-        },
-        {
-          id: "REJECT_CALL",
-          title: t("reject"),
-          destructive: true,
-          foreground: false,
-        },
-      ],
-    },
-  ]);
-}
-
 // --- Initialization helper ---
 export const setupNotificationListeners = () => {
   registerDeliveredListener();
   registerOpenedListener();
-  registerCallNotificationCategory();
-  registerCallActionListeners();
 };
 
 export function clearAllNotifications() {
