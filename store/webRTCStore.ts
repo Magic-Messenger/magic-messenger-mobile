@@ -46,6 +46,7 @@ type WebRTCStore = {
   targetUsername?: string;
   isCaller?: boolean;
   incomingCallData?: IncomingCallData;
+  isSwitchingCall: boolean; // Flag to prevent auto-close when switching calls
 
   setConnectionState: (connectionState: ConnectionStateType) => void;
   setLocalStream: (stream?: MediaStream) => void;
@@ -57,6 +58,7 @@ type WebRTCStore = {
   setCallerUsername: (username: string) => void;
   setTargetUsername: (username: string) => void;
   setIncomingCallData: (data: IncomingCallData) => void;
+  setIsSwitchingCall: (isSwitching: boolean) => void;
 
   startCall: ({
     targetUsername,
@@ -89,6 +91,7 @@ const initialState = {
   targetUsername: undefined,
   isCaller: false,
   incomingCallData: undefined,
+  isSwitchingCall: false,
 };
 
 // Helper function to get the other party's username
@@ -170,6 +173,10 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
 
   setIncomingCallData: (data: IncomingCallData) => {
     set({ incomingCallData: data });
+  },
+
+  setIsSwitchingCall: (isSwitching: boolean) => {
+    set({ isSwitchingCall: isSwitching });
   },
 
   handleIncomingCall: (incomingCall: IncomingCallEvent) => {
@@ -343,6 +350,8 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     const otherParty = getOtherPartyUsername(get());
     const callId = (data?.callId ?? get().callId) as string;
     const targetUsername = (data?.targetUsername ?? otherParty) as string;
+    const currentIsSwitchingCall = get().isSwitchingCall; // Preserve switching flag
+    const currentIncomingCallData = get().incomingCallData; // Preserve incoming call data when switching
 
     WebRTCService.closeConnection();
 
@@ -361,6 +370,10 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     set({
       ...resetState(),
       connectionState: "closed",
+      isSwitchingCall: currentIsSwitchingCall, // Preserve switching flag
+      incomingCallData: currentIsSwitchingCall
+        ? currentIncomingCallData
+        : undefined, // Preserve incoming call data when switching
     });
   },
 

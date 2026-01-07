@@ -313,6 +313,10 @@
     "lockNoteDescription": "Please enter your password to view your notes.",
     "lockNoteButton": "View Notes"
   },
+  "incomingCall": {
+    "incoming": "Incoming",
+    "call": "Call"
+  },
   "permissions": {
     "cameraRequired": "Camera Permission Required",
     "microphoneRequired": "Microphone Permission Required",

@@ -25,8 +25,8 @@ export const useAudioCalling = () => {
   useKeepAwake();
   const styles = useThemedStyles(createStyle);
 
-  const { targetUsername, callingType, mode } = useLocalSearchParams<
-    StartCallingType & { mode?: string }
+  const { targetUsername, callingType, mode, switching } = useLocalSearchParams<
+    StartCallingType & { mode?: string; switching?: string }
   >();
 
   const [loading, setLoading] = useState(true);
@@ -50,6 +50,7 @@ export const useAudioCalling = () => {
   const connectionState = useWebRTCStore((s) => s.connectionState);
   const isIncoming = useWebRTCStore((s) => s.isIncoming);
   const isRemoteAudioEnabled = useWebRTCStore((s) => s.isRemoteAudioEnabled);
+  const isSwitchingCall = useWebRTCStore((s) => s.isSwitchingCall);
 
   const startCall = useWebRTCStore((s) => s.startCall);
   const endCall = useWebRTCStore((s) => s.endCall);
@@ -137,16 +138,39 @@ export const useAudioCalling = () => {
     }
 
     const initializeCall = async () => {
+      // If switching from another call, clean up first
+      if (switching === "true") {
+        const store = useWebRTCStore.getState();
+        // End any existing call
+        store.endCall();
+        // Wait for cleanup
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        // Don't reset isSwitchingCall here - wait until new call is initialized
+      }
+
       // Check permissions before starting or answering call
       const hasPermission = await checkAndRequestPermissions("microphone");
 
       if (!hasPermission) {
         trackEvent("Audio call permission denied", { targetUsername });
         setLoading(false);
+        // Reset switching flag if permission denied
+        if (switching === "true") {
+          useWebRTCStore.getState().setIsSwitchingCall(false);
+        }
         return;
       }
 
       if (mode === "answer") {
+        // If there's pending incoming call data, accept the call
+        const pendingCallData = useWebRTCStore.getState().incomingCallData;
+        if (pendingCallData) {
+          await useWebRTCStore.getState().acceptIncomingCall();
+        }
+        // Reset switching flag AFTER call is properly initialized (connectionState is now "new")
+        if (switching === "true") {
+          useWebRTCStore.getState().setIsSwitchingCall(false);
+        }
         setLoading(false);
       } else {
         startCall({
@@ -170,7 +194,7 @@ export const useAudioCalling = () => {
         durationIntervalRef.current = null;
       }
     };
-  }, [targetUsername, mode, checkAndRequestPermissions]);
+  }, [targetUsername, mode, switching, checkAndRequestPermissions]);
 
   // ✅ Optimized: Use requestAnimationFrame for smoother updates on Android
   useEffect(() => {
@@ -214,11 +238,12 @@ export const useAudioCalling = () => {
       connectionState === "closed" ||
       connectionState === "disconnected"
     ) {
-      if (isCallActiveRef.current) {
+      // ✅ Only proceed if call is still active and not switching to another call
+      if (isCallActiveRef.current && !isSwitchingCall) {
         handleCallEnd();
       }
     }
-  }, [connectionState]);
+  }, [connectionState, isSwitchingCall]);
 
   return {
     t,

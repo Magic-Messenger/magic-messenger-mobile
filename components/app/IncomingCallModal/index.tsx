@@ -7,6 +7,7 @@ import React, {
   useMemo,
   useRef,
 } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Animated,
   Easing,
@@ -15,6 +16,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CallingType } from "@/api/models";
 import { useWebRTCStore } from "@/store";
@@ -23,9 +25,25 @@ import { Icon } from "../../ui";
 import { ThemedText } from "../ThemedText";
 
 export const IncomingCallModal = () => {
+  const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
+
   const incomingCallData = useWebRTCStore((s) => s.incomingCallData);
+  const connectionState = useWebRTCStore((s) => s.connectionState);
+  const isSwitchingCall = useWebRTCStore((s) => s.isSwitchingCall);
   const acceptIncomingCall = useWebRTCStore((s) => s.acceptIncomingCall);
   const declineIncomingCall = useWebRTCStore((s) => s.declineIncomingCall);
+  const endCall = useWebRTCStore((s) => s.endCall);
+  const setIsSwitchingCall = useWebRTCStore((s) => s.setIsSwitchingCall);
+
+  // Check if user is in an active call
+  const isInActiveCall = useMemo(
+    () =>
+      connectionState === "connected" ||
+      connectionState === "connecting" ||
+      connectionState === "new",
+    [connectionState],
+  );
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const soundRef = useRef<Audio.Sound | null>(null);
@@ -101,14 +119,14 @@ export const IncomingCallModal = () => {
       const pulse = Animated.loop(
         Animated.sequence([
           Animated.timing(pulseAnim, {
-            toValue: 1.2,
-            duration: 500,
+            toValue: 1.02,
+            duration: 600,
             easing: Easing.ease,
             useNativeDriver: true,
           }),
           Animated.timing(pulseAnim, {
             toValue: 1,
-            duration: 500,
+            duration: 600,
             easing: Easing.ease,
             useNativeDriver: true,
           }),
@@ -128,33 +146,117 @@ export const IncomingCallModal = () => {
   const handleAccept = useCallback(async () => {
     if (!incomingCallData) return;
 
-    const { callerUsername, callingType } = incomingCallData;
-
-    await acceptIncomingCall();
+    // Store call data locally before any state changes
+    const callerUsername = incomingCallData.callerUsername;
+    const callingType = incomingCallData.callingType;
 
     const pathname =
       callingType === CallingType.Audio
         ? "/(calling)/audioCalling/screens"
         : "/(calling)/videoCalling/screens";
 
-    startTransition(() => {
-      router.push({
+    // If in active call, handle transition
+    if (isInActiveCall) {
+      // Set flag to prevent auto-close in call screens
+      setIsSwitchingCall(true);
+
+      // Navigate immediately with switchingCall flag
+      // The new screen will handle cleanup and accept
+      router.replace({
         pathname,
         params: {
           targetUsername: callerUsername,
           callingType,
           mode: "answer",
+          switching: "true",
         },
       });
-    });
-  }, [incomingCallData, acceptIncomingCall]);
+    } else {
+      // Normal flow - not in active call
+      await acceptIncomingCall();
+
+      startTransition(() => {
+        router.push({
+          pathname,
+          params: {
+            targetUsername: callerUsername,
+            callingType,
+            mode: "answer",
+          },
+        });
+      });
+    }
+  }, [incomingCallData, isInActiveCall, endCall, setIsSwitchingCall]);
 
   const handleDecline = useCallback(() => {
     declineIncomingCall();
   }, [declineIncomingCall]);
 
-  if (!incomingCallData) return null;
+  // Don't show modal/banner if no incoming call or if we're currently switching calls
+  if (!incomingCallData || isSwitchingCall) return null;
 
+  // Show banner when user is in active call
+  if (isInActiveCall) {
+    return (
+      <Animated.View
+        style={[
+          styles.bannerContainer,
+          {
+            top: insets.top + 10,
+            transform: [{ scale: pulseAnim }],
+          },
+        ]}
+      >
+        <View style={styles.bannerContent}>
+          {/* Caller Avatar */}
+          <View style={styles.bannerAvatar}>
+            <ThemedText style={styles.bannerAvatarText}>
+              {callerInitial}
+            </ThemedText>
+          </View>
+
+          {/* Caller Info */}
+          <View style={styles.bannerInfo}>
+            <ThemedText style={styles.bannerCallerName} numberOfLines={1}>
+              {incomingCallData.callerUsername}
+            </ThemedText>
+            <ThemedText style={styles.bannerCallType}>
+              {t("incomingCall.incoming")}{" "}
+              {isVideoCall ? t("common.video") : t("common.audio")}
+            </ThemedText>
+          </View>
+
+          {/* Action Buttons */}
+          <View style={styles.bannerButtons}>
+            {/* Decline Button */}
+            <TouchableOpacity
+              style={[styles.bannerButton, styles.bannerDeclineButton]}
+              onPress={handleDecline}
+              activeOpacity={0.7}
+            >
+              <Icon name="phone" type="fontawesome5" color="#fff" size={16} />
+            </TouchableOpacity>
+
+            {/* Accept Button */}
+            <TouchableOpacity
+              style={[styles.bannerButton, styles.bannerAcceptButton]}
+              onPress={handleAccept}
+              activeOpacity={0.7}
+            >
+              <Icon
+                name={isVideoCall ? "video" : "phone"}
+                type="fontawesome5"
+                color="#fff"
+                size={16}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Animated.View>
+    );
+  }
+
+  // Show full modal when not in active call
   return (
     <Modal
       visible={!!incomingCallData}
@@ -181,7 +283,9 @@ export const IncomingCallModal = () => {
             {incomingCallData.callerUsername}
           </ThemedText>
           <ThemedText style={styles.callType}>
-            Incoming {isVideoCall ? "Video" : "Audio"} Call
+            {t("incomingCall.incoming")}{" "}
+            {isVideoCall ? t("common.video") : t("common.audio")}{" "}
+            {t("incomingCall.call")}
           </ThemedText>
 
           {/* Action Buttons */}
@@ -216,6 +320,76 @@ export const IncomingCallModal = () => {
 };
 
 const styles = StyleSheet.create({
+  // Banner styles (for active call)
+  bannerContainer: {
+    position: "absolute",
+    left: 16,
+    right: 16,
+    zIndex: 9999,
+    elevation: 10,
+  },
+  bannerContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(30, 30, 50, 0.95)",
+    borderRadius: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  bannerAvatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "#4a4a6a",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  bannerAvatarText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  bannerInfo: {
+    flex: 1,
+    marginRight: 12,
+  },
+  bannerCallerName: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  bannerCallType: {
+    color: "#aaa",
+    fontSize: 12,
+    marginTop: 2,
+  },
+  bannerButtons: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  bannerButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  bannerDeclineButton: {
+    backgroundColor: "#FF3B30",
+    transform: [{ rotate: "135deg" }],
+  },
+  bannerAcceptButton: {
+    backgroundColor: "#34C759",
+  },
+
+  // Full modal styles
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.85)",
