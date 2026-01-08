@@ -61,7 +61,7 @@ export const useVideoCalling = () => {
     if (router.canGoBack()) {
       router.back();
     } else {
-      router.replace("/");
+      router.replace("/(tabs)/chat/home");
     }
   }, []);
 
@@ -142,7 +142,7 @@ export const useVideoCalling = () => {
     if (router.canGoBack()) {
       router.back();
     } else {
-      router.replace("/");
+      router.replace("/(tabs)/chat/home");
     }
   }, []);
 

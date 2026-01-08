@@ -69,7 +69,7 @@ export const useAudioCalling = () => {
     if (router.canGoBack()) {
       router.back();
     } else {
-      router.replace("/");
+      router.replace("/(tabs)/chat/home");
     }
   }, []);
 
@@ -130,7 +130,7 @@ export const useAudioCalling = () => {
       router.back();
     } else {
       // Fallback to home screen when back is not possible (e.g., after call switching)
-      router.replace("/");
+      router.replace("/(tabs)/chat/home");
     }
   }, []);
 
