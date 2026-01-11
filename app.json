@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Magic RN",
+    "name": "Magic Privacy Messenger",
     "slug": "magic-messenger",
-    "version": "1.3.8",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "splash": {
@@ -15,12 +15,14 @@
     "newArchEnabled": true,
     "ios": {
       "icon": "./assets/images/icon.png",
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.privatixsolutions.magicchat",
-      "buildNumber": "2",
+      "version": "2.0.0",
+      "buildNumber": "1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "UIBackgroundModes": ["remote-notification"]
+        "UIBackgroundModes": ["remote-notification"],
+        "UIDeviceFamily": [1]
       },
       "entitlements": {
         "aps-environment": "production"
