@@ -11,7 +11,11 @@ import { initReactI18next } from "react-i18next";
 import { DEFAULT_LANGUAGE } from "@/constants";
 import { useAppStore } from "@/store";
 
+import de from "./locales/de.json";
 import en from "./locales/en.json";
+import es from "./locales/es.json";
+import fr from "./locales/fr.json";
+import nl from "./locales/nl.json";
 
 dayjs.extend(relativeTime);
 
@@ -38,13 +42,16 @@ const initI18n = async () => {
         translation: en,
       },
       es: {
-        translation: en,
+        translation: es,
+      },
+      de: {
+        translation: de,
       },
       fr: {
-        translation: en,
+        translation: fr,
       },
       nl: {
-        translation: en,
+        translation: nl,
       },
     },
     interpolation: {
