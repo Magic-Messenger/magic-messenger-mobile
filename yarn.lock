@@ -2437,6 +2437,11 @@
   resolved "https://registry.npmjs.org/@radix-ui/react-use-layout-effect/-/react-use-layout-effect-1.1.1.tgz"
   integrity sha512-RbJRS4UWQFkzHTTwVymMTUv8EqYhOp8dOOviLj2ugtTiXRaRQS7GLGxZTLL1jWhMeoSCf5zmcZkqTl9IiYfXcQ==
 
+"@react-native-community/netinfo@^11.4.1":
+  version "11.4.1"
+  resolved "https://registry.yarnpkg.com/@react-native-community/netinfo/-/netinfo-11.4.1.tgz#a3c247aceab35f75dd0aa4bfa85d2be5a4508688"
+  integrity sha512-B0BYAkghz3Q2V09BF88RA601XursIEA111tnc2JOaN7axJWmNefmfjZqw/KdSxKZp7CZUuPpjBmz/WCR9uaHYg==
+
 "@react-native-firebase/app@^23.7.0":
   version "23.7.0"
   resolved "https://registry.yarnpkg.com/@react-native-firebase/app/-/app-23.7.0.tgz#48faec190c8e70d684953a5bd28286b6e8e4729d"
@@ -7967,10 +7972,10 @@ react-is@^19.1.0:
   resolved "https://registry.npmjs.org/react-is/-/react-is-19.2.0.tgz"
   integrity sha512-x3Ax3kNSMIIkyVYhWPyO09bu0uttcAIoecO/um/rKGQ4EltYWVYtyiGkS/3xMynrbVQdS69Jhlv8FXUEZehlzA==
 
-react-native-capture-protection@^2.3.3:
-  version "2.3.5"
-  resolved "https://registry.npmjs.org/react-native-capture-protection/-/react-native-capture-protection-2.3.5.tgz"
-  integrity sha512-SCj6bswmQXXgINQ+22yeYADlSFAJiqLK+s1pMcYHRrE7oTRMQc0ky2vf91ac8r3LQqfVvB79cgmwqmPaZ5dkOw==
+react-native-capture-protection@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/react-native-capture-protection/-/react-native-capture-protection-2.4.0.tgz#3a448361747c5d9ffdb3497f020b52a1bb12c8cf"
+  integrity sha512-nipLYnXorytj2Ynk6npRTL6EG3DVby4mpOd3ywG3HOBFqniLly05awqRQCbJY7knQvYFoDuVauKaV08lBwNBNw==
 
 react-native-compressor@^1.13.0:
   version "1.13.0"

@@ -99,7 +99,7 @@ export const useDetail = () => {
     query: {
       enabled: isFocused,
       refetchInterval: isFocused ? 10000 : false,
-      refetchOnWindowFocus: true,
+      staleTime: 10000,
     },
   });
 
@@ -116,8 +116,6 @@ export const useDetail = () => {
     {
       query: {
         enabled: !!chatId && isFocused,
-        refetchOnWindowFocus: true,
-        refetchOnReconnect: true,
       },
     },
   );

@@ -4,5 +4,6 @@ export * from "./useChatHelper";
 export * from "./useMediaPermissions";
 export * from "./usePicker";
 export * from "./useScreenProtection";
+export * from "./useSetupQueryClient";
 export * from "./useSignalREvents";
 export * from "./useWebRTCEvents";

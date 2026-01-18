@@ -33,8 +33,6 @@ export default function ChatScreen() {
     {
       query: {
         enabled: isFocused,
-        refetchOnWindowFocus: true,
-        refetchOnReconnect: true,
       },
     },
   );

@@ -19,7 +19,7 @@ import Toast from "react-native-toast-message";
 import { usePostApiAccountRegisterFirebaseToken } from "@/api/endpoints/magicMessenger";
 import { IncomingCallModal } from "@/components";
 import { Colors } from "@/constants";
-import { useScreenProtection } from "@/hooks";
+import { useScreenProtection, useSetupReactQueryLifecycle } from "@/hooks";
 import { initDayjs } from "@/i18n";
 import { ImageViewerProvider, SignalRProvider, TorProvider } from "@/providers";
 import {
@@ -31,7 +31,16 @@ import {
 import { useAppStore, useUserStore, useWebRTCStore } from "@/store";
 import { headerImage, toastConfig, trackEvent } from "@/utils";
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 1000 * 30,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    },
+  },
+});
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -45,6 +54,7 @@ export default function RootLayout() {
     SFProSemiBold: require("../assets/fonts/SF-Pro-Text-Semibold.ttf"),
   });
 
+  useSetupReactQueryLifecycle();
   useScreenProtection();
 
   const rehydrated = useUserStore((state) => state.rehydrated);
