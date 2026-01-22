@@ -19,7 +19,7 @@ import Toast from "react-native-toast-message";
 import { usePostApiAccountRegisterFirebaseToken } from "@/api/endpoints/magicMessenger";
 import { IncomingCallModal } from "@/components";
 import { Colors } from "@/constants";
-import { useScreenProtection, useSetupReactQueryLifecycle } from "@/hooks";
+import { useScreenProtection } from "@/hooks";
 import { initDayjs } from "@/i18n";
 import { ImageViewerProvider, SignalRProvider, TorProvider } from "@/providers";
 import {
@@ -43,7 +43,7 @@ export const queryClient = new QueryClient({
 });
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+function RootLayoutContent() {
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     SFPro: require("../assets/fonts/SF-Pro.ttf"),
@@ -54,7 +54,6 @@ export default function RootLayout() {
     SFProSemiBold: require("../assets/fonts/SF-Pro-Text-Semibold.ttf"),
   });
 
-  useSetupReactQueryLifecycle();
   useScreenProtection();
 
   const rehydrated = useUserStore((state) => state.rehydrated);
@@ -140,65 +139,59 @@ export default function RootLayout() {
   }
 
   return (
-    <GestureHandlerRootView>
-      <PortalProvider>
-        <QueryClientProvider client={queryClient}>
-          <KeyboardProvider>
-            <TorProvider>
-              <SignalRProvider>
-                <ImageViewerProvider>
-                  <Stack
-                    screenOptions={{
-                      headerTransparent: true,
-                      headerTintColor: Colors.white,
-                      headerBackTitle: t("back"),
-                      ...headerImage(),
-                      contentStyle: {
-                        backgroundColor: "transparent",
-                      },
-                      headerTitleAlign: "center",
-                    }}
-                  >
-                    <Stack.Screen
-                      name="index"
-                      options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                      name="(auth)"
-                      options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                      name="(tabs)"
-                      options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                      name="(calling)"
-                      options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                      name="chatDetail"
-                      options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                      name="groupChatDetail"
-                      options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                      name="ticketDetail"
-                      options={{ headerShown: true }}
-                    />
-                    <Stack.Screen name="+not-found" />
-                  </Stack>
+    <KeyboardProvider>
+      <TorProvider>
+        <SignalRProvider>
+          <ImageViewerProvider>
+            <Stack
+              screenOptions={{
+                headerTransparent: true,
+                headerTintColor: Colors.white,
+                headerBackTitle: t("back"),
+                ...headerImage(),
+                contentStyle: {
+                  backgroundColor: "transparent",
+                },
+                headerTitleAlign: "center",
+              }}
+            >
+              <Stack.Screen name="index" options={{ headerShown: false }} />
+              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="(calling)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="chatDetail"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="groupChatDetail"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="ticketDetail"
+                options={{ headerShown: true }}
+              />
+              <Stack.Screen name="+not-found" />
+            </Stack>
 
-                  <IncomingCallModal />
-                  <Toast config={toastConfig} />
-                  <StatusBar style="light" />
-                </ImageViewerProvider>
-              </SignalRProvider>
-            </TorProvider>
-          </KeyboardProvider>
-        </QueryClientProvider>
-      </PortalProvider>
-    </GestureHandlerRootView>
+            <IncomingCallModal />
+            <Toast config={toastConfig} />
+            <StatusBar style="light" />
+          </ImageViewerProvider>
+        </SignalRProvider>
+      </TorProvider>
+    </KeyboardProvider>
   );
 }
+
+const RootLayout = () => (
+  <GestureHandlerRootView>
+    <PortalProvider>
+      <QueryClientProvider client={queryClient}>
+        <RootLayoutContent />
+      </QueryClientProvider>
+    </PortalProvider>
+  </GestureHandlerRootView>
+);
+
+export default RootLayout;
