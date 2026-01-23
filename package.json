@@ -27,6 +27,8 @@
     "generate-api:watch": "orval --config orval.config.ts --watch",
     "build:ios": "eas build -p ios --clear-cache --profile production && eas submit -p ios --profile production",
     "build:android": "eas build -p android --profile production && eas submit -p android --profile production",
+    "build:android:local": "eas build -p android --profile production --local",
+    "build:android:local:apk": "eas build -p android --profile production-apk --local",
     "prepare-hooks": "husky install",
     "prepare": "husky"
   },

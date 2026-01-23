@@ -2,7 +2,7 @@
   "expo": {
     "name": "Magic",
     "slug": "magic-messenger",
-    "version": "2.0.8",
+    "version": "2.0.9",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "splash": {
@@ -47,7 +47,7 @@
       "enableProguardInReleaseBuilds": true,
       "enableMinifyInReleaseBuilds": true,
       "applicationBinarySize": 16384,
-      "versionCode": 208,
+      "versionCode": 209,
       "keystore": {
         "keystorePath": "./magic-keystore.keystore",
         "keystorePassword": "TPYazilimMagicProject1234*+2025",
