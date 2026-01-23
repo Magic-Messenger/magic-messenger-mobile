@@ -9,18 +9,24 @@ import { ThemedText } from "../../ThemedText";
 
 interface Props {
   setSearchText: (_text: string) => void;
+  searchText?: string;
+  searchPlaceholder?: string;
   onBlockedPress?: () => void;
   isBlocked?: boolean;
   isShowBlocked?: boolean;
   addContactRoute?: string;
+  showTitle?: boolean;
 }
 
 export const ContactHeader = ({
   setSearchText,
+  searchText,
+  searchPlaceholder,
   onBlockedPress,
   isBlocked,
   isShowBlocked = true,
   addContactRoute = "/(tabs)/settings/contacts/screens/add",
+  showTitle = true,
 }: Props) => {
   const { t } = useTranslation();
   const styles = useThemedStyles(createStyle);
@@ -53,8 +59,9 @@ export const ContactHeader = ({
       </View>
 
       <Input
-        placeholder={t("common.search")}
+        placeholder={searchPlaceholder || t("common.search")}
         style={[styles.mt5, styles.mb5]}
+        value={searchText}
         onChangeText={(_text) => setSearchText(_text)}
         rightIcon={{
           type: "feather",
@@ -62,9 +69,11 @@ export const ContactHeader = ({
         }}
       />
 
-      <ThemedText type="title" weight="semiBold" size={20}>
-        {t("contacts.yourContacts")}
-      </ThemedText>
+      {showTitle && (
+        <ThemedText type="title" weight="semiBold" size={20}>
+          {t("contacts.yourContacts")}
+        </ThemedText>
+      )}
     </View>
   );
 };

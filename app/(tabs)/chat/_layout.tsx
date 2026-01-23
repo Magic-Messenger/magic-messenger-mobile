@@ -36,6 +36,14 @@ export default function ChatStack() {
           title: t("chat.title"),
         }}
       />
+      <Stack.Screen
+        name="contacts/add"
+        options={{
+          ...headerImage(),
+          headerShown: true,
+          title: t("contacts.addContact"),
+        }}
+      />
     </Stack>
   );
 }

@@ -169,6 +169,8 @@
     "allContacts": "Alle contacten",
     "addUser": "Gebruiker toevoegen",
     "yourContacts": "Uw contacten",
+    "global": "Globaal",
+    "searchGlobalPlaceholder": "Zoek globaal of in contacten",
     "editContact": "Contact bewerken",
     "userName": "Gebruikersnaam",
     "nickName": "Nickname voor dit contact",

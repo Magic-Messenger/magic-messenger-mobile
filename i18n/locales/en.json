@@ -169,6 +169,8 @@
     "allContacts": "All Contacts",
     "addUser": "Add User",
     "yourContacts": "Your Contacts",
+    "global": "Global",
+    "searchGlobalPlaceholder": "Search globally or in contacts",
     "editContact": "Edit Contact",
     "userName": "User Name",
     "nickName": "Nickname for this contact",
