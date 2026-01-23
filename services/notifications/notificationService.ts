@@ -128,37 +128,43 @@ export async function registerForPushNotificationsAsync(): Promise<
   string | null
 > {
   if (!Device.isDevice) {
-    trackEvent("Must use physical device for push notifications");
+    trackEvent("❌ Push notifications require a physical device");
     return null;
   }
 
-  const permissonStatus = await messaging().hasPermission();
-  let finalStatus = permissonStatus;
+  /* 1️⃣ Permission */
+  const authStatus = await messaging().requestPermission({
+    alert: true,
+    badge: true,
+    sound: true,
+  });
 
-  if (
-    permissonStatus !== AuthorizationStatus.AUTHORIZED &&
-    permissonStatus !== AuthorizationStatus.PROVISIONAL
-  ) {
-    finalStatus = await messaging().requestPermission();
-  }
+  const isAuthorized =
+    authStatus === AuthorizationStatus.AUTHORIZED ||
+    authStatus === AuthorizationStatus.PROVISIONAL;
 
-  if (
-    finalStatus !== AuthorizationStatus.AUTHORIZED &&
-    finalStatus !== AuthorizationStatus.PROVISIONAL
-  ) {
-    trackEvent("Failed to get push token");
+  if (!isAuthorized) {
+    trackEvent("❌ Push permission not granted");
     return null;
   }
 
-  trackEvent(
-    "✅ Firebase Is Device Registered For Remote Messages:",
-    messaging().isDeviceRegisteredForRemoteMessages,
-  );
-  if (!messaging().isDeviceRegisteredForRemoteMessages)
+  /* 2️⃣ iOS – APNs required */
+  if (Platform.OS === "ios") {
     await messaging().registerDeviceForRemoteMessages();
 
-  const firebaseTokenData = await messaging().getToken();
+    const apnsToken = await messaging().getAPNSToken();
+    trackEvent("🍎 APNS Token:", apnsToken);
 
-  trackEvent("✅ Firebase Push Token:", firebaseTokenData);
-  return firebaseTokenData;
+    if (!apnsToken) {
+      trackEvent("❌ APNS token not available");
+      return null;
+    }
+  }
+
+  /* 3️⃣ Token created (Android + iOS) */
+  await new Promise((r) => setTimeout(r, 1500));
+  const fcmToken = await messaging().getToken();
+  trackEvent("🔥 FCM Token:", fcmToken);
+
+  return fcmToken ?? null;
 }

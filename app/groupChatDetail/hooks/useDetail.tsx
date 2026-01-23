@@ -103,8 +103,6 @@ export const useDetail = () => {
     {
       query: {
         enabled: !!chatId && isFocused,
-        refetchOnWindowFocus: true,
-        refetchOnReconnect: true,
       },
     },
   );

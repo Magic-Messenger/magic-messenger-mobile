@@ -2,6 +2,7 @@ import "react-native-reanimated";
 
 import { PortalProvider } from "@gorhom/portal";
 import LogRocket from "@logrocket/react-native";
+import messaging from "@react-native-firebase/messaging";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as Application from "expo-application";
 import { useFonts } from "expo-font";
@@ -15,6 +16,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import Toast from "react-native-toast-message";
 
+import { usePostApiAccountRegisterFirebaseToken } from "@/api/endpoints/magicMessenger";
 import { IncomingCallModal } from "@/components";
 import { Colors } from "@/constants";
 import { useScreenProtection } from "@/hooks";
@@ -27,12 +29,21 @@ import {
   setupNotificationListeners,
 } from "@/services";
 import { useAppStore, useUserStore, useWebRTCStore } from "@/store";
-import { headerImage, toastConfig } from "@/utils";
+import { headerImage, toastConfig, trackEvent } from "@/utils";
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 1000 * 30,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    },
+  },
+});
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+function RootLayoutContent() {
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     SFPro: require("../assets/fonts/SF-Pro.ttf"),
@@ -52,6 +63,9 @@ export default function RootLayout() {
   const currentAppState = useAppStore((state) => state.currentAppState);
 
   const { t } = useTranslation();
+
+  const { mutateAsync: registerFirebaseToken } =
+    usePostApiAccountRegisterFirebaseToken();
 
   useEffect(() => {
     if (loaded) {
@@ -104,70 +118,80 @@ export default function RootLayout() {
     initDayjs();
   }, [language]);
 
+  useEffect(() => {
+    const unsubscribe = messaging().onTokenRefresh(async (token) => {
+      trackEvent("🔁 FCM Token Refreshed:", token);
+
+      if (isLogin) {
+        registerFirebaseToken({
+          data: { firebaseToken: token },
+        })
+          .then()
+          .catch();
+      }
+    });
+
+    return () => unsubscribe();
+  }, [isLogin]);
+
   if (!loaded || !rehydrated) {
     return null;
   }
 
   return (
-    <GestureHandlerRootView>
-      <PortalProvider>
-        <QueryClientProvider client={queryClient}>
-          <KeyboardProvider>
-            <TorProvider>
-              <SignalRProvider>
-                <ImageViewerProvider>
-                  <Stack
-                    screenOptions={{
-                      headerTransparent: true,
-                      headerTintColor: Colors.white,
-                      headerBackTitle: t("back"),
-                      ...headerImage(),
-                      contentStyle: {
-                        backgroundColor: "transparent",
-                      },
-                      headerTitleAlign: "center",
-                    }}
-                  >
-                    <Stack.Screen
-                      name="index"
-                      options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                      name="(auth)"
-                      options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                      name="(tabs)"
-                      options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                      name="(calling)"
-                      options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                      name="chatDetail"
-                      options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                      name="groupChatDetail"
-                      options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                      name="ticketDetail"
-                      options={{ headerShown: true }}
-                    />
-                    <Stack.Screen name="+not-found" />
-                  </Stack>
+    <KeyboardProvider>
+      <TorProvider>
+        <SignalRProvider>
+          <ImageViewerProvider>
+            <Stack
+              screenOptions={{
+                headerTransparent: true,
+                headerTintColor: Colors.white,
+                headerBackTitle: t("back"),
+                ...headerImage(),
+                contentStyle: {
+                  backgroundColor: "transparent",
+                },
+                headerTitleAlign: "center",
+              }}
+            >
+              <Stack.Screen name="index" options={{ headerShown: false }} />
+              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="(calling)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="chatDetail"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="groupChatDetail"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="ticketDetail"
+                options={{ headerShown: true }}
+              />
+              <Stack.Screen name="+not-found" />
+            </Stack>
 
-                  <IncomingCallModal />
-                  <Toast config={toastConfig} />
-                  <StatusBar style="light" />
-                </ImageViewerProvider>
-              </SignalRProvider>
-            </TorProvider>
-          </KeyboardProvider>
-        </QueryClientProvider>
-      </PortalProvider>
-    </GestureHandlerRootView>
+            <IncomingCallModal />
+            <Toast config={toastConfig} />
+            <StatusBar style="light" />
+          </ImageViewerProvider>
+        </SignalRProvider>
+      </TorProvider>
+    </KeyboardProvider>
   );
 }
+
+const RootLayout = () => (
+  <GestureHandlerRootView>
+    <PortalProvider>
+      <QueryClientProvider client={queryClient}>
+        <RootLayoutContent />
+      </QueryClientProvider>
+    </PortalProvider>
+  </GestureHandlerRootView>
+);
+
+export default RootLayout;
