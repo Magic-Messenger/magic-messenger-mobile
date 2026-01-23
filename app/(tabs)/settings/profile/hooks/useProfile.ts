@@ -7,8 +7,10 @@ import {
   useDeleteApiAccountDeleteProfile,
   useGetApiAccountGetProfile,
   usePostApiAccountChangeLanguage,
+  usePostApiAccountUploadProfilePicture,
 } from "@/api/endpoints/magicMessenger";
 import { Colors, flexBox, spacing } from "@/constants";
+import { usePicker } from "@/hooks";
 import { useAppStore, useUserStore } from "@/store";
 import { ColorDto, useThemedStyles } from "@/theme";
 import { changeLanguage, showToast, widthPixel } from "@/utils";
@@ -19,11 +21,14 @@ export const useProfile = () => {
   const logout = useUserStore((state) => state.logout);
   const styles = useThemedStyles(createStyle);
 
-  const { data, isLoading } = useGetApiAccountGetProfile();
+  const { data, isLoading, refetch } = useGetApiAccountGetProfile();
   const { mutateAsync: deleteProfileRequest, isPending } =
     useDeleteApiAccountDeleteProfile();
   const { mutateAsync: changeLanguageRequest } =
     usePostApiAccountChangeLanguage();
+  const { mutateAsync: uploadProfilePictureRequest, isPending: isUploading } =
+    usePostApiAccountUploadProfilePicture();
+  const { pickMedia, isProcessing } = usePicker();
 
   const [userPassword, setUserPassword] = useState<string | null>(null);
   const [deleteApprove, setDeleteApprove] = useState<boolean>(false);
@@ -57,6 +62,35 @@ export const useProfile = () => {
     router.push("/(tabs)/settings/changePassword");
   };
 
+  const uploadProfilePicture = async () => {
+    try {
+      const media = await pickMedia();
+      if (!media || media.type !== "image") return;
+
+      const { success } = await uploadProfilePictureRequest({
+        data: {
+          file: {
+            uri: media.uri,
+            name: `profile-${Date.now()}.jpg`,
+            type: "image/jpeg",
+          } as any,
+        },
+      });
+
+      if (success) {
+        showToast({
+          text1: t("profile.profilePictureUpdated"),
+        });
+        refetch();
+      }
+    } catch (error) {
+      showToast({
+        type: "error",
+        text1: t("profile.profilePictureError"),
+      });
+    }
+  };
+
   return {
     t,
     language,
@@ -64,6 +98,8 @@ export const useProfile = () => {
     data,
     isLoading,
     isPending,
+    isUploading,
+    isProcessing,
     userPassword,
     setUserPassword,
     deleteApprove,
@@ -71,6 +107,7 @@ export const useProfile = () => {
     deleteProfile,
     handleChangeLanguage,
     changePassword,
+    uploadProfilePicture,
   };
 };
 
@@ -80,7 +117,9 @@ const createStyle = (colors: ColorDto) =>
       ...spacing({
         pl: 20,
         pr: 20,
+        gap: 15,
       }),
+      flexDirection: "row",
     },
     userIDInfo: {
       ...spacing({

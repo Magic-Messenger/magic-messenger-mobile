@@ -1,5 +1,5 @@
 import { Image } from "expo-image";
-import { TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 
 import {
   AppLayout,
@@ -9,7 +9,8 @@ import {
   Input,
   ThemedText,
 } from "@/components";
-import { appSupportLanguages, copyToClipboard } from "@/utils";
+import { Colors } from "@/constants";
+import { appSupportLanguages, copyToClipboard, widthPixel } from "@/utils";
 
 import { useProfile } from "../hooks";
 
@@ -24,9 +25,12 @@ export default function ProfileScreen() {
     setDeleteApprove,
     setUserPassword,
     isPending,
+    isUploading,
+    isProcessing,
     deleteProfile,
     handleChangeLanguage,
     changePassword,
+    uploadProfilePicture,
   } = useProfile();
 
   return (
@@ -36,6 +40,53 @@ export default function ProfileScreen() {
       title={t("profile.yourProfile")}
     >
       <View style={styles.mainContainer}>
+        <View>
+          <TouchableOpacity
+            onPress={uploadProfilePicture}
+            disabled={isUploading || isProcessing}
+            style={{
+              position: "relative",
+              width: widthPixel(80),
+              height: widthPixel(80),
+              borderRadius: widthPixel(50),
+              backgroundColor: Colors.mainAccent,
+              justifyContent: "center",
+              alignItems: "center",
+              overflow: "hidden",
+            }}
+          >
+            {data?.data?.photoUrl ? (
+              <Image
+                source={{ uri: data.data.photoUrl }}
+                style={{
+                  width: widthPixel(100),
+                  height: widthPixel(100),
+                  borderRadius: widthPixel(50),
+                }}
+                contentFit="cover"
+              />
+            ) : (
+              <Icon type="feather" name="user" size={40} color={Colors.white} />
+            )}
+            <View
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: "rgba(0,0,0,0.4)",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              {(isUploading || isProcessing) && (
+                <ActivityIndicator size="small" color={Colors.white} />
+              )}
+              <Icon type="feather" name="edit" size={20} color={Colors.white} />
+            </View>
+          </TouchableOpacity>
+        </View>
         <View
           style={[
             styles.flex,
