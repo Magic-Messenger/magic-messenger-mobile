@@ -18,7 +18,6 @@ import {
   NativeSyntheticEvent,
   TouchableOpacity,
 } from "react-native";
-import { CaptureProtection } from "react-native-capture-protection";
 
 import {
   useDeleteApiChatsDelete,
@@ -32,6 +31,7 @@ import {
 import { CallingType, MessageDto, MessageType } from "@/api/models";
 import { ActionSheetRef, Icon } from "@/components";
 import { INITIAL_PAGE_SIZE, UploadFileResultDto } from "@/constants";
+import { useScreenProtection } from "@/hooks";
 import { useMediaPermissions } from "@/hooks/useMediaPermissions";
 import {
   useChatMessages,
@@ -88,6 +88,8 @@ export const useDetail = () => {
   const chatStore = useChatStore();
   // Get messages for the current chat from the store
   const messages = useChatMessages(chatId);
+
+  useScreenProtection({ enabled: isScreenshotEnabled });
 
   const { mutateAsync: sendApiMessage } = usePostApiChatsSendMessage();
   const { mutateAsync: createApiChat } = usePostApiChatsCreate();
@@ -225,22 +227,6 @@ export const useDetail = () => {
       isLoadingRef.current = false;
     }, 500);
   }, [chatId, pagination.hasMore]);
-
-  const initializeScreenshot = useCallback(async () => {
-    if (isScreenshotEnabled) {
-      await CaptureProtection.allow();
-    } else {
-      await CaptureProtection.prevent({
-        appSwitcher: false,
-        screenshot: true,
-        record: true,
-      });
-    }
-  }, [isScreenshotEnabled]);
-
-  useEffect(() => {
-    initializeScreenshot().then().catch();
-  }, [isScreenshotEnabled]);
 
   // For inverted list, load more when scrolling towards the top (which appears as bottom due to inversion)
   const handleEndReached = useCallback(() => {
