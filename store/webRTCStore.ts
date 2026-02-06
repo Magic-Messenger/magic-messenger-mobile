@@ -399,10 +399,59 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
   },
 
   checkWaitingCalling: () => {
+    trackEvent("[checkWaitingCalling] Checking for waiting calls...");
+
     getApiCallingGetWaitingCalling()
       .then((waitingCalling) => {
+        trackEvent("[checkWaitingCalling] API response", {
+          success: waitingCalling?.success,
+          hasData: !!waitingCalling?.data,
+          data: waitingCalling?.data,
+        });
+
         if (waitingCalling?.success && waitingCalling?.data) {
-          trackEvent("Waiting call found", waitingCalling?.data);
+          trackEvent("[checkWaitingCalling] Waiting call found", {
+            callingId: waitingCalling?.data?.callingId,
+            caller: waitingCalling?.data?.caller,
+            targets: waitingCalling?.data?.targets,
+            isGroupCalling: waitingCalling?.data?.isGroupCalling,
+            callingType: waitingCalling?.data?.callingType,
+          });
+
+          // Check if it's a group call
+          if (waitingCalling?.data?.isGroupCalling) {
+            trackEvent("[checkWaitingCalling] >>> GROUP CALL detected <<<", {
+              callId: waitingCalling?.data?.callingId,
+              caller: waitingCalling?.data?.caller,
+              targets: waitingCalling?.data?.targets,
+            });
+
+            // Import dynamically to avoid circular dependency
+            import("./groupWebRTCStore").then(({ useGroupWebRTCStore }) => {
+              // Note: API CallingDto doesn't have groupName field
+              // Backend may send group name in 'caller' or we need to look it up
+              // For now, using 'caller' as groupName placeholder
+              const groupCallData = {
+                callId: waitingCalling?.data?.callingId as string,
+                groupName: waitingCalling?.data?.caller as string,
+                callerUsername: waitingCalling?.data?.caller as string,
+                callingType: waitingCalling?.data?.callingType as CallingType,
+                offer: waitingCalling?.data?.offer as string,
+              };
+
+              trackEvent(
+                "[checkWaitingCalling] Routing to groupWebRTCStore",
+                groupCallData,
+              );
+              useGroupWebRTCStore
+                .getState()
+                .handleIncomingGroupCall(groupCallData);
+            });
+            return;
+          }
+
+          // Regular 1:1 call
+          trackEvent("[checkWaitingCalling] Regular 1:1 call detected");
           startTransition(() => {
             get().setIncomingCallData({
               ...waitingCalling?.data,
@@ -418,9 +467,13 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
               get().setIsIncoming(true);
             }, 500);
           });
+        } else {
+          trackEvent("[checkWaitingCalling] No waiting calls found");
         }
       })
-      .catch();
+      .catch((error) => {
+        trackEvent("[checkWaitingCalling] Error", { error: String(error) });
+      });
   },
 
   onCameraToggle: (data: CameraToggleEvent) => {

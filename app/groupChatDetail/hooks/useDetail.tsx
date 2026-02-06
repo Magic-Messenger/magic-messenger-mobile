@@ -32,12 +32,14 @@ import {
   useGetApiChatsGroupMessages,
   usePostApiChatsSendMessage,
 } from "@/api/endpoints/magicMessenger";
-import { MessageDto, MessageType } from "@/api/models";
+import { CallingType, MessageDto, MessageType } from "@/api/models";
 import { ActionSheetRef, Icon } from "@/components";
 import { INITIAL_PAGE_SIZE, UploadFileResultDto } from "@/constants";
+import { useMediaPermissions } from "@/hooks/useMediaPermissions";
 import {
   useChatMessages,
   useChatStore,
+  useGroupWebRTCStore,
   useSignalRStore,
   useUserStore,
 } from "@/store";
@@ -460,6 +462,108 @@ export const useDetail = () => {
     setShowEncryptionInfo(false);
   }, [isMessagesLoading, messages?.length]);
 
+  //#region Group Calling Handlers
+  const resetGroupCall = useGroupWebRTCStore((s) => s.resetStore);
+  const { checkAndRequestPermissions, openSettings } = useMediaPermissions();
+
+  const onGroupCallingPress = useCallback(
+    (callingType: CallingType) => {
+      Alert.alert(
+        t("chatDetail.calling.title", {
+          type: callingType === CallingType.Audio ? "audio" : "video",
+        }),
+        t("chatDetail.groupCalling.areYouSure", {
+          defaultValue: `Start a group ${callingType === CallingType.Audio ? "audio" : "video"} call?`,
+          groupName: title,
+        }),
+        [
+          {
+            text: t("chatDetail.calling.cancel"),
+            style: "cancel",
+          },
+          {
+            text: t("chatDetail.calling.confirm"),
+            style: "default",
+            onPress: async () => {
+              const permissionType =
+                callingType === CallingType.Audio ? "microphone" : "both";
+              const hasPermission =
+                await checkAndRequestPermissions(permissionType);
+
+              if (!hasPermission) {
+                const permissionName =
+                  callingType === CallingType.Audio
+                    ? t("permissions.microphone", "Microphone")
+                    : t(
+                        "permissions.cameraAndMicrophone",
+                        "Camera & Microphone",
+                      );
+
+                Alert.alert(
+                  t("permissions.denied.title", "Permission Required"),
+                  t("permissions.denied.message", {
+                    defaultValue: `${permissionName} permission is required to make calls. Please enable it in settings.`,
+                    permission: permissionName,
+                  }),
+                  [
+                    {
+                      text: t("permissions.denied.cancel", "Cancel"),
+                      style: "cancel",
+                    },
+                    {
+                      text: t(
+                        "permissions.denied.openSettings",
+                        "Open Settings",
+                      ),
+                      style: "default",
+                      onPress: () => openSettings(),
+                    },
+                  ],
+                  { cancelable: true },
+                );
+                return;
+              }
+
+              // Reset group WebRTC store before starting new call
+              resetGroupCall();
+
+              trackEvent("group_calling_initiated", {
+                chatId,
+                callingType,
+                groupName: title,
+              });
+
+              const pathname =
+                callingType === CallingType.Audio
+                  ? "/(calling)/groupAudioCalling/screens"
+                  : "/(calling)/groupVideoCalling/screens";
+
+              router.push({
+                pathname,
+                params: {
+                  groupName: title as string,
+                  chatId: chatId as string,
+                  callingType,
+                },
+              });
+            },
+          },
+        ],
+        { cancelable: true },
+      );
+    },
+    [
+      chatId,
+      title,
+      router,
+      resetGroupCall,
+      checkAndRequestPermissions,
+      openSettings,
+      t,
+    ],
+  );
+  //#endregion
+
   return {
     t,
     title,
@@ -482,5 +586,6 @@ export const useDetail = () => {
     handleScroll,
     handleEndReached,
     handleSendMessage,
+    onGroupCallingPress,
   };
 };

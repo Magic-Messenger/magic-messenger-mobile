@@ -36,6 +36,7 @@ export default function GroupChatScreen() {
     handleReply,
     handleEndReached,
     onClearReply,
+    onGroupCallingPress,
   } = useDetail();
 
   const renderItem = useCallback(
@@ -76,6 +77,7 @@ export default function GroupChatScreen() {
             groupAccountCount={groupAccountCount as string}
             userName={userName as string}
             title={title as string}
+            onCallingPress={onGroupCallingPress}
           />
         }
         footer={

@@ -32,6 +32,20 @@ export default function CallingStacks() {
           title: "",
         }}
       />
+      <Stack.Screen
+        name="groupVideoCalling/screens/index"
+        options={{
+          headerShown: true,
+          title: "",
+        }}
+      />
+      <Stack.Screen
+        name="groupAudioCalling/screens/index"
+        options={{
+          headerShown: true,
+          title: "",
+        }}
+      />
     </Stack>
   );
 }

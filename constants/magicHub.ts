@@ -3,15 +3,22 @@ import * as signalR from "@microsoft/signalr";
 import {
   AddMessageToTicketCommandRequest,
   AnswerCallCommandRequest,
+  AnswerGroupCallCommandRequest,
+  CallGroupCommandRequest,
   CallingType,
   CallUserCommandRequest,
   ChangeTicketStatusCommandRequest,
   ChatDto,
+  EndGroupCallCommandRequest,
+  GroupIceCandidateCommandRequest,
   IceCandidateCommandRequest,
   MessageDto,
+  RejectGroupCallCommandRequest,
   SendMessageCommandRequest,
   TicketDto,
   TicketMessageDto,
+  ToggleGroupCameraCommandRequest,
+  ToggleGroupMicrophoneCommandRequest,
 } from "@/api/models";
 
 export interface EndCallCommandRequest {
@@ -52,6 +59,47 @@ export interface MicrophoneToggleEvent {
   isEnabled: boolean;
 }
 
+/* -------------------- Group Calling Event Types -------------------- */
+
+export interface IncomingGroupCallEvent {
+  callId: string;
+  groupName: string;
+  callerUsername: string;
+  offer: string;
+  callingType: CallingType;
+}
+
+export interface GroupCallAnsweredEvent {
+  callId: string;
+  groupName: string;
+  answerUsername: string;
+  answer: string;
+  answerType: CallingType;
+}
+
+export interface GroupCallEndedEvent {
+  endedUsername: string;
+}
+
+export interface GroupCallRejectedEvent {
+  rejectedUsername: string;
+}
+
+export interface GroupIceCandidateEvent {
+  callerUsername: string;
+  candidate: string;
+}
+
+export interface GroupCameraToggleEvent {
+  toggledUsername: string;
+  isEnabled: boolean;
+}
+
+export interface GroupMicrophoneToggleEvent {
+  toggledUsername: string;
+  isEnabled: boolean;
+}
+
 export const createMagicHubClient = (
   connection: signalR.HubConnection,
 ): MagicHubClient => ({
@@ -86,6 +134,17 @@ export const createMagicHubClient = (
   rejectCall: (request) => connection.invoke("RejectCall", request), // Changed from decreaseCall
   toggleCamera: (request) => connection.invoke("ToggleCamera", request),
   toggleMicrophone: (request) => connection.invoke("ToggleMicrophone", request),
+  // Group calling methods
+  callGroup: (request) => connection.invoke("CallGroup", request),
+  answerGroupCall: (request) => connection.invoke("AnswerGroupCall", request),
+  endGroupCall: (request) => connection.invoke("EndGroupCall", request),
+  rejectGroupCall: (request) => connection.invoke("RejectGroupCall", request),
+  sendGroupIceCandidate: (request) =>
+    connection.invoke("SendGroupIceCandidate", request),
+  toggleGroupCamera: (request) =>
+    connection.invoke("ToggleGroupCamera", request),
+  toggleGroupMicrophone: (request) =>
+    connection.invoke("ToggleGroupMicrophone", request),
 });
 
 /* Types */
@@ -188,6 +247,14 @@ export interface MagicHubEvents {
   call_rejected: CallRejectedEvent; // Changed from call_declined
   camera_toggle: CameraToggleEvent; // Changed from camera_toggled
   microphone_toggle: MicrophoneToggleEvent; // Added
+  // Group calling events
+  incoming_group_call: IncomingGroupCallEvent;
+  group_call_answered: GroupCallAnsweredEvent;
+  group_call_ended: GroupCallEndedEvent;
+  group_call_rejected: GroupCallRejectedEvent;
+  group_ice_candidate: GroupIceCandidateEvent;
+  group_camera_toggle: GroupCameraToggleEvent;
+  group_microphone_toggle: GroupMicrophoneToggleEvent;
 }
 
 export interface MagicHubClient {
@@ -241,4 +308,23 @@ export interface MagicHubClient {
   toggleCamera(request: ToggleCameraCommandRequest): Promise<void>;
 
   toggleMicrophone(request: ToggleMicrophoneCommandRequest): Promise<void>;
+
+  // Group calling methods
+  callGroup(request: CallGroupCommandRequest): Promise<string>;
+
+  answerGroupCall(request: AnswerGroupCallCommandRequest): Promise<void>;
+
+  endGroupCall(request: EndGroupCallCommandRequest): Promise<void>;
+
+  rejectGroupCall(request: RejectGroupCallCommandRequest): Promise<void>;
+
+  sendGroupIceCandidate(
+    request: GroupIceCandidateCommandRequest,
+  ): Promise<void>;
+
+  toggleGroupCamera(request: ToggleGroupCameraCommandRequest): Promise<void>;
+
+  toggleGroupMicrophone(
+    request: ToggleGroupMicrophoneCommandRequest,
+  ): Promise<void>;
 }

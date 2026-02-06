@@ -1,6 +1,7 @@
 export * from "./appStore";
 export * from "./chatStore";
 export * from "./groupChatStore";
+export * from "./groupWebRTCStore";
 export * from "./noteStore";
 export * from "./protectRouteStore";
 export * from "./qrStore";

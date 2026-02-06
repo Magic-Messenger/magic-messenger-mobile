@@ -17,7 +17,7 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 import Toast from "react-native-toast-message";
 
 import { usePostApiAccountRegisterFirebaseToken } from "@/api/endpoints/magicMessenger";
-import { IncomingCallModal } from "@/components";
+import { IncomingCallModal, IncomingGroupCallModal } from "@/components";
 import { Colors } from "@/constants";
 import { useScreenProtection } from "@/hooks";
 import { initDayjs } from "@/i18n";
@@ -28,7 +28,12 @@ import {
   registerForPushNotificationsAsync,
   setupNotificationListeners,
 } from "@/services";
-import { useAppStore, useUserStore, useWebRTCStore } from "@/store";
+import {
+  useAppStore,
+  useSignalRStore,
+  useUserStore,
+  useWebRTCStore,
+} from "@/store";
 import { headerImage, toastConfig, trackEvent } from "@/utils";
 
 export const queryClient = new QueryClient({
@@ -105,14 +110,37 @@ function RootLayoutContent() {
   }, []);
 
   useEffect(() => {
+    // When app comes to foreground, ensure SignalR is connected and check for waiting calls
     if (
       isLogin &&
       previousAppState?.match?.(/inactive|background/) &&
       currentAppState === "active"
     ) {
-      useWebRTCStore.getState().checkWaitingCalling();
+      const accessToken = useUserStore.getState().accessToken;
+      if (accessToken) {
+        // Force reconnect SignalR if connection was dropped in background
+        useSignalRStore
+          .getState()
+          .startConnection(accessToken)
+          .then(() => {
+            // Check for waiting calls after ensuring connection
+            useWebRTCStore.getState().checkWaitingCalling();
+          })
+          .catch(console.error);
+      }
     }
   }, [isLogin, previousAppState, currentAppState]);
+
+  // Check for waiting calls on initial app load when logged in
+  useEffect(() => {
+    if (isLogin && loaded && rehydrated) {
+      // Small delay to ensure SignalR connection is established
+      const timer = setTimeout(() => {
+        useWebRTCStore.getState().checkWaitingCalling();
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isLogin, loaded, rehydrated]);
 
   useEffect(() => {
     initDayjs();
@@ -175,6 +203,7 @@ function RootLayoutContent() {
             </Stack>
 
             <IncomingCallModal />
+            <IncomingGroupCallModal />
             <Toast config={toastConfig} />
             <StatusBar style="light" />
           </ImageViewerProvider>

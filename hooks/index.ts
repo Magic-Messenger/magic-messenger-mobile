@@ -1,6 +1,7 @@
 export * from "./useAudioPlayer";
 export * from "./useAudioRecorder";
 export * from "./useChatHelper";
+export * from "./useGroupWebRTCEvents";
 export * from "./useMediaPermissions";
 export * from "./usePicker";
 export * from "./useScreenProtection";

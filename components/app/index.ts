@@ -18,6 +18,7 @@ export * from "./Contact/ContactScanQr";
 export * from "./EmptyList";
 export * from "./ExternalLink";
 export * from "./IncomingCallModal";
+export * from "./IncomingGroupCallModal";
 export * from "./Note/NoteItem";
 export * from "./PasswordInput";
 export * from "./PermissionDeniedModal";

@@ -43,7 +43,27 @@ export const useSignalRStore = create<SignalRStore>((set, get) => ({
   lastReceivedMessage: undefined,
 
   startConnection: async (token: string) => {
-    if (get().connection) return;
+    const existing = get().connection;
+
+    // If connection exists and is connected, skip
+    if (existing && existing.state === "Connected") return;
+
+    // If connection exists but is disconnected/closed, clean it up first
+    if (existing && existing.state !== "Connected") {
+      trackEvent("[SignalR] Cleaning up stale connection", {
+        state: existing.state,
+      });
+      try {
+        await existing.stop();
+      } catch {
+        // Ignore stop errors on stale connection
+      }
+      set({
+        connection: undefined,
+        isConnected: false,
+        magicHubClient: undefined,
+      });
+    }
 
     const hubUrl = `${process.env.EXPO_PUBLIC_API_URL}/hub/magic-app`;
     trackEvent("hubUrl: ", hubUrl);
@@ -57,7 +77,11 @@ export const useSignalRStore = create<SignalRStore>((set, get) => ({
       .build();
 
     connection.onclose(() =>
-      set({ isConnected: false, connection: undefined }),
+      set({
+        isConnected: false,
+        connection: undefined,
+        magicHubClient: undefined,
+      }),
     );
     connection.onreconnected(() => set({ isConnected: true }));
     connection.onreconnecting(() => set({ isConnected: false }));
@@ -71,6 +95,11 @@ export const useSignalRStore = create<SignalRStore>((set, get) => ({
       });
     } catch (err) {
       console.error("SignalR connection is not started: ", err);
+      set({
+        connection: undefined,
+        isConnected: false,
+        magicHubClient: undefined,
+      });
     }
   },
 
