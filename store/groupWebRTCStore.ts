@@ -245,12 +245,16 @@ export const useGroupWebRTCStore = create<GroupWebRTCStore>((set, get) => ({
         (username, remoteStream) => {
           get().updateParticipantStream(username, remoteStream);
         },
-        // onIceCandidate
+        // onIceCandidate - embed targetUsername so only the intended recipient processes it
         (username, candidate) => {
           startTransition(() => {
             useSignalRStore.getState().magicHubClient?.sendGroupIceCandidate({
               targetGroup: groupName,
-              candidate: JSON.stringify(candidate),
+              candidate: JSON.stringify({
+                ice: candidate,
+                _targetUsername:
+                  username === "__pending_caller__" ? undefined : username,
+              }),
             });
           });
         },
@@ -429,11 +433,15 @@ export const useGroupWebRTCStore = create<GroupWebRTCStore>((set, get) => ({
         (username, remoteStream) => {
           get().updateParticipantStream(username, remoteStream);
         },
+        // onIceCandidate - embed targetUsername so only the intended recipient processes it
         (username, candidate) => {
           startTransition(() => {
             useSignalRStore.getState().magicHubClient?.sendGroupIceCandidate({
               targetGroup: groupName,
-              candidate: JSON.stringify(candidate),
+              candidate: JSON.stringify({
+                ice: candidate,
+                _targetUsername: username,
+              }),
             });
           });
         },
@@ -495,67 +503,102 @@ export const useGroupWebRTCStore = create<GroupWebRTCStore>((set, get) => ({
   },
 
   handleGroupCallAnswered: async (data: GroupCallAnsweredEvent) => {
-    trackEvent("[GroupCall] >>> handleGroupCallAnswered called <<<", {
-      data,
-      currentParticipants: Array.from(get().participants.keys()),
-      isInGroupCall: get().isInGroupCall,
-      isCaller: get().isCaller,
-    });
-
     const { answerUsername, answer, groupName } = data;
     const currentUsername = useUserStore.getState().userName;
     const { isCaller } = get();
 
     // Ignore our own answer
-    if (answerUsername === currentUsername) {
-      trackEvent("[GroupCall] Ignoring own answer", { answerUsername });
-      return;
-    }
-
-    trackEvent("[GroupCall] Processing answer from", {
-      answerUsername,
-      hasAnswer: !!answer,
-      answerLength: answer?.length,
-      isCaller,
-    });
-
-    // Add participant if not exists
-    if (!get().participants.has(answerUsername)) {
-      trackEvent("[GroupCall] Adding new participant", { answerUsername });
-      get().addParticipant(answerUsername);
-    }
-
-    trackEvent("[GroupCall] Participants after add", {
-      participants: Array.from(get().participants.keys()),
-    });
+    if (answerUsername === currentUsername) return;
 
     try {
-      const parsedAnswer = JSON.parse(answer);
+      const parsed = JSON.parse(answer);
 
-      // Check if we're the caller and have the __pending_caller__ placeholder connection
-      // This is the connection we created when starting the call
+      // Check if this is a targeted message (for mesh/subsequent-answerer negotiation)
+      const msgTarget = parsed._targetUsername;
+      if (msgTarget && msgTarget !== currentUsername) return;
+
+      trackEvent("[GroupCall] Processing group_call_answered", {
+        answerUsername,
+        isCaller,
+        isTargeted: !!msgTarget,
+        sdpType: parsed.type,
+        hasParticipant: GroupWebRTCService.hasParticipant(answerUsername),
+      });
+
+      // Add participant if not exists
+      if (!get().participants.has(answerUsername)) {
+        get().addParticipant(answerUsername);
+      }
+
+      // Extract clean SDP (without our custom fields)
+      const cleanSdp = { type: parsed.type, sdp: parsed.sdp } as any;
+
+      // ─── CASE 1: Targeted OFFER (mesh/subsequent-answerer setup) ───
+      if (msgTarget && parsed.type === "offer") {
+        trackEvent("[GroupCall] Received targeted offer", {
+          from: answerUsername,
+        });
+
+        // Close existing PC if any (it uses old SDP context and won't work)
+        if (GroupWebRTCService.hasParticipant(answerUsername)) {
+          GroupWebRTCService.removeParticipant(answerUsername);
+        }
+
+        await GroupWebRTCService.createPeerConnectionForParticipant(
+          answerUsername,
+        );
+        await GroupWebRTCService.setRemoteDescriptionForParticipant(
+          answerUsername,
+          cleanSdp,
+        );
+        const ourAnswer =
+          await GroupWebRTCService.createAnswerForParticipant(answerUsername);
+
+        const answerPayload = JSON.stringify({
+          type: ourAnswer.type,
+          sdp: ourAnswer.sdp,
+          _targetUsername: answerUsername,
+        });
+
+        await useSignalRStore.getState().magicHubClient?.answerGroupCall({
+          callId: get().callId!,
+          groupName: groupName ?? get().groupName!,
+          answerType: get().callingType,
+          answer: answerPayload,
+        });
+
+        return;
+      }
+
+      // ─── CASE 2: Targeted ANSWER (response to our offer) ──────────
+      if (msgTarget && parsed.type === "answer") {
+        trackEvent("[GroupCall] Received targeted answer", {
+          from: answerUsername,
+        });
+
+        if (GroupWebRTCService.hasParticipant(answerUsername)) {
+          await GroupWebRTCService.setRemoteDescriptionForParticipant(
+            answerUsername,
+            cleanSdp,
+          );
+        }
+        return;
+      }
+
+      // ─── CASE 3: Broadcast answer (original answer to caller's offer) ─
+
+      // 3a: We're the caller with __pending_caller__ placeholder
       const hasPendingCaller =
         GroupWebRTCService.hasParticipant("__pending_caller__");
 
-      trackEvent("[GroupCall] Checking for pending caller connection", {
-        hasPendingCaller,
-        hasParticipantConnection:
-          GroupWebRTCService.hasParticipant(answerUsername),
-        isCaller,
-      });
-
-      // If we're the caller and have the pending connection, rename it to the actual participant
       if (
         isCaller &&
         hasPendingCaller &&
         !GroupWebRTCService.hasParticipant(answerUsername)
       ) {
-        trackEvent(
-          "[GroupCall] Renaming __pending_caller__ to actual participant",
-          {
-            answerUsername,
-          },
-        );
+        trackEvent("[GroupCall] Renaming __pending_caller__", {
+          to: answerUsername,
+        });
 
         const renamed = GroupWebRTCService.renameParticipant(
           "__pending_caller__",
@@ -563,95 +606,97 @@ export const useGroupWebRTCStore = create<GroupWebRTCStore>((set, get) => ({
         );
 
         if (renamed) {
-          // Now set the remote description (their answer) on the renamed connection
-          trackEvent(
-            "[GroupCall] Setting remote answer on renamed connection",
-            {
-              answerUsername,
-              answerType: parsedAnswer.type,
-            },
-          );
-
           await GroupWebRTCService.setRemoteDescriptionForParticipant(
             answerUsername,
-            parsedAnswer,
+            parsed,
           );
-
-          trackEvent("[GroupCall] Remote description set successfully", {
-            answerUsername,
-          });
           return;
         }
       }
 
-      // Check if we have a connection for this participant
-      if (!GroupWebRTCService.hasParticipant(answerUsername)) {
-        trackEvent("[GroupCall] Creating new peer connection for", {
-          answerUsername,
-        });
-        // Create new peer connection for this participant
+      // 3b: We're the caller, __pending_caller__ already used → send targeted offer
+      if (isCaller && !GroupWebRTCService.hasParticipant(answerUsername)) {
+        trackEvent(
+          "[GroupCall] Sending targeted offer to subsequent answerer",
+          {
+            answerer: answerUsername,
+          },
+        );
+
         await GroupWebRTCService.createPeerConnectionForParticipant(
           answerUsername,
         );
+        const offer =
+          await GroupWebRTCService.createOfferForParticipant(answerUsername);
 
-        // Use Perfect Negotiation pattern - treat their "answer" as an "offer"
-        // because we're creating a fresh peer connection and need to negotiate
-        // Set the answer as remote description with type "offer"
-        const remoteOffer = {
-          type: "offer" as RTCSdpType,
-          sdp: parsedAnswer.sdp,
-        };
-
-        trackEvent("[GroupCall] Setting remote offer (from their answer)", {
-          answerUsername,
-          sdpType: remoteOffer.type,
+        const offerPayload = JSON.stringify({
+          type: offer.type,
+          sdp: offer.sdp,
+          _targetUsername: answerUsername,
         });
 
-        await GroupWebRTCService.setRemoteDescriptionForParticipant(
-          answerUsername,
-          remoteOffer as RTCSessionDescription,
-        );
-
-        // Create and send our answer back
-        const ourAnswer =
-          await GroupWebRTCService.createAnswerForParticipant(answerUsername);
-
-        trackEvent("[GroupCall] Sending our answer back to participant", {
-          answerUsername,
-          answerType: ourAnswer?.type,
-        });
-
-        // Send our answer to the participant
-        const { callId, callingType } = get();
         await useSignalRStore.getState().magicHubClient?.answerGroupCall({
-          callId: callId!,
+          callId: get().callId!,
           groupName: groupName ?? get().groupName!,
-          answerType: callingType,
-          answer: JSON.stringify(ourAnswer),
+          answerType: get().callingType,
+          answer: offerPayload,
         });
-      } else {
-        // We already have a connection - check signaling state
+
+        return;
+      }
+
+      // 3c: We're a non-caller receiving another non-caller's answer → mesh setup
+      if (!isCaller && !GroupWebRTCService.hasParticipant(answerUsername)) {
+        // Tie-break: alphabetically smaller username creates the offer
+        if (currentUsername && currentUsername < answerUsername) {
+          trackEvent(
+            "[GroupCall] Initiating mesh connection (we create offer)",
+            {
+              to: answerUsername,
+            },
+          );
+
+          await GroupWebRTCService.createPeerConnectionForParticipant(
+            answerUsername,
+          );
+          const offer =
+            await GroupWebRTCService.createOfferForParticipant(answerUsername);
+
+          const offerPayload = JSON.stringify({
+            type: offer.type,
+            sdp: offer.sdp,
+            _targetUsername: answerUsername,
+          });
+
+          await useSignalRStore.getState().magicHubClient?.answerGroupCall({
+            callId: get().callId!,
+            groupName: groupName ?? get().groupName!,
+            answerType: get().callingType,
+            answer: offerPayload,
+          });
+        } else {
+          trackEvent("[GroupCall] Waiting for mesh offer from", {
+            from: answerUsername,
+          });
+        }
+        return;
+      }
+
+      // 3d: We already have a PC for this participant
+      if (GroupWebRTCService.hasParticipant(answerUsername)) {
         const signalingState =
           GroupWebRTCService.getSignalingState(answerUsername);
 
-        trackEvent("[GroupCall] Processing answer for existing connection", {
-          answerUsername,
-          signalingState,
-        });
-
-        // If we're in stable state, the connection is already established
-        // This might be a response to our role-reversed answer, so we can ignore it
         if (signalingState === "stable") {
-          trackEvent("[GroupCall] Connection already stable, ignoring answer", {
+          trackEvent("[GroupCall] Connection already stable, ignoring", {
             answerUsername,
           });
           return;
         }
 
-        // Otherwise, set the remote description
         await GroupWebRTCService.setRemoteDescriptionForParticipant(
           answerUsername,
-          parsedAnswer,
+          parsed,
         );
       }
     } catch (error) {
@@ -670,9 +715,19 @@ export const useGroupWebRTCStore = create<GroupWebRTCStore>((set, get) => ({
     if (callerUsername === currentUsername) return;
 
     try {
+      const parsed = JSON.parse(candidate);
+
+      // Extract the actual ICE candidate and target from envelope
+      const iceCandidate = parsed.ice ?? parsed;
+      const targetUsername = parsed._targetUsername;
+
+      // If targetUsername is specified and doesn't match us, ignore
+      // (this candidate is meant for a different participant's peer connection)
+      if (targetUsername && targetUsername !== currentUsername) return;
+
       await GroupWebRTCService.addIceCandidateForParticipant(
         callerUsername,
-        JSON.parse(candidate),
+        iceCandidate,
       );
     } catch (error) {
       trackEvent("[GroupCall] Error adding ICE candidate", {
