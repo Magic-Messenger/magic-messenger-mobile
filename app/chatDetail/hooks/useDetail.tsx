@@ -369,6 +369,7 @@ export const useDetail = () => {
 
     return () => {
       if (magicHubClient && chatId) {
+        magicHubClient.stopTyping(chatId as string);
         magicHubClient.leaveChat?.(chatId as string);
       }
     };

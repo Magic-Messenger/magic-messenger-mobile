@@ -1,7 +1,14 @@
-import React, { startTransition, useCallback, useMemo, useState } from "react";
+import React, {
+  startTransition,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
+  AppState,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -68,6 +75,24 @@ export function ChatFooter({
   const [uploadType, setUploadType] = useState<
     "image" | "video" | "audio" | null
   >(null);
+
+  // Stop typing on unmount (router go back) and app state change (background)
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState.match(/inactive|background/)) {
+        if (chatId && magicHubClient) {
+          magicHubClient.stopTyping(chatId);
+        }
+      }
+    });
+
+    return () => {
+      subscription.remove();
+      if (chatId && magicHubClient) {
+        magicHubClient.stopTyping(chatId);
+      }
+    };
+  }, [chatId, magicHubClient]);
 
   const handleSendMessage = useCallback(() => {
     const trimmedMessage = message.trim();
