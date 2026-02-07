@@ -20,6 +20,16 @@ import { trackEvent } from "@/utils";
 
 import { useSignalRStore, useUserStore } from "../store";
 
+/* Serialization queue for handleGroupCallAnswered.
+ * Ensures events are processed one-at-a-time, preventing race conditions
+ * when multiple group_call_answered events arrive simultaneously. */
+let _answerQueue: Promise<void> = Promise.resolve();
+
+/* Timeout map for mesh offer fallback (CASE 3c).
+ * If the expected mesh offer doesn't arrive within 5s, the waiting side
+ * creates its own offer to avoid being stuck in "connecting" forever. */
+const _meshOfferTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
+
 /* -------------------- Types -------------------- */
 
 export type GroupParticipant = {
@@ -74,7 +84,7 @@ type GroupWebRTCStore = {
   handleIncomingGroupCall: (data: IncomingGroupCallEvent) => void;
   acceptGroupCall: () => Promise<void>;
   declineGroupCall: () => void;
-  handleGroupCallAnswered: (data: GroupCallAnsweredEvent) => Promise<void>;
+  handleGroupCallAnswered: (data: GroupCallAnsweredEvent) => void;
   handleGroupIceCandidate: (data: GroupIceCandidateEvent) => Promise<void>;
   handleGroupCallEnded: (data: GroupCallEndedEvent) => void;
   handleGroupCallRejected: (data: GroupCallRejectedEvent) => void;
@@ -107,6 +117,241 @@ const initialState = {
   participants: new Map<string, GroupParticipant>(),
   incomingGroupCallData: null as IncomingGroupCallData,
 };
+
+/** Extracted async logic for handleGroupCallAnswered. Runs inside the serialized queue. */
+async function _processGroupCallAnswered(
+  get: () => GroupWebRTCStore,
+  _set: (partial: Partial<GroupWebRTCStore>) => void,
+  data: GroupCallAnsweredEvent,
+): Promise<void> {
+  const { answerUsername, answer, groupName } = data;
+  const currentUsername = useUserStore.getState().userName;
+  const { isCaller } = get();
+
+  try {
+    const parsed = JSON.parse(answer);
+
+    // Check if this is a targeted message (for mesh/subsequent-answerer negotiation)
+    const msgTarget = parsed._targetUsername;
+    if (msgTarget && msgTarget !== currentUsername) return;
+
+    trackEvent("[GroupCall] Processing group_call_answered", {
+      answerUsername,
+      isCaller,
+      isTargeted: !!msgTarget,
+      sdpType: parsed.type,
+      hasParticipant: GroupWebRTCService.hasParticipant(answerUsername),
+    });
+
+    // Add participant if not exists
+    if (!get().participants.has(answerUsername)) {
+      get().addParticipant(answerUsername);
+    }
+
+    // Extract clean SDP (without our custom fields)
+    const cleanSdp = { type: parsed.type, sdp: parsed.sdp } as any;
+
+    // ─── CASE 1: Targeted OFFER (mesh/subsequent-answerer setup) ───
+    if (msgTarget && parsed.type === "offer") {
+      trackEvent("[GroupCall] Received targeted offer", {
+        from: answerUsername,
+      });
+
+      // Cancel mesh timeout if we were waiting for this
+      const meshTimeout = _meshOfferTimeouts.get(answerUsername);
+      if (meshTimeout) {
+        clearTimeout(meshTimeout);
+        _meshOfferTimeouts.delete(answerUsername);
+      }
+
+      // Recreate PC (preserves pending ICE candidates)
+      if (GroupWebRTCService.hasParticipant(answerUsername)) {
+        GroupWebRTCService.recreateParticipant(answerUsername);
+      }
+
+      await GroupWebRTCService.createPeerConnectionForParticipant(
+        answerUsername,
+      );
+      await GroupWebRTCService.setRemoteDescriptionForParticipant(
+        answerUsername,
+        cleanSdp,
+      );
+      const ourAnswer =
+        await GroupWebRTCService.createAnswerForParticipant(answerUsername);
+
+      const answerPayload = JSON.stringify({
+        type: ourAnswer.type,
+        sdp: ourAnswer.sdp,
+        _targetUsername: answerUsername,
+      });
+
+      await useSignalRStore.getState().magicHubClient?.answerGroupCall({
+        callId: get().callId!,
+        groupName: groupName ?? get().groupName!,
+        answerType: get().callingType,
+        answer: answerPayload,
+      });
+
+      return;
+    }
+
+    // ─── CASE 2: Targeted ANSWER (response to our offer) ──────────
+    if (msgTarget && parsed.type === "answer") {
+      trackEvent("[GroupCall] Received targeted answer", {
+        from: answerUsername,
+      });
+
+      if (GroupWebRTCService.hasParticipant(answerUsername)) {
+        await GroupWebRTCService.setRemoteDescriptionForParticipant(
+          answerUsername,
+          cleanSdp,
+        );
+      }
+      return;
+    }
+
+    // ─── CASE 3: Broadcast answer (original answer to caller's offer) ─
+
+    // 3a: We're the caller with __pending_caller__ placeholder
+    const hasPendingCaller =
+      GroupWebRTCService.hasParticipant("__pending_caller__");
+
+    if (
+      isCaller &&
+      hasPendingCaller &&
+      !GroupWebRTCService.hasParticipant(answerUsername)
+    ) {
+      trackEvent("[GroupCall] Renaming __pending_caller__", {
+        to: answerUsername,
+      });
+
+      const renamed = GroupWebRTCService.renameParticipant(
+        "__pending_caller__",
+        answerUsername,
+      );
+
+      if (renamed) {
+        await GroupWebRTCService.setRemoteDescriptionForParticipant(
+          answerUsername,
+          parsed,
+        );
+        return;
+      }
+    }
+
+    // 3b: We're the caller, __pending_caller__ already used → send targeted offer
+    if (isCaller && !GroupWebRTCService.hasParticipant(answerUsername)) {
+      trackEvent("[GroupCall] Sending targeted offer to subsequent answerer", {
+        answerer: answerUsername,
+      });
+
+      await GroupWebRTCService.createPeerConnectionForParticipant(
+        answerUsername,
+      );
+      const offer =
+        await GroupWebRTCService.createOfferForParticipant(answerUsername);
+
+      const offerPayload = JSON.stringify({
+        type: offer.type,
+        sdp: offer.sdp,
+        _targetUsername: answerUsername,
+      });
+
+      await useSignalRStore.getState().magicHubClient?.answerGroupCall({
+        callId: get().callId!,
+        groupName: groupName ?? get().groupName!,
+        answerType: get().callingType,
+        answer: offerPayload,
+      });
+
+      return;
+    }
+
+    // 3c: We're a non-caller receiving another non-caller's answer → mesh setup
+    if (!isCaller && !GroupWebRTCService.hasParticipant(answerUsername)) {
+      // Tie-break: alphabetically smaller username creates the offer
+      if (currentUsername && currentUsername < answerUsername) {
+        await _createAndSendMeshOffer(get, answerUsername, groupName);
+      } else {
+        trackEvent("[GroupCall] Waiting for mesh offer from", {
+          from: answerUsername,
+        });
+
+        // Fallback timeout: if the offer doesn't arrive within 5s, create it ourselves
+        const timeoutId = setTimeout(async () => {
+          _meshOfferTimeouts.delete(answerUsername);
+          if (GroupWebRTCService.hasParticipant(answerUsername)) return;
+          trackEvent(
+            "[GroupCall] Mesh offer timeout - creating offer ourselves",
+            {
+              to: answerUsername,
+            },
+          );
+          try {
+            await _createAndSendMeshOffer(get, answerUsername, groupName);
+          } catch (e) {
+            trackEvent("[GroupCall] Mesh offer fallback error", {
+              error: String(e),
+            });
+          }
+        }, 5000);
+        _meshOfferTimeouts.set(answerUsername, timeoutId);
+      }
+      return;
+    }
+
+    // 3d: We already have a PC for this participant
+    if (GroupWebRTCService.hasParticipant(answerUsername)) {
+      const signalingState =
+        GroupWebRTCService.getSignalingState(answerUsername);
+
+      if (signalingState === "stable") {
+        trackEvent("[GroupCall] Connection already stable, ignoring", {
+          answerUsername,
+        });
+        return;
+      }
+
+      await GroupWebRTCService.setRemoteDescriptionForParticipant(
+        answerUsername,
+        parsed,
+      );
+    }
+  } catch (error) {
+    trackEvent("[GroupCall] Error handling call answered", {
+      error: String(error),
+      answerUsername,
+    });
+  }
+}
+
+/** Helper to create and send a mesh offer to a peer */
+async function _createAndSendMeshOffer(
+  get: () => GroupWebRTCStore,
+  targetUsername: string,
+  groupName: string | undefined,
+): Promise<void> {
+  trackEvent("[GroupCall] Initiating mesh connection (we create offer)", {
+    to: targetUsername,
+  });
+
+  await GroupWebRTCService.createPeerConnectionForParticipant(targetUsername);
+  const offer =
+    await GroupWebRTCService.createOfferForParticipant(targetUsername);
+
+  const offerPayload = JSON.stringify({
+    type: offer.type,
+    sdp: offer.sdp,
+    _targetUsername: targetUsername,
+  });
+
+  await useSignalRStore.getState().magicHubClient?.answerGroupCall({
+    callId: get().callId!,
+    groupName: groupName ?? get().groupName!,
+    answerType: get().callingType,
+    answer: offerPayload,
+  });
+}
 
 export const useGroupWebRTCStore = create<GroupWebRTCStore>((set, get) => ({
   ...initialState,
@@ -502,209 +747,21 @@ export const useGroupWebRTCStore = create<GroupWebRTCStore>((set, get) => ({
     set({ incomingGroupCallData: null });
   },
 
-  handleGroupCallAnswered: async (data: GroupCallAnsweredEvent) => {
-    const { answerUsername, answer, groupName } = data;
+  handleGroupCallAnswered: (data: GroupCallAnsweredEvent) => {
     const currentUsername = useUserStore.getState().userName;
-    const { isCaller } = get();
+    // Ignore our own answer (synchronous — no need to queue)
+    if (data.answerUsername === currentUsername) return;
 
-    // Ignore our own answer
-    if (answerUsername === currentUsername) return;
-
-    try {
-      const parsed = JSON.parse(answer);
-
-      // Check if this is a targeted message (for mesh/subsequent-answerer negotiation)
-      const msgTarget = parsed._targetUsername;
-      if (msgTarget && msgTarget !== currentUsername) return;
-
-      trackEvent("[GroupCall] Processing group_call_answered", {
-        answerUsername,
-        isCaller,
-        isTargeted: !!msgTarget,
-        sdpType: parsed.type,
-        hasParticipant: GroupWebRTCService.hasParticipant(answerUsername),
+    // Serialize all processing through a queue to prevent race conditions
+    // when multiple group_call_answered events arrive simultaneously
+    _answerQueue = _answerQueue
+      .then(() => _processGroupCallAnswered(get, set, data))
+      .catch((error) => {
+        trackEvent("[GroupCall] Error in answer queue", {
+          error: String(error),
+          answerUsername: data.answerUsername,
+        });
       });
-
-      // Add participant if not exists
-      if (!get().participants.has(answerUsername)) {
-        get().addParticipant(answerUsername);
-      }
-
-      // Extract clean SDP (without our custom fields)
-      const cleanSdp = { type: parsed.type, sdp: parsed.sdp } as any;
-
-      // ─── CASE 1: Targeted OFFER (mesh/subsequent-answerer setup) ───
-      if (msgTarget && parsed.type === "offer") {
-        trackEvent("[GroupCall] Received targeted offer", {
-          from: answerUsername,
-        });
-
-        // Close existing PC if any (it uses old SDP context and won't work)
-        if (GroupWebRTCService.hasParticipant(answerUsername)) {
-          GroupWebRTCService.removeParticipant(answerUsername);
-        }
-
-        await GroupWebRTCService.createPeerConnectionForParticipant(
-          answerUsername,
-        );
-        await GroupWebRTCService.setRemoteDescriptionForParticipant(
-          answerUsername,
-          cleanSdp,
-        );
-        const ourAnswer =
-          await GroupWebRTCService.createAnswerForParticipant(answerUsername);
-
-        const answerPayload = JSON.stringify({
-          type: ourAnswer.type,
-          sdp: ourAnswer.sdp,
-          _targetUsername: answerUsername,
-        });
-
-        await useSignalRStore.getState().magicHubClient?.answerGroupCall({
-          callId: get().callId!,
-          groupName: groupName ?? get().groupName!,
-          answerType: get().callingType,
-          answer: answerPayload,
-        });
-
-        return;
-      }
-
-      // ─── CASE 2: Targeted ANSWER (response to our offer) ──────────
-      if (msgTarget && parsed.type === "answer") {
-        trackEvent("[GroupCall] Received targeted answer", {
-          from: answerUsername,
-        });
-
-        if (GroupWebRTCService.hasParticipant(answerUsername)) {
-          await GroupWebRTCService.setRemoteDescriptionForParticipant(
-            answerUsername,
-            cleanSdp,
-          );
-        }
-        return;
-      }
-
-      // ─── CASE 3: Broadcast answer (original answer to caller's offer) ─
-
-      // 3a: We're the caller with __pending_caller__ placeholder
-      const hasPendingCaller =
-        GroupWebRTCService.hasParticipant("__pending_caller__");
-
-      if (
-        isCaller &&
-        hasPendingCaller &&
-        !GroupWebRTCService.hasParticipant(answerUsername)
-      ) {
-        trackEvent("[GroupCall] Renaming __pending_caller__", {
-          to: answerUsername,
-        });
-
-        const renamed = GroupWebRTCService.renameParticipant(
-          "__pending_caller__",
-          answerUsername,
-        );
-
-        if (renamed) {
-          await GroupWebRTCService.setRemoteDescriptionForParticipant(
-            answerUsername,
-            parsed,
-          );
-          return;
-        }
-      }
-
-      // 3b: We're the caller, __pending_caller__ already used → send targeted offer
-      if (isCaller && !GroupWebRTCService.hasParticipant(answerUsername)) {
-        trackEvent(
-          "[GroupCall] Sending targeted offer to subsequent answerer",
-          {
-            answerer: answerUsername,
-          },
-        );
-
-        await GroupWebRTCService.createPeerConnectionForParticipant(
-          answerUsername,
-        );
-        const offer =
-          await GroupWebRTCService.createOfferForParticipant(answerUsername);
-
-        const offerPayload = JSON.stringify({
-          type: offer.type,
-          sdp: offer.sdp,
-          _targetUsername: answerUsername,
-        });
-
-        await useSignalRStore.getState().magicHubClient?.answerGroupCall({
-          callId: get().callId!,
-          groupName: groupName ?? get().groupName!,
-          answerType: get().callingType,
-          answer: offerPayload,
-        });
-
-        return;
-      }
-
-      // 3c: We're a non-caller receiving another non-caller's answer → mesh setup
-      if (!isCaller && !GroupWebRTCService.hasParticipant(answerUsername)) {
-        // Tie-break: alphabetically smaller username creates the offer
-        if (currentUsername && currentUsername < answerUsername) {
-          trackEvent(
-            "[GroupCall] Initiating mesh connection (we create offer)",
-            {
-              to: answerUsername,
-            },
-          );
-
-          await GroupWebRTCService.createPeerConnectionForParticipant(
-            answerUsername,
-          );
-          const offer =
-            await GroupWebRTCService.createOfferForParticipant(answerUsername);
-
-          const offerPayload = JSON.stringify({
-            type: offer.type,
-            sdp: offer.sdp,
-            _targetUsername: answerUsername,
-          });
-
-          await useSignalRStore.getState().magicHubClient?.answerGroupCall({
-            callId: get().callId!,
-            groupName: groupName ?? get().groupName!,
-            answerType: get().callingType,
-            answer: offerPayload,
-          });
-        } else {
-          trackEvent("[GroupCall] Waiting for mesh offer from", {
-            from: answerUsername,
-          });
-        }
-        return;
-      }
-
-      // 3d: We already have a PC for this participant
-      if (GroupWebRTCService.hasParticipant(answerUsername)) {
-        const signalingState =
-          GroupWebRTCService.getSignalingState(answerUsername);
-
-        if (signalingState === "stable") {
-          trackEvent("[GroupCall] Connection already stable, ignoring", {
-            answerUsername,
-          });
-          return;
-        }
-
-        await GroupWebRTCService.setRemoteDescriptionForParticipant(
-          answerUsername,
-          parsed,
-        );
-      }
-    } catch (error) {
-      trackEvent("[GroupCall] Error handling call answered", {
-        error: String(error),
-        answerUsername,
-      });
-    }
   },
 
   handleGroupIceCandidate: async (data: GroupIceCandidateEvent) => {
@@ -824,6 +881,10 @@ export const useGroupWebRTCStore = create<GroupWebRTCStore>((set, get) => ({
       });
     }
 
+    // Clear mesh offer timeouts
+    _meshOfferTimeouts.forEach((t) => clearTimeout(t));
+    _meshOfferTimeouts.clear();
+
     GroupWebRTCService.closeAllConnections();
     set({
       ...initialState,
@@ -841,6 +902,11 @@ export const useGroupWebRTCStore = create<GroupWebRTCStore>((set, get) => ({
 
   resetStore: () => {
     trackEvent("[GroupCall] Resetting store");
+
+    // Clear mesh offer timeouts
+    _meshOfferTimeouts.forEach((t) => clearTimeout(t));
+    _meshOfferTimeouts.clear();
+
     GroupWebRTCService.closeAllConnections();
     set({
       ...initialState,

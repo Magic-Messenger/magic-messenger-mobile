@@ -54,6 +54,10 @@ type ParticipantConnection = {
   // Mutable username that can be updated when participant is renamed
   // Callbacks reference this to get the current name
   currentUsername: string;
+  // Grace timer for transient "disconnected" state
+  disconnectTimer?: ReturnType<typeof setTimeout>;
+  // Whether ICE restart has already been attempted for this connection
+  hasAttemptedIceRestart: boolean;
 };
 
 /* -------------------- Service -------------------- */
@@ -192,6 +196,7 @@ class GroupWebRTCService {
       hasRemoteDescription: false,
       connectionState: "new",
       currentUsername: participantUsername, // Mutable reference for callbacks
+      hasAttemptedIceRestart: false,
     };
 
     this.participants.set(participantUsername, participantData);
@@ -228,32 +233,87 @@ class GroupWebRTCService {
       }
     };
 
-    // Handle connection state changes
-    // Use participantData.currentUsername so it uses the updated name after rename
+    // Handle connection state changes with grace period and ICE restart
     peerConnection.onconnectionstatechange = () => {
       const state = peerConnection.connectionState as ConnectionStateType;
       participantData.connectionState = state;
+      const username = participantData.currentUsername;
 
       trackEvent("[GroupWebRTC] Connection state changed", {
-        participantUsername: participantData.currentUsername,
+        participantUsername: username,
         state,
       });
 
-      this.onConnectionStateChangeCallback?.(
-        participantData.currentUsername,
-        state,
-      );
+      this.onConnectionStateChangeCallback?.(username, state);
 
-      // Handle disconnection
-      if (
-        state === "disconnected" ||
-        state === "failed" ||
-        state === "closed"
-      ) {
-        this.onParticipantDisconnectedCallback?.(
-          participantData.currentUsername,
-        );
+      // Clear any pending disconnect timer when connection recovers
+      if (state === "connected") {
+        if (participantData.disconnectTimer) {
+          clearTimeout(participantData.disconnectTimer);
+          participantData.disconnectTimer = undefined;
+        }
+        participantData.hasAttemptedIceRestart = false;
+        return;
       }
+
+      // "disconnected" is often transient — wait 5s before removing
+      if (state === "disconnected") {
+        if (participantData.disconnectTimer) return; // already waiting
+        trackEvent("[GroupWebRTC] Starting 5s grace period for disconnected", {
+          participantUsername: username,
+        });
+        participantData.disconnectTimer = setTimeout(() => {
+          participantData.disconnectTimer = undefined;
+          const current = peerConnection.connectionState as ConnectionStateType;
+          if (current === "disconnected" || current === "failed") {
+            trackEvent("[GroupWebRTC] Grace period expired, removing", {
+              participantUsername: username,
+              finalState: current,
+            });
+            this.onParticipantDisconnectedCallback?.(username);
+          }
+        }, 5000);
+        return;
+      }
+
+      // "failed" — attempt ICE restart once before giving up
+      if (state === "failed") {
+        if (!participantData.hasAttemptedIceRestart) {
+          participantData.hasAttemptedIceRestart = true;
+          trackEvent("[GroupWebRTC] Attempting ICE restart", {
+            participantUsername: username,
+          });
+          try {
+            peerConnection.restartIce();
+          } catch (e) {
+            trackEvent("[GroupWebRTC] ICE restart failed", {
+              participantUsername: username,
+              error: String(e),
+            });
+            this.onParticipantDisconnectedCallback?.(username);
+          }
+          return;
+        }
+        // Already attempted ICE restart, give up
+        trackEvent("[GroupWebRTC] ICE restart already attempted, removing", {
+          participantUsername: username,
+        });
+        this.onParticipantDisconnectedCallback?.(username);
+        return;
+      }
+
+      if (state === "closed") {
+        this.onParticipantDisconnectedCallback?.(username);
+      }
+    };
+
+    // Monitor ICE connection state for more granular diagnostics
+    peerConnection.oniceconnectionstatechange = () => {
+      const iceState = peerConnection.iceConnectionState;
+      trackEvent("[GroupWebRTC] ICE connection state changed", {
+        participantUsername: participantData.currentUsername,
+        iceState,
+      });
     };
 
     // Flush any pending ICE candidates that arrived before peer connection was created
@@ -520,6 +580,40 @@ class GroupWebRTCService {
     return true;
   }
 
+  /**
+   * Close the old PeerConnection but preserve pending ICE candidates
+   * so they can be flushed when the new PC is created.
+   * Use this instead of removeParticipant when you plan to immediately
+   * recreate the connection (e.g., CASE 1 targeted offer).
+   */
+  recreateParticipant(participantUsername: string): void {
+    const participant = this.participants.get(participantUsername);
+    if (!participant) return;
+
+    trackEvent("[GroupWebRTC] Recreating participant (preserving ICE queue)", {
+      participantUsername,
+      pendingCount: participant.pendingIceCandidates.length,
+    });
+
+    // Preserve pending ICE candidates by moving them to the global queue
+    const existingQueue =
+      this.pendingIceCandidatesQueue.get(participantUsername) ?? [];
+    existingQueue.push(...participant.pendingIceCandidates);
+    this.pendingIceCandidatesQueue.set(participantUsername, existingQueue);
+
+    // Clean up old peer connection
+    if (participant.disconnectTimer) {
+      clearTimeout(participant.disconnectTimer);
+    }
+    participant.peerConnection.ontrack = undefined;
+    participant.peerConnection.onicecandidate = undefined;
+    participant.peerConnection.onconnectionstatechange = undefined;
+    participant.peerConnection.oniceconnectionstatechange = undefined;
+    participant.peerConnection.close();
+
+    this.participants.delete(participantUsername);
+  }
+
   /* -------------------- Cleanup -------------------- */
 
   removeParticipant(participantUsername: string): void {
@@ -532,10 +626,16 @@ class GroupWebRTCService {
 
     if (!participant) return;
 
+    // Clean up timers
+    if (participant.disconnectTimer) {
+      clearTimeout(participant.disconnectTimer);
+    }
+
     // Clean up peer connection
     participant.peerConnection.ontrack = undefined;
     participant.peerConnection.onicecandidate = undefined;
     participant.peerConnection.onconnectionstatechange = undefined;
+    participant.peerConnection.oniceconnectionstatechange = undefined;
 
     participant.peerConnection.close();
     participant.pendingIceCandidates = [];
@@ -548,9 +648,13 @@ class GroupWebRTCService {
 
     // Close all peer connections
     this.participants.forEach((participant, username) => {
+      if (participant.disconnectTimer) {
+        clearTimeout(participant.disconnectTimer);
+      }
       participant.peerConnection.ontrack = undefined;
       participant.peerConnection.onicecandidate = undefined;
       participant.peerConnection.onconnectionstatechange = undefined;
+      participant.peerConnection.oniceconnectionstatechange = undefined;
 
       participant.peerConnection.close();
       trackEvent("[GroupWebRTC] Closed connection for", { username });
