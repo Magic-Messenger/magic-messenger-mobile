@@ -1,12 +1,6 @@
 import { Audio } from "expo-av";
 import { router } from "expo-router";
-import React, {
-  startTransition,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-} from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Animated,
@@ -33,7 +27,6 @@ export const IncomingGroupCallModal = () => {
     (s) => s.incomingGroupCallData,
   );
   const isInGroupCall = useGroupWebRTCStore((s) => s.isInGroupCall);
-  const acceptGroupCall = useGroupWebRTCStore((s) => s.acceptGroupCall);
   const declineGroupCall = useGroupWebRTCStore((s) => s.declineGroupCall);
 
   // Debug log when modal should show
@@ -146,7 +139,7 @@ export const IncomingGroupCallModal = () => {
     }
   }, [incomingGroupCallData, pulseAnim]);
 
-  const handleAccept = useCallback(async () => {
+  const handleAccept = useCallback(() => {
     if (!incomingGroupCallData) return;
 
     const groupName = incomingGroupCallData.groupName;
@@ -157,28 +150,27 @@ export const IncomingGroupCallModal = () => {
         ? "/(calling)/groupAudioCalling/screens"
         : "/(calling)/groupVideoCalling/screens";
 
-    trackEvent("[IncomingGroupCallModal] Accepting call", {
-      groupName,
-      callingType,
-      pathname,
-    });
-
-    // Accept the call and navigate
-    await acceptGroupCall();
-
-    trackEvent("[IncomingGroupCallModal] Navigating to", { pathname });
-
-    startTransition(() => {
-      router.push({
+    trackEvent(
+      "[IncomingGroupCallModal] Accepting call - navigating to screen",
+      {
+        groupName,
+        callingType,
         pathname,
-        params: {
-          groupName,
-          callingType,
-          mode: "answer",
-        },
-      });
+      },
+    );
+
+    // Navigate to the calling screen – acceptGroupCall will be called there
+    // (calling it here before the screen mounts causes the camera to start
+    // while the modal is still visible, leading to "camera not running" on Android)
+    router.push({
+      pathname,
+      params: {
+        groupName,
+        callingType,
+        mode: "answer",
+      },
     });
-  }, [incomingGroupCallData, acceptGroupCall]);
+  }, [incomingGroupCallData]);
 
   const handleDecline = useCallback(() => {
     declineGroupCall();

@@ -278,7 +278,12 @@ class WebRTCService {
       return;
     }
     try {
-      await videoTrack._switchCamera?.();
+      const settings = videoTrack.getSettings?.() ?? {};
+      const newFacingMode =
+        settings.facingMode === "user" ? "environment" : "user";
+      await videoTrack.applyConstraints({
+        facingMode: newFacingMode,
+      });
     } catch (error) {
       trackEvent("[WebRTC] switchCamera error", { error });
     }
