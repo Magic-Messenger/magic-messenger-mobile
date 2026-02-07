@@ -104,7 +104,7 @@ export const useGroupVideoCalling = () => {
     setIsSwitchingCamera(true);
 
     try {
-      GroupWebRTCService.switchCamera();
+      await GroupWebRTCService.switchCamera();
       await new Promise((resolve) => setTimeout(resolve, 300));
 
       setIsFrontCamera((prev) => {

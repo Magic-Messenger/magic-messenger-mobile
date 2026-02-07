@@ -267,10 +267,21 @@ class WebRTCService {
     this.localStream?.getVideoTracks().forEach((t) => (t.enabled = enabled));
   }
 
-  switchCamera(): void {
-    this.localStream?.getVideoTracks().forEach((track) => {
-      track._switchCamera?.();
-    });
+  async switchCamera(): Promise<void> {
+    const videoTrack = this.localStream?.getVideoTracks()[0];
+    if (
+      !videoTrack ||
+      !videoTrack.enabled ||
+      videoTrack.readyState === "ended"
+    ) {
+      trackEvent("[WebRTC] switchCamera skipped – no active video track");
+      return;
+    }
+    try {
+      await videoTrack._switchCamera?.();
+    } catch (error) {
+      trackEvent("[WebRTC] switchCamera error", { error });
+    }
   }
 
   /* -------------------- Stats -------------------- */
