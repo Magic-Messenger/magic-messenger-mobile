@@ -107,6 +107,5 @@ const createStyle = () =>
     },
     footerContainer: {
       backgroundColor: "transparent",
-      overflow: "hidden",
     },
   });
