@@ -39,6 +39,11 @@ export const useGroupWebRTCEvents = () => {
       useGroupWebRTCStore.getState().handleGroupCallEnded(data);
     };
 
+    const onGroupCallAllEnded = (data: any) => {
+      trackEvent("[GroupWebRTC Events] group_call_all_ended received", data);
+      useGroupWebRTCStore.getState().handleGroupCallAllEnded(data);
+    };
+
     const onGroupCallRejected = (data: any) => {
       trackEvent("[GroupWebRTC Events] group_call_rejected received", data);
       useGroupWebRTCStore.getState().handleGroupCallRejected(data);
@@ -56,6 +61,7 @@ export const useGroupWebRTCEvents = () => {
     magicHubClient.on("group_call_answered", onGroupCallAnswered);
     magicHubClient.on("group_ice_candidate", onGroupIceCandidate);
     magicHubClient.on("group_call_ended", onGroupCallEnded);
+    magicHubClient.on("group_call_all_ended", onGroupCallAllEnded);
     magicHubClient.on("group_call_rejected", onGroupCallRejected);
     magicHubClient.on("group_camera_toggle", onGroupCameraToggle);
     magicHubClient.on("group_microphone_toggle", onGroupMicrophoneToggle);
@@ -70,6 +76,7 @@ export const useGroupWebRTCEvents = () => {
       magicHubClient.off("group_call_answered");
       magicHubClient.off("group_ice_candidate");
       magicHubClient.off("group_call_ended");
+      magicHubClient.off("group_call_all_ended");
       magicHubClient.off("group_call_rejected");
       magicHubClient.off("group_camera_toggle");
       magicHubClient.off("group_microphone_toggle");

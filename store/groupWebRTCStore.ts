@@ -3,6 +3,7 @@ import { create } from "zustand";
 
 import { CallingType } from "@/api/models";
 import {
+  GroupCallAllEndedEvent,
   GroupCallAnsweredEvent,
   GroupCallEndedEvent,
   GroupCallRejectedEvent,
@@ -87,6 +88,7 @@ type GroupWebRTCStore = {
   handleGroupCallAnswered: (data: GroupCallAnsweredEvent) => void;
   handleGroupIceCandidate: (data: GroupIceCandidateEvent) => Promise<void>;
   handleGroupCallEnded: (data: GroupCallEndedEvent) => void;
+  handleGroupCallAllEnded: (data: GroupCallAllEndedEvent) => void;
   handleGroupCallRejected: (data: GroupCallRejectedEvent) => void;
   handleGroupCameraToggle: (data: GroupCameraToggleEvent) => void;
   handleGroupMicrophoneToggle: (data: GroupMicrophoneToggleEvent) => void;
@@ -812,6 +814,20 @@ export const useGroupWebRTCStore = create<GroupWebRTCStore>((set, get) => ({
     trackEvent("[GroupCall] Participant removed, remaining count:", {
       count: get().participants.size,
     });
+  },
+
+  handleGroupCallAllEnded: (data: GroupCallAllEndedEvent) => {
+    trackEvent("[GroupCall] Group call all ended", data);
+
+    // Dismiss the incoming call modal if it's showing
+    if (get().incomingGroupCallData) {
+      set({ incomingGroupCallData: null });
+    }
+
+    // If we're in a call, clean up
+    if (get().isInGroupCall) {
+      get().resetStore();
+    }
   },
 
   handleGroupCallRejected: (data: GroupCallRejectedEvent) => {

@@ -81,6 +81,10 @@ export interface GroupCallEndedEvent {
   endedUsername: string;
 }
 
+export interface GroupCallAllEndedEvent {
+  callId: string;
+}
+
 export interface GroupCallRejectedEvent {
   rejectedUsername: string;
 }
@@ -253,6 +257,7 @@ export interface MagicHubEvents {
   incoming_group_call: IncomingGroupCallEvent;
   group_call_answered: GroupCallAnsweredEvent;
   group_call_ended: GroupCallEndedEvent;
+  group_call_all_ended: GroupCallAllEndedEvent;
   group_call_rejected: GroupCallRejectedEvent;
   group_ice_candidate: GroupIceCandidateEvent;
   group_camera_toggle: GroupCameraToggleEvent;
