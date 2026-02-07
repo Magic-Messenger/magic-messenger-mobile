@@ -231,7 +231,9 @@ export interface MagicHubEvents {
   message_received: MessageReceivedEvent;
   group_message_received: MessageReceivedEvent;
   message_delivered: MessageDeliveredEvent;
+  group_message_delivered: MessageDeliveredEvent;
   message_seen: MessageSeenEvent;
+  group_message_seen: MessageSeenEvent;
   user_online: UserOnlineEvent;
   user_offline: UserOfflineEvent;
   unread_count: UnreadCountEvent;

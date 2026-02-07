@@ -262,7 +262,9 @@ export const useSignalREvents = () => {
       magicHubClient.on("group_message_received", handleMessageReceived);
 
       magicHubClient.on("message_delivered", handleMessageDelivered);
+      magicHubClient.on("group_message_delivered", handleMessageDelivered);
       magicHubClient.on("message_seen", handleMessageSeen);
+      magicHubClient.on("group_message_seen", handleMessageSeen);
     }
 
     return () => {
@@ -276,7 +278,9 @@ export const useSignalREvents = () => {
         magicHubClient.off("group_message_received");
 
         magicHubClient.off("message_delivered");
+        magicHubClient.off("group_message_delivered");
         magicHubClient.off("message_seen");
+        magicHubClient.off("group_message_seen");
       }
     };
   }, [magicHubClient]);
