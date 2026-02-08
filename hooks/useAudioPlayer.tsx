@@ -41,8 +41,23 @@ export function useAudioPlayer() {
         return;
       }
 
+      // Ensure audio mode is set for playback (not recording)
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+        playsInSilentModeIOS: true,
+        staysActiveInBackground: false,
+        shouldDuckAndroid: true,
+        playThroughEarpieceAndroid: false,
+      });
+
+      // iOS AVAsset needs a recognizable file extension to determine format.
+      // If the URL lacks one (e.g. blob/UUID URLs), append an override hint.
+      const playbackUri = uri.match(/\.(m4a|mp3|aac|wav|caf|ogg)(\?|$)/i)
+        ? uri
+        : `${uri}.m4a`;
+
       const { sound } = await Audio.Sound.createAsync(
-        { uri },
+        { uri: playbackUri, overrideFileExtensionAndroid: "m4a" },
         { shouldPlay: true },
       );
 
